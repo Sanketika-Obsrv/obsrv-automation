@@ -13,11 +13,9 @@ Replace the default values in infra-provision/azure/vars.tf .
 Steps:
 Run create shell script and provide option input as "azure" .
 
-
 Destroy infra on Azure
 Steps:
 Run destroy shell script with option as "azure" and append --auto-approve to continue without confirmation.
-
 
 Infra provision on local
 
