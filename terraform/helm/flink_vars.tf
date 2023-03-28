@@ -63,3 +63,21 @@ variable "flink_image_tag" {
     description = "Flink kubernetes service name."
     default     = "latest"
 }
+
+variable "flink_force_update" {
+    type        = bool
+    description = "Force update release. This is temporarily needed for github actions"
+    default     = true
+}
+
+variable "flink_cleanup_on_fail" {
+    type        = bool
+    description = "Cleanup orphan resources on failure."
+    default     = true
+}
+
+variable "flink_atomic" {
+    type        = bool
+    description = "Rollback on failure."
+    default     = true
+}
