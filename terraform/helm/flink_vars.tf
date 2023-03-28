@@ -45,3 +45,21 @@ variable "flink_kubernetes_service_name" {
     description = "Flink kubernetes service name."
     default     = "druid-validator-jobmanager"
 }
+
+variable "flink_container_registry" {
+    type        = string
+    description = "Container registry. For example docker.io/obsrv"
+    default     = "sanketikahub"
+}
+
+variable "flink_image_name" {
+    type        = string
+    description = "Flink kubernetes service name."
+    default     = "obsrv-core"
+}
+
+variable "flink_image_tag" {
+    type        = string
+    description = "Flink kubernetes service name."
+    default     = "latest"
+}

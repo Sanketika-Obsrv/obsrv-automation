@@ -1,7 +1,7 @@
 namespace: ""
 imagepullsecrets: ""
 registry: ""
-repository: "manjudr/obsrv-core-pipeline" 
+repository: "manjudr/obsrv-core-pipeline"
 image_tag: "2.1"
 serviceMonitor:
   enabled: false
@@ -162,7 +162,7 @@ merged-pipeline:
       consumer.parallelism = 1
       downstream.operators.parallelism = 1
     }
-    
+
     redis {
       database {
         extractor.duplication.store.id = 1

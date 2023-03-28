@@ -3,3 +3,5 @@ s3_access_key: ${s3_access_key}
 s3_secret_key: ${s3_secret_key}
 azure_account: ${azure_account}
 azure_secret: ${azure_secret}
+repository: ${flink_container_registry}
+image_tag: ${flink_image_tag}

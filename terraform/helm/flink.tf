@@ -9,6 +9,8 @@ resource "helm_release" "flink" {
     values = [
       templatefile(var.flink_chart_template,
       {
+          repository              = "${var.flink_container_registry}/${var.flink_image_name}"
+          image_tag               = var.flink_image_tag
           checkpoint_store_type   = var.flink_checkpoint_store_type
           s3_access_key           = try(local.storage.s3_access_key, "")
           s3_secret_key           = try(local.storage.s3_secret_key, "")
