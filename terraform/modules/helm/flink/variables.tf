@@ -1,13 +1,11 @@
 variable "env" {
   type        = string
   description = "Environment name. All resources will be prefixed with this value."
-  default     = "dev"
 }
 
 variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
-  default     = "obsrv"
 }
 
 variable "flink_release_name" {
@@ -61,7 +59,6 @@ variable "flink_kubernetes_service_name" {
 variable "flink_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
-  default     = "manjudr"
 }
 
 variable "flink_image_name" {
@@ -73,7 +70,6 @@ variable "flink_image_name" {
 variable "flink_image_tag" {
   type        = string
   description = "Flink image tag."
-  default     = "2.1"
 }
 
 variable "flink_checkpoint_store_type" {

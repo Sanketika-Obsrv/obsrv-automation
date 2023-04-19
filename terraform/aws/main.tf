@@ -35,39 +35,55 @@ provider "helm" {
 
 module "vpc" {
   source         = "../modules/aws/vpc"
+  env            = var.env
+  building_block = var.building_block
 }
 
 module "eks" {
   source                = "../modules/aws/eks"
+  env                   = var.env
+  building_block        = var.building_block
   eks_master_subnet_ids = module.vpc.multi_zone_public_subnets_ids
   eks_nodes_subnet_ids  = module.vpc.single_zone_public_subnets_id
 }
 
 module "iam" {
   source         = "../modules/aws/iam"
+  env            = var.env
+  building_block = var.building_block
 }
 
 module "s3" {
   source         = "../modules/aws/s3"
+  env            = var.env
+  building_block = var.building_block
 }
 
 module "promtail" {
   source                    = "../modules/helm/promtail"
+  env                       = var.env
+  building_block            = var.building_block
   promtail_chart_depends_on = [module.loki]
 }
 
 module "loki" {
-  source                    = "../modules/helm/loki"
-  depends_on                = [module.eks, module.monitoring]
+  source         = "../modules/helm/loki"
+  env            = var.env
+  building_block = var.building_block
+  depends_on     = [module.eks, module.monitoring]
 }
 
 module "monitoring" {
   source          = "../modules/helm/monitoring"
+  env             = var.env
+  building_block  = var.building_block
   depends_on      = [module.eks]
 }
 
 module "superset" {
   source                            = "../modules/helm/superset"
+  env                               = var.env
+  building_block                    = var.building_block
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
@@ -76,21 +92,29 @@ module "superset" {
 
 module "grafana_configs" {
   source                           = "../modules/helm/grafana_configs"
+  env                              = var.env
+  building_block                   = var.building_block
   grafana_configs_chart_depends_on = [module.monitoring]
 }
 
 module "postgresql" {
   source               = "../modules/helm/postgresql"
+  env                  = var.env
+  building_block       = var.building_block
   depends_on           = [module.eks]
 }
 
 module "kafka" {
   source         = "../modules/helm/kafka"
+  env            = var.env
+  building_block = var.building_block
   depends_on     = [module.eks]
 }
 
 module "flink" {
   source                         = "../modules/helm/flink"
+  env                            = var.env
+  building_block                 = var.building_block
   flink_container_registry       = var.flink_container_registry
   flink_image_tag                = var.flink_image_tag
   s3_access_key                  = module.iam.s3_access_key
@@ -102,6 +126,8 @@ module "flink" {
 
 module "druid_raw_cluster" {
   source                             = "../modules/helm/druid_raw_cluster"
+  env                                = var.env
+  building_block                     = var.building_block
   s3_access_key                      = module.iam.s3_access_key
   s3_secret_key                      = module.iam.s3_secret_key
   s3_bucket                          = module.s3.s3_bucket
@@ -113,26 +139,36 @@ module "druid_raw_cluster" {
 
 module "druid_operator" {
   source          = "../modules/helm/druid_operator"
+  env             = var.env
+  building_block  = var.building_block
   depends_on      = [module.eks]
 }
 
 module "kafka_exporter" {
   source                          = "../modules/helm/kafka_exporter"
+  env                             = var.env
+  building_block                  = var.building_block
   kafka_exporter_chart_depends_on = [module.kafka, module.monitoring]
 }
 
 module "postgresql_exporter" {
   source                               = "../modules/helm/postgresql_exporter"
+  env                                  = var.env
+  building_block                       = var.building_block
   postgresql_exporter_chart_depends_on = [module.postgresql, module.monitoring]
 }
 
 module "druid_exporter" {
   source                          = "../modules/helm/druid_exporter"
+  env                             = var.env
+  building_block                  = var.building_block
   druid_exporter_chart_depends_on = [module.druid_raw_cluster, module.monitoring]
 }
 
 module "dataset_api" {
   source                             = "../modules/helm/dataset_api"
+  env                                = var.env
+  building_block                     = var.building_block
   dataset_api_container_registry     = var.dataset_api_container_registry
   dataset_api_image_tag              = var.dataset_api_image_tag
   dataset_api_postgres_user_password = module.postgresql.postgresql_dataset_api_user_password
@@ -141,11 +177,15 @@ module "dataset_api" {
 
 module "secor" {
   source                  = "../modules/helm/secor"
+  env                     = var.env
+  building_block          = var.building_block
   secor_chart_depends_on  = [module.kafka]
 }
 
 module "submit_ingestion" {
   source                            = "../modules/helm/submit_ingestion"
+  env                               = var.env
+  building_block                    = var.building_block
   submit_ingestion_chart_depends_on = [module.kafka, module.druid_raw_cluster]
 }
 

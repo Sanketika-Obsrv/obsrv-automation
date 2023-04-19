@@ -1,13 +1,11 @@
 variable "env" {
   type        = string
   description = "Environment name. All resources will be prefixed with this value."
-  default     = "dev"
 }
 
 variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
-  default     = "obsrv"
 }
 
 variable "dataset_api_release_name" {
@@ -77,17 +75,15 @@ variable "dataset_api_chart_depends_on" {
 variable "dataset_api_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
-  default     = "sanketikahub"
 }
 
 variable "dataset_api_image_name" {
   type        = string
   description = "Dataset api image name."
   default     = "obsrv-api-service"
- }
+}
 
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.4"
 }
