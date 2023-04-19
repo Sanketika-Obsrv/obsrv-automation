@@ -156,6 +156,7 @@ module "dataset_api" {
   dataset_api_container_registry     = var.dataset_api_container_registry
   dataset_api_image_tag              = var.dataset_api_image_tag
   dataset_api_postgres_user_password = module.postgresql.postgresql_dataset_api_user_password
+  dataset_api_sa_annotations         = "this-needs-to: be-implemented-and-added"
   dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
 }
 
