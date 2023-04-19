@@ -87,3 +87,9 @@ variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
 }
+
+variable "dataset_api_sa_annotations" {
+  type        = string
+  description = "Service account annotations for dataset api service account."
+  default     = "serviceAccountName: default"
+}

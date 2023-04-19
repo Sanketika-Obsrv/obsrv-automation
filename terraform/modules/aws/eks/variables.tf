@@ -113,3 +113,21 @@ variable "eks_node_disk_size" {
   description = "EKS nodes disk size"
   default     = 128
 }
+
+variable "oidc_thumbprint_list" {
+  type        = list(string)
+  description = "Additional list of server certificate thumbprints for the OpenID Connect (OIDC) identity provider's server certificate(s)"
+  default     = []
+}
+
+variable "dataset_api_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for service account."
+  default     = "dataset-api-sa-iam-role"
+}
+
+variable "dataset_api_namespace" {
+  type        = string
+  description = "Dataset service namespace."
+  default     = "dataset-api"
+}

@@ -11,3 +11,5 @@ postgres_service:
 dockerhub: ${dataset_api_container_registry}
 repository: ${dataset_api_image_name}
 image_tag: ${dataset_api_image_tag}
+service_account_annotations:
+  ${dataset_api_sa_annotations}

@@ -27,3 +27,5 @@ postgres_service:
 redis_service:
   REDIS_HOST: obsrv-redis-master.redis.svc.cluster.local
   REDIS_PORT: 6379
+
+service_account_annotations: ""

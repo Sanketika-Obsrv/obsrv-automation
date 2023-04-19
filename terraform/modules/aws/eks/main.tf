@@ -151,6 +151,29 @@ resource "aws_eks_addon" "addons" {
   resolve_conflicts  = "OVERWRITE"
 }
 
+data "tls_certificate" "cluster_tls_cert" {
+  url = aws_eks_cluster.eks_master.identity.0.oidc.0.issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks_openid" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = concat([data.tls_certificate.cluster_tls_cert.certificates.0.sha1_fingerprint], var.oidc_thumbprint_list)
+  url             = aws_eks_cluster.eks_master.identity.0.oidc.0.issuer
+}
+
+resource "aws_iam_role" "dataset_api_sa_iam_role" {
+  name                = "${var.env}-${var.dataset_api_sa_iam_role_name}"
+  assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.dataset_api_namespace}", SA_NAME = "${var.dataset_api_namespace}-sa" })
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+  depends_on          = [aws_iam_openid_connect_provider.eks_openid]
+  tags = merge(
+    {
+    Name = "${var.env}-${var.dataset_api_sa_iam_role_name}"
+    },
+    local.common_tags,
+    var.additional_tags)
+}
+
 resource "local_file" "kubeconfig" {
   content  = local.kubeconfig
   filename = "${var.building_block}-${var.env}-kubeconfig.yaml"

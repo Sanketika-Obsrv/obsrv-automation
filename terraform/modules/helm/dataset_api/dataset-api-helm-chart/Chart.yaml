@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "1.0"
 description: A Helm chart for deploying apis on Kubernetes
 name: dataset-api
-version: 1.0.0
+version: 1.0.2
