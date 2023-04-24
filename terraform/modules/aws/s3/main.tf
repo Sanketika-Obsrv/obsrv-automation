@@ -18,6 +18,16 @@ resource "aws_s3_bucket" "storage_bucket" {
     var.additional_tags)
 }
 
+resource "aws_s3_bucket" "velero_storage_bucket" {
+  bucket = "velero-${local.storage_bucket}"
+  tags = merge(
+    {
+      Name = "velero-${local.storage_bucket}"
+    },
+    local.common_tags,
+    var.additional_tags)
+}
+
 # resource "aws_s3_object" "object" {
 #     for_each = fileset("../sample-data/", "*")
 #       bucket = local.storage_bucket

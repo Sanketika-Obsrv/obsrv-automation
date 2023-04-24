@@ -1,0 +1,19 @@
+credentials:
+  secretContents:
+    cloud: ${credentials_secret_contents_cloud}
+configuration:
+  provider: ${cloud_provider}
+  backupStorageLocation:
+    bucket: ${velero_backup_bucket}
+    config:
+      region: ${velero_backup_bucket_region}
+  volumeSnapshotLocation:
+    name: default
+    config:
+      region: ${velero_backup_bucket_region}
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws
+    volumeMounts:
+      - name: plugins
+        mountPath: /target

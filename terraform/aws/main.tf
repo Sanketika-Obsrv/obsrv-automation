@@ -190,6 +190,17 @@ module "submit_ingestion" {
   submit_ingestion_chart_depends_on = [module.kafka, module.druid_raw_cluster]
 }
 
+module "velero" {
+  source                       = "../modules/helm/velero"
+  env                          = var.env
+  building_block               = var.building_block
+  cloud_provider               = "aws"
+  velero_backup_bucket         = module.s3.velero_storage_bucket
+  velero_backup_bucket_region  = var.region
+  velero_aws_access_key_id     = module.iam.s3_access_key
+  velero_aws_secret_access_key = module.iam.s3_secret_key
+}
+
 # module "alert_rules" {
 #   source                       = "../modules/helm/alert_rules"
 #   alertrules_chart_depends_on  = [module.monitoring]
