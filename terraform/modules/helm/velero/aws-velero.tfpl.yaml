@@ -20,3 +20,8 @@ initContainers:
     volumeMounts:
       - name: plugins
         mountPath: /target
+metrics:
+  serviceMonitor:
+    enabled: true
+  additionalLabels:
+    release: monitoring

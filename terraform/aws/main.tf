@@ -75,10 +75,10 @@ module "loki" {
 }
 
 module "monitoring" {
-  source          = "../modules/helm/monitoring"
-  env             = var.env
-  building_block  = var.building_block
-  depends_on      = [module.eks]
+  source                           = "../modules/helm/monitoring"
+  env                              = var.env
+  building_block                   = var.building_block
+  depends_on                       = [module.eks]
 }
 
 module "superset" {

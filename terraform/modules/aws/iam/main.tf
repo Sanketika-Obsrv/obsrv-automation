@@ -69,7 +69,7 @@ resource "aws_iam_policy" "velero_user_policy" {
   })
 }
 
-resource "aws_iam_user_policy_attachment" "velero_user_policy" {
+resource "aws_iam_user_policy_attachment" "velero_user_policy_attachment" {
   user       = aws_iam_user.velero_user.name
   policy_arn = aws_iam_policy.velero_user_policy.arn
 }
