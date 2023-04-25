@@ -23,5 +23,5 @@ initContainers:
 metrics:
   serviceMonitor:
     enabled: true
-  additionalLabels:
-    release: monitoring
+    additionalLabels:
+      release: monitoring
