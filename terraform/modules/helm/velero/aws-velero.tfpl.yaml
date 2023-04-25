@@ -1,6 +1,9 @@
 credentials:
   secretContents:
-    cloud: ${credentials_secret_contents_cloud}
+    cloud: |
+      [default]
+      aws_access_key_id=${velero_aws_access_key_id}
+      aws_secret_access_key=${velero_aws_secret_access_key}
 configuration:
   provider: ${cloud_provider}
   backupStorageLocation:

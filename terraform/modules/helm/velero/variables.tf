@@ -62,12 +62,6 @@ variable "velero_install_timeout" {
   default     = 1200
 }
 
-variable "aws_velero_crdentials_file" {
-  type        = string
-  description = "AWS S3 bucket credentials for velero."
-  default     = "aws-credentials.tfpl"
-}
-
 variable "aws_velero_custom_values_yaml" {
   type        = string
   description = "Velero chart values.yaml path for AWS cloud."
