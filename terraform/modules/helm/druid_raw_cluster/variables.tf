@@ -44,7 +44,7 @@ variable "druid_cluster_wait_for_jobs" {
   default     = true
 }
 
-variable "druid_cluster_chart_template" {
+variable "druid_cluster_custom_values_yaml" {
   type        = string
   description = "Druid cluster chart values.yaml path."
   default     = "druid_raw_cluster.yaml.tfpl"

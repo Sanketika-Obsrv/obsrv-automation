@@ -22,7 +22,7 @@ variable "alertrules_create_namespace" {
   default     = true
 }
 
-variable "alertrules_chart_template" {
+variable "alertrules_custom_values_yaml" {
   type = string
   default = "alert_rules.yaml.tfpl"
 }

@@ -8,7 +8,7 @@ resource "helm_release" "alertrules" {
     cleanup_on_fail  = true
     atomic           = true
     values = [
-      templatefile("${path.module}/${var.alertrules_chart_template}",
+      templatefile("${path.module}/${var.alertrules_custom_values_yaml}",
         {
           alertrules_namespace = var.alertrules_namespace
         }
