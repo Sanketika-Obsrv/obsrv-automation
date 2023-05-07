@@ -136,6 +136,12 @@ variable "limits_config_retention_period" {
 
 variable "compactor_retention_enabled" {
   type        = bool
-  description = "Activate custom (per-stream,per-tenant) retention."
+  description = "Activate retention using compactor."
   default     = true
+}
+
+variable "compactor_working_directory" {
+  type        = string
+  description = "Compactor working directory."
+  default     = "/var/loki/compactor/retention"
 }

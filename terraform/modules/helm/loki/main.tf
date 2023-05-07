@@ -25,6 +25,7 @@ resource "helm_release" "loki" {
           limits_config_split_queries_by_interval      = var.limits_config_split_queries_by_interval
           limits_config_retention_period               = var.limits_config_retention_period
           compactor_retention_enabled                  = var.compactor_retention_enabled
+          compactor_working_directory                  = var.compactor_working_directory
         }
       )
     ]
