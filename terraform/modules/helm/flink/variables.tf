@@ -111,3 +111,9 @@ variable "azure_storage_account_key" {
   description = "Azure storage account key for flink checkpoints."
   default     = ""
 }
+
+variable "google_service_account_key_path" {
+  description = "The path to the service account key file."
+  type        = string
+  default     = ""
+}

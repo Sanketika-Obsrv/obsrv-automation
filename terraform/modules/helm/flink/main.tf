@@ -20,6 +20,7 @@ resource "helm_release" "flink" {
           azure_account                  = var.azure_storage_account_name
           azure_secret                   = var.azure_storage_account_key
           postgresql_flink_user_password = var.postgresql_flink_user_password
+          google_service_account_key_path= var.google_service_account_key_path
       })
     ]
 }

@@ -15,7 +15,7 @@ locals {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "google_container_cluster" "cluster" {
-  provider = google-beta
+  provider    = google
 
   name        = var.name
   description = var.description
@@ -83,6 +83,14 @@ resource "google_container_cluster" "cluster" {
 
     network_policy_config {
       disabled = !var.enable_network_policy
+    }
+
+    gcp_filestore_csi_driver_config {
+      enabled = var.gcp_filestore_csi_driver
+    }
+
+    gce_persistent_disk_csi_driver_config {
+      enabled = var.gce_persistent_disk_csi_driver
     }
   }
 
@@ -163,6 +171,55 @@ resource "google_container_cluster" "cluster" {
   resource_labels = var.resource_labels
 }
 
+# resource "google_container_node_pool" "node_pool" {
+#   provider = google
+
+#   name     = "${var.building_block}-${var.env}-pool"
+#   project  = var.project
+#   location = var.zone
+#   cluster  = google_container_cluster.cluster.name
+
+#   initial_node_count = var.gke_node_pool_scaling_config["desired_size"]
+
+#   autoscaling {
+#     min_node_count = var.gke_node_pool_scaling_config["min_size"]
+#     max_node_count = var.gke_node_pool_scaling_config["max_size"]
+#   }
+
+#   management {
+#     auto_repair  = "true"
+#     auto_upgrade = "true"
+#   }
+
+#   node_config {
+#     image_type   = "COS_CONTAINERD"
+#     machine_type = var.gke_node_pool_instance_type
+
+#     tags = [
+#       module.networking.public
+#     ]
+
+#     disk_size_gb = "20"
+#     disk_type    = var.kubernetes_storage_class
+#     preemptible  = var.gke_node_pool_preemptible
+
+#     service_account = module.gke_service_account.email
+
+#     oauth_scopes = [
+#       "https://www.googleapis.com/auth/cloud-platform",
+#     ]
+#   }
+
+#   lifecycle {
+#     ignore_changes = [initial_node_count]
+#   }
+
+#   timeouts {
+#     create = "30m"
+#     update = "30m"
+#     delete = "30m"
+#   }
+# }
 # ---------------------------------------------------------------------------------------------------------------------
 # Prepare locals to keep the code cleaner
 # ---------------------------------------------------------------------------------------------------------------------

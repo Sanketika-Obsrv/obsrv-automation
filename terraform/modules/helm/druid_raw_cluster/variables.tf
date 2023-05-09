@@ -124,3 +124,9 @@ variable "azure_storage_container" {
   description = "Azure storage account container name for druid deepstore."
   default     = ""
 }
+
+variable "gcs_bucket" {
+  type        = string
+  description = "GCS bucket name for druid deepstore."
+  default     = ""
+}

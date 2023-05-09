@@ -13,6 +13,11 @@ variable "location" {
   type        = string
 }
 
+variable "zone" {
+  description = "The zone for the cluster. If the cluster is regional, this should be one of the zones in the region. Otherwise, this should be the same zone as the region."
+  type        = string
+}
+
 variable "name" {
   description = "The name of the cluster"
   type        = string
@@ -32,6 +37,7 @@ variable "cluster_secondary_range_name" {
   description = "The name of the secondary range within the subnetwork for the cluster to use"
   type        = string
 }
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
@@ -71,6 +77,18 @@ variable "horizontal_pod_autoscaling" {
 
 variable "http_load_balancing" {
   description = "Whether to enable the http (L7) load balancing addon"
+  type        = bool
+  default     = true
+}
+
+variable "gcp_filestore_csi_driver" {
+  description = "Whether to enable the Filestore CSI driver addon"
+  type        = bool
+  default     = true
+}
+
+variable "gce_persistent_disk_csi_driver" {
+  description = "Whether to enable the Google Compute Engine Persistent Disk Container Storage Interface (CSI) Driver addon"
   type        = bool
   default     = true
 }

@@ -3,6 +3,7 @@ s3_access_key: ${s3_access_key}
 s3_secret_key: ${s3_secret_key}
 azure_account: ${azure_account}
 azure_secret: ${azure_secret}
+google_service_account_key_path: ${google_service_account_key_path}
 repository: ${flink_container_registry}
 image_tag: ${flink_image_tag}
 base_config: |

@@ -26,6 +26,7 @@ resource "helm_release" "druid_cluster" {
         azure_storage_account_name  = var.azure_storage_account_name
         azure_storage_account_key   = var.azure_storage_account_key
         azure_storage_container     = var.azure_storage_container
+        gcs_bucket                  = var.gcs_bucket
       }
     )
   ]

@@ -35,6 +35,9 @@ azure_storage_account_name: ""
 azure_storage_account_key: ""
 azure_storage_container: ""
 
+# Google Cloud Storage Details
+gcs_bucket: ""
+
 # Indexing service logs
 # For local disk (only viable in a cluster_type if this is a network mount):
 druid_indexer_logs_type: "s3"

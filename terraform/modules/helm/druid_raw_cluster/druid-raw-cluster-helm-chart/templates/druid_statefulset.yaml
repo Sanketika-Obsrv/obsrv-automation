@@ -78,6 +78,10 @@ spec:
     druid.azure.container = {{ .Values.azure_storage_container }}
     #druid.storage.storageDirectory = {{ .Values.druid_storage_directory }}
     #druid.storage.disableAcl=true
+    # Google Cloud Storage
+    druid.google.bucket = {{ .Values.gcs_bucket }}
+    druid.google.prefix = druid/segments
+
 
     # # Indexing service logs
     # # For local disk (only viable in a cluster if this is a network mount):
@@ -104,7 +108,7 @@ spec:
     # Storage type of double columns
     # ommiting this will lead to index double as float at the storage layer
     druid.indexing.doubleStorage={{ .Values.druid_indexing_doubleStorage }}
-    #Writing query logs into file 
+    #Writing query logs into file
     druid.request.logging.type={{ .Values.druid_request_logging_type }}
     druid.request.logging.dir={{ .Values.druid_request_logging_dir }}
     druid.javascript.enabled=true
@@ -252,7 +256,7 @@ spec:
         druid.segmentCache.locations=[{{ .Values.druid_segmentCache_locations }}]
         druid.segmentCache.numLoadingThreads={{ .Values.druid_segmentCache_numLoadingThreads }}
         # Caching
-        druid.historical.cache.useCache={{ .Values.druid_historical_cache_useCache }} 
+        druid.historical.cache.useCache={{ .Values.druid_historical_cache_useCache }}
         druid.historical.cache.populateCache={{ .Values.druid_historical_cache_populateCache }}
         druid.historical.cache.unCacheable=[{{ .Values.druid_historical_cache_unCacheable }}]
         druid.cache.type={{ .Values.druid_cache_type }}

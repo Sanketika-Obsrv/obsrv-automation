@@ -148,15 +148,14 @@ variable "override_default_node_pool_service_account" {
 variable "gke_node_pool_instance_type" {
   type        = string
   description = "GKE nodepool instance types."
-  # default     = "e2-medium"
-  default     = "c2-standard-4"
+  default     = "c2d-standard-4"
 }
 
 variable "gke_node_pool_scaling_config" {
   type        = map(number)
   description = "EKS node group auto scaling configuration."
   default = {
-    desired_size = 4
+    desired_size = 3
     max_size   = 4
     min_size   = 3
   }
@@ -165,7 +164,13 @@ variable "gke_node_pool_scaling_config" {
 variable "kubernetes_storage_class" {
   type        = string
   description = "Storage class name for the GKE cluster"
-  default     = "pd-balanced"
+  default     = "pd-standard"
+}
+
+variable "gke_node_pool_preemptible" {
+  type        = bool
+  description = "Whether to use preemptible nodes for the GKE cluster; use `true` for fault-tolerant workloads, `false` otherwise. Ref: https://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms"
+  default     = false
 }
 
 variable "druid_deepstorage_type" {
@@ -177,7 +182,7 @@ variable "druid_deepstorage_type" {
 variable "flink_checkpoint_store_type" {
   type        = string
   description = "Flink checkpoint store type."
-  default     = "gcloud"
+  default     = "gcs"
 }
 
 ### kubectl config
@@ -193,3 +198,28 @@ variable "kubectl_config_path" {
 #   type        = string
 #   default     = "gke_"
 # }
+
+# Helm Specific Configs
+variable "dataset_api_container_registry" {
+  type        = string
+  description = "Container registry. For example docker.io/obsrv"
+  default     = "sanketikahub"
+}
+
+variable "dataset_api_image_tag" {
+  type        = string
+  description = "Dataset api image tag."
+  default     = "1.0.4"
+}
+
+variable "flink_container_registry" {
+  type        = string
+  description = "Container registry. For example docker.io/obsrv"
+  default     = "manjudr"
+}
+
+variable "flink_image_tag" {
+   type        = string
+   description = "Flink kubernetes service name."
+   default     = "2.1"
+}
