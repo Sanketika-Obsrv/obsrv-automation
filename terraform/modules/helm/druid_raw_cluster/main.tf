@@ -10,7 +10,7 @@ resource "helm_release" "druid_cluster" {
   cleanup_on_fail  = true
   atomic           = true
   values = [
-    templatefile("${path.module}/${var.druid_cluster_chart_template}",
+    templatefile("${path.module}/${var.druid_cluster_custom_values_yaml}",
       {
         druid_namespace             = var.druid_cluster_namespace
         druid_raw_user              = var.druid_raw_user

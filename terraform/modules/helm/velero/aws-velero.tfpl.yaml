@@ -1,0 +1,27 @@
+credentials:
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=${velero_aws_access_key_id}
+      aws_secret_access_key=${velero_aws_secret_access_key}
+configuration:
+  provider: ${cloud_provider}
+  backupStorageLocation:
+    bucket: ${velero_backup_bucket}
+    config:
+      region: ${velero_backup_bucket_region}
+  volumeSnapshotLocation:
+    name: default
+    config:
+      region: ${velero_backup_bucket_region}
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws
+    volumeMounts:
+      - name: plugins
+        mountPath: /target
+metrics:
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: monitoring

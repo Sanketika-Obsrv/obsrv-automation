@@ -11,14 +11,7 @@ base_config: |
     env = "dev"
     enable.distributed.checkpointing = false
     statebackend {
-      blob {
-        storage {
-          account = "obsrvacc.blob.core.windows.net"
-          container = "obsrv-data-storage"
-          checkpointing.dir = "checkpoint"
-        }
-      }
-      base.url = ""
+      base.url = "${checkpoint_base_url}"
     }
   }
   kafka {
@@ -45,20 +38,20 @@ base_config: |
 
   redis.connection.timeout = 100
   redis {
-    host = obsrv-redis-master.redis.svc.cluster.local
+    host = obsrv-redis-headless.redis.svc.cluster.local
     port = 6379
   }
 
   redis-meta {
-    host = obsrv-redis-master.redis.svc.cluster.local
+    host = obsrv-redis-headless.redis.svc.cluster.local
     port = 6379
   }
 
   postgres {
-    host = postgres-postgresql-hl.postgres.svc.cluster.local
+    host = postgresql-hl.postgres.svc.cluster.local
     port = 5432
     maxConnections = 2
-    user = flink
+    user = postgres
     password = '${postgresql_flink_user_password}'
     database = obsrv
   }

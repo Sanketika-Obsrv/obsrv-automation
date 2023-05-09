@@ -1,9 +1,8 @@
 namespace: ""
 imagepullsecrets: ""
 registry: ""
-repository: "manjudr/obsrv-core-pipeline"
-release_name: "obsrv-flink"
-image_tag: "2.1"
+repository: "sanketikahub/obsrv-core"
+image_tag: "1.0.1"
 serviceMonitor:
   enabled: false
 replicaCount: 1
@@ -15,6 +14,8 @@ jobmanager:
   ui_port: 8081
   prom_port: 9250
   heap_memory: 1024
+  cpu_requests: 0.7
+  cpu_limits: 1
 
 rest_port: 80
 resttcp_port: 8081
@@ -26,7 +27,8 @@ taskmanager:
   rpc_port: 6122
   heap_memory: 1024
   replicas: 1
-  cpu_requests: 0.3
+  cpu_requests: 0.7
+  cpu_limits: 1
 
 checkpoint_store_type: ""
 
@@ -55,12 +57,12 @@ dataset_registry: |
 
 log4j_console_properties: |
   # This affects logging for both user code and Flink
-  rootLogger.level = ERROR
+  rootLogger.level = INFO
   rootLogger.appenderRef.console.ref = ConsoleAppender
 
   # Uncomment this if you want to _only_ change Flink's logging
   logger.flink.name = org.apache.flink
-  logger.flink.level = ERROR
+  logger.flink.level = INFO
 
   # The following lines keep the log level of common libraries/connectors on
   # log level INFO. The root logger does not override this. You have to manually
@@ -87,23 +89,16 @@ log4j_console_properties: |
 base_config: |
   job {
     env = "dev"
-    enable.distributed.checkpointing = false
+    enable.distributed.checkpointing = true
     statebackend {
-      blob {
-        storage {
-          account = "obsrvacc.blob.core.windows.net"
-          container = "obsrv-data-storage"
-          checkpointing.dir = "checkpoint"
-        }
-      }
-      base.url = ""
+      base.url = "s3://flink-checkpoints-obsrv-dev"
     }
   }
   kafka {
     broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
     producer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
     consumer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
-    zookeeper = "kafka-zookeeper-headless.svc.cluster.local:2181"
+    zookeeper = "kafka-headless.kafka.svc.cluster.local:2181"
     producer {
       max-request-size = 1572864
       batch.size = 98304
@@ -115,25 +110,25 @@ base_config: |
   task {
     parallelism = 1
     consumer.parallelism = 1
-    checkpointing.interval = 10000
-    checkpointing.pause.between.seconds = 10000
+    checkpointing.interval = 30000
+    checkpointing.pause.between.seconds = 5000
     restart-strategy.attempts = 3
     restart-strategy.delay = 30000 # in milli-seconds
   }
 
   redis.connection.timeout = 100
   redis {
-    host = obsrv-redis-master.redis.svc.cluster.local
+    host = obsrv-redis-headless.redis.svc.cluster.local
     port = 6379
   }
 
   redis-meta {
-    host = obsrv-redis-master.redis.svc.cluster.local
+    host = obsrv-redis-headless.redis.svc.cluster.local
     port = 6379
   }
 
   postgres {
-    host = postgres-postgresql-hl.postgres.svc.cluster.local
+    host = postgresql-hl.postgresql.svc.cluster.local
     port = 5432
     maxConnections = 2
     user = "postgres"
@@ -148,7 +143,7 @@ base_config: |
 
 merged-pipeline:
   merged-pipeline: |+
-    include file("/data/flink/conf/base-config.conf")
+    include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".ingest"
       output.raw.topic = ${job.env}".raw"
@@ -201,7 +196,7 @@ merged-pipeline:
 
 extractor:
   extractor: |+
-    include file("/data/flink/conf/base-config.conf")
+    include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".ingest"
       output.raw.topic = ${job.env}".raw"
@@ -244,7 +239,7 @@ extractor:
 
 preprocessor:
   preprocessor: |+
-    include file("/data/flink/conf/base-config.conf")
+    include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".raw"
       output.failed.topic = ${job.env}".failed"
@@ -283,7 +278,7 @@ preprocessor:
 
 denormalizer:
   denormalizer: |+
-    include file("/data/flink/conf/base-config.conf")
+    include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".unique"
       output.denorm.topic = ${job.env}".denorm"
@@ -316,7 +311,7 @@ denormalizer:
 
 transformer:
   transformer: |+
-    include file("/data/flink/conf/base-config.conf")
+    include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".denorm"
       output.transform.topic = ${job.env}".transform"
@@ -348,7 +343,7 @@ transformer:
 
 druid-router:
   druid-router: |+
-    include file("/data/flink/conf/base-config.conf")
+    include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".transform"
       stats.topic = ${job.env}".stats"
@@ -374,3 +369,58 @@ druid-router:
     state.savepoints.dir: file:///tmp
 
   job_classname: org.sunbird.obsrv.router.task.DruidRouterStreamTask
+
+unified-pipeline:
+  unified-pipeline: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = ${job.env}".ingest"
+      output.raw.topic = ${job.env}".raw"
+      output.extractor.duplicate.topic = ${job.env}".extractor.duplicate"
+      output.failed.topic = ${job.env}".failed"
+      output.batch.failed.topic = ${job.env}".extractor.failed"
+      event.max.size = "1048576" # Max is only 1MB
+      output.invalid.topic = ${job.env}".invalid"
+      output.unique.topic = ${job.env}".unique"
+      output.duplicate.topic = ${job.env}".duplicate"
+      output.denorm.topic = ${job.env}".denorm"
+      output.denorm.failed.topic = ${job.env}".denorm.failed"
+      output.transform.topic = ${job.env}".transform"
+      output.transform.failed.topic = ${job.env}".transform.failed"
+      stats.topic = ${job.env}".stats"
+      groupId = ${job.env}"-unified-pipeline-group"
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
+      window.time.in.seconds = 5
+      window.count = 30
+      window.shards = 1400
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+    redis {
+      database {
+        extractor.duplication.store.id = 1
+        preprocessor.duplication.store.id = 2
+        key.expiry.seconds = 3600
+      }
+    }
+
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+
+  job_classname: in.sanketika.obsrv.pipeline.task.UnifiedPipelineStreamTask

@@ -9,6 +9,7 @@ loki:
     retention_period: "${limits_config_retention_period}"
 compactor:
   retention_enabled: ${compactor_retention_enabled}
+  working_directory: ${compactor_working_directory}
 minio:
   enabled: ${minio_enabled}
   metrics:

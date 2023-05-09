@@ -117,7 +117,8 @@ image:
 ##   zookeeper.connection.timeout.ms=6000
 ##   group.initial.rebalance.delay.ms=0
 ##
-config: ""
+config: {}
+
 ## @param existingConfigmap ConfigMap with Kafka Configuration
 ## NOTE: This will override `config` AND any KAFKA_CFG_ environment variables
 ##
@@ -137,7 +138,7 @@ existingLog4jConfigMap: ""
 heapOpts: -Xmx1024m -Xms1024m
 ## @param deleteTopicEnable Switch to enable topic deletion or not
 ##
-deleteTopicEnable: false
+deleteTopicEnable: true
 ## @param autoCreateTopicsEnable Switch to enable auto creation of topics. Enabling auto creation of topics not recommended for production or similar environments
 ##
 autoCreateTopicsEnable: true
@@ -149,7 +150,8 @@ logFlushIntervalMessages: _10000
 logFlushIntervalMs: 1000
 ## @param logRetentionBytes A size-based retention policy for logs
 ##
-logRetentionBytes: _1073741824
+# logRetentionBytes: _1073741824
+logRetentionBytes: _-1
 ## @param logRetentionCheckIntervalMs The interval at which log segments are checked to see if they can be deleted
 ##
 logRetentionCheckIntervalMs: 300000
@@ -927,7 +929,7 @@ persistence:
     - ReadWriteOnce
   ## @param persistence.size PVC Storage Request for Kafka data volume
   ##
-  size: 8Gi
+  size: 50Gi
   ## @param persistence.annotations Annotations for the PVC
   ##
   annotations: {}

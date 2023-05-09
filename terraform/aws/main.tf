@@ -48,9 +48,10 @@ module "eks" {
 }
 
 module "iam" {
-  source         = "../modules/aws/iam"
-  env            = var.env
-  building_block = var.building_block
+  source                = "../modules/aws/iam"
+  env                   = var.env
+  building_block        = var.building_block
+  velero_storage_bucket = module.s3.velero_storage_bucket
 }
 
 module "s3" {
@@ -74,10 +75,10 @@ module "loki" {
 }
 
 module "monitoring" {
-  source          = "../modules/helm/monitoring"
-  env             = var.env
-  building_block  = var.building_block
-  depends_on      = [module.eks]
+  source                           = "../modules/helm/monitoring"
+  env                              = var.env
+  building_block                   = var.building_block
+  depends_on                       = [module.eks]
 }
 
 module "superset" {
@@ -122,6 +123,8 @@ module "flink" {
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
   flink_chart_depends_on         = [module.kafka]
   postgresql_flink_user_password = module.postgresql.postgresql_flink_user_password
+  checkpoint_base_url            = "s3://${module.s3.checkpoint_storage_bucket}"
+
 }
 
 module "druid_raw_cluster" {
@@ -188,6 +191,17 @@ module "submit_ingestion" {
   env                               = var.env
   building_block                    = var.building_block
   submit_ingestion_chart_depends_on = [module.kafka, module.druid_raw_cluster]
+}
+
+module "velero" {
+  source                       = "../modules/helm/velero"
+  env                          = var.env
+  building_block               = var.building_block
+  cloud_provider               = "aws"
+  velero_backup_bucket         = module.s3.velero_storage_bucket
+  velero_backup_bucket_region  = var.region
+  velero_aws_access_key_id     = module.iam.velero_user_access_key
+  velero_aws_secret_access_key = module.iam.velero_user_secret_key
 }
 
 # module "alert_rules" {

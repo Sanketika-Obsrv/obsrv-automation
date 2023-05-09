@@ -77,6 +77,12 @@ variable "flink_checkpoint_store_type" {
   description = "Flink checkpoint store type."
 }
 
+variable "checkpoint_base_url" {
+  type        = string
+  description = "checkpoint storage base url."
+  default     = ""
+}
+
 variable "flink_chart_depends_on" {
   type        = any
   description = "List of helm release names that this chart depends on."
