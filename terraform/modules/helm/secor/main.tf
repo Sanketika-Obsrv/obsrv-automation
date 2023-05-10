@@ -13,6 +13,7 @@ resource "helm_release" "secor" {
   values = [
     templatefile("${path.module}/${var.secor_custom_values_yaml}",
       {
+        storage_class          = var.kubernetes_storage_class
         deployment_stage       = var.env
         secor_namespace        = var.secor_namespace
         base_path              = var.secor_backup_basepath
@@ -33,7 +34,7 @@ resource "helm_release" "secor" {
         file_size              = var.secor_backup_max_file_size
         file_age               = var.secor_backup_interval
         threads                = var.secor_threads_count
-
+        google_service_account_key_path = var.google_service_account_key_path
       }
     )
   ]

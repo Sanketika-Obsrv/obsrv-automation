@@ -1,12 +1,13 @@
 cloud_storage_bucket: "${cloud_storage_bucket}"
 namespace: "${secor_namespace}"
-storageClass: "gp2"
+storageClass: "${storage_class}"
 secor_env: "${deployment_stage}"
 image_repository: "${image_repository}"
 region: "${region}"
 pullPolicy: "Always"
 jvm_memory: 1024m
 image_tag: "${secor_image_tag}"
+google_service_account_key_path: "${google_service_account_key_path}"
 secor_jobs:
   ingest-backup:
     replicas: 1

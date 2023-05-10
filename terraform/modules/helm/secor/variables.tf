@@ -3,6 +3,11 @@ variable "env" {
   description = "Environment name. All resources will be prefixed with this value."
 }
 
+variable "kubernetes_storage_class" {
+  type        = string
+  description = "kubernetes storage class name"
+}
+
 variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
@@ -165,4 +170,10 @@ variable "region" {
   type        = string
   description = "AWS region to create the resources."
   default     = "us-east-2"
+}
+
+variable "google_service_account_key_path" {
+  description = "The path to the google service account key file."
+  type        = string
+  default     = ""
 }

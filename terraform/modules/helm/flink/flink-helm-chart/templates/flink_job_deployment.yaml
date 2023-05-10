@@ -212,6 +212,9 @@ spec:
           "-Ds3.endpoint={{ .Values.s3_endpoint }}",
           "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
 {{- end }}
+{{- if eq .Values.checkpoint_store_type "gcs" }}
+          "-Dgoogle.cloud.auth.service.account.json.keyfile={{ .Values.google_service_account_key_path }}",
+{{- end }}
           "-Dweb.submit.enable=false",
           "-Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter",
           "-Dmetrics.reporter.prom.host={{ .Release.Name }}-taskmanager",

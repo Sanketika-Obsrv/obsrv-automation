@@ -13,12 +13,7 @@ resource "google_service_account" "service_account" {
 # plus any other roles added through the 'service_account_roles' variable
 # ----------------------------------------------------------------------------------------------------------------------
 locals {
-  all_service_account_roles = concat(var.service_account_roles, [
-    "roles/logging.logWriter",
-    "roles/monitoring.metricWriter",
-    "roles/monitoring.viewer",
-    "roles/stackdriver.resourceMetadata.writer"
-  ])
+  all_service_account_roles = var.service_account_roles
 }
 
 resource "google_project_iam_member" "service_account-roles" {

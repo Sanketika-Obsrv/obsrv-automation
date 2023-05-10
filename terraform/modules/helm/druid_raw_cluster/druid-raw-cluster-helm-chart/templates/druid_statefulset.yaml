@@ -86,10 +86,17 @@ spec:
     # # Indexing service logs
     # # For local disk (only viable in a cluster if this is a network mount):
     druid.indexer.logs.type={{ .Values.druid_indexer_logs_type }}
-    druid.indexer.logs.container={{ .Values.druid_indexer_logs_container }}
     druid.indexer.logs.prefix={{ .Values.druid_indexer_logs_prefix }}
+
+    {{- if eq .Values.druid_deepstorage_type "s3" }}
+    druid.indexer.logs.container={{ .Values.s3_bucket }}
     druid.indexer.logs.s3Bucket={{ .Values.druid_indexer_logs_container }}
     druid.indexer.logs.s3Prefix= {{ .Values.druid_indexer_logs_prefix }}
+    {{- end }}
+
+    {{- if eq .Values.druid_deepstorage_type "google" }}
+    druid.indexer.logs.bucket={{ .Values.gcs_bucket }}
+    {{- end }}
 
     # Service discovery
     druid.selectors.indexing.serviceName={{ .Values.druid_selectors_indexing_serviceName }}

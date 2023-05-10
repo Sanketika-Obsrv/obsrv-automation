@@ -101,6 +101,18 @@ variable "igw_cidr" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "gcs_service_account_name" {
+  description = "The name of the custom service account used for GCS. This parameter is limited to a maximum of 28 characters."
+  type        = string
+  default     = "gcs-object-admin"
+}
+
+variable "gcs_service_account_description" {
+  description = "A description of the custom service account used for the GKE cluster."
+  type        = string
+  default     = "GCS Service Account managed by Terraform"
+}
+
 ## GKE Cluster Variables
 
 variable "gke_cluster_location" {
@@ -165,6 +177,12 @@ variable "kubernetes_storage_class" {
   type        = string
   description = "Storage class name for the GKE cluster"
   default     = "pd-standard"
+}
+
+variable "kubernetes_storage_class_raw" {
+  type        = string
+  description = "Storage class name in raw format, they use a different notation than the GKE cluster"
+  default     = "standard-rwo"
 }
 
 variable "gke_node_pool_preemptible" {

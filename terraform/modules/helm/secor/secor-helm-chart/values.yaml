@@ -1,12 +1,13 @@
 cloud_storage_bucket: "${cloud_storage_bucket}"
 namespace: "${secor_namespace}"
-storageClass: "gp2"
+storageClass: "${storage_class}"
 secor_env: "${deployment_stage}"
 image_repository: "${image_repository}"
 region: "${region}"
 pullPolicy: "Always"
 jvm_memory: 1024m
 image_tag: "${secor_image_tag}"
+google_service_account_key_path: "${google_service_account_key_path}"
 secor_jobs:
   ingest-backup:
     replicas: 1
@@ -69,7 +70,7 @@ secor_jobs:
     lag_threshold_warning: 100000
     threads: "${threads}"
     lag_threshold_critical: 200000
-    
+
   extractor-failed-backup:
     replicas: 1
     consumer_group: "${deployment_stage}_extractor_failed"
@@ -348,7 +349,7 @@ secor_jobs:
     lag_threshold_warning: 100000
     threads: "${threads}"
     lag_threshold_critical: 200000
-  
+
   system-stats:
     replicas: 1
     consumer_group: "${deployment_stage}_system_stats"
@@ -378,8 +379,8 @@ secor_jobs:
       memory: "${secor_memory_limit}"
     lag_threshold_warning: 100000
     threads: "${threads}"
-    lag_threshold_critical: 200000  
-  
+    lag_threshold_critical: 200000
+
   system-events:
     replicas: 1
     consumer_group: "${deployment_stage}_system_events"
@@ -409,7 +410,7 @@ secor_jobs:
       memory: "${secor_memory_limit}"
     lag_threshold_warning: 100000
     threads: "${threads}"
-    lag_threshold_critical: 200000      
+    lag_threshold_critical: 200000
 
 alertrules:
   enabled: false

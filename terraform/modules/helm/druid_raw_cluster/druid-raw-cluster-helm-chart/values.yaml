@@ -9,7 +9,7 @@ storageClass: "default"
 
 ######################### Druid common variables ########################
 druid_directory: "/opt/druid"
-druid_extensions_loadList: '"postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-azure-extensions", "druid-s3-extensions"'
+druid_extensions_loadList: '"postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-azure-extensions", "druid-s3-extensions", "druid-google-extensions"'
 
 # Logging
 # Log all runtime properties on startup. Disable to avoid logging properties on startup:
@@ -22,7 +22,7 @@ druid_metadata_storage_connector_user: "druid"
 druid_metadata_storage_connector_password: "druid"
 
 # Druid Storage Type
-druid_deepstorage_type: "s3"
+druid_deepstorage_type: ""
 druid_storage_directory: "/data"
 
 # AWS S3 Details
@@ -40,8 +40,8 @@ gcs_bucket: ""
 
 # Indexing service logs
 # For local disk (only viable in a cluster_type if this is a network mount):
-druid_indexer_logs_type: "s3"
-druid_indexer_logs_container: "obsrv-dev-725876873105"
+druid_indexer_logs_type: ""
+druid_indexer_logs_container: ""
 druid_indexer_logs_prefix: "backups/druid/druid-task-logs"
 
 # Service discovery

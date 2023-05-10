@@ -39,3 +39,7 @@ primary:
       07_create_dataset_api_user.sql: |
         CREATE USER dataset_api_user WITH ENCRYPTED PASSWORD '${postgresql_dataset_api_user_password}';
         GRANT ALL PRIVILEGES ON DATABASE dataset_api TO dataset_api_user;
+      08_create_obsrv_db.sql: |
+        CREATE DATABASE obsrv;
+      09_create_obsrv_user.sql: |
+        GRANT ALL PRIVILEGES ON DATABASE obsrv TO postgres;
