@@ -23,10 +23,10 @@ variable "redis_install_timeout" {
   default     = 1200
 }
 
-variable "monitoring_release_name" {
+variable "redis_release_name" {
   type        = string
-  description = "Monitoring helm release name."
-  default     = "monitoring"
+  description = "Redis helm release name."
+  default     = "obsrv-redis"
 }
 
 variable "redis_namespace" {
