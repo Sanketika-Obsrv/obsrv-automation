@@ -52,18 +52,19 @@ variable "dataset_api_install_timeout" {
 variable "dataset_api_postgres_database" {
   type        = string
   description = "Dataset service postgres database"
-  default     = "dataset_api"
+  default     = "obsrv"
 }
 
 variable "dataset_api_postgres_username" {
   type = string
   description = "Dataset service postgres username"
-  default = "dataset_api_user"
+  default = "postgres"
 }
 
 variable "dataset_api_postgres_user_password" {
   type = string
   description = "Dataset service postgres password"
+  default = "postgres"
 }
 
 variable "dataset_api_chart_depends_on" {

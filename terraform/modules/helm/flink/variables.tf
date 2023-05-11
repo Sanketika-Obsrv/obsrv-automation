@@ -89,6 +89,11 @@ variable "flink_chart_depends_on" {
   default     = ""
 }
 
+variable "postgresql_admin_password" {
+  type        = string
+  description = "Postgresql admin password."
+}
+
 variable "postgresql_flink_user_password" {
   type        = string
   description = "Postgresql flink user password."

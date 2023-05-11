@@ -25,7 +25,7 @@ postgres_service:
   POSTGRES_USERNAME: "postgres"
   POSTGRES_PASSWORD: "postgres"
 redis_service:
-  REDIS_HOST: obsrv-redis-master.redis.svc.cluster.local
+  REDIS_HOST: obsrv-redis-headless.redis.svc.cluster.local
   REDIS_PORT: 6379
 
 service_account_annotations: ""

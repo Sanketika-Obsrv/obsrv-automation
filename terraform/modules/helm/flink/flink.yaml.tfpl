@@ -52,7 +52,7 @@ base_config: |
     port = 5432
     maxConnections = 2
     user = postgres
-    password = '${postgresql_flink_user_password}'
+    password = ${postgresql_admin_password}
     database = obsrv
   }
 

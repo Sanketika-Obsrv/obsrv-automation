@@ -332,6 +332,7 @@ module "flink" {
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
   flink_chart_depends_on         = [module.kafka]
   postgresql_flink_user_password = module.postgresql.postgresql_flink_user_password
+  postgresql_admin_password      = module.postgresql.postgresql_admin_password
 }
 
 module "druid_operator" {
