@@ -105,6 +105,12 @@ variable "postgresql_obsrv_database" {
   description = "Postgresql obsrv database."
 }
 
+variable "redis_namespace" {
+  type        = string
+  description = "Namespace of Redis installation."
+  default     = "redis"
+}
+
 variable "s3_access_key" {
   type        = string
   description = "S3 access key for flink checkpoints."

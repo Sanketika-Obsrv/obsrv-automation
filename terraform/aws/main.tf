@@ -134,6 +134,7 @@ module "flink" {
   postgresql_obsrv_user_password = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database      = module.postgresql.postgresql_obsrv_database
   checkpoint_base_url            = "s3://${module.s3.checkpoint_storage_bucket}"
+  redis_namespace                = module.redis.redis_namespace
 }
 
 module "druid_raw_cluster" {

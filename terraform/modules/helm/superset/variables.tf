@@ -82,3 +82,10 @@ variable "superset_chart_depends_on" {
   description = "List of helm release names that this chart depends on."
   default     = ""
 }
+
+variable "redis_namespace" {
+  type        = string
+  description = "Namespace of redis installation."
+  default     = "redis"
+}
+

@@ -8,6 +8,8 @@ postgres:
     db_username: "superset"
     db_password: "superset123"
 
+redis_url: redis://obsrv-redis-headless.redis.svc.cluster.local:6379/3
+
 replicaCount: 1
 oauth_enabled: False
 
@@ -102,7 +104,7 @@ configOverrides:
       'CACHE_TYPE': 'redis',
       'CACHE_DEFAULT_TIMEOUT': 600,
       'CACHE_KEY_PREFIX': 'superset_',
-      'CACHE_REDIS_URL': 'redis://obsrv-redis-master.redis.svc.cluster.local:6379/3'
+      'CACHE_REDIS_URL': '{{ tpl .Values.redis_url . }}'
     }
 
   sql_alchemy_config: |
@@ -194,8 +196,8 @@ resources: {}
 ## Superset node configuration
 supersetNode:
   connections:
-    redis_host: 'obsrv-redis-master.redis.svc.cluster.local'
-    redis_port: "6379"
+    # redis_host: 'obsrv-redis-master.redis.svc.cluster.local'
+    # redis_port: "6379"
     db_host: '{{ template "superset.fullname" . }}-postgres-headless'
     db_port: "{{ .Values.postgres.db_port }}"
     db_user: "{{ .Values.postgres.superset.db_username }}"

@@ -21,6 +21,7 @@ resource "helm_release" "dataset_api" {
           dataset_api_image_name             = var.dataset_api_image_name
           dataset_api_image_tag              = var.dataset_api_image_tag
           dataset_api_sa_annotations         = var.dataset_api_sa_annotations
+          redis_namespace                    = var.redis_namespace
         }
       )
     ]

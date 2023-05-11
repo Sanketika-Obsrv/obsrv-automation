@@ -9,7 +9,7 @@ network:
 SYSTEM_ENV: "${env}"
 TELEMETRY_KAFKA_COMPRESSION: snappy
 druid_service:
-  DRUID_HOST: http://druid-raw-dev-routers.druid-raw.svc
+  DRUID_HOST: http://druid-raw-routers.druid-raw.svc
   DRUID_PORT: 8888
 kafka_service:
   KAFKA_HOST: "kafka-headless.kafka.svc"
@@ -22,8 +22,8 @@ postgres_service:
   POSTGRES_HOST: postgresql-hl.postgresql.svc
   POSTGRES_PORT: 5432
   POSTGRES_DATABASE: "obsrv"
-  POSTGRES_USERNAME: "postgres"
-  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_USERNAME: "obsrv"
+  POSTGRES_PASSWORD: "obsrv123"
 redis_service:
   REDIS_HOST: obsrv-redis-headless.redis.svc.cluster.local
   REDIS_PORT: 6379

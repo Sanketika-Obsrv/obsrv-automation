@@ -92,3 +92,9 @@ variable "dataset_api_sa_annotations" {
   description = "Service account annotations for dataset api service account."
   default     = "serviceAccountName: default"
 }
+
+variable "redis_namespace" {
+  type        = string
+  description = "Namespace of Redis installation."
+  default     = "redis"
+}
