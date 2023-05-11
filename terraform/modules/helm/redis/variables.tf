@@ -1,14 +1,13 @@
 variable "redis_chart_repository" {
   type        = string
   description = "Redis chart repository url."
-  default     = "https://github.com/bitnami/charts/tree/main/bitnami/redis"
   default     = "https://charts.bitnami.com/bitnami"
 }
 
 variable "redis_chart_name" {
   type        = string
   description = "Redis chart name."
-  default     = "bitnami/redis"
+  default     = "redis"
 }
 
 variable "redis_chart_version" {
