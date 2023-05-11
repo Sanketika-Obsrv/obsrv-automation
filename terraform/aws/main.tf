@@ -88,7 +88,8 @@ module "superset" {
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
-  superset_chart_depends_on         = [module.postgresql]
+  superset_chart_depends_on         = [module.postgresql, module.redis]
+  redis_namespace                   = module.redis.redis_namespace
 }
 
 module "grafana_configs" {
@@ -100,6 +101,13 @@ module "grafana_configs" {
 
 module "postgresql" {
   source               = "../modules/helm/postgresql"
+  env                  = var.env
+  building_block       = var.building_block
+  depends_on           = [module.eks]
+}
+
+module "redis" {
+  source               = "../modules/helm/redis"
   env                  = var.env
   building_block       = var.building_block
   depends_on           = [module.eks]
@@ -121,7 +129,7 @@ module "flink" {
   s3_access_key                  = module.iam.s3_access_key
   s3_secret_key                  = module.iam.s3_secret_key
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
-  flink_chart_depends_on         = [module.kafka, module.postgresql]
+  flink_chart_depends_on         = [module.kafka, module.postgresql, module.redis]
   postgresql_obsrv_username      = module.postgresql.postgresql_obsrv_username
   postgresql_obsrv_user_password = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database      = module.postgresql.postgresql_obsrv_database
@@ -180,6 +188,7 @@ module "dataset_api" {
   postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
   dataset_api_sa_annotations         = "eks.amazonaws.com/role-arn: ${module.eks.dataset_api_sa_annotations}"
   dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
+  redis_namespace                    = module.redis.redis_namespace
 }
 
 module "secor" {
