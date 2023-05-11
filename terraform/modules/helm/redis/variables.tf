@@ -88,7 +88,3 @@ variable "redis_custom_values_yaml" {
   description = "Redis chart values.yaml path."
   default     = "redis.yaml.tfpl"
 }
-
-
-
-

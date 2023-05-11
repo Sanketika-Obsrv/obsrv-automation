@@ -12,7 +12,7 @@ dockerhub: ${dataset_api_container_registry}
 repository: ${dataset_api_image_name}
 image_tag: ${dataset_api_image_tag}
 redis_service:
-  REDIS_HOST: obsrv-redis-headless.${redis_namespace}.svc.cluster.local
+  REDIS_HOST: ${redis_release_name}-headless.${redis_namespace}.svc.cluster.local
   REDIS_PORT: 6379
 service_account_annotations:
   ${dataset_api_sa_annotations}

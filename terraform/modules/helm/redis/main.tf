@@ -13,7 +13,6 @@ resource "helm_release" "redis" {
     values = [
       templatefile("${path.module}/${var.redis_custom_values_yaml}",
         {
-            prometheus_persistent_volume_size = var.prometheus_persistent_volume_size
             redis_master_maxmemory          = var.redis_master_maxmemory
             redis_replica_maxmemory         = var.redis_replica_maxmemory
             redis_maxmemory_eviction_policy = var.redis_maxmemory_eviction_policy

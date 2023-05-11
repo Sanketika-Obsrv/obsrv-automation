@@ -90,6 +90,7 @@ module "superset" {
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
   superset_chart_depends_on         = [module.postgresql, module.redis]
   redis_namespace                   = module.redis.redis_namespace
+  redis_release_name                = module.redis.redis_release_name
 }
 
 module "grafana_configs" {
@@ -135,6 +136,7 @@ module "flink" {
   postgresql_obsrv_database      = module.postgresql.postgresql_obsrv_database
   checkpoint_base_url            = "s3://${module.s3.checkpoint_storage_bucket}"
   redis_namespace                = module.redis.redis_namespace
+  redis_release_name             = module.redis.redis_release_name
 }
 
 module "druid_raw_cluster" {
@@ -190,6 +192,7 @@ module "dataset_api" {
   dataset_api_sa_annotations         = "eks.amazonaws.com/role-arn: ${module.eks.dataset_api_sa_annotations}"
   dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
   redis_namespace                    = module.redis.redis_namespace
+  redis_release_name                 = module.redis.redis_release_name
 }
 
 module "secor" {

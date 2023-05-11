@@ -98,3 +98,9 @@ variable "redis_namespace" {
   description = "Namespace of Redis installation."
   default     = "redis"
 }
+
+variable "redis_release_name" {
+  type        = string
+  description = "Release name for Redis installation."
+  default     = "obsrv-redis"
+}

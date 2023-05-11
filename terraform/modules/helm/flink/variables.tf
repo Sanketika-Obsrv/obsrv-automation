@@ -111,6 +111,12 @@ variable "redis_namespace" {
   default     = "redis"
 }
 
+variable "redis_release_name" {
+  type        = string
+  description = "Release name for Redis installation."
+  default     = "obsrv-redis"
+}
+
 variable "s3_access_key" {
   type        = string
   description = "S3 access key for flink checkpoints."
