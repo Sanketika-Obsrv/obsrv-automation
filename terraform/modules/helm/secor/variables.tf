@@ -166,3 +166,9 @@ variable "region" {
   description = "AWS region to create the resources."
   default     = "us-east-2"
 }
+
+variable "secor_sa_annotations" {
+  type        = string
+  description = "Service account annotations for secor service account."
+  default     = "serviceAccountName: default"
+}

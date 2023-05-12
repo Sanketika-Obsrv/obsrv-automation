@@ -13,6 +13,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   serviceName: secor
+  secviceAccountName: {{ .Values.namespace }}-sa
   updateStrategy:
     type: RollingUpdate
   replicas: {{ get (get $.Values.secor_jobs $.Release.Name) "replicas" }}
@@ -47,7 +48,7 @@ spec:
               value: "/opt/secor/config/log4j.docker.properties"
             - name: "JVM_MEMORY"
               value: "{{ .Values.jvm_memory }}"
-              
+
           volumeMounts:
            - mountPath: /opt/secor/config
              name: secor-config

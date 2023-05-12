@@ -124,3 +124,9 @@ variable "azure_storage_container" {
   description = "Azure storage account container name for druid deepstore."
   default     = ""
 }
+
+variable "druid_raw_sa_annotations" {
+  type        = string
+  description = "Service account annotations for druid raw service account."
+  default     = "serviceAccountName: default"
+}

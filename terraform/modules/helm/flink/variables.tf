@@ -140,3 +140,9 @@ variable "azure_storage_account_key" {
   description = "Azure storage account key for flink checkpoints."
   default     = ""
 }
+
+variable "flink_sa_annotations" {
+  type        = string
+  description = "Service account annotations for flink service account."
+  default     = "serviceAccountName: default"
+}

@@ -49,3 +49,27 @@ Selector labels
 app.kubernetes.io/name: {{ include "druid-cluster.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
+
+
+{{/*
+Common labels
+*/}}
+{{- define "druid-cluster.labels" -}}
+helm.sh/chart: {{ include "druid-cluster.chart" . }}
+{{ include "druid-cluster.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "druid-cluster.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "druid-cluster.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}

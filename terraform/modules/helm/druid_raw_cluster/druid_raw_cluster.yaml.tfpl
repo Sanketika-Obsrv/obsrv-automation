@@ -12,3 +12,8 @@ s3_secret_key: ${s3_secret_key}
 azure_storage_account_name: ${azure_storage_account_name}
 azure_storage_account_key: ${azure_storage_account_key}
 azure_storage_container: ${azure_storage_container}
+
+serviceAccount:
+  annotations:
+    ${druid_raw_sa_annotations}
+  name: ${druid_raw_service_account_name}

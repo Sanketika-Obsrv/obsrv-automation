@@ -131,3 +131,39 @@ variable "dataset_api_namespace" {
   description = "Dataset service namespace."
   default     = "dataset-api"
 }
+
+variable "flink_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for flink service account."
+  default     = "flink-sa-iam-role"
+}
+
+variable "flink_namespace" {
+  type        = string
+  description = "Flink namespace."
+  default     = "flink"
+}
+
+variable "druid_raw_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for druid raw service account."
+  default     = "druid-raw-sa-iam-role"
+}
+
+variable "druid_raw_namespace" {
+  type        = string
+  description = "Druid raw namespace."
+  default     = "druid-raw"
+}
+
+variable "secor_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for secor service account."
+  default     = "secor-sa-iam-role"
+}
+
+variable "secor_namespace" {
+  type        = string
+  description = "Secor namespace."
+  default     = "secor"
+}

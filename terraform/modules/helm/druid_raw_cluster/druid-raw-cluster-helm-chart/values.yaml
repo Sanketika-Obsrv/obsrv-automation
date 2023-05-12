@@ -83,10 +83,10 @@ druid_broker_pod_cpu_limit: 500m
 
 # HTTP server threads
 druid_broker_http_numConnections: 5
-druid_server_http_numThreads: 25
+#druid_server_http_numThreads: 25
 
 druid_javascript.enabled: true
-druid_sql_enable: true
+#druid_sql_enable: true
 
 druid_broker_replicas: 1
 
@@ -145,7 +145,7 @@ druid_historical_pod_cpu_request: 500m
 druid_historical_pod_cpu_limit: 1
 
 # HTTP server threads
-druid_server_http_numThreads: 25
+#druid_server_http_numThreads: 25
 
 # Processing threads and buffers
 druid_historical_processing_buffer_sizeBytes: 64MiB
@@ -186,15 +186,15 @@ druid_middlemanager_peon_heap_size: 256M
 
 # Task launch parameters
 druid_indexer_runner_javaOpts: "-server -Xms512m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
-druid_indexer_task_baseTaskDir: "/var/task"
+#druid_indexer_task_baseTaskDir: "/var/task"
 
 # Peon properties
-druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 25MiB
-druid_indexer_fork_property_druid_processing_numThreads: 2
-druid_indexer_fork_property_druid_server_http_numThreads: 25
+#druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 25MiB
+#druid_indexer_fork_property_druid_processing_numThreads: 2
+#druid_indexer_fork_property_druid_server_http_numThreads: 25
 
 #Additional Parameters
-druid_indexer_task_restoreTasksOnRestart: true
+#druid_indexer_task_restoreTasksOnRestart: true
 
 druid_middlemanager_replicas: 1
 
@@ -299,7 +299,7 @@ zookeeper:
     purgeInterval: 0
   maxSessionTimeout: 40000
 
-  allowAnonymousLogin: true
+#  allowAnonymousLogin: true
 
   minServerId: 1
 
@@ -341,4 +341,11 @@ zookeeper:
     headless:
       annotations: {}
 
-
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""

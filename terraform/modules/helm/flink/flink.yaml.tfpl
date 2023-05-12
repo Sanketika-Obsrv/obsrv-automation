@@ -60,3 +60,8 @@ base_config: |
     host = "localhost"
     port = "9042"
   }
+
+serviceAccount:
+  annotations:
+    ${flink_sa_annotations}
+  name: ${flink_service_account_name}

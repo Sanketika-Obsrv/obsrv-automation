@@ -25,6 +25,8 @@ resource "helm_release" "flink" {
           checkpoint_base_url            = var.checkpoint_base_url
           redis_namespace                = var.redis_namespace
           redis_release_name             = var.redis_release_name
+          flink_sa_annotations           = var.flink_sa_annotations
+          flink_service_account_name     = "${var.flink_namespace}-sa"
       })
     ]
 }

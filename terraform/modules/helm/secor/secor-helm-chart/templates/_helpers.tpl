@@ -49,3 +49,22 @@ Selector labels
 app.kubernetes.io/name: {{ include "secor.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
+
+{{/*
+Selector labels
+*/}}
+{{- define "secor.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "secor.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "secor.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (include "secor.fullname" .) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}

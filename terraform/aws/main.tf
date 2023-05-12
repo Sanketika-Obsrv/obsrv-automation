@@ -127,8 +127,8 @@ module "flink" {
   building_block                 = var.building_block
   flink_container_registry       = var.flink_container_registry
   flink_image_tag                = var.flink_image_tag
-  s3_access_key                  = module.iam.s3_access_key
-  s3_secret_key                  = module.iam.s3_secret_key
+  # s3_access_key                  = module.iam.s3_access_key
+  # s3_secret_key                  = module.iam.s3_secret_key
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
   flink_chart_depends_on         = [module.kafka, module.postgresql, module.redis]
   postgresql_obsrv_username      = module.postgresql.postgresql_obsrv_username
@@ -137,19 +137,21 @@ module "flink" {
   checkpoint_base_url            = "s3://${module.s3.checkpoint_storage_bucket}"
   redis_namespace                = module.redis.redis_namespace
   redis_release_name             = module.redis.redis_release_name
+  flink_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
 }
 
 module "druid_raw_cluster" {
   source                             = "../modules/helm/druid_raw_cluster"
   env                                = var.env
   building_block                     = var.building_block
-  s3_access_key                      = module.iam.s3_access_key
-  s3_secret_key                      = module.iam.s3_secret_key
+  # s3_access_key                      = module.iam.s3_access_key
+  # s3_secret_key                      = module.iam.s3_secret_key
   s3_bucket                          = module.s3.s3_bucket
   druid_deepstorage_type             = var.druid_deepstorage_type
   druid_raw_cluster_chart_depends_on = [module.postgresql, module.druid_operator]
   kubernetes_storage_class           = var.kubernetes_storage_class
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
+  druid_raw_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.druid_raw_sa_iam_role}"
 }
 
 module "druid_operator" {
@@ -199,6 +201,7 @@ module "secor" {
   source                  = "../modules/helm/secor"
   env                     = var.env
   building_block          = var.building_block
+  secor_sa_annotations    = "eks.amazonaws.com/role-arn: ${module.eks.secor_sa_iam_role}"
   secor_chart_depends_on  = [module.kafka]
 }
 
@@ -220,7 +223,7 @@ module "velero" {
   velero_aws_secret_access_key = module.iam.velero_user_secret_key
 }
 
-# module "alert_rules" {
-#   source                       = "../modules/helm/alert_rules"
-#   alertrules_chart_depends_on  = [module.monitoring]
-# }
+module "alert_rules" {
+  source                       = "../modules/helm/alert_rules"
+  alertrules_chart_depends_on  = [module.monitoring]
+}
