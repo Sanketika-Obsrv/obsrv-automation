@@ -1,7 +1,7 @@
 druid_env: "dev"
 druid_cluster_type: "raw"
 druid_image: "apache/druid:25.0.0"
-druid_namespace: ""
+druid_namespace: "druid-raw"
 druid_monitoring: True
 mount_path: /druid/data
 storageClass: "default"

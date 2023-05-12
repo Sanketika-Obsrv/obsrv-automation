@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-jobmanager
-  namespace: {{ .Release.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: flink
     component: {{ .Release.Name }}-jobmanager
@@ -28,7 +28,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-jobmanager-webui
-  namespace: {{ .Release.namespace }}
+  namespace: {{ .Release.Namespace }}
   {{- if .Values.service.annotations }}
   {{- with .Values.service.annotations }}
 annotations:
@@ -55,7 +55,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-taskmanager
-  namespace: {{ .Release.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: flink
     component: {{ .Release.Name }}-taskmanager
@@ -72,7 +72,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Release.Name }}-jobmanager
-  namespace: {{ .Release.namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   template:
     metadata:
@@ -99,6 +99,7 @@ spec:
       restartPolicy: OnFailure
 #      imagePullSecrets:
 #      - name: {{ .Values.imagepullsecrets }}
+      serviceAccount: {{ .Release.Namespace }}-sa
       containers:
       - name: {{ .Release.Name }}-jobmanager
         image: "{{ .Values.repository }}:{{ .Values.image_tag }}"
@@ -160,7 +161,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-taskmanager
-  namespace: {{ .Release.namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.taskmanager.replicas }}
   selector:
@@ -188,6 +189,7 @@ spec:
             path: {{ .Release.Name }}.conf
 #      imagePullSecrets:
 #      - name: {{ .Values.imagepullsecrets }}
+      serviceAccount: {{ .Release.Namespace }}-sa
       containers:
       - name: {{ .Release.Name }}-taskmanager
         image: "{{ .Values.repository }}:{{ .Values.image_tag }}"

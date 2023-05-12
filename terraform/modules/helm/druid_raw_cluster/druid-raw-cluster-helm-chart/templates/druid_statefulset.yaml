@@ -7,6 +7,7 @@ metadata:
   name: "{{ .Values.druid_cluster_type }}"
 spec:
   image: "{{ .Values.druid_image }}"
+  serviceAccount: "{{ .Values.druid_namespace }}-sa"
   startScript: /druid.sh
   # podLabels:
   #   release: alpha
