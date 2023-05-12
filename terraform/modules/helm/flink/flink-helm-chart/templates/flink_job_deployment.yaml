@@ -99,7 +99,7 @@ spec:
       restartPolicy: OnFailure
 #      imagePullSecrets:
 #      - name: {{ .Values.imagepullsecrets }}
-      serviceAccountName: {{ .Release.Namespace }}-sa
+      serviceAccount: {{ .Release.Namespace }}-sa
       containers:
       - name: {{ .Release.Name }}-jobmanager
         image: "{{ .Values.repository }}:{{ .Values.image_tag }}"
@@ -189,7 +189,7 @@ spec:
             path: {{ .Release.Name }}.conf
 #      imagePullSecrets:
 #      - name: {{ .Values.imagepullsecrets }}
-      serviceAccountName: {{ .Release.Namespace }}-sa
+      serviceAccount: {{ .Release.Namespace }}-sa
       containers:
       - name: {{ .Release.Name }}-taskmanager
         image: "{{ .Values.repository }}:{{ .Values.image_tag }}"
