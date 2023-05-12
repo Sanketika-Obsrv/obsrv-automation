@@ -6,10 +6,6 @@ image:
 auth:
   enablePostgresUser: true
   postgresPassword: ${postgresql_admin_password}
-  username: ${postgresql_obsrv_username}
-  password: ${postgresql_obsrv_user_password}
-  database: ${postgresql_obsrv_database}
-
 
 primary:
   extendedConfiguration: |
