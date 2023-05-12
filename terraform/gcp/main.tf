@@ -1,5 +1,5 @@
 terraform {
-  # backend "gcs" {}
+  backend "gcs" { }
 
   required_providers {
     google = {
@@ -96,6 +96,12 @@ module "gke_service_account"{
   google_service_account_key_path = "./.keys/${var.building_block}-${var.cluster_service_account_name}.json"
 }
 
+resource "google_storage_bucket_object" "gke_service_account" {
+  name   = "service-accounts/${var.building_block}-${var.cluster_service_account_name}.json"
+  source = "./.keys/${var.building_block}-${var.cluster_service_account_name}.json"
+  bucket = "${var.project}-${var.env}-configs"
+}
+
 module "gcs_service_account"{
   source = "../modules/gcp/service-account"
   name        = "${var.building_block}-${var.gcs_service_account_name}"
@@ -103,6 +109,12 @@ module "gcs_service_account"{
   description = var.gcs_service_account_description
   service_account_roles = ["roles/storage.objectAdmin"]
   google_service_account_key_path = "./.keys/${var.building_block}-${var.gcs_service_account_name}.json"
+}
+
+resource "google_storage_bucket_object" "gcs_service_account" {
+  name   = "service-accounts/${var.building_block}-${var.gcs_service_account_name}.json"
+  source = "./.keys/${var.building_block}-${var.gcs_service_account_name}.json"
+  bucket = "${var.project}-${var.env}-configs"
 }
 
 module "gke_cluster" {
@@ -213,6 +225,11 @@ resource "null_resource" "configure_kubectl" {
   depends_on = [google_container_node_pool.node_pool]
 }
 
+resource "google_storage_bucket_object" "kubeconfig" {
+  name   = "kubeconfig/config-${var.building_block}-${var.env}.yaml"
+  source = var.kubectl_config_path != "" ? var.kubectl_config_path : ""
+  bucket = "${var.project}-${var.env}-configs"
+}
 # resource "kubernetes_cluster_role_binding" "user" {
 #   metadata {
 #     name = "admin-user"
