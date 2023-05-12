@@ -138,6 +138,7 @@ module "flink" {
   redis_namespace                = module.redis.redis_namespace
   redis_release_name             = module.redis.redis_release_name
   flink_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
+  flink_namespace                = module.eks.flink_namespace
 }
 
 module "druid_raw_cluster" {
@@ -152,6 +153,7 @@ module "druid_raw_cluster" {
   kubernetes_storage_class           = var.kubernetes_storage_class
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
   druid_raw_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.druid_raw_sa_iam_role}"
+  druid_cluster_namespace            = module.eks.druid_raw_namespace
 }
 
 module "druid_operator" {
@@ -195,6 +197,7 @@ module "dataset_api" {
   dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
   redis_namespace                    = module.redis.redis_namespace
   redis_release_name                 = module.redis.redis_release_name
+  dataset_api_namespace              = module.eks.dataset_api_namespace
 }
 
 module "secor" {
@@ -203,6 +206,7 @@ module "secor" {
   building_block          = var.building_block
   secor_sa_annotations    = "eks.amazonaws.com/role-arn: ${module.eks.secor_sa_iam_role}"
   secor_chart_depends_on  = [module.kafka]
+  secor_namespace         = module.eks.secor_namespace
 }
 
 module "submit_ingestion" {

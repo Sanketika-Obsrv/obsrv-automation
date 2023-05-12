@@ -21,3 +21,19 @@ output "druid_raw_sa_iam_role" {
 output "secor_sa_iam_role" {
   value = aws_iam_role.secor_sa_iam_role.arn
 }
+
+output "dataset_api_namespace" {
+  value = var.dataset_api_namespace
+}
+
+output "druid_raw_namespace" {
+  value = var.druid_raw_namespace
+}
+
+output "flink_namespace" {
+  value = var.flink_namespace
+}
+
+output "secor_namespace" {
+  value = var.secor_namespace
+}

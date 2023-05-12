@@ -43,7 +43,6 @@ variable "secor_image_repository" {
 variable "secor_namespace" {
   type        = string
   description = "Secor namespace."
-  default     = "secor"
 }
 
 variable "secor_chart_path" {

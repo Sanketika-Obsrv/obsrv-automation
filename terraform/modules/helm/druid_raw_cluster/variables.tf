@@ -17,7 +17,6 @@ variable "druid_cluster_release_name" {
 variable "druid_cluster_namespace" {
   type        = string
   description = "Druid namespace."
-  default     = "druid-raw"
 }
 
 variable "druid_cluster_chart_path" {

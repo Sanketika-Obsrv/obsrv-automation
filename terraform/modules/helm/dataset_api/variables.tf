@@ -17,7 +17,6 @@ variable "dataset_api_release_name" {
 variable "dataset_api_namespace" {
   type        = string
   description = "Dataset service namespace."
-  default     = "dataset-api"
 }
 
 variable "dataset_api_chart_path" {

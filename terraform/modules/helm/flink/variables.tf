@@ -17,7 +17,6 @@ variable "flink_release_name" {
 variable "flink_namespace" {
   type        = string
   description = "Flink namespace."
-  default     = "flink"
 }
 
 variable "flink_chart_path" {
