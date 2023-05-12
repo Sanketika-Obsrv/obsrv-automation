@@ -193,6 +193,7 @@ module "dataset_api" {
   # dataset_api_postgres_user_password = module.postgresql.postgresql_dataset_api_user_password
   postgresql_obsrv_username          = module.postgresql.postgresql_obsrv_username
   postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
   dataset_api_sa_annotations         = "eks.amazonaws.com/role-arn: ${module.eks.dataset_api_sa_annotations}"
   dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
   redis_namespace                    = module.redis.redis_namespace
