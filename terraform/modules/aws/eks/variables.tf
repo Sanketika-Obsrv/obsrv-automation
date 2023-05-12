@@ -122,7 +122,7 @@ variable "oidc_thumbprint_list" {
 
 variable "dataset_api_sa_iam_role_name" {
   type        = string
-  description = "IAM role name for service account."
+  description = "IAM role name for dataset api service account."
   default     = "dataset-api-sa-iam-role"
 }
 

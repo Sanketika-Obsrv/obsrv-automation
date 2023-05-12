@@ -145,8 +145,8 @@ module "druid_raw_cluster" {
   source                             = "../modules/helm/druid_raw_cluster"
   env                                = var.env
   building_block                     = var.building_block
-  # s3_access_key                      = module.iam.s3_access_key
-  # s3_secret_key                      = module.iam.s3_secret_key
+#  s3_access_key                      = module.iam.s3_access_key
+#  s3_secret_key                      = module.iam.s3_secret_key
   s3_bucket                          = module.s3.s3_bucket
   druid_deepstorage_type             = var.druid_deepstorage_type
   druid_raw_cluster_chart_depends_on = [module.postgresql, module.druid_operator]

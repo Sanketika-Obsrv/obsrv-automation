@@ -1,11 +1,11 @@
 output "postgresql_admin_username" {
   value     = var.postgresql_admin_username
-#  sensitive = true
+  sensitive = true
 }
 
 output "postgresql_admin_password" {
   value     = var.postgresql_admin_password
- # sensitive = true
+  sensitive = true
 }
 
 output "postgresql_superset_user_password" {
