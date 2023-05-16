@@ -91,6 +91,7 @@ module "superset" {
   superset_chart_depends_on         = [module.postgresql, module.redis]
   redis_namespace                   = module.redis.redis_namespace
   redis_release_name                = module.redis.redis_release_name
+  postgresql_service_name           = module.postgresql.postgresql_service_name
 }
 
 module "grafana_configs" {
