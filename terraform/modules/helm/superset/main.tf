@@ -16,6 +16,8 @@ resource "helm_release" "superset" {
         pg_admin_password         = var.postgresql_admin_password
         pg_superset_user_password = var.postgresql_superset_user_password
         superset_image_tag        = var.superset_image_tag
+        redis_namespace           = var.redis_namespace
+        redis_release_name        = var.redis_release_name
       }
       )
     ]

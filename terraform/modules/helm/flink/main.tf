@@ -19,10 +19,14 @@ resource "helm_release" "flink" {
           s3_secret_key                  = var.s3_secret_key
           azure_account                  = var.azure_storage_account_name
           azure_secret                   = var.azure_storage_account_key
-          postgresql_flink_user_password = var.postgresql_flink_user_password
-          postgresql_admin_password      = var.postgresql_admin_password
-          google_service_account_key_path= var.google_service_account_key_path
+          postgresql_obsrv_username      = var.postgresql_obsrv_username
+          postgresql_obsrv_user_password = var.postgresql_obsrv_user_password
+          postgresql_obsrv_database      = var.postgresql_obsrv_database
           checkpoint_base_url            = var.checkpoint_base_url
+          redis_namespace                = var.redis_namespace
+          redis_release_name             = var.redis_release_name
+          flink_sa_annotations           = var.flink_sa_annotations
+          flink_service_account_name     = "${var.flink_namespace}-sa"
       })
     ]
 }

@@ -23,6 +23,9 @@ resource "helm_release" "postgresql" {
           postgresql_flink_user_password       = var.postgresql_flink_user_password
           postgresql_druid_raw_user_password   = var.postgresql_druid_raw_user_password
           postgresql_dataset_api_user_password = var.postgresql_dataset_api_user_password
+          postgresql_obsrv_username            = var.postgresql_obsrv_username
+          postgresql_obsrv_user_password       = var.postgresql_obsrv_user_password
+          postgresql_obsrv_database            = var.postgresql_obsrv_database
       })
     ]
 }

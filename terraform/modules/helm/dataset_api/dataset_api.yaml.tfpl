@@ -1,15 +1,18 @@
 namespace: ${dataset_api_namespace}
 druid_service:
-  DRUID_HOST: http://druid-raw-${env}-routers.druid-raw.svc
+  DRUID_HOST: http://druid-raw-routers.druid-raw.svc
   DRUID_PORT: 8888
 postgres_service:
   POSTGRES_HOST: postgresql-hl.postgresql.svc
   POSTGRES_PORT: 5432
-  POSTGRES_DATABASE: ${dataset_api_postgres_database}
-  POSTGRES_USERNAME: ${dataset_api_postgres_username}
-  POSTGRES_PASSWORD: ${dataset_api_postgres_user_password}
+  POSTGRES_DATABASE: ${postgressql_obsrv_database}
+  POSTGRES_USERNAME: ${postgresql_obsrv_username}
+  POSTGRES_PASSWORD: ${postgresql_obsrv_user_password}
 dockerhub: ${dataset_api_container_registry}
 repository: ${dataset_api_image_name}
 image_tag: ${dataset_api_image_tag}
+redis_service:
+  REDIS_HOST: ${redis_release_name}-headless.${redis_namespace}.svc.cluster.local
+  REDIS_PORT: 6379
 service_account_annotations:
   ${dataset_api_sa_annotations}

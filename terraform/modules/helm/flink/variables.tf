@@ -17,7 +17,6 @@ variable "flink_release_name" {
 variable "flink_namespace" {
   type        = string
   description = "Flink namespace."
-  default     = "flink"
 }
 
 variable "flink_chart_path" {
@@ -89,14 +88,32 @@ variable "flink_chart_depends_on" {
   default     = ""
 }
 
-variable "postgresql_admin_password" {
+variable "postgresql_obsrv_username" {
   type        = string
-  description = "Postgresql admin password."
+  description = "Postgresql obsrv username."
+  default     = "obsrv"
 }
 
-variable "postgresql_flink_user_password" {
+variable "postgresql_obsrv_user_password" {
   type        = string
-  description = "Postgresql flink user password."
+  description = "Postgresql obsrv user password."
+}
+
+variable "postgresql_obsrv_database" {
+  type        = string
+  description = "Postgresql obsrv database."
+}
+
+variable "redis_namespace" {
+  type        = string
+  description = "Namespace of Redis installation."
+  default     = "redis"
+}
+
+variable "redis_release_name" {
+  type        = string
+  description = "Release name for Redis installation."
+  default     = "obsrv-redis"
 }
 
 variable "s3_access_key" {
@@ -127,4 +144,9 @@ variable "google_service_account_key_path" {
   description = "The path to the service account key file."
   type        = string
   default     = ""
+
+variable "flink_sa_annotations" {
+  type        = string
+  description = "Service account annotations for flink service account."
+  default     = "serviceAccountName: default"
 }

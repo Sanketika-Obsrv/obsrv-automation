@@ -17,7 +17,6 @@ variable "dataset_api_release_name" {
 variable "dataset_api_namespace" {
   type        = string
   description = "Dataset service namespace."
-  default     = "dataset-api"
 }
 
 variable "dataset_api_chart_path" {
@@ -49,22 +48,20 @@ variable "dataset_api_install_timeout" {
   default     = 1200
 }
 
-variable "dataset_api_postgres_database" {
+variable "postgresql_obsrv_database" {
   type        = string
-  description = "Dataset service postgres database"
-  default     = "obsrv"
+  description = "obsrv postgres database"
 }
 
-variable "dataset_api_postgres_username" {
+variable "postgresql_obsrv_username" {
   type = string
-  description = "Dataset service postgres username"
-  default = "postgres"
+  description = "obsrv postgres username"
+  default = "obsrv"
 }
 
-variable "dataset_api_postgres_user_password" {
+variable "postgresql_obsrv_user_password" {
   type = string
-  description = "Dataset service postgres password"
-  default = "postgres"
+  description = "obsrv user postgres password"
 }
 
 variable "dataset_api_chart_depends_on" {
@@ -93,4 +90,16 @@ variable "dataset_api_sa_annotations" {
   type        = string
   description = "Service account annotations for dataset api service account."
   default     = "serviceAccountName: default"
+}
+
+variable "redis_namespace" {
+  type        = string
+  description = "Namespace of Redis installation."
+  default     = "redis"
+}
+
+variable "redis_release_name" {
+  type        = string
+  description = "Release name for Redis installation."
+  default     = "obsrv-redis"
 }

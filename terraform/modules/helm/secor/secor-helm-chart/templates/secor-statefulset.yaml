@@ -26,6 +26,7 @@ spec:
         app: secor
         release: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ .Values.namespace }}-sa
       # imagePullSecrets:
       # - name: {{ .Values.imagepullsecrets }}
       initContainers:
@@ -47,7 +48,6 @@ spec:
               value: "/opt/secor/config/log4j.docker.properties"
             - name: "JVM_MEMORY"
               value: "{{ .Values.jvm_memory }}"
-              
           volumeMounts:
            - mountPath: /opt/secor/config
              name: secor-config
@@ -62,12 +62,10 @@ spec:
               memory: {{ get (get (get $.Values.secor_jobs $.Release.Name) "limits") "memory"}}
           securityContext:
             runAsUser: 9999
-
       volumes:
         - configMap:
             name: {{ .Release.Name }}-config
           name: secor-config
-
   volumeClaimTemplates:
     - metadata:
         name: {{ .Values.describedobject.name }}

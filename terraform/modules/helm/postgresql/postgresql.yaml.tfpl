@@ -24,22 +24,13 @@ primary:
       01_create_superset_user.sql: |
         CREATE USER superset WITH ENCRYPTED PASSWORD '${postgresql_superset_user_password}';
         GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
-      02_create_flink_db.sql: |
-        CREATE DATABASE flink;
-      03_create_flink_user.sql: |
-        CREATE USER flink WITH ENCRYPTED PASSWORD '${postgresql_flink_user_password}';
-        GRANT ALL PRIVILEGES ON DATABASE flink TO flink;
-      04_create_druid_raw_db.sql: |
+      02_create_druid_raw_db.sql: |
         CREATE DATABASE druid_raw;
-      05_create_druid_raw_user.sql: |
+      03_create_druid_raw_user.sql: |
         CREATE USER druid_raw WITH ENCRYPTED PASSWORD '${postgresql_druid_raw_user_password}';
         GRANT ALL PRIVILEGES ON DATABASE druid_raw TO druid_raw;
-      06_create_dataset_api.sql: |
-        CREATE DATABASE dataset_api;
-      07_create_dataset_api_user.sql: |
-        CREATE USER dataset_api_user WITH ENCRYPTED PASSWORD '${postgresql_dataset_api_user_password}';
-        GRANT ALL PRIVILEGES ON DATABASE dataset_api TO dataset_api_user;
-      08_create_obsrv_db.sql: |
-        CREATE DATABASE obsrv;
-      09_create_obsrv_user.sql: |
-        GRANT ALL PRIVILEGES ON DATABASE obsrv TO postgres;
+      04_create_obsrv_db.sql: |
+        CREATE DATABASE '${postgresql_obsrv_database}';
+      05_create_obsrv_user.sql: |
+        CREATE USER '${postgresql_obsrv_username}' WITH ENCRYPTED PASSWORD '${postgresql_obsrv_user_password}';
+        GRANT ALL PRIVILEGES ON DATABASE '${postgresql_obsrv_database}' TO '${postgresql_obsrv_username}';

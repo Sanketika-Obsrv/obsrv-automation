@@ -4,15 +4,15 @@
 apiVersion: "druid.apache.org/v1alpha1"
 kind: "Druid"
 metadata:
-  name: "{{ .Values.druid_cluster_type }}-{{ .Values.druid_env }}"
+  name: "{{ .Values.druid_cluster_type }}"
 spec:
   image: "{{ .Values.druid_image }}"
+  serviceAccount: "{{ .Values.druid_namespace }}-sa"
   startScript: /druid.sh
-  podLabels:
-    environment: {{ .Values.druid_env }}
-    release: alpha
-  podAnnotations:
-    dummykey: dummyval
+  # podLabels:
+  #   release: alpha
+  # podAnnotations:
+  #   dummykey: dummyval
   readinessProbe:
     httpGet:
       path: /status/health
@@ -453,7 +453,7 @@ spec:
       #             pathType: Prefix
       #             backend:
       #               service:
-      #                 name: druid-{{ .Values.druid_cluster_type }}-{{ .Values.druid_env }}-routers
+      #                 name: druid-{{ .Values.druid_cluster_type }}-routers
       #                 port:
       #                   name: druidrouterport
 

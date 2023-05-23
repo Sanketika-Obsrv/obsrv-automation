@@ -11,3 +11,5 @@ image:
   repository: amancevice/superset
   tag: ${superset_image_tag}
   pullPolicy: Always
+
+redis_url: 'redis://${redis_release_name}-headless.${redis_namespace}.svc.cluster.local:6379/3'

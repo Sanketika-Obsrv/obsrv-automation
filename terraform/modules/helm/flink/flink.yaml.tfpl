@@ -6,6 +6,7 @@ azure_secret: ${azure_secret}
 google_service_account_key_path: ${google_service_account_key_path}
 repository: ${flink_container_registry}
 image_tag: ${flink_image_tag}
+
 base_config: |
   job {
     env = "dev"
@@ -38,12 +39,12 @@ base_config: |
 
   redis.connection.timeout = 100
   redis {
-    host = obsrv-redis-headless.redis.svc.cluster.local
+    host = ${redis_release_name}-headless.${redis_namespace}.svc.cluster.local
     port = 6379
   }
 
   redis-meta {
-    host = obsrv-redis-headless.redis.svc.cluster.local
+    host = ${redis_release_name}-headless.${redis_namespace}.svc.cluster.local
     port = 6379
   }
 
@@ -51,12 +52,17 @@ base_config: |
     host = postgresql-hl.postgres.svc.cluster.local
     port = 5432
     maxConnections = 2
-    user = postgres
-    password = ${postgresql_admin_password}
-    database = obsrv
+    user = '${postgresql_obsrv_username}'
+    password = '${postgresql_obsrv_user_password}'
+    database = '${postgresql_obsrv_database}'
   }
 
   lms-cassandra {
     host = "localhost"
     port = "9042"
   }
+
+serviceAccount:
+  annotations:
+    ${flink_sa_annotations}
+  name: ${flink_service_account_name}

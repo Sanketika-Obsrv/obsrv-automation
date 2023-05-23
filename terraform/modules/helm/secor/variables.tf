@@ -48,7 +48,6 @@ variable "secor_image_repository" {
 variable "secor_namespace" {
   type        = string
   description = "Secor namespace."
-  default     = "secor"
 }
 
 variable "secor_chart_path" {
@@ -172,8 +171,8 @@ variable "region" {
   default     = "us-east-2"
 }
 
-variable "google_service_account_key_path" {
-  description = "The path to the google service account key file."
+variable "secor_sa_annotations" {
   type        = string
-  default     = ""
+  description = "Service account annotations for secor service account."
+  default     = "serviceAccountName: default"
 }

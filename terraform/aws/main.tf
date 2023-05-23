@@ -88,7 +88,9 @@ module "superset" {
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
-  superset_chart_depends_on         = [module.postgresql]
+  superset_chart_depends_on         = [module.postgresql, module.redis]
+  redis_namespace                   = module.redis.redis_namespace
+  redis_release_name                = module.redis.redis_release_name
 }
 
 module "grafana_configs" {
@@ -100,6 +102,13 @@ module "grafana_configs" {
 
 module "postgresql" {
   source               = "../modules/helm/postgresql"
+  env                  = var.env
+  building_block       = var.building_block
+  depends_on           = [module.eks]
+}
+
+module "redis" {
+  source               = "../modules/helm/redis"
   env                  = var.env
   building_block       = var.building_block
   depends_on           = [module.eks]
@@ -118,26 +127,33 @@ module "flink" {
   building_block                 = var.building_block
   flink_container_registry       = var.flink_container_registry
   flink_image_tag                = var.flink_image_tag
-  s3_access_key                  = module.iam.s3_access_key
-  s3_secret_key                  = module.iam.s3_secret_key
+  # s3_access_key                  = module.iam.s3_access_key
+  # s3_secret_key                  = module.iam.s3_secret_key
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
-  flink_chart_depends_on         = [module.kafka]
-  postgresql_flink_user_password = module.postgresql.postgresql_flink_user_password
+  flink_chart_depends_on         = [module.kafka, module.postgresql, module.redis]
+  postgresql_obsrv_username      = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database      = module.postgresql.postgresql_obsrv_database
   checkpoint_base_url            = "s3://${module.s3.checkpoint_storage_bucket}"
-
+  redis_namespace                = module.redis.redis_namespace
+  redis_release_name             = module.redis.redis_release_name
+  flink_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
+  flink_namespace                = module.eks.flink_namespace
 }
 
 module "druid_raw_cluster" {
   source                             = "../modules/helm/druid_raw_cluster"
   env                                = var.env
   building_block                     = var.building_block
-  s3_access_key                      = module.iam.s3_access_key
-  s3_secret_key                      = module.iam.s3_secret_key
+#  s3_access_key                      = module.iam.s3_access_key
+#  s3_secret_key                      = module.iam.s3_secret_key
   s3_bucket                          = module.s3.s3_bucket
   druid_deepstorage_type             = var.druid_deepstorage_type
   druid_raw_cluster_chart_depends_on = [module.postgresql, module.druid_operator]
   kubernetes_storage_class           = var.kubernetes_storage_class
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
+  druid_raw_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.druid_raw_sa_iam_role}"
+  druid_cluster_namespace            = module.eks.druid_raw_namespace
 }
 
 module "druid_operator" {
@@ -174,16 +190,24 @@ module "dataset_api" {
   building_block                     = var.building_block
   dataset_api_container_registry     = var.dataset_api_container_registry
   dataset_api_image_tag              = var.dataset_api_image_tag
-  dataset_api_postgres_user_password = module.postgresql.postgresql_dataset_api_user_password
+  # dataset_api_postgres_user_password = module.postgresql.postgresql_dataset_api_user_password
+  postgresql_obsrv_username          = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
   dataset_api_sa_annotations         = "eks.amazonaws.com/role-arn: ${module.eks.dataset_api_sa_annotations}"
   dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
+  redis_namespace                    = module.redis.redis_namespace
+  redis_release_name                 = module.redis.redis_release_name
+  dataset_api_namespace              = module.eks.dataset_api_namespace
 }
 
 module "secor" {
   source                  = "../modules/helm/secor"
   env                     = var.env
   building_block          = var.building_block
+  secor_sa_annotations    = "eks.amazonaws.com/role-arn: ${module.eks.secor_sa_iam_role}"
   secor_chart_depends_on  = [module.kafka]
+  secor_namespace         = module.eks.secor_namespace
 }
 
 module "submit_ingestion" {
@@ -204,7 +228,7 @@ module "velero" {
   velero_aws_secret_access_key = module.iam.velero_user_secret_key
 }
 
-# module "alert_rules" {
-#   source                       = "../modules/helm/alert_rules"
-#   alertrules_chart_depends_on  = [module.monitoring]
-# }
+module "alert_rules" {
+  source                       = "../modules/helm/alert_rules"
+  alertrules_chart_depends_on  = [module.monitoring]
+}
