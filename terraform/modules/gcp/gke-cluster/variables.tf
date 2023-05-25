@@ -3,6 +3,16 @@
 # These parameters must be supplied when consuming this module.
 # ---------------------------------------------------------------------------------------------------------------------
 
+variable "building_block" {
+  type        = string
+  description = "Building block name. All resources will be prefixed with this value."
+}
+
+variable "env" {
+  type        = string
+  description = "Environment name. All resources will be prefixed with this value."
+}
+
 variable "project" {
   description = "The project ID to host the cluster in"
   type        = string
@@ -53,8 +63,47 @@ variable "description" {
 variable "kubernetes_version" {
   description = "The Kubernetes version of the masters. If set to 'latest' it will pull latest available version in the selected region."
   type        = string
-  # default     = "latest"
-  default     = "1.25.7-gke.1000"
+  # default     = "STABLE"
+  default     = "1.25.8-gke.500"
+}
+
+variable "gke_node_pool_instance_type" {
+  type        = string
+  description = "GKE nodepool instance types."
+  default     = "c2d-standard-4"
+}
+
+variable "gke_node_pool_scaling_config" {
+  type        = map(number)
+  description = "EKS node group auto scaling configuration."
+  default = {
+    desired_size = 3
+    max_size   = 4
+    min_size   = 0
+  }
+}
+
+variable "gke_node_pool_network_tags" {
+  type        = list(string)
+  description = "List of networks to attach to the node pool"
+}
+
+variable "kubernetes_storage_class" {
+  type        = string
+  description = "Storage class name for the GKE cluster"
+  default     = "pd-ssd"
+}
+
+variable "kubernetes_storage_class_raw" {
+  type        = string
+  description = "Storage class name in raw format, they use a different notation than the GKE cluster"
+  default     = "premium-rwo"
+}
+
+variable "gke_node_pool_preemptible" {
+  type        = bool
+  description = "Whether to use preemptible nodes for the GKE cluster; use `true` for fault-tolerant workloads, `false` otherwise. Ref: https://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms"
+  default     = false
 }
 
 variable "logging_service" {
@@ -237,7 +286,7 @@ variable "services_secondary_range_name" {
 
 variable "enable_workload_identity" {
   description = "Enable Workload Identity on the cluster"
-  default     = false
+  default     = true
   type        = bool
 }
 

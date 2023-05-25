@@ -11,7 +11,7 @@ variable "building_block" {
 variable "flink_release_name" {
   type        = string
   description = "Flink helm release name."
-  default     = "merged-pipeline"
+  default     = "unified-pipeline"
 }
 
 variable "flink_namespace" {
@@ -52,7 +52,7 @@ variable "flink_custom_values_yaml" {
 variable "flink_kubernetes_service_name" {
   type        = string
   description = "Flink kubernetes service name."
-  default     = "merged-pipeline"
+  default     = "unified-pipeline"
 }
 
 variable "flink_container_registry" {
@@ -63,7 +63,7 @@ variable "flink_container_registry" {
 variable "flink_image_name" {
   type        = string
   description = "Flink image name."
-  default     = "obsrv-core-pipeline"
+  default     = "obsrv-core"
 }
 
 variable "flink_image_tag" {
@@ -144,6 +144,7 @@ variable "google_service_account_key_path" {
   description = "The path to the service account key file."
   type        = string
   default     = ""
+}
 
 variable "flink_sa_annotations" {
   type        = string

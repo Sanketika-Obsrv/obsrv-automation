@@ -89,7 +89,7 @@ log4j_console_properties: |
 base_config: |
   job {
     env = "dev"
-    enable.distributed.checkpointing = false
+    enable.distributed.checkpointing = true
     statebackend {
       base.url = "s3://flink-checkpoints-obsrv-dev"
     }

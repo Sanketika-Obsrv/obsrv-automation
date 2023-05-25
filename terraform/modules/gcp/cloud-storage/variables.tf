@@ -3,9 +3,14 @@ variable "project" {
   type        = string
 }
 
-variable "name" {
-  description = "The name of the cloud storage bucket"
+variable "building_block" {
   type        = string
+  description = "Building block name. All resources will be prefixed with this value."
+}
+
+variable "env" {
+  type        = string
+  description = "Environment name. All resources will be prefixed with this value."
 }
 
 variable "region" {

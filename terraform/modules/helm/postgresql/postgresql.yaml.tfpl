@@ -30,7 +30,7 @@ primary:
         CREATE USER druid_raw WITH ENCRYPTED PASSWORD '${postgresql_druid_raw_user_password}';
         GRANT ALL PRIVILEGES ON DATABASE druid_raw TO druid_raw;
       04_create_obsrv_db.sql: |
-        CREATE DATABASE '${postgresql_obsrv_database}';
+        CREATE DATABASE ${postgresql_obsrv_database};
       05_create_obsrv_user.sql: |
-        CREATE USER '${postgresql_obsrv_username}' WITH ENCRYPTED PASSWORD '${postgresql_obsrv_user_password}';
-        GRANT ALL PRIVILEGES ON DATABASE '${postgresql_obsrv_database}' TO '${postgresql_obsrv_username}';
+        CREATE USER ${postgresql_obsrv_username} WITH ENCRYPTED PASSWORD '${postgresql_obsrv_user_password}';
+        GRANT ALL PRIVILEGES ON DATABASE ${postgresql_obsrv_database} TO ${postgresql_obsrv_username};

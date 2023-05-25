@@ -49,12 +49,12 @@ base_config: |
   }
 
   postgres {
-    host = postgresql-hl.postgres.svc.cluster.local
+    host = postgresql-hl.postgresql.svc.cluster.local
     port = 5432
     maxConnections = 2
-    user = '${postgresql_obsrv_username}'
-    password = '${postgresql_obsrv_user_password}'
-    database = '${postgresql_obsrv_database}'
+    user = ${postgresql_obsrv_username}
+    password = ${postgresql_obsrv_user_password}
+    database = ${postgresql_obsrv_database}
   }
 
   lms-cassandra {

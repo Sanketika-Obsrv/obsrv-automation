@@ -128,6 +128,7 @@ variable "gcs_bucket" {
   type        = string
   description = "GCS bucket name for druid deepstore."
   default     = ""
+}
 
 variable "druid_raw_sa_annotations" {
   type        = string

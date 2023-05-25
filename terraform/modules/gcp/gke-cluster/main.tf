@@ -160,66 +160,65 @@ resource "google_container_cluster" "cluster" {
     }
   }
 
-  # dynamic "workload_identity_config" {
-  #   for_each = local.workload_identity_config
+  dynamic "workload_identity_config" {
+    for_each = local.workload_identity_config
 
-  #   content {
-  #     identity_namespace = workload_identity_config.value.identity_namespace
-  #   }
-  # }
+    content {
+      workload_pool = workload_identity_config.value.identity_namespace
+    }
+  }
 
   resource_labels = var.resource_labels
 }
 
-# resource "google_container_node_pool" "node_pool" {
-#   provider = google
+resource "google_container_node_pool" "node_pool" {
+  provider = google
 
-#   name     = "${var.building_block}-${var.env}-pool"
-#   project  = var.project
-#   location = var.zone
-#   cluster  = google_container_cluster.cluster.name
+  name     = "${var.building_block}-${var.env}-pool"
+  project  = var.project
+  location = var.zone
+  cluster  = google_container_cluster.cluster.name
 
-#   initial_node_count = var.gke_node_pool_scaling_config["desired_size"]
+  initial_node_count = var.gke_node_pool_scaling_config["desired_size"]
 
-#   autoscaling {
-#     min_node_count = var.gke_node_pool_scaling_config["min_size"]
-#     max_node_count = var.gke_node_pool_scaling_config["max_size"]
-#   }
+  autoscaling {
+    min_node_count = var.gke_node_pool_scaling_config["min_size"]
+    max_node_count = var.gke_node_pool_scaling_config["max_size"]
+  }
 
-#   management {
-#     auto_repair  = "true"
-#     auto_upgrade = "true"
-#   }
+  management {
+    auto_repair  = "true"
+    auto_upgrade = "true"
+  }
 
-#   node_config {
-#     image_type   = "COS_CONTAINERD"
-#     machine_type = var.gke_node_pool_instance_type
+  node_config {
+    image_type   = "COS_CONTAINERD"
+    machine_type = var.gke_node_pool_instance_type
 
-#     tags = [
-#       module.networking.public
-#     ]
+    tags = var.gke_node_pool_network_tags
 
-#     disk_size_gb = "20"
-#     disk_type    = var.kubernetes_storage_class
-#     preemptible  = var.gke_node_pool_preemptible
+    disk_size_gb = "20"
+    disk_type    = var.kubernetes_storage_class
+    preemptible  = var.gke_node_pool_preemptible
 
-#     service_account = module.gke_service_account.email
+    service_account = var.alternative_default_service_account
 
-#     oauth_scopes = [
-#       "https://www.googleapis.com/auth/cloud-platform",
-#     ]
-#   }
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform",
+    ]
+  }
 
-#   lifecycle {
-#     ignore_changes = [initial_node_count]
-#   }
+  lifecycle {
+    ignore_changes = [initial_node_count]
+  }
 
-#   timeouts {
-#     create = "30m"
-#     update = "30m"
-#     delete = "30m"
-#   }
-# }
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "30m"
+  }
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Prepare locals to keep the code cleaner
 # ---------------------------------------------------------------------------------------------------------------------
@@ -239,3 +238,4 @@ data "google_container_engine_versions" "location" {
   location = var.location
   project  = var.project
 }
+

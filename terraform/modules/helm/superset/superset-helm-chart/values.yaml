@@ -196,8 +196,8 @@ resources: {}
 ## Superset node configuration
 supersetNode:
   connections:
-    # redis_host: 'obsrv-redis-master.redis.svc.cluster.local'
-    # redis_port: "6379"
+    redis_host: 'obsrv-redis-master.redis.svc.cluster.local'
+    redis_port: "6379"
     db_host: '{{ template "superset.fullname" . }}-postgres-headless'
     db_port: "{{ .Values.postgres.db_port }}"
     db_user: "{{ .Values.postgres.superset.db_username }}"

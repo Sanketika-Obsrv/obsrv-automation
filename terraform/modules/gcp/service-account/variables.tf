@@ -35,3 +35,21 @@ variable "google_service_account_key_path" {
   type        = string
   default     = ""
 }
+
+variable "sa_namespace" {
+  description = "The namespace of the GKE service account."
+  type        = string
+  default     = ""
+}
+
+variable "sa_name" {
+  description = "The name of the GKE service account."
+  type        = string
+  default     = ""
+}
+
+variable "sa_key_store_bucket" {
+  description = "The name of the GCS bucket where the service account key will be stored."
+  type        = string
+  default     = ""
+}

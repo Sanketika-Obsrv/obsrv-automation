@@ -157,38 +157,16 @@ variable "override_default_node_pool_service_account" {
   default     = true
 }
 
-variable "gke_node_pool_instance_type" {
-  type        = string
-  description = "GKE nodepool instance types."
-  default     = "c2d-standard-4"
-}
-
-variable "gke_node_pool_scaling_config" {
-  type        = map(number)
-  description = "EKS node group auto scaling configuration."
-  default = {
-    desired_size = 3
-    max_size   = 4
-    min_size   = 3
-  }
-}
-
 variable "kubernetes_storage_class" {
   type        = string
   description = "Storage class name for the GKE cluster"
-  default     = "pd-standard"
+  default     = "pd-ssd"
 }
 
 variable "kubernetes_storage_class_raw" {
   type        = string
   description = "Storage class name in raw format, they use a different notation than the GKE cluster"
   default     = "standard-rwo"
-}
-
-variable "gke_node_pool_preemptible" {
-  type        = bool
-  description = "Whether to use preemptible nodes for the GKE cluster; use `true` for fault-tolerant workloads, `false` otherwise. Ref: https://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms"
-  default     = false
 }
 
 variable "druid_deepstorage_type" {
@@ -233,11 +211,59 @@ variable "dataset_api_image_tag" {
 variable "flink_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
-  default     = "manjudr"
+  default     = "sanketikahub"
 }
 
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "2.1"
+   default     = "1.0.3"
+}
+
+variable "dataset_api_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for dataset api service account."
+  default     = "dataset-api-sa-iam-role"
+}
+
+variable "dataset_api_namespace" {
+  type        = string
+  description = "Dataset service namespace."
+  default     = "dataset-api"
+}
+
+variable "flink_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for flink service account."
+  default     = "flink-sa-iam-role"
+}
+
+variable "flink_namespace" {
+  type        = string
+  description = "Flink namespace."
+  default     = "flink"
+}
+
+variable "druid_raw_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for druid raw service account."
+  default     = "druid-raw-sa-iam-role"
+}
+
+variable "druid_raw_namespace" {
+  type        = string
+  description = "Druid raw namespace."
+  default     = "druid-raw"
+}
+
+variable "secor_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for secor service account."
+  default     = "secor-sa-iam-role"
+}
+
+variable "secor_namespace" {
+  type        = string
+  description = "Secor namespace."
+  default     = "secor"
 }

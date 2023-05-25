@@ -19,6 +19,7 @@ resource "helm_release" "flink" {
           s3_secret_key                  = var.s3_secret_key
           azure_account                  = var.azure_storage_account_name
           azure_secret                   = var.azure_storage_account_key
+          google_service_account_key_path= var.google_service_account_key_path
           postgresql_obsrv_username      = var.postgresql_obsrv_username
           postgresql_obsrv_user_password = var.postgresql_obsrv_user_password
           postgresql_obsrv_database      = var.postgresql_obsrv_database
