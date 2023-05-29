@@ -24,7 +24,7 @@ resource "aws_iam_access_key" "velero_user_key" {
 }
 
 resource "aws_iam_policy" "velero_user_policy" {
-  name        = "velero_policy"
+  name        = "${var.building_block}-${var.env}-velero-policy"
   path        = "/"
   description = "Velero Backup IAM Policy"
 

@@ -35,7 +35,7 @@ locals {
 }
 
 resource "aws_iam_role" "eks_master_role" {
-  name               = var.eks_master_role
+  name               = "${var.building_block}-${var.env}-${var.eks_master_role}"
   assume_role_policy = <<POLICY
   {
     "Version": "2012-10-17",
@@ -59,7 +59,7 @@ resource "aws_iam_role" "eks_master_role" {
 }
 
 resource "aws_iam_role" "eks_nodes_role" {
-  name        = var.eks_nodes_role
+  name        = "${var.building_block}-${var.env}-${var.eks_nodes_role}"
   assume_role_policy = jsonencode({
    Version    = "2012-10-17"
    Statement  = [{
