@@ -159,6 +159,55 @@ resource "null_resource" "configure_kubectl" {
   depends_on = [ module.gke_cluster ]
 }
 
+module "dataset_api_sa_iam_role" {
+  source = "../modules/gcp/service-account"
+  name        = "${var.building_block}-${var.dataset_api_sa_iam_role_name}"
+  project     = var.project
+  description = "GCP SA bound to K8S SA ${var.project}[${var.dataset_api_namespace}-sa]"
+  service_account_roles = [
+    "roles/storage.objectAdmin"
+  ]
+  sa_namespace = var.dataset_api_namespace
+  sa_name = "${var.dataset_api_namespace}-sa"
+}
+
+module "flink_sa_iam_role" {
+  source = "../modules/gcp/service-account"
+  name        = "${var.building_block}-${var.flink_sa_iam_role_name}"
+  project     = var.project
+  description = "GCP SA bound to K8S SA ${var.project}[${var.flink_namespace}-sa]"
+  service_account_roles = [
+    "roles/storage.objectAdmin"
+  ]
+  sa_namespace = var.flink_namespace
+  sa_name = "${var.flink_namespace}-sa"
+}
+
+module "druid_raw_sa_iam_role" {
+  source = "../modules/gcp/service-account"
+  name        = "${var.building_block}-${var.druid_raw_sa_iam_role_name}"
+  project     = var.project
+  description = "GCP SA bound to K8S SA ${var.project}[${var.druid_raw_namespace}-sa]"
+  service_account_roles = [
+    "roles/storage.objectAdmin"
+  ]
+  sa_namespace = var.druid_raw_namespace
+  sa_name = "${var.druid_raw_namespace}-sa"
+}
+
+module "secor_sa_iam_role" {
+  source = "../modules/gcp/service-account"
+  name        = "${var.building_block}-${var.secor_sa_iam_role_name}"
+  project     = var.project
+  description = "GCP SA bound to K8S SA ${var.project}[${var.secor_namespace}-sa]"
+  service_account_roles = [
+    "roles/storage.objectAdmin"
+  ]
+  google_service_account_key_path = "../modules/helm/secor/secor-helm-chart/config/${var.building_block}-${var.secor_sa_iam_role_name}.json"
+  sa_namespace = var.secor_namespace
+  sa_name = "${var.secor_namespace}-sa"
+}
+
 resource "google_storage_bucket_object" "kubeconfig" {
   name   = "kubeconfig/config-${var.building_block}-${var.env}.yaml"
   source = var.kubectl_config_path != "" ? var.kubectl_config_path : ""
@@ -297,35 +346,9 @@ module "flink" {
   checkpoint_base_url            = "gs://${module.cloud_storage.checkpoint_storage_bucket}"
   redis_namespace                = module.redis.redis_namespace
   redis_release_name             = module.redis.redis_release_name
-  flink_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
+  flink_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   flink_namespace                = var.flink_namespace
 }
-
-module "flink_sa_iam_role" {
-  source = "../modules/gcp/service-account"
-  name        = "${var.building_block}-${var.flink_sa_iam_role_name}"
-  project     = var.project
-  description = "GCP SA bound to K8S SA ${var.project}[${var.flink_namespace}-sa]"
-  service_account_roles = [
-    "roles/storage.objectAdmin"
-  ]
-  depends_on = [ module.flink ]
-  sa_namespace = var.flink_namespace
-  sa_name = "${var.flink_namespace}-sa"
-}
-
-# module "flink-workload-identity" {
-#   source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-#   use_existing_k8s_sa = true
-#   cluster_name        = module.gke_cluster.name
-#   location            = var.zone
-#   name                = var.flink_sa_iam_role_name
-#   k8s_sa_name         = "${var.flink_namespace}-sa"
-#   namespace           = var.flink_namespace
-#   project_id          = var.project
-#   roles               = ["roles/storage.objectAdmin"]
-#   depends_on          = [ module.flink ]
-# }
 
 module "druid_operator" {
   source          = "../modules/helm/druid_operator"
@@ -343,35 +366,9 @@ module "druid_raw_cluster" {
   druid_raw_cluster_chart_depends_on = [module.postgresql, module.druid_operator]
   kubernetes_storage_class           = var.kubernetes_storage_class_raw
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
-  druid_raw_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.druid_raw_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
+  druid_raw_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.druid_raw_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   druid_cluster_namespace            = var.druid_raw_namespace
 }
-
-module "druid_raw_sa_iam_role" {
-  source = "../modules/gcp/service-account"
-  name        = "${var.building_block}-${var.druid_raw_sa_iam_role_name}"
-  project     = var.project
-  description = "GCP SA bound to K8S SA ${var.project}[${var.druid_raw_namespace}-sa]"
-  service_account_roles = [
-    "roles/storage.objectAdmin"
-  ]
-  depends_on = [ module.druid_raw_cluster ]
-  sa_namespace = var.druid_raw_namespace
-  sa_name = "${var.druid_raw_namespace}-sa"
-}
-
-# module "druid_workload_identity" {
-#   source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-#   use_existing_k8s_sa = true
-#   cluster_name        = module.gke_cluster.name
-#   location            = var.zone
-#   name                = var.druid_sa_iam_role_name
-#   k8s_sa_name         = "${var.druid_namespace}-sa"
-#   namespace           = var.druid_namespace
-#   project_id          = var.project
-#   roles               = ["roles/storage.objectAdmin"]
-#   depends_on          = [ module.druid_raw_cluster ]
-# }
 
 module "kafka_exporter" {
   source                          = "../modules/helm/kafka_exporter"
@@ -400,80 +397,29 @@ module "dataset_api" {
   building_block                     = var.building_block
   dataset_api_container_registry     = var.dataset_api_container_registry
   dataset_api_image_tag              = var.dataset_api_image_tag
-  # dataset_api_postgres_user_password = module.postgresql.postgresql_dataset_api_user_password
   postgresql_obsrv_username          = module.postgresql.postgresql_obsrv_username
   postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
-  dataset_api_sa_annotations         = "iam.gke.io/gcp-service-account: ${var.dataset_api_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
+  dataset_api_sa_annotations         = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.dataset_api_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
   redis_namespace                    = module.redis.redis_namespace
   redis_release_name                 = module.redis.redis_release_name
   dataset_api_namespace              = var.dataset_api_namespace
 }
 
-module "dataset_api_sa_iam_role" {
-  source = "../modules/gcp/service-account"
-  name        = "${var.building_block}-${var.dataset_api_sa_iam_role_name}"
-  project     = var.project
-  description = "GCP SA bound to K8S SA ${var.project}[${var.dataset_api_namespace}-sa]"
-  service_account_roles = [
-    "roles/storage.objectAdmin"
-  ]
-  depends_on = [ module.dataset_api ]
-  sa_namespace = var.dataset_api_namespace
-  sa_name = "${var.dataset_api_namespace}-sa"
-}
-
-# module "dataset_api_workload_identity" {
-#   source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-#   use_existing_k8s_sa = true
-#   cluster_name        = module.gke_cluster.name
-#   location            = var.zone
-#   name                = var.dataset_api_sa_iam_role_name
-#   k8s_sa_name         = "${var.dataset_api_namespace}-sa"
-#   namespace           = var.dataset_api_namespace
-#   project_id          = var.project
-#   roles               = ["roles/storage.objectAdmin"]
-#   depends_on          = [ module.dataset_api ]
-# }
-
 module "secor" {
   source                  = "../modules/helm/secor"
   env                     = var.env
   building_block          = var.building_block
   kubernetes_storage_class = var.kubernetes_storage_class_raw
-  secor_sa_annotations    = "iam.gke.io/gcp-service-account: ${var.secor_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
+  secor_sa_annotations    = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.secor_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   secor_chart_depends_on  = [module.kafka]
   secor_namespace         = var.secor_namespace
   cloud_store_provider    = "GS"
   cloud_storage_bucket    = module.cloud_storage.name
+  upload_manager          = "com.pinterest.secor.uploader.GsUploadManager"
+  google_service_account_key_path = "${var.building_block}-${var.secor_sa_iam_role_name}.json"
 }
-
-module "secor_sa_iam_role" {
-  source = "../modules/gcp/service-account"
-  name        = "${var.building_block}-${var.secor_sa_iam_role_name}"
-  project     = var.project
-  description = "GCP SA bound to K8S SA ${var.project}[${var.secor_namespace}-sa]"
-  service_account_roles = [
-    "roles/storage.objectAdmin"
-  ]
-  depends_on = [ module.secor ]
-  sa_namespace = var.secor_namespace
-  sa_name = "${var.secor_namespace}-sa"
-}
-
-# module "secor_workload_identity" {
-#   source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-#   use_existing_k8s_sa = true
-#   cluster_name        = module.gke_cluster.name
-#   location            = var.zone
-#   name                = var.secor_sa_iam_role_name
-#   k8s_sa_name         = "${var.secor_namespace}-sa"
-#   namespace           = var.secor_namespace
-#   project_id          = var.project
-#   roles               = ["roles/storage.objectAdmin"]
-#   depends_on          = [ module.secor ]
-# }
 
 # module "submit_ingestion" {
 #   source                            = "../modules/helm/submit_ingestion"

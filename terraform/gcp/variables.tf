@@ -217,7 +217,7 @@ variable "flink_container_registry" {
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "1.0.3"
+   default     = "1.0.4"
 }
 
 variable "dataset_api_sa_iam_role_name" {

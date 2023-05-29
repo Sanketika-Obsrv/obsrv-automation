@@ -122,7 +122,7 @@ spec:
           "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
 {{- end }}
 {{- if eq .Values.checkpoint_store_type "gcs" }}
-          "-Dgoogle.cloud.auth.service.account.json.keyfile={{ .Values.google_service_account_key_path }}",
+          "-Dgoogle.cloud.auth.service.account.enable=true",
 {{- end }}
 {{- $release_name := .Release.Name }}
                "--job-classname={{ (index .Values $release_name).job_classname }}",
@@ -215,7 +215,7 @@ spec:
           "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
 {{- end }}
 {{- if eq .Values.checkpoint_store_type "gcs" }}
-          "-Dgoogle.cloud.auth.service.account.json.keyfile={{ .Values.google_service_account_key_path }}",
+          "-Dgoogle.cloud.auth.service.account.enable=true",
 {{- end }}
           "-Dweb.submit.enable=false",
           "-Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter",

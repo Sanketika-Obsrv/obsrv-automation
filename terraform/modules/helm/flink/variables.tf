@@ -140,12 +140,6 @@ variable "azure_storage_account_key" {
   default     = ""
 }
 
-variable "google_service_account_key_path" {
-  description = "The path to the service account key file."
-  type        = string
-  default     = ""
-}
-
 variable "flink_sa_annotations" {
   type        = string
   description = "Service account annotations for flink service account."
