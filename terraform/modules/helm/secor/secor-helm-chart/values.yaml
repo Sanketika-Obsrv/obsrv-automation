@@ -1,3 +1,5 @@
+cloud_store_provider: "${cloud_store_provider}"
+upload_manager: "${upload_manager}"
 cloud_storage_bucket: "${cloud_storage_bucket}"
 namespace: "${secor_namespace}"
 storageClass: "${storage_class}"
@@ -7,7 +9,6 @@ region: "${region}"
 pullPolicy: "Always"
 jvm_memory: 1024m
 image_tag: "${secor_image_tag}"
-google_service_account_key_path: "${google_service_account_key_path}"
 secor_jobs:
   ingest-backup:
     replicas: 1
@@ -24,10 +25,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
-    message_channel_identifier: ""
+    message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -55,10 +55,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -86,10 +85,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -117,10 +115,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -148,10 +145,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -179,10 +175,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -210,10 +205,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -241,10 +235,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -272,10 +265,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -303,10 +295,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -334,10 +325,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -365,10 +355,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:
@@ -396,10 +385,9 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_prefix_enabled: "false"
     message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
+    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
     requests:

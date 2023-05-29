@@ -6,6 +6,7 @@ variable "env" {
 variable "kubernetes_storage_class" {
   type        = string
   description = "kubernetes storage class name"
+  default     = "gp2"
 }
 
 variable "building_block" {
@@ -22,7 +23,7 @@ variable "secor_release_name" {
 variable "secor_image_tag" {
   type        = string
   description = "secor image version"
-  default     = "0.29.1"
+  default     = "0.29.16-java-11-gs"
 }
 
 variable "jobs" {
@@ -145,6 +146,18 @@ variable "kafka_zookeeper_ip" {
   type        = string
   description = "Kafka zookeeper address"
   default     = "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
+}
+
+variable "cloud_store_provider" {
+  type        = string
+  description = "Cloud storage provider"
+  default     = "S3" # Can be one of S3, GS, Swift or Azure
+}
+
+variable "upload_manager" {
+  type        = string
+  description = "Upload manager Class"
+  default     = "com.pinterest.secor.uploader.HadoopS3UploadManager"
 }
 
 variable "cloud_storage_bucket" {

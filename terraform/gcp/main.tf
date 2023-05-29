@@ -169,6 +169,7 @@ module "dataset_api_sa_iam_role" {
   ]
   sa_namespace = var.dataset_api_namespace
   sa_name = "${var.dataset_api_namespace}-sa"
+  depends_on = [ module.gke_cluster ]
 }
 
 module "flink_sa_iam_role" {
@@ -181,6 +182,7 @@ module "flink_sa_iam_role" {
   ]
   sa_namespace = var.flink_namespace
   sa_name = "${var.flink_namespace}-sa"
+  depends_on = [ module.gke_cluster ]
 }
 
 module "druid_raw_sa_iam_role" {
@@ -193,6 +195,7 @@ module "druid_raw_sa_iam_role" {
   ]
   sa_namespace = var.druid_raw_namespace
   sa_name = "${var.druid_raw_namespace}-sa"
+  depends_on = [ module.gke_cluster ]
 }
 
 module "secor_sa_iam_role" {
@@ -203,9 +206,9 @@ module "secor_sa_iam_role" {
   service_account_roles = [
     "roles/storage.objectAdmin"
   ]
-  google_service_account_key_path = "../modules/helm/secor/secor-helm-chart/config/${var.building_block}-${var.secor_sa_iam_role_name}.json"
   sa_namespace = var.secor_namespace
   sa_name = "${var.secor_namespace}-sa"
+  depends_on = [ module.gke_cluster ]
 }
 
 resource "google_storage_bucket_object" "kubeconfig" {
@@ -348,6 +351,7 @@ module "flink" {
   redis_release_name             = module.redis.redis_release_name
   flink_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   flink_namespace                = var.flink_namespace
+  depends_on                     = [ module.flink_sa_iam_role ]
 }
 
 module "druid_operator" {
@@ -368,6 +372,7 @@ module "druid_raw_cluster" {
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
   druid_raw_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.druid_raw_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   druid_cluster_namespace            = var.druid_raw_namespace
+  depends_on                         = [ module.druid_raw_sa_iam_role ]
 }
 
 module "kafka_exporter" {
@@ -405,6 +410,7 @@ module "dataset_api" {
   redis_namespace                    = module.redis.redis_namespace
   redis_release_name                 = module.redis.redis_release_name
   dataset_api_namespace              = var.dataset_api_namespace
+  depends_on                         = [ module.dataset_api_sa_iam_role ]
 }
 
 module "secor" {
@@ -418,7 +424,7 @@ module "secor" {
   cloud_store_provider    = "GS"
   cloud_storage_bucket    = module.cloud_storage.name
   upload_manager          = "com.pinterest.secor.uploader.GsUploadManager"
-  google_service_account_key_path = "${var.building_block}-${var.secor_sa_iam_role_name}.json"
+  depends_on              = [ module.secor_sa_iam_role ]
 }
 
 # module "submit_ingestion" {

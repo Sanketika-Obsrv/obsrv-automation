@@ -1,4 +1,6 @@
+cloud_store_provider: "${cloud_store_provider}"
 cloud_storage_bucket: "${cloud_storage_bucket}"
+upload_manager : "${upload_manager}"
 namespace: "${secor_namespace}"
 storageClass: "${storage_class}"
 secor_env: "${deployment_stage}"
@@ -7,7 +9,6 @@ region: "${region}"
 pullPolicy: "Always"
 jvm_memory: 1024m
 image_tag: "${secor_image_tag}"
-google_service_account_key_path: "${google_service_account_key_path}"
 secor_jobs:
   ingest-backup:
     replicas: 1

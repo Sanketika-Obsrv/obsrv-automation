@@ -34,6 +34,9 @@ resource "helm_release" "secor" {
   values = [
     templatefile("${path.module}/${var.secor_custom_values_yaml}",
       {
+        cloud_store_provider       = var.cloud_store_provider
+        upload_manager             = var.upload_manager
+        storage_class              = var.kubernetes_storage_class
         deployment_stage           = var.env
         secor_namespace            = var.secor_namespace
         base_path                  = var.secor_backup_basepath
