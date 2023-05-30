@@ -2,7 +2,7 @@ namespace: ""
 imagepullsecrets: ""
 registry: ""
 repository: "sanketikahub/obsrv-core"
-image_tag: "1.0.1"
+image_tag: "1.0.2"
 serviceMonitor:
   enabled: false
 replicaCount: 1
@@ -91,7 +91,7 @@ base_config: |
     env = "dev"
     enable.distributed.checkpointing = true
     statebackend {
-      base.url = "s3://flink-checkpoints-obsrv-dev"
+      base.url = "s3://checkpoint-obsrv-dev"
     }
   }
   kafka {
@@ -118,12 +118,12 @@ base_config: |
 
   redis.connection.timeout = 100
   redis {
-    host = obsrv-redis-headless.redis.svc.cluster.local
+    host = obsrv-redis-master.redis.svc.cluster.local
     port = 6379
   }
 
   redis-meta {
-    host = obsrv-redis-headless.redis.svc.cluster.local
+    host = obsrv-redis-master.redis.svc.cluster.local
     port = 6379
   }
 
@@ -370,6 +370,61 @@ druid-router:
 
   job_classname: org.sunbird.obsrv.router.task.DruidRouterStreamTask
 
+master-data-processor:
+  master-data-processor: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = ${job.env}".masterdata.ingest"
+      output.raw.topic = ${job.env}".masterdata.raw"
+      output.extractor.duplicate.topic = ${job.env}".masterdata.extractor.duplicate"
+      output.failed.topic = ${job.env}".masterdata.failed"
+      output.batch.failed.topic = ${job.env}".masterdata.extractor.failed"
+      event.max.size = "1048576" # Max is only 1MB
+      output.invalid.topic = ${job.env}".masterdata.invalid"
+      output.unique.topic = ${job.env}".masterdata.unique"
+      output.duplicate.topic = ${job.env}".masterdata.duplicate"
+      output.transform.topic = ${job.env}".masterdata.transform"
+      stats.topic = ${job.env}".masterdata.stats"
+      groupId = ${job.env}"-masterdata-pipeline-group"
+
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
+      window.time.in.seconds = 5
+      window.count = 30
+      window.shards = 1400
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+    redis {
+      database {
+        extractor.duplication.store.id = 1
+        preprocessor.duplication.store.id = 2
+        key.expiry.seconds = 3600
+      }
+    }
+
+    dataset.type = "master-dataset"
+  
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+  
+  job_classname: org.sunbird.obsrv.pipeline.task.MasterDataProcessorStreamTask
+
 unified-pipeline:
   unified-pipeline: |+
     include file("/data/flink/conf/baseconfig.conf")
@@ -398,8 +453,8 @@ unified-pipeline:
       window.time.in.seconds = 5
       window.count = 30
       window.shards = 1400
-      consumer.parallelism = 1
-      downstream.operators.parallelism = 1
+      consumer.parallelism = 2
+      downstream.operators.parallelism = 2
     }
 
     redis {
@@ -412,8 +467,8 @@ unified-pipeline:
 
   flink-conf: |+
     jobmanager.memory.flink.size: 1024m
-    taskmanager.memory.flink.size: 1024m
-    taskmanager.numberOfTaskSlots: 1
+    taskmanager.memory.flink.size: 2048m
+    taskmanager.numberOfTaskSlots: 2
     jobManager.numberOfTaskSlots: 1
     parallelism.default: 1
     jobmanager.execution.failover-strategy: region

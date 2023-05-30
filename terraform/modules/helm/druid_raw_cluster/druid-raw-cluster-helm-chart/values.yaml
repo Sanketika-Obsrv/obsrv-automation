@@ -17,8 +17,8 @@ druid.startup.logging.logProperties: true
 # Druid Metadata Store
 druid_metadata_storage_type: "postgresql"
 druid_metadata_storage_connector_connectURI: "jdbc:postgresql://postgresql-hl.postgresql.svc.cluster.local:5432/druid_raw"
-druid_metadata_storage_connector_user: "druid"
-druid_metadata_storage_connector_password: "druid"
+druid_metadata_storage_connector_user: "druid_raw"
+druid_metadata_storage_connector_password: "druid_raw"
 
 # Druid Storage Type
 druid_deepstorage_type: ""
@@ -160,8 +160,8 @@ druid_query_groupBy_maxMergingDictionarySize: 100000000
 druid_query_groupBy_maxOnDiskStorage: 524288000
 
 # Segmentstorage (default 1 gb storage)
-druid_segmentCache_locations: '{"path": "/druid/data/store", "maxSize": 1073741824}'
-druid_historical_persistent_volume_size: 1G
+druid_segmentCache_locations: '{"path": "/druid/data/store", "maxSize": 10737418240}'
+druid_historical_persistent_volume_size: 10G
 
 druid_segmentCache_numLoadingThreads: 4
 
@@ -206,20 +206,26 @@ druid_middlemanager_replicas: 1
 
 druid_indexer_service: druid/indexer
 druid_indexer_port: 8091
-druid_indexer_min_heap_size: 256M
-druid_indexer_max_heap_size: 512M
-druid_indexer_max_direct_size: 256M
+# druid_indexer_min_heap_size: 256M
+# druid_indexer_max_heap_size: 512M
+# druid_indexer_max_direct_size: 256M
+druid_indexer_min_heap_size: 2g
+druid_indexer_max_heap_size: 2g
+druid_indexer_max_direct_size: 2g
 
 # Peon properties
 druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 64M
+druid_indexer_worker_globalIngestionHeapLimitBytes: "512000000"
 druid_indexer_fork_property_druid_processing_numThreads: 2 # Number of cores - 1 (or 1)
 druid_indexer_fork_property_druid_processing_numMergeBuffers: 1
 druid_indexer_fork_property_druid_server_http_numThreads: 25 # max(10, (Number of cores * 17) / 16 + 2) + 30
 
-druid_indexer_pod_memory_request: 512Mi
-druid_indexer_pod_memory_limit: 768Mi
-druid_indexer_pod_cpu_request: 500m
-druid_indexer_pod_cpu_limit: 1
+# druid_indexer_pod_memory_request: 512Mi
+# druid_indexer_pod_memory_limit: 768Mi
+druid_indexer_pod_memory_request: 2Gi
+druid_indexer_pod_memory_limit: 2Gi
+druid_indexer_pod_cpu_request: 1
+druid_indexer_pod_cpu_limit: 2
 druid_indexer_numConcurrentMerges: 1
 
 druid_indexer_persistent_volume_size: 1Gi
@@ -227,7 +233,7 @@ druid_indexer_persistent_volume_size: 1Gi
 indexer_intial_delay: 30
 
 # Number of tasks per indexer
-druid_indexer_worker_capacity: 2 #(Number of available processors - 1)
+druid_indexer_worker_capacity: 4 #(Number of available processors - 1)
 
 # Task launch parameters
 # druid_indexer_runner_javaOpts: "-server -Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxDirectMemorySize=512m"

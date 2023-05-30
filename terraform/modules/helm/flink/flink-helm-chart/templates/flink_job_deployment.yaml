@@ -169,13 +169,13 @@ spec:
   replicas: {{ .Values.taskmanager.replicas }}
   selector:
     matchLabels:
-      app: flink
-      component: {{ .Release.Name }}-taskmanager
+      app: {{ .Release.Name }}-taskmanager
+      # component: {{ .Release.Name }}-taskmanager
   template:
     metadata:
       labels:
-        app: flink
-        component: {{ .Release.Name }}-taskmanager
+        app: {{ .Release.Name }}-taskmanager
+        # component: {{ .Release.Name }}-taskmanager
     spec:
       volumes:
       - name: flink-config-volume

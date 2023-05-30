@@ -88,6 +88,18 @@ variable "secor_threads_count" {
   default     = 2
 }
 
+variable "secor_extractor_timestamp_key" {
+  type        = string
+  description = "Secor process number of threads."
+  default     = "syncts"
+}
+
+variable "secor_default_timestamp_key" {
+  type        = string
+  description = "Secor process number of threads."
+  default     = "obsrv_meta.syncts"
+}
+
 variable "secor_cpu_request" {
   type        = string
   description = "Secor CPU Request"
@@ -127,7 +139,7 @@ variable "secor_backup_max_file_size" {
 variable "secor_backup_basepath" {
   type        = string
   description = "Secor backup base path"
-  default     = "/telemetry-data"
+  default     = "telemetry-data"
 }
 
 variable "secor_backup_pv_size" {
@@ -135,6 +147,14 @@ variable "secor_backup_pv_size" {
   description = "secor backup pv size"
   default     = "1Gi"
 }
+
+variable "jvm_memory" {
+  type        = string
+  description = "secor process JVM memory"
+  default     = "1024m"
+}
+
+
 
 variable "kafka_broker_ip" {
   type        = string
@@ -157,7 +177,7 @@ variable "cloud_store_provider" {
 variable "upload_manager" {
   type        = string
   description = "Upload manager Class"
-  default     = "com.pinterest.secor.uploader.HadoopS3UploadManager"
+  default     = "com.pinterest.secor.uploader.S3UploadManager"
 }
 
 variable "cloud_storage_bucket" {
@@ -182,6 +202,38 @@ variable "region" {
   type        = string
   description = "AWS region to create the resources."
   default     = "us-east-2"
+}
+
+variable "storage_class" {
+  type        = string
+  description = "Storage Class"
+  default     = "default"
+}
+
+variable "message_timezone" {
+  type        = string
+  description = "message timezone"
+  default     = "UTC"
+}
+
+variable "parser_timezone" {
+  type        = string
+  description = "parser timezone"
+  default     = "Asia/Kolkata"
+}
+
+
+
+variable "image_pull_policy" {
+  type        = string
+  description = "Docker image pull policy"
+  default     = "IfNotPresent"
+}
+
+variable "fallback_timestamp_key" {
+  type        = string
+  description = "default timestamp key"
+  default     = ""
 }
 
 variable "secor_sa_annotations" {

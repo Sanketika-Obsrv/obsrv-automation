@@ -378,6 +378,7 @@ spec:
         # Processing resource properties
         # testing auto for sizeBytes
         druid.processing.buffer.sizeBytes={{ .Values.druid_indexer_fork_property_druid_processing_buffer_sizeBytes }}
+        druid.worker.globalIngestionHeapLimitBytes={{ .Values.druid_indexer_worker_globalIngestionHeapLimitBytes }}
         druid.processing.numThreads={{ .Values.druid_indexer_fork_property_druid_processing_numThreads }}
         druid.processing.numMergeBuffers={{ .Values.druid_indexer_fork_property_druid_processing_numMergeBuffers }}
         druid.server.http.numThreads={{ .Values.druid_indexer_fork_property_druid_server_http_numThreads }}
