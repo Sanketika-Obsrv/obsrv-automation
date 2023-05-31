@@ -11,13 +11,22 @@ resource "helm_release" "velero" {
     cleanup_on_fail  = true
     atomic           = true
     values = [
-      var.cloud_provider == "aws" ? templatefile("${path.module}/${var.aws_velero_custom_values_yaml}",
+        var.cloud_provider == "aws" ? templatefile("${path.module}/${var.aws_velero_custom_values_yaml}",
         {
             cloud_provider               = var.cloud_provider
             velero_backup_bucket         = var.velero_backup_bucket
             velero_backup_bucket_region  = var.velero_backup_bucket_region
             velero_aws_access_key_id     = var.velero_aws_access_key_id
             velero_aws_secret_access_key = var.velero_aws_secret_access_key
+        }) : var.cloud_provider == "gcp" ? templatefile("${path.module}/${var.gcp_velero_custom_values_yaml}",
+        {
+            cloud_provider               = var.cloud_provider
+            velero_backup_bucket         = var.velero_backup_bucket
+            velero_backup_bucket_region  = var.velero_backup_bucket_region
+            velero_sa_iam_role_name      = "${var.building_block}-${var.velero_sa_iam_role_name}"
+            sa_name                      = var.velero_sa_name
+            project_id                   = var.gcp_project_id
+            velero_sa_annotations        = var.velero_sa_annotations
         }) : var.cloud_provider == "azure" ? true : false
     ]
 }

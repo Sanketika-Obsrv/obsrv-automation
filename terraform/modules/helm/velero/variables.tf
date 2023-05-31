@@ -68,14 +68,22 @@ variable "aws_velero_custom_values_yaml" {
   default     = "aws-velero.tfpl.yaml"
 }
 
+variable "gcp_velero_custom_values_yaml" {
+  type        = string
+  description = "Velero chart values.yaml path for GCP cloud."
+  default     = "gcp-velero.tfpl.yaml"
+}
+
 variable "velero_aws_access_key_id" {
   type        = string
   description = "Velero S3 bucker AWS access key."
+  default     = ""
 }
 
 variable "velero_aws_secret_access_key" {
   type        = string
   description = "Velero S3 bucker AWS secret key."
+  default     = ""
 }
 
 variable "cloud_provider" {
@@ -91,4 +99,26 @@ variable "velero_backup_bucket" {
 variable "velero_backup_bucket_region" {
   type        = string
   description = "S3 bucket region in which the backups will be stored."
+}
+
+variable "velero_sa_iam_role_name" {
+  type        = string
+  description = "Service Account IAM Role Name"
+}
+
+variable "velero_sa_name" {
+  type        = string
+  description = "Service Account Name"
+  default     = "velero-sa"
+}
+
+variable "velero_sa_annotations" {
+  type        = string
+  description = "Service Account Annotations."
+  default     = "serviceAccountName: default"
+}
+
+variable "gcp_project_id" {
+  type        = string
+  description = "Google Project ID, if the provider is gcp"
 }

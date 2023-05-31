@@ -267,3 +267,15 @@ variable "secor_namespace" {
   description = "Secor namespace."
   default     = "secor"
 }
+
+variable "velero_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for secor service account."
+  default     = "velero-sa-iam-role"
+}
+
+variable "velero_namespace" {
+  type        = string
+  description = "Velero namespace."
+  default     = "velero"
+}

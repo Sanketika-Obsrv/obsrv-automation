@@ -211,6 +211,21 @@ module "secor_sa_iam_role" {
   depends_on = [ module.gke_cluster ]
 }
 
+module "velero_sa_iam_role" {
+  source = "../modules/gcp/service-account"
+  name        = "${var.building_block}-${var.velero_sa_iam_role_name}"
+  project     = var.project
+  description = "GCP SA bound to K8S SA ${var.project}[${var.velero_namespace}-sa]"
+  service_account_roles = [
+    "roles/compute.storageAdmin",
+    "roles/storage.objectAdmin",
+    "roles/iam.serviceAccountTokenCreator"
+  ]
+  sa_namespace = var.velero_namespace
+  sa_name = "${var.velero_namespace}-sa"
+  depends_on = [ module.gke_cluster ]
+}
+
 resource "google_storage_bucket_object" "kubeconfig" {
   name   = "kubeconfig/config-${var.building_block}-${var.env}.yaml"
   source = var.kubectl_config_path != "" ? var.kubectl_config_path : ""
@@ -330,7 +345,7 @@ module "superset" {
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
-  superset_chart_depends_on         = [module.postgresql, module.redis]
+  superset_chart_depends_on         = [ module.postgresql, module.redis ]
   redis_namespace                   = module.redis.redis_namespace
   redis_release_name                = module.redis.redis_release_name
 }
@@ -367,7 +382,7 @@ module "druid_raw_cluster" {
   building_block                     = var.building_block
   gcs_bucket                         = module.cloud_storage.name
   druid_deepstorage_type             = var.druid_deepstorage_type
-  druid_raw_cluster_chart_depends_on = [module.postgresql, module.druid_operator]
+  druid_raw_cluster_chart_depends_on = [ module.postgresql, module.druid_operator ]
   kubernetes_storage_class           = var.kubernetes_storage_class_raw
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
   druid_raw_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.druid_raw_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
@@ -406,7 +421,7 @@ module "dataset_api" {
   postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
   dataset_api_sa_annotations         = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.dataset_api_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
-  dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
+  dataset_api_chart_depends_on       = [ module.postgresql, module.kafka ]
   redis_namespace                    = module.redis.redis_namespace
   redis_release_name                 = module.redis.redis_release_name
   dataset_api_namespace              = var.dataset_api_namespace
@@ -419,7 +434,7 @@ module "secor" {
   building_block          = var.building_block
   kubernetes_storage_class = var.kubernetes_storage_class_raw
   secor_sa_annotations    = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.secor_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
-  secor_chart_depends_on  = [module.kafka]
+  secor_chart_depends_on  = [ module.kafka ]
   secor_namespace         = var.secor_namespace
   cloud_store_provider    = "GS"
   cloud_storage_bucket    = module.cloud_storage.name
@@ -427,25 +442,27 @@ module "secor" {
   depends_on              = [ module.secor_sa_iam_role ]
 }
 
-# module "submit_ingestion" {
-#   source                            = "../modules/helm/submit_ingestion"
-#   env                               = var.env
-#   building_block                    = var.building_block
-#   submit_ingestion_chart_depends_on = [module.kafka, module.druid_raw_cluster]
-# }
+module "submit_ingestion" {
+  source                            = "../modules/helm/submit_ingestion"
+  env                               = var.env
+  building_block                    = var.building_block
+  submit_ingestion_chart_depends_on = [ module.kafka, module.druid_raw_cluster ]
+}
 
-# # module "velero" {
-# #   source                       = "../modules/helm/velero"
-# #   env                          = var.env
-# #   building_block               = var.building_block
-# #   cloud_provider               = "aws"
-# #   velero_backup_bucket         = module.s3.velero_storage_bucket
-# #   velero_backup_bucket_region  = var.region
-# #   velero_aws_access_key_id     = module.iam.velero_user_access_key
-# #   velero_aws_secret_access_key = module.iam.velero_user_secret_key
-# # }
+module "velero" {
+  source                       = "../modules/helm/velero"
+  env                          = var.env
+  gcp_project_id               = var.project
+  building_block               = var.building_block
+  cloud_provider               = "gcp"
+  velero_backup_bucket         = module.cloud_storage.velero_storage_bucket
+  velero_backup_bucket_region  = var.region
+  velero_sa_iam_role_name      = var.velero_sa_iam_role_name
+  velero_sa_annotations        = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.velero_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
+  depends_on                   = [ module.velero_sa_iam_role ]
+}
 
-# # module "alert_rules" {
-# #   source                       = "../modules/helm/alert_rules"
-# #   alertrules_chart_depends_on  = [module.monitoring]
-# # }
+module "alert_rules" {
+  source                       = "../modules/helm/alert_rules"
+  alertrules_chart_depends_on  = [ module.monitoring ]
+}
