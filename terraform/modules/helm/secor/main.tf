@@ -62,6 +62,7 @@ resource "helm_release" "secor" {
         file_size                  = var.secor_backup_max_file_size
         file_age                   = var.secor_backup_interval
         threads                    = var.secor_threads_count
+        parser_timezone            = var.parser_timezone
       }
     )
   ]

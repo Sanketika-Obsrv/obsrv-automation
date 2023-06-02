@@ -217,7 +217,7 @@ variable "flink_container_registry" {
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "1.0.4"
+   default     = "build_deploy_v2"
 }
 
 variable "dataset_api_sa_iam_role_name" {
@@ -278,4 +278,127 @@ variable "velero_namespace" {
   type        = string
   description = "Velero namespace."
   default     = "velero"
+}
+
+variable "postgresql_backup_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for postgresql backup service account."
+  default     = "psql-backup-sa"
+}
+
+variable "postgresql_namespace" {
+  type        = string
+  description = "Postgresql backup namespace."
+  default     = "postgresql"
+}
+
+variable "redis_backup_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for postgresql backup service account."
+  default     = "redis-backup-sa"
+}
+
+variable "redis_namespace" {
+  type        = string
+  description = "Redis backup namespace."
+  default     = "redis"
+}
+
+
+variable "monitoring_grafana_oauth_configs" {
+  type        = map
+  description = "Grafana oauth related variables. See below commented code for values that need to be passed"
+  # default     = {
+  #   gf_auth_generic_oauth_enabled          = false
+  #   gf_auth_generic_oauth_name             = ""
+  #   gf_auth_generic_oauth_allow_sign_up    = false
+  #   gf_auth_generic_oauth_client_id        = ""
+  #   gf_auth_generic_oauth_client_secret    = ""
+  #   gf_auth_generic_oauth_scopes           = ""
+  #   gf_auth_generic_oauth_auth_url         = ""
+  #   gf_auth_generic_oauth_token_url        = ""
+  #   gf_auth_generic_oauth_api_url          = ""
+  #   gf_auth_generic_oauth_auth_http_method = ""
+  #   gf_auth_generic_oauth_username_field   = ""
+  # }
+}
+
+# web console variables start
+variable "web_console_configs" {
+  type = map
+  description = "Web console config variables. See below commented code for values that need to be passed"
+  # default = {
+  #   port                               =
+  #   app_name                           =
+  #   prometheus_url                     =
+  #   config_api_url                     =
+  #   obs_api_url                        =
+  #   system_api_url                     =
+  #   alert_manager_url                  =
+  #   grafana_url                        =
+  #   superset_url                       =
+  #   react_app_grafana_url              =
+  #   react_app_superset_url             =
+  #   session_secret                     =
+  #   postgres_connection_string         =
+  #   oauth_web_console_url              =
+  #   auth_keycloak_realm                =
+  #   auth_keycloak_public_client        =
+  #   auth_keycloak_ssl_required         =
+  #   auth_keycloak_client_id            =
+  #   auth_keycloak_client_secret        =
+  #   auth_keycloak_server_url           =
+  #   auth_google_client_id              =
+  #   auth_google_client_secret          =
+  #   https                              =
+  #   react_app_version                  =
+  #   generate_sourcemap                 =
+  # }
+}
+
+variable "web_console_image_repository" {
+  type        = string
+  description = "Container registry. For example docker.io/obsrv"
+  default     = "sanketikahub/obsrv-web-console"
+}
+
+variable "web_console_image_tag" {
+  type        = string
+  description = "web console image tag."
+  default = "v1.0.1"
+}
+# web console variables end.
+
+
+variable "docker_registry_secret_dockerconfigjson" {
+  type        = string
+  description = "The dockerconfigjson encoded in base64 format."
+}
+
+variable "command_service_image_tag" {
+  type        = string
+  description = "CommandService image tag."
+  default     = "1.0.2"
+}
+
+variable "web_console_base_url" {
+  type        = string
+  description = "Web console base url."
+  default = "http://webconsole.obsrv.ai"
+}
+
+variable "superset_base_url" {
+  type        = string
+  description = "Superset base url."
+  default = "http://superset.obsrv.ai"
+}
+
+variable "oauth_configs" {
+  type = map
+  description = "Superset config variables. See the below commented code to know values to be passed "
+  # default = {
+  #   superset_oauth_clientid           =
+  #   superset_oauth_client_secret      =
+  #   superset_oauth_token              =
+  # }
 }
