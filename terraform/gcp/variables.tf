@@ -227,9 +227,9 @@ variable "flink_image_tag" {
 }
 
 variable "flink_release_name" {
-  type        = string
+  type        = list(string)
   description = "Flink helm release name."
-  default     = "merged-pipeline"
+  default     = [ "merged-pipeline","master-data-processor" ]
 }
 
 variable "dataset_api_sa_iam_role_name" {
