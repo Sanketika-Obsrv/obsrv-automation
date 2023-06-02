@@ -148,7 +148,7 @@ module "gke_cluster" {
 
 resource "null_resource" "configure_kubectl" {
   provisioner "local-exec" {
-    command = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region `${var.zone} --project ${var.project}"
+    command = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.zone} --project ${var.project}"
 
     # Use environment variables to allow custom kubectl config paths
     environment = {
@@ -355,6 +355,7 @@ module "flink" {
   env                            = var.env
   building_block                 = var.building_block
   flink_container_registry       = var.flink_container_registry
+  flink_release_name             = var.flink_release_name
   flink_image_name               = var.flink_image_name
   flink_image_tag                = var.flink_image_tag
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
@@ -433,7 +434,7 @@ module "secor" {
   source                  = "../modules/helm/secor"
   env                     = var.env
   building_block          = var.building_block
-  kubernetes_storage_class = var.kubernetes_storage_class_raw
+  storage_class           = var.kubernetes_storage_class_raw
   secor_sa_annotations    = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.secor_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   secor_chart_depends_on  = [ module.kafka ]
   secor_namespace         = var.secor_namespace

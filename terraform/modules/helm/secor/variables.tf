@@ -3,12 +3,6 @@ variable "env" {
   description = "Environment name. All resources will be prefixed with this value."
 }
 
-variable "kubernetes_storage_class" {
-  type        = string
-  description = "kubernetes storage class name"
-  default     = "gp2"
-}
-
 variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."

@@ -221,9 +221,15 @@ variable "flink_image_name" {
 }
 
 variable "flink_image_tag" {
-   type        = string
-   description = "Flink kubernetes service name."
-   default     = "build_deploy_v2"
+  type        = string
+  description = "Flink kubernetes service name."
+  default     = "build_deploy_v2"
+}
+
+variable "flink_release_name" {
+  type        = string
+  description = "Flink helm release name."
+  default     = "merged-pipeline"
 }
 
 variable "dataset_api_sa_iam_role_name" {
