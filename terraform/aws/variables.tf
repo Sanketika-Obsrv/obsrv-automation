@@ -49,11 +49,17 @@ variable "dataset_api_image_tag" {
 variable "flink_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
-  default     = "manjudr"
+  default     = "sanketikahub/obsrv-core"
 }
 
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "2.1"
+   default     = "release-0.5.0_RC10"
+}
+
+variable "storage_class" {
+  type        = string
+  description = "Storage Class"
+  default     = "default"
 }

@@ -27,7 +27,7 @@ secor_jobs:
     partition_prefix_enabled: "false"
     partition_prefix_key: ""
     partition_prefix_mapping: "{}"
-    message_channel_identifier: ""
+    message_channel_identifier: "dataset"
     output_file_pattern: "{partition}-{currentTimestamp}.json"
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:

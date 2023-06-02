@@ -51,6 +51,8 @@ primary:
             router_config JSON,
             dataset_config JSON,
             status TEXT,
+            tags TEXT[],
+            data_version INT,
             created_by TEXT,
             updated_by TEXT,
             created_date TIMESTAMP NOT NULL DEFAULT now(),
@@ -115,9 +117,9 @@ primary:
           published_date TIMESTAMP NOT NULL,
           UNIQUE (dataset_id)
         );
-      CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config(dataset_id);
+        CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config(dataset_id);
 
-      CREATE INDEX IF NOT EXISTS dataset_source_config_status ON dataset_source_config(status);
+        CREATE INDEX IF NOT EXISTS dataset_source_config_status ON dataset_source_config(status);
 
       GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${postgresql_obsrv_username};
 

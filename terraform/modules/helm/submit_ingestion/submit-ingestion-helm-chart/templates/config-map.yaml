@@ -54,6 +54,16 @@ data:
             },
             {
               "type": "doubleSum",
+              "name": "latency_time",
+              "fieldName": "latency_time"
+            },
+            {
+              "type": "doubleSum",
+              "name": "processing_time",
+              "fieldName": "processing_time"
+            },
+            {
+              "type": "doubleSum",
               "name": "extractor_job_processing_time",
               "fieldName": "extractor_job_processing_time"
             },
@@ -123,7 +133,17 @@ data:
                 {
                   "type": "path",
                   "name": "total_processing_time",
-                  "expr": "$.obsrv_meta.timespans.total_processing_time"
+                  "expr": "$.obsrv_meta.total_processing_time"
+                },
+                {
+                  "type": "path",
+                  "name": "latency_time",
+                  "expr": "$.obsrv_meta.latency_time"
+                },
+                {
+                  "type": "path",
+                  "name": "processing_time",
+                  "expr": "$.obsrv_meta.processing_time"
                 },
                 {
                   "type": "path",
