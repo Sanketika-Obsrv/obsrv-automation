@@ -214,6 +214,12 @@ variable "flink_container_registry" {
   default     = "sanketikahub"
 }
 
+variable "flink_image_name" {
+  type        = string
+  description = "Flink image name."
+  default     = "merged-pipeline"
+}
+
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."

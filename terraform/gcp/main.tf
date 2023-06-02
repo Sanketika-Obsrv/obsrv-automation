@@ -355,6 +355,7 @@ module "flink" {
   env                            = var.env
   building_block                 = var.building_block
   flink_container_registry       = var.flink_container_registry
+  flink_image_name               = var.flink_image_name
   flink_image_tag                = var.flink_image_tag
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
   flink_chart_depends_on         = [ module.kafka, module.redis, module.postgresql ]
