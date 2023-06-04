@@ -19,8 +19,8 @@ resource "helm_release" "flink_sa" {
   ]
 }
 resource "helm_release" "flink" {
-    count            = length(var.flink_release_name)
-    name             = var.flink_release_name[count.index]
+    for_each        = var.flink_release_map
+    name            = each.value
     chart            = "${path.module}/${var.flink_chart_path}"
     namespace        = var.flink_namespace
     create_namespace = var.flink_create_namespace
@@ -33,6 +33,7 @@ resource "helm_release" "flink" {
     values = [
       templatefile("${path.module}/${var.flink_custom_values_yaml}",
       {
+          flink_image_name               = each.value
           flink_container_registry       = "${var.flink_container_registry}"
           flink_image_tag                = var.flink_image_tag
           checkpoint_store_type          = var.flink_checkpoint_store_type
