@@ -7,12 +7,14 @@ variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
 }
+# *** changed this to release map.
+# variable "flink_release_name" {
+#   type        = string
+#   description = "Flink helm release name."
+#   default     = "merged-pipeline"
+# }
+# *** changed this to release map.
 
-variable "flink_release_name" {
-  type        = string
-  description = "Flink helm release name."
-  default     = "merged-pipeline"
-}
 
 variable "flink_namespace" {
   type        = string
