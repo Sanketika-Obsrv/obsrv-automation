@@ -73,6 +73,11 @@ variable "flink_custom_values_yaml_sa" {
   description = "Flink chart values.yaml path."
   default     = "flink.yaml.tfpl-sa"
 }
+variable "flink_sa_release_name" {
+  type        = string
+  description = "Flink helm release name."
+  default     = "flink"
+}
 
 variable "flink_kubernetes_service_name" {
   type        = string
