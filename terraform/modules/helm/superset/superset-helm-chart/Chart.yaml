@@ -29,7 +29,7 @@ maintainers:
   - name: craig-rueda
     email: craig@craigrueda.com
     url: https://github.com/craig-rueda
-version: 0.3.5
+version: 0.3.6
 dependencies:
 - name: redis
   version: 12.3.3
