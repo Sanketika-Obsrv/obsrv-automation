@@ -171,3 +171,16 @@ variable "flink_release_map" {
     druid-router    = "druid-router"
   }
 }
+
+variable "flink_image_map" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    merged-pipeline = "merged-pipeline"
+    extractor       = "extractor"
+    preprocessor    = "preprocessor"
+    denormalizer    = "denormalizer"
+    transformer     = "transformer"
+    druid-router    = "druid-router"
+  }
+}
