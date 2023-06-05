@@ -63,7 +63,6 @@ variable "flink_image_map" {
   type        = map(string)
   default = {
     merged-pipeline = "merged-pipeline"
-    unified-pipeline = "unified-pipeline"
     extractor       = "extractor"
     preprocessor    = "preprocessor"
     denormalizer    = "denormalizer"
