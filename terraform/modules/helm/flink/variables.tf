@@ -31,11 +31,13 @@ variable "flink_chart_path" {
   default     = "flink-helm-chart"
 }
 
-variable "flink_release_name" {
-  description = "Create release names"
-  type        = list(string)
-  default     = [ "merged-pipeline","master-data-processor"]
-}
+# *** changed this to release map.
+# variable "flink_release_name" {
+#   type        = string
+#   description = "Flink helm release name."
+#   default     = "merged-pipeline"
+# }
+# *** changed this to release map.
 
 variable "flink_chart_install_timeout" {
   type        = number
@@ -156,4 +158,16 @@ variable "flink_sa_annotations" {
   type        = string
   description = "Service account annotations for flink service account."
   default     = "serviceAccountName: default"
+}
+variable "flink_release_map" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    merged-pipeline = "merged-pipeline"
+    extractor       = "extractor"
+    preprocessor    = "preprocessor"
+    denormalizer    = "denormalizer"
+    transformer     = "transformer"
+    druid-router    = "druid-router"
+  }
 }

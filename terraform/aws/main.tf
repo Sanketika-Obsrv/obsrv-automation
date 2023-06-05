@@ -127,6 +127,7 @@ module "flink" {
   building_block                 = var.building_block
   flink_container_registry       = var.flink_container_registry
   flink_image_tag                = var.flink_image_tag
+  flink_image_map                = var.flink_image_map
   # s3_access_key                  = module.iam.s3_access_key
   # s3_secret_key                  = module.iam.s3_secret_key
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type

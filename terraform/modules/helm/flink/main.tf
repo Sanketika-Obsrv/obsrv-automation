@@ -19,8 +19,8 @@ resource "helm_release" "flink_sa" {
   ]
 }
 resource "helm_release" "flink" {
-    count            = length(var.flink_release_name)
-    name             = var.flink_release_name[count.index]
+    for_each         = var.flink_release_map
+    name             = each.value
     chart            = "${path.module}/${var.flink_chart_path}"
     namespace        = var.flink_namespace
     create_namespace = var.flink_create_namespace
@@ -35,6 +35,7 @@ resource "helm_release" "flink" {
       {
           flink_container_registry       = "${var.flink_container_registry}"
           flink_image_tag                = var.flink_image_tag
+          flink_image_name               = each.value
           checkpoint_store_type          = var.flink_checkpoint_store_type
           s3_access_key                  = var.s3_access_key
           s3_secret_key                  = var.s3_secret_key
