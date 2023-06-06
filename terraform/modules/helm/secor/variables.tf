@@ -189,7 +189,6 @@ variable "region" {
 variable "kubernetes_storage_class" {
   type        = string
   description = "Storage Class"
-  default     = "default"
 }
 
 variable "message_timezone" {
