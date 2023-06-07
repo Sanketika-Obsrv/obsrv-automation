@@ -1,0 +1,14 @@
+namespace: ${web_console_namespace}
+image: 
+  repository: ${web_console_image_repository}
+  image_name: ${web_console_image_name}
+  tag: ${web_console_image_tag}
+ENV: ${env}
+PORT: ${port}
+APP_NAME: ${app_name}
+PROMETHEUS_URL: ${prometheus_url}
+REACT_APP_GRAFANA_URL: ${react_app_grafana_url}
+REACT_APP_SUPERSET_URL: ${react_app_superset_url}
+HTTPS: ${https}
+REACT_APP_VERSION: ${react_app_version}
+GENERATE_SOURCEMAP: ${generate_sourcemap}

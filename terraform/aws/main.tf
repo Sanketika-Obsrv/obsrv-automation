@@ -234,3 +234,13 @@ module "alert_rules" {
   source                       = "../modules/helm/alert_rules"
   alertrules_chart_depends_on  = [module.monitoring]
 }
+
+module "web_console" {
+  source                           = "../modules/helm/web_console"
+  env                              = var.env
+  building_block                   = var.building_block
+  web_console_configs              = var.web_console_configs
+  depends_on                       = [module.eks]
+  web_console_image_repository     = var.web_console_image_repository
+  web_console_image_tag            = var.web_console_image_tag
+}

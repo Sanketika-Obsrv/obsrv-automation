@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: web-console
+  name: web-console
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - name: http-web-console
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: web-console
+  type: LoadBalancer
