@@ -4,5 +4,8 @@ supervisor_path: "druid/indexer/v1/supervisor"
 bootstrap_servers: "kafka-headless.kafka.svc.cluster.local:9092"
 ingestion_spec:
   system_stats:
-     topic: "dev.stats"
-     name: "system-stats"
+    topic: "dev.stats"
+    name: "system-stats"
+  masterdata_system_stats:
+    topic: "dev.masterdata.stats"
+    name: "masterdata-system-stats"
