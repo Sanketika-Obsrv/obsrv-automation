@@ -31,13 +31,13 @@ variable "flink_checkpoint_store_type" {
 variable "dataset_api_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
-  default     = "sb-obsrv-api-service"
+  default     = "sunbird"
 }
 
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.4"
+  default     = "1.0.0"
 }
 
 variable "flink_container_registry" {
