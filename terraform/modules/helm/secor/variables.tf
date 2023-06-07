@@ -17,7 +17,7 @@ variable "secor_release_name" {
 variable "secor_image_tag" {
   type        = string
   description = "secor image version"
-  default     = "0.29.11"
+  default     = "0.29.11-java-11"
 }
 
 variable "jobs" {
@@ -37,7 +37,7 @@ variable "jobs" {
 variable "secor_image_repository" {
   type        = string
   description = "secor image version"
-  default     = "manjudr/secor"
+  default     = "sunbird/sb-obsrv-secor"
 }
 
 variable "secor_namespace" {

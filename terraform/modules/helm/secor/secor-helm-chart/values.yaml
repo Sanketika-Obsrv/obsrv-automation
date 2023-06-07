@@ -6,7 +6,7 @@ image_repository: ""
 region: ""
 pullPolicy: "IfNotPresent"
 jvm_memory: 1024m
-image_tag: "0.29.11"
+image_tag: ""
 message_timezone: "UTC"
 parser_timezone: "Asia/Kolkata"
 secor_jobs:
