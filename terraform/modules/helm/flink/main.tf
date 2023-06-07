@@ -18,9 +18,10 @@ resource "helm_release" "flink_sa" {
     )
   ]
 }
+
 resource "helm_release" "flink" {
-    for_each         = var.flink_release_map
-    name             = each.value
+    for_each         = contains([var.merged_pipeline_enabled], true ) ? var.flink_release_merged : var.flink_release_map
+    name             = each.key
     chart            = "${path.module}/${var.flink_chart_path}"
     namespace        = var.flink_namespace
     create_namespace = var.flink_create_namespace
@@ -41,6 +42,7 @@ resource "helm_release" "flink" {
           s3_secret_key                  = var.s3_secret_key
           azure_account                  = var.azure_storage_account_name
           azure_secret                   = var.azure_storage_account_key
+          postgresql_service_name        = var.postgresql_service_name
           postgresql_obsrv_username      = var.postgresql_obsrv_username
           postgresql_obsrv_user_password = var.postgresql_obsrv_user_password
           postgresql_obsrv_database      = var.postgresql_obsrv_database

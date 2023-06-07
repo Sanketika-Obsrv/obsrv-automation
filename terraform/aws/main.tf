@@ -127,7 +127,9 @@ module "flink" {
   building_block                 = var.building_block
   flink_container_registry       = var.flink_container_registry
   flink_image_tag                = var.flink_image_tag
-  flink_image_map                = var.flink_image_map
+  flink_release_merged           = var.flink_release_merged
+  flink_release_map              = var.flink_release_map
+  merged_pipeline_enabled        = var.merged_pipeline_enabled
   # s3_access_key                  = module.iam.s3_access_key
   # s3_secret_key                  = module.iam.s3_secret_key
   flink_checkpoint_store_type    = var.flink_checkpoint_store_type
@@ -140,6 +142,7 @@ module "flink" {
   redis_release_name             = module.redis.redis_release_name
   flink_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
   flink_namespace                = module.eks.flink_namespace
+  postgresql_service_name        = var.postgresql_service_name
 }
 
 module "druid_raw_cluster" {

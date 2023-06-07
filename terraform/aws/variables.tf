@@ -61,17 +61,37 @@ variable "flink_image_tag" {
 variable "storage_class" {
   type        = string
   description = "Storage Class"
-  default     = "default"
+  default     = "gp2"
 }
-variable "flink_image_map" {
+variable "flink_release_map" {
   description = "Create release names"
   type        = map(string)
   default = {
-    merged-pipeline = "merged-pipeline"
-    extractor       = "extractor"
+    extractor       = "extractor-1.0.0"
     preprocessor    = "preprocessor"
     denormalizer    = "denormalizer"
     transformer     = "transformer"
     druid-router    = "druid-router"
+    master-data-processor = "master-data-processor"
   }
+}
+
+variable "flink_release_merged" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    merged-pipeline = "merged-pipeline"
+    master-data-processor = "master-data-processor"
+  }
+}
+
+variable "merged_pipeline_enabled" {
+  description = "Toggle to deploy merged pipeline"
+  type = bool
+  default = true
+}
+variable "postgresql_service_name" {
+  type        = string
+  description = "Postgresql service name."
+  default = "postgresql"
 }
