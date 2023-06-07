@@ -1,8 +1,8 @@
 namespace: "dev"
-dockerhub: "sanketikahub"
+dockerhub: "sunbird"
 replicaCount: 1
-repository: "obsrv-api-service"
-image_tag: 1.0.4
+repository: "sb-obsrv-api-service"
+image_tag: 1.0.0
 network:
   port: 3000
   targetport: 3000

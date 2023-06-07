@@ -31,7 +31,7 @@ variable "flink_checkpoint_store_type" {
 variable "dataset_api_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
-  default     = "sanketikahub"
+  default     = "sb-obsrv-api-service"
 }
 
 variable "dataset_api_image_tag" {
