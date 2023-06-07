@@ -73,8 +73,3 @@ variable "flink_image_map" {
 
 }
 
-variable "storage_class" {
-  type        = string
-  description = "Storage Class"
-  default     = "default"
-}
