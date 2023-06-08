@@ -217,6 +217,8 @@ module "submit_ingestion" {
   env                               = var.env
   building_block                    = var.building_block
   submit_ingestion_chart_depends_on = [module.kafka, module.druid_raw_cluster]
+  druid_cluster_release_name        = module.druid_raw_cluster.druid_cluster_release_name
+  druid_cluster_namespace           = module.druid_raw_cluster.druid_cluster_namespace
 }
 
 module "velero" {
