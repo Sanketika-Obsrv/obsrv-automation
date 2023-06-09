@@ -167,23 +167,11 @@ variable "flink_sa_annotations" {
 variable "flink_release_names" {
   description = "Create release names"
   type        = map(string)
-  default = {
-    extractor       = "extractor"
-    preprocessor    = "preprocessor"
-    denormalizer    = "denormalizer"
-    transformer     = "transformer"
-    druid-router    = "druid-router"
-    master-data-processor = "master-data-processor"
-  }
 }
 
 variable "flink_merged_pipeline_release_names" {
   description = "Create release names"
   type        = map(string)
-  default = {
-    merged-pipeline = "merged-pipeline"
-    master-data-processor = "master-data-processor"
-  }
 }
 
 variable "merged_pipeline_enabled" {
