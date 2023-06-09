@@ -29,6 +29,8 @@ cd terraform/aws
 terragrunt init
 terragrunt plan
 terragrunt apply
+export KUBE_CONFIG_PATH=./{cluster-name}.yaml #
+terragrunt apply
 ```
 ## GCP
 ### Prerequisites:
