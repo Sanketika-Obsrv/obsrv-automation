@@ -61,7 +61,7 @@ variable "flink_image_tag" {
 variable "storage_class" {
   type        = string
   description = "Storage Class"
-  default     = "default"
+  default     = "gp2"
 }
 
 variable "web_console_configs" {

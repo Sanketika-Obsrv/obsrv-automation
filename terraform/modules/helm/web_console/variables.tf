@@ -62,15 +62,5 @@ variable "web_console_image_name" {
 
 variable "web_console_configs" {
   type = map
-  description = "Web console config variables. See below commented code for values that need to be passed"
-  default = {
-    port                               = "3000"
-    app_name                           = "obsrv-web-console"
-    prometheus_url                     = "http://monitoring-kube-prometheus-prometheus.monitoring:9090"
-    react_app_grafana_url              = "http://localhost:80"
-    react_app_superset_url             = "http://localhost:8081"
-    https                              = false
-    react_app_version                  = "v1.2.0"
-    generate_sourcemap                 = false
-  } 
+  description = "Web console config variables. See below commented code for values that need to be passed" 
 }
