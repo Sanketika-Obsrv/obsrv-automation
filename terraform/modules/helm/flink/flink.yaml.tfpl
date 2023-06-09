@@ -3,8 +3,10 @@ s3_access_key: ${s3_access_key}
 s3_secret_key: ${s3_secret_key}
 azure_account: ${azure_account}
 azure_secret: ${azure_secret}
-repository: ${flink_container_registry}
-image_tag: ${flink_image_tag}
+image:
+  registry: ${flink_container_registry}
+  repository: ${flink_image_name}
+  tag: ${flink_image_tag}
 
 base_config: |
   job {
@@ -48,12 +50,12 @@ base_config: |
   }
 
   postgres {
-    host = postgresql-hl.postgres.svc.cluster.local
+    host = ${postgresql_service_name}.svc.cluster.local
     port = 5432
     maxConnections = 2
-    user = '${postgresql_obsrv_username}'
-    password = '${postgresql_obsrv_user_password}'
-    database = '${postgresql_obsrv_database}'
+    user = ${postgresql_obsrv_username}
+    password = ${postgresql_obsrv_user_password}
+    database = ${postgresql_obsrv_database}
   }
 
   lms-cassandra {

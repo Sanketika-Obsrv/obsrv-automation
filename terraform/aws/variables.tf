@@ -49,7 +49,7 @@ variable "dataset_api_image_tag" {
 variable "flink_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
-  default     = "sanketikahub/obsrv-core"
+  default     = "sanketikahub"
 }
 
 variable "flink_image_tag" {
@@ -89,4 +89,36 @@ variable "web_console_image_repository" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
   default     = "sanketikahub"
+}
+
+variable "flink_release_names" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    extractor       = "extractor"
+    preprocessor    = "preprocessor"
+    denormalizer    = "denormalizer"
+    transformer     = "transformer"
+    druid-router    = "druid-router"
+    master-data-processor = "master-data-processor"
+  }
+}
+
+variable "flink_merged_pipeline_release_names" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    merged-pipeline = "merged-pipeline"
+    master-data-processor = "master-data-processor"
+  }
+}
+
+variable "merged_pipeline_enabled" {
+  description = "Toggle to deploy merged pipeline"
+  type = bool
+  default = true
+}
+variable "postgresql_service_name" {
+  type        = string
+  description = "Postgresql service name."
 }

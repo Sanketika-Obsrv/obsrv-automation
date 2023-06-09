@@ -102,7 +102,7 @@ spec:
       serviceAccount: {{ .Release.Namespace }}-sa
       containers:
       - name: {{ .Release.Name }}-jobmanager
-        image: "{{ .Values.repository }}:{{ .Values.image_tag }}"
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         resources:
           requests:
@@ -192,7 +192,7 @@ spec:
       serviceAccount: {{ .Release.Namespace }}-sa
       containers:
       - name: {{ .Release.Name }}-taskmanager
-        image: "{{ .Values.repository }}:{{ .Values.image_tag }}"
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         resources:
           requests:

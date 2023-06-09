@@ -31,11 +31,13 @@ variable "flink_chart_path" {
   default     = "flink-helm-chart"
 }
 
-variable "flink_release_name" {
-  description = "Create release names"
-  type        = list(string)
-  default     = [ "merged-pipeline","master-data-processor"]
-}
+# *** changed this to release map.
+# variable "flink_release_name" {
+#   type        = string
+#   description = "Flink helm release name."
+#   default     = "merged-pipeline"
+# }
+# *** changed this to release map.
 
 variable "flink_chart_install_timeout" {
   type        = number
@@ -116,6 +118,11 @@ variable "postgresql_obsrv_database" {
   description = "Postgresql obsrv database."
 }
 
+variable "postgresql_service_name" {
+  type        = string
+  description = "Postgresql service name."
+}
+
 variable "redis_namespace" {
   type        = string
   description = "Namespace of Redis installation."
@@ -156,4 +163,18 @@ variable "flink_sa_annotations" {
   type        = string
   description = "Service account annotations for flink service account."
   default     = "serviceAccountName: default"
+}
+variable "flink_release_names" {
+  description = "Create release names"
+  type        = map(string)
+}
+
+variable "flink_merged_pipeline_release_names" {
+  description = "Create release names"
+  type        = map(string)
+}
+
+variable "merged_pipeline_enabled" {
+  description = "Toggle to enable merged pipeline"
+  type = bool
 }
