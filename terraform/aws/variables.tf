@@ -67,7 +67,7 @@ variable "flink_release_names" {
   description = "Create release names"
   type        = map(string)
   default = {
-    extractor       = "extractor-1.0.0"
+    extractor       = "extractor"
     preprocessor    = "preprocessor"
     denormalizer    = "denormalizer"
     transformer     = "transformer"
