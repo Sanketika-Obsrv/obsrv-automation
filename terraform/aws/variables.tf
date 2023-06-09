@@ -63,7 +63,7 @@ variable "storage_class" {
   description = "Storage Class"
   default     = "gp2"
 }
-variable "flink_release_map" {
+variable "flink_release_names" {
   description = "Create release names"
   type        = map(string)
   default = {
@@ -76,7 +76,7 @@ variable "flink_release_map" {
   }
 }
 
-variable "flink_release_merged" {
+variable "flink_merged_pipeline_release_names" {
   description = "Create release names"
   type        = map(string)
   default = {
@@ -93,5 +93,4 @@ variable "merged_pipeline_enabled" {
 variable "postgresql_service_name" {
   type        = string
   description = "Postgresql service name."
-  default = "postgresql"
 }

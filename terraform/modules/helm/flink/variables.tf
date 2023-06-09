@@ -121,7 +121,6 @@ variable "postgresql_obsrv_database" {
 variable "postgresql_service_name" {
   type        = string
   description = "Postgresql service name."
-  default = "postgresql"
 }
 
 variable "redis_namespace" {
@@ -165,7 +164,7 @@ variable "flink_sa_annotations" {
   description = "Service account annotations for flink service account."
   default     = "serviceAccountName: default"
 }
-variable "flink_release_map" {
+variable "flink_release_names" {
   description = "Create release names"
   type        = map(string)
   default = {
@@ -178,7 +177,7 @@ variable "flink_release_map" {
   }
 }
 
-variable "flink_release_merged" {
+variable "flink_merged_pipeline_release_names" {
   description = "Create release names"
   type        = map(string)
   default = {
@@ -188,6 +187,6 @@ variable "flink_release_merged" {
 }
 
 variable "merged_pipeline_enabled" {
-  description = ""
+  description = "Toggle to enable merged pipeline"
   type = bool
 }

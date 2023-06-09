@@ -20,7 +20,7 @@ resource "helm_release" "flink_sa" {
 }
 
 resource "helm_release" "flink" {
-    for_each         = contains([var.merged_pipeline_enabled], true ) ? var.flink_release_merged : var.flink_release_map
+    for_each         = contains([var.merged_pipeline_enabled], true ) ? var.flink_merged_pipeline_release_names : var.flink_release_names
     name             = each.key
     chart            = "${path.module}/${var.flink_chart_path}"
     namespace        = var.flink_namespace

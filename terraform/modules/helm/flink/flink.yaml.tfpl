@@ -50,7 +50,7 @@ base_config: |
   }
 
   postgres {
-    host = postgresql-hl.${postgresql_service_name}.svc.cluster.local
+    host = ${postgresql_service_name}.svc.cluster.local
     port = 5432
     maxConnections = 2
     user = ${postgresql_obsrv_username}
