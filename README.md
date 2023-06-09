@@ -29,7 +29,7 @@ cd terraform/aws
 terragrunt init
 terragrunt plan
 terragrunt apply
-export KUBE_CONFIG_PATH=./{cluster-name}.yaml #
+export KUBE_CONFIG_PATH=./{cluster-name}.yaml # the previous command will build the cluster and then fail as it is unable to read the kube config. hence, we need to export this variable and terragrunt applu again
 terragrunt apply
 ```
 ## GCP
