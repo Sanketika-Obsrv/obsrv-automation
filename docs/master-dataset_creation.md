@@ -1,9 +1,9 @@
 # Master Dataset 
 A Master Dataset is an entity that holds your lookup data. It is structurally similar to a Dataset, except that it doesn't get indexed in the analytical store but in a cache store for fast lookups while ingesting data.  
-In the dataset_config, you will need to specify the field name on which denorms will happen. For e.g.  
+In the dataset_config, you will need to specify the field name on which denorms will happen. This will become the primary key for the Master Dataset. For e.g.  
 ```
 "dataset_config": {
-    "data_key": ""
+    "data_key": "uid"
 }
 ```
 Once a Master Dataset is indexed, any Dataset can specify it in the denorm config. For e.g.
@@ -12,9 +12,9 @@ Once a Master Dataset is indexed, any Dataset can specify it in the denorm confi
     "redis_db_host": "localhost",
     "redis_db_port": 6379,
     "denorm_fields": [{
-        "denorm_key": "assetRef", # the field in Dataset on which denorm needs to happen
+        "denorm_key": "uid", # the field in Dataset on which denorm needs to happen
         "redis_db": 3, # cache store index for Master Dataset
-        "denorm_out_field": "asset_metadata" # the name to give the new field
+        "denorm_out_field": "user_metadata" # the name to give the new field
     }]
 }
 ```
