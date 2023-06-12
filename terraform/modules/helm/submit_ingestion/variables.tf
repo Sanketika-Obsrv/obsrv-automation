@@ -61,3 +61,13 @@ variable "submit_ingestion_chart_depends_on" {
   description = "List of helm release names that this chart depends on."
   default     = ""
 }
+
+variable "druid_cluster_release_name" {
+  type        = any
+  description = "druid release name"
+}
+
+variable "druid_cluster_namespace" {
+  type        = any
+  description = "druid namespace"
+}

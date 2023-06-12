@@ -1,0 +1,16 @@
+namespace: "web-console"
+replicaCount: 1
+image: 
+  repository: sanketikahub
+  image_name: obsrv-web-console
+  tag: "release-0.5.0_RC2"
+  pullPolicy: "IfNotPresent"
+ENV: development
+PORT: 3000
+APP_NAME: obsrv-web-console
+PROMETHEUS_URL: http://localhost
+HTTPS: false
+REACT_APP_VERSION: v1.2.0
+GENERATE_SOURCEMAP: false
+REACT_APP_GRAFANA_URL: http://localhost
+REACT_APP_SUPERSET_URL: http://localhost

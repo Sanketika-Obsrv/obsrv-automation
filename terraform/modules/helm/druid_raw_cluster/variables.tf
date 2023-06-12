@@ -11,7 +11,7 @@ variable "building_block" {
 variable "druid_cluster_release_name" {
   type        = string
   description = "Druid cluster helm release name."
-  default     = "druid-cluster"
+  default     = "druid-raw"
 }
 
 variable "druid_cluster_namespace" {

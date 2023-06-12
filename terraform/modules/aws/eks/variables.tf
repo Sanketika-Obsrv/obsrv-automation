@@ -60,8 +60,8 @@ variable "eks_node_group_scaling_config" {
   type        = map(number)
   description = "EKS node group auto scaling configuration."
   default = {
-    desired_size = 4
-    max_size     = 4
+    desired_size = 5
+    max_size     = 5
     min_size     = 0
   }
 }

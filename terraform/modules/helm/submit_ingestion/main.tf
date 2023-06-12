@@ -14,6 +14,8 @@ resource "helm_release" "submit_ingestion" {
         {
            env                        = var.env
            submit_ingestion_namespace = var.submit_ingestion_namespace
+           druid_cluster_namespace    = var.druid_cluster_namespace
+           druid_cluster_release_name = var.druid_cluster_release_name
         }
       )
     ]
