@@ -213,7 +213,7 @@ module "secor" {
   secor_chart_depends_on  = [module.kafka]
   secor_namespace         = module.eks.secor_namespace
   cloud_storage_bucket    = module.s3.s3_bucket
-  storage_class           = var.storage_class
+  kubernetes_storage_class = var.kubernetes_storage_class
 }
 
 module "submit_ingestion" {

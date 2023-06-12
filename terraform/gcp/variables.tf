@@ -214,23 +214,39 @@ variable "flink_container_registry" {
   default     = "sanketikahub"
 }
 
-variable "flink_image_name" {
-  type        = string
-  description = "Flink image name."
-  default     = "merged-pipeline"
+variable "flink_release_names" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    extractor       = "extractor"
+    preprocessor    = "preprocessor"
+    denormalizer    = "denormalizer"
+    transformer     = "transformer"
+    druid-router    = "druid-router"
+    master-data-processor = "master-data-processor"
+  }
 }
 
+variable "flink_merged_pipeline_release_names" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    merged-pipeline = "merged-pipeline"
+    master-data-processor = "master-data-processor"
+  }
+}
+
+variable "merged_pipeline_enabled" {
+  description = "Toggle to deploy merged pipeline"
+  type = bool
+  default = true
+}
 variable "flink_image_tag" {
   type        = string
   description = "Flink kubernetes service name."
   default     = "build_deploy_v2"
 }
 
-variable "flink_release_name" {
-  type        = list(string)
-  description = "Flink helm release name."
-  default     = [ "merged-pipeline","master-data-processor" ]
-}
 
 variable "dataset_api_sa_iam_role_name" {
   type        = string

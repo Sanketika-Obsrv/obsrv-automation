@@ -58,12 +58,6 @@ variable "flink_image_tag" {
    default     = "release-0.5.0_RC10"
 }
 
-variable "storage_class" {
-  type        = string
-  description = "Storage Class"
-  default     = "gp2"
-}
-
 variable "web_console_configs" {
   type = map
   description = "Web console config variables. See below commented code for values that need to be passed"

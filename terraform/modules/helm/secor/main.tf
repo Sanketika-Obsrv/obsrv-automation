@@ -45,7 +45,7 @@ resource "helm_release" "secor" {
         message_timezone           = var.message_timezone
         parser_timezone            = var.parser_timezone
         image_pull_policy          = var.image_pull_policy
-        storage_class              = var.storage_class
+        storage_class              = var.kubernetes_storage_class
         env                        = var.env
         kafka_broker_host          = var.kafka_broker_ip
         zookeeper_quorum           = var.kafka_zookeeper_ip

@@ -198,7 +198,7 @@ variable "region" {
   default     = "us-east-2"
 }
 
-variable "storage_class" {
+variable "kubernetes_storage_class" {
   type        = string
   description = "Storage Class"
 }
