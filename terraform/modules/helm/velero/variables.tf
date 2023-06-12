@@ -104,6 +104,7 @@ variable "velero_backup_bucket_region" {
 variable "velero_sa_iam_role_name" {
   type        = string
   description = "Service Account IAM Role Name"
+  default     = ""
 }
 
 variable "velero_sa_name" {
@@ -121,4 +122,5 @@ variable "velero_sa_annotations" {
 variable "gcp_project_id" {
   type        = string
   description = "Google Project ID, if the provider is gcp"
+  default     = ""
 }

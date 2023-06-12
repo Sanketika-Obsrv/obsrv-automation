@@ -112,7 +112,3 @@ variable "merged_pipeline_enabled" {
   type = bool
   default = true
 }
-variable "postgresql_service_name" {
-  type        = string
-  description = "Postgresql service name."
-}
