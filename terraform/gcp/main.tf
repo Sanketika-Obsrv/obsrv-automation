@@ -351,25 +351,25 @@ module "superset" {
 }
 
 module "flink" {
-  source                         = "../modules/helm/flink"
-  env                            = var.env
-  building_block                 = var.building_block
-  flink_container_registry       = var.flink_container_registry
-  flink_image_tag                = var.flink_image_tag
+  source                              = "../modules/helm/flink"
+  env                                 = var.env
+  building_block                      = var.building_block
+  flink_container_registry            = var.flink_container_registry
+  flink_image_tag                     = var.flink_image_tag
   flink_merged_pipeline_release_names = var.flink_merged_pipeline_release_names
-  flink_release_names              = var.flink_release_names
-  merged_pipeline_enabled        = var.merged_pipeline_enabled
-  flink_checkpoint_store_type    = var.flink_checkpoint_store_type
-  flink_chart_depends_on         = [ module.kafka, module.redis, module.postgresql ]
-  postgresql_obsrv_username      = module.postgresql.postgresql_obsrv_username
-  postgresql_obsrv_user_password = module.postgresql.postgresql_obsrv_user_password
-  postgresql_obsrv_database      = module.postgresql.postgresql_obsrv_database
-  checkpoint_base_url            = "gs://${module.cloud_storage.checkpoint_storage_bucket}"
-  redis_namespace                = module.redis.redis_namespace
-  redis_release_name             = module.redis.redis_release_name
-  flink_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
-  flink_namespace                = var.flink_namespace
-  depends_on                     = [ module.flink_sa_iam_role ]
+  flink_release_names                 = var.flink_release_names
+  merged_pipeline_enabled             = var.merged_pipeline_enabled
+  flink_checkpoint_store_type         = var.flink_checkpoint_store_type
+  flink_chart_depends_on              = [ module.kafka, module.redis, module.postgresql ]
+  postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
+  checkpoint_base_url                 = "gs://${module.cloud_storage.checkpoint_storage_bucket}"
+  redis_namespace                     = module.redis.redis_namespace
+  redis_release_name                  = module.redis.redis_release_name
+  flink_sa_annotations                = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
+  flink_namespace                     = var.flink_namespace
+  depends_on                          = [ module.flink_sa_iam_role ]
 }
 
 module "druid_operator" {
