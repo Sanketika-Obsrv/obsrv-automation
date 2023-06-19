@@ -122,8 +122,3 @@ variable "postgresql_druid_raw_user_password" {
   default   = "druidraw123"
 }
 
-variable "postgresql_dataset_api_user_password" {
-  type        = string
-  description = "Postgresql dataset api user password."
-  default   = "datasetapi123"
-}
