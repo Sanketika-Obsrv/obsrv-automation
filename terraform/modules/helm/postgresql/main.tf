@@ -20,9 +20,7 @@ resource "helm_release" "postgresql" {
           postgresql_admin_password            = var.postgresql_admin_password
           postgresql_superset_user_password    = var.postgresql_superset_user_password
           postgresql_image_tag                 = var.postgresql_image_tag
-          postgresql_flink_user_password       = var.postgresql_flink_user_password
           postgresql_druid_raw_user_password   = var.postgresql_druid_raw_user_password
-          postgresql_dataset_api_user_password = var.postgresql_dataset_api_user_password
           postgresql_obsrv_username            = var.postgresql_obsrv_username
           postgresql_obsrv_user_password       = var.postgresql_obsrv_user_password
           postgresql_obsrv_database            = var.postgresql_obsrv_database
