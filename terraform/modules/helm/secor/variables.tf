@@ -37,7 +37,7 @@ variable "jobs" {
 variable "secor_image_repository" {
   type        = string
   description = "secor image version"
-  default     = "manjudr/secor"
+  default     = "sanketikahub/secor"
 }
 
 variable "secor_namespace" {
