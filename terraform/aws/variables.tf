@@ -43,7 +43,7 @@ variable "dataset_api_container_registry" {
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.4"
+  default     = "1.0.7"
 }
 
 variable "flink_container_registry" {
