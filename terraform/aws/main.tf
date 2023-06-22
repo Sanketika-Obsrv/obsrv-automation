@@ -203,6 +203,7 @@ module "dataset_api" {
   redis_namespace                    = module.redis.redis_namespace
   redis_release_name                 = module.redis.redis_release_name
   dataset_api_namespace              = module.eks.dataset_api_namespace
+  s3_bucket                          = module.s3.s3_bucket
 }
 
 module "secor" {

@@ -23,5 +23,8 @@ data:
   POSTGRES_PASSWORD: "{{ .Values.postgres_service.POSTGRES_PASSWORD }}"
   REDIS_HOST: "{{ .Values.redis_service.REDIS_HOST }}"
   REDIS_PORT: "{{ .Values.redis_service.REDIS_PORT }}"
-
-  
+  EXHAUST_PROVIDER: "{{ .Values.exhaust_service.EXHAUST_PROVIDER }}"
+  EXHAUST_REGION: "{{ .Values.exhaust_service.EXHAUST_REGION }}"
+  LABEL_CONTAINER: "{{ .Values.exhaust_service.LABEL_CONTAINER }}"
+  LABEL_CONTAINER_PREFIX: "{{ .Values.exhaust_service.LABEL_CONTAINER_PREFIX }}"
+  STORAGE_URL_EXPIRY: "{{ .Values.exhaust_service.STORAGE_URL_EXPIRY }}"

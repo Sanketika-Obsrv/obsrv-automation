@@ -23,6 +23,7 @@ resource "helm_release" "dataset_api" {
           dataset_api_sa_annotations         = var.dataset_api_sa_annotations
           redis_namespace                    = var.redis_namespace
           redis_release_name                 = var.redis_release_name
+          s3_bucket                          = var.s3_bucket
         }
       )
     ]

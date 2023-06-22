@@ -27,5 +27,11 @@ postgres_service:
 redis_service:
   REDIS_HOST: obsrv-redis-headless.redis.svc.cluster.local
   REDIS_PORT: 6379
+exhaust_service:
+  EXHAUST_PROVIDER: "aws"
+  EXHAUST_REGION: "us-east-2"
+  LABEL_CONTAINER: ""
+  LABEL_CONTAINER_PREFIX: "telemetry-data"
+  STORAGE_URL_EXPIRY: 3600
 
 service_account_annotations: ""
