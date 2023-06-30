@@ -5,7 +5,7 @@ druid_service:
 postgres_service:
   POSTGRES_HOST: postgresql-hl.postgresql.svc
   POSTGRES_PORT: 5432
-  POSTGRES_DATABASE: ${postgressql_obsrv_database}
+  POSTGRES_DATABASE: ${postgresql_obsrv_database}
   POSTGRES_USERNAME: ${postgresql_obsrv_username}
   POSTGRES_PASSWORD: ${postgresql_obsrv_user_password}
 dockerhub: ${dataset_api_container_registry}
