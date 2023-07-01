@@ -371,7 +371,7 @@ spec:
         # Number of tasks per indexer
         druid.worker.capacity={{ .Values.druid_indexer_worker_capacity }}
         # Task launch parameters
-        druid.indexer.runner.javaOpts={{ .Values.druid_indexer_runner_javaOpts }}
+        # druid.indexer.runner.javaOpts={{ .Values.druid_indexer_runner_javaOpts }}
         druid.indexer.task.baseTaskDir={{ .Values.druid_indexer_task_baseTaskDir }}
         # Merge jobs
         druid.worker.numConcurrentMerges={{ .Values.druid_indexer_numConcurrentMerges }}
