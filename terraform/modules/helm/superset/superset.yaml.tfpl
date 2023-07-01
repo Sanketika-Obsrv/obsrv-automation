@@ -2,7 +2,7 @@ postgres:
   adminUser: ${pg_admin_username}
   adminPassword: ${pg_admin_password}
   db_host: ${postgresql_service_name}
-  db_port: 5432
+  db_port: '5432'
   superset:
     db_name: superset
     db_username: superset
@@ -14,5 +14,5 @@ image:
   pullPolicy: Always
 
 redis_host: ${redis_release_name}-master.${redis_namespace}.svc.cluster.local
-redis_port: 6379
-superset_redis_db_index: 3
+redis_port: '6379'
+superset_redis_db_index: '3'

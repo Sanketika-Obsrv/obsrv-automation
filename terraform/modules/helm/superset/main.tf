@@ -18,6 +18,7 @@ resource "helm_release" "superset" {
         superset_image_tag        = var.superset_image_tag
         redis_namespace           = var.redis_namespace
         redis_release_name        = var.redis_release_name
+        postgresql_service_name   = var.postgresql_service_name
       }
       )
     ]

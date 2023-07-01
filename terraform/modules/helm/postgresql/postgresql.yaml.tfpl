@@ -121,6 +121,6 @@ primary:
 
         CREATE INDEX IF NOT EXISTS dataset_source_config_status ON dataset_source_config(status);
 
-      GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${postgresql_obsrv_username};
+        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${postgresql_obsrv_username};
 
-      GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${postgresql_obsrv_username};
+        GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${postgresql_obsrv_username};
