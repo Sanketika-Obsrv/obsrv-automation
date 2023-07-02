@@ -23,13 +23,7 @@ provider "aws" {
 provider "helm" {
   alias  = "helm"
   kubernetes {
-    host                   = module.eks.kubernetes_host
-    cluster_ca_certificate = module.eks.kubernetes_ca_certificate
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args        = ["--region", "${var.region}", "eks", "get-token", "--cluster-name", "${var.building_block}-${var.env}-eks"]
-    }
+    config_path = "${var.building_block}-${var.env}-kubeconfig.yaml"
   }
 }
 
@@ -249,4 +243,10 @@ module "web_console" {
   depends_on                       = [module.eks]
   web_console_image_repository     = var.web_console_image_repository
   web_console_image_tag            = var.web_console_image_tag
+}
+
+module "get_kubeconfig" {
+  source         = "../modules/aws/get_kubeconfig"
+  env            = var.env
+  building_block = var.building_block
 }
