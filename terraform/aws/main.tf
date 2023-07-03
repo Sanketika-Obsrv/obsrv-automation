@@ -39,6 +39,7 @@ module "eks" {
   building_block        = var.building_block
   eks_master_subnet_ids = module.vpc.multi_zone_public_subnets_ids
   eks_nodes_subnet_ids  = module.vpc.single_zone_public_subnets_id
+  depends_on            = [module.vpc]
 }
 
 module "iam" {
