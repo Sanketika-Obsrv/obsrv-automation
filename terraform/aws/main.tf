@@ -23,7 +23,7 @@ provider "aws" {
 provider "helm" {
   alias  = "helm"
   kubernetes {
-    config_path = "${var.building_block}-${var.env}-kubeconfig.yaml"
+    config_path = "~/.kube/config"
   }
 }
 
