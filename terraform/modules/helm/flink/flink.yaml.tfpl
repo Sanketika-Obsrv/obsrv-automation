@@ -11,7 +11,7 @@ image:
 base_config: |
   job {
     env = "${env}"
-    enable.distributed.checkpointing = true
+    enable.distributed.checkpointing = false
     statebackend {
       base.url = "${checkpoint_base_url}"
     }

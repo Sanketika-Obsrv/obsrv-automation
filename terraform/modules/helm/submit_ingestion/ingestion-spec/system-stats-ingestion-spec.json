@@ -95,7 +95,7 @@
       "taskCount": "1",
       "replicas": 1,
       "taskDuration": "PT1H",
-      "useEarliestOffset": false,
+      "useEarliestOffset": true,
       "completionTimeout": "PT1H",
       "inputFormat": {
         "type": "json",
