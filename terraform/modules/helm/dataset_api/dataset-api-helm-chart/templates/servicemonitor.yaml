@@ -6,6 +6,7 @@ metadata:
   labels:
     app: {{ .Chart.Name }}
     release: monitoring
+    system: api
 spec:
   jobLabel: jobLabel
   selector:

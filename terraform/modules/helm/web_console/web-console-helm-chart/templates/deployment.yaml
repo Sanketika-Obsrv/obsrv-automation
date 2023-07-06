@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: web-console
+    system.infra: "true"
   name: web-console
   namespace: {{ .Values.namespace }}
 spec:
@@ -14,6 +15,7 @@ spec:
     metadata:
       labels:
         app: web-console
+        system.infra: "true"
     spec:
       containers:
         - image: "{{ .Values.image.repository }}/{{ .Values.image.image_name }}:{{ .Values.image.tag }}"

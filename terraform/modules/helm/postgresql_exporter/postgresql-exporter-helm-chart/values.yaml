@@ -453,7 +453,8 @@ affinity: {}
 
 annotations: {}
 
-podLabels: {}
+podLabels: 
+  system.monitoring: "true"
 
 # Configurable health checks
 livenessProbe:

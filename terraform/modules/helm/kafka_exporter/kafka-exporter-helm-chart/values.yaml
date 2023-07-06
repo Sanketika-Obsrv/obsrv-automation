@@ -48,6 +48,7 @@ prometheus:
     interval: "30s"
     additionalLabels:
       app: kafka-exporter
+      system.monitoring: "true"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

@@ -18,6 +18,7 @@ spec:
       {{- end }}
       labels:
         {{- include "druid-operator.selectorLabels" . | nindent 8 }}
+        system: druid
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

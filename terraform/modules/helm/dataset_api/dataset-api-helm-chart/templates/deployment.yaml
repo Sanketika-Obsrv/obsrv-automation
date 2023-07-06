@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: {{ .Chart.Name }}
+        system.ingestion: "true"
+        system.querying: "true"
+        system.api: "true"
     spec:
       serviceAccountName: {{ .Chart.Name }}-sa
       containers:
@@ -117,6 +120,9 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Chart.Name }}
+    system.ingestion: "true"
+    system.querying: "true"
+    system.api: "true"
 spec:
   type: LoadBalancer
   ports:

@@ -1,5 +1,7 @@
 loki:
   auth_enabled: ${loki_auth_enabled}
+  podLabels:
+    system.monitoring: 'true'
   limits_config:
     enforce_metric_name: ${limits_config_enforce_metric_name}
     reject_old_samples: ${limits_config_reject_old_samples}
@@ -18,13 +20,19 @@ minio:
       includeNode: ${minio_include_node_metrics}
       additionalLabels:
         release: monitoring
+        system.monitoring: 'true'
 monitoring:
   dashboards:
     namespace: "${loki_dashboards_namespace}"
   serviceMonitor:
     labels:
       release: monitoring
+      system.monitoring: 'true'
 read:
   affinity: {}
+  podLabels:
+    system.monitoring: 'true'
 write:
   affinity: {}
+  podLabels:
+    system.monitoring: 'true'

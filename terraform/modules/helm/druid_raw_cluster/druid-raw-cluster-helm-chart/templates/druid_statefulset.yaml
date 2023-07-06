@@ -137,6 +137,8 @@ spec:
       nodeType: "broker"
       druid.port: {{ .Values.druid_broker_port }}
       nodeConfigMountPath: "/opt/druid/conf/druid/cluster/query/broker"
+      podLabels:
+        system.querying: "true"
       replicas: {{ .Values.druid_broker_replicas }}
       runtime.properties: |
         druid.service={{ .Values.druid_broker_service }}
@@ -186,6 +188,9 @@ spec:
       kind: Deployment
       nodeType: "coordinator"
       druid.port: {{ .Values.druid_coordinator_port }}
+      podLabels:
+        system.querying: "true"
+        system.ingestion: "true"
       nodeConfigMountPath: "/opt/druid/conf/druid/cluster/master/coordinator-overlord"
       replicas: {{ .Values.druid_coordinator_replicas }}
       runtime.properties: |
@@ -218,6 +223,9 @@ spec:
       druid.port: {{ .Values.druid_overlord_port }}
       nodeConfigMountPath: "/opt/druid/conf/druid/cluster/master/coordinator-overlord"
       replicas: {{ .Values.druid_overlord_replicas }}
+      podLabels:
+        system.querying: "true"
+        system.ingestion: "true"
       runtime.properties: |
         druid.service={{ .Values.druid_overlord_service }}
         druid.indexer.queue.startDelay={{ .Values.druid_indexer_queue_startDelay }}
@@ -247,6 +255,8 @@ spec:
       druid.port: {{ .Values.druid_historical_port }}
       nodeConfigMountPath: "/opt/druid/conf/druid/cluster/data/historical"
       replicas: {{ .Values.druid_historical_replicas }}
+      podLabels:
+        system.querying: "true"
       readinessProbe:
         httpGet:
           path: /status/health
@@ -283,6 +293,8 @@ spec:
       volumeClaimTemplates:
         - metadata:
             name: historical-volume
+            labels:
+              system.querying: "true"
           spec:
             storageClassName: "{{- .Values.storageClass }}"
             accessModes:
@@ -366,6 +378,8 @@ spec:
       druid.port: {{ .Values.druid_indexer_port }}
       nodeConfigMountPath: "/opt/druid/conf/druid/cluster/data/indexer"
       replicas: {{ .Values.druid_indexer_replicas }}
+      podLabels:
+        system.ingestion: "true"
       runtime.properties: |
         druid.service={{ .Values.druid_indexer_service }}
         # Number of tasks per indexer
@@ -405,6 +419,8 @@ spec:
       volumeClaimTemplates:
         - metadata:
             name: indexer-volume
+            labels:
+              system.ingestion: "true"
           spec:
             storageClassName: "{{- .Values.storageClass }}"
             accessModes:
@@ -425,6 +441,9 @@ spec:
       druid.port: {{ .Values.druid_router_plaintextPort }}
       nodeConfigMountPath: "/opt/druid/conf/druid/cluster/query/router"
       replicas: {{ .Values.druid_router_replicas }}
+      podLabels:
+        system.querying: "true"
+        system.ingestion: "true"
       services:
         - spec:
             type: ClusterIP

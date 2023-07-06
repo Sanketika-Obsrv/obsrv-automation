@@ -22,6 +22,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "prometheus-druid-exporter.fullname" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        system.monitoring: "true"
     spec:
       containers:
       - env:

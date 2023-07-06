@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/version: {{ .Chart.AppVersion }}
     release: monitoring
+    system.monitoring: "true"
   name: {{ include "prometheus-druid-exporter.fullname" . }}
 spec:
   ports:
