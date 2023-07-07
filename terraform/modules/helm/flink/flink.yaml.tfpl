@@ -10,7 +10,7 @@ image:
   imagePullSecrets: []
 base_config: |
   job {
-    env = "dev"
+    env = "${env}"
     enable.distributed.checkpointing = true
     statebackend {
       base.url = "${checkpoint_base_url}"

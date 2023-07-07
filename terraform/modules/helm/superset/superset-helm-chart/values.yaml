@@ -2,7 +2,8 @@
 postgres:
   adminUser: "postgres"
   adminPassword: "postgres"
-  db_port: 5432
+  db_host: "postgresql-hl.postgresql.svc.cluster.local"
+  db_port: "5432"
   superset:
     db_name: "superset"
     db_username: "superset"
@@ -38,8 +39,6 @@ bootstrapScript: |
   #!/bin/bash
   #rm -rf /var/lib/apt/lists/* && \
   pip install \
-    sqlalchemy==1.3.24 \
-    psycopg2==2.8.5 \
     redis==3.2.1 && \
   if [ ! -f ~/bootstrap ]; then echo "Running Superset with uid {{ .Values.runAsUser }}" > ~/bootstrap; fi
 
@@ -110,7 +109,7 @@ configOverrides:
     }
 
   sql_alchemy_config: |
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{{ tpl .Values.postgres.superset.db_username . }}:{{ tpl .Values.postgres.superset.db_password . }}@postgresql-hl.postgresql.svc.cluster.local:5432/{{ tpl .Values.postgres.superset.db_name . }}'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{{ tpl .Values.postgres.superset.db_username . }}:{{ tpl .Values.postgres.superset.db_password . }}@{{ tpl .Values.postgres.db_host . }}:{{ tpl .Values.postgres.db_port . }}/{{ tpl .Values.postgres.superset.db_name . }}'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SECRET_KEY = 'thisISaSECRET_1234'
 
@@ -147,17 +146,15 @@ configOverrides:
     # The default user self registration role
     AUTH_USER_REGISTRATION_ROLE = "{{ oauth.user_registration_role }}"
 
-configMountPath: "/etc/superset"
-
+configMountPath: "/app/pythonpath"
 extraConfigMountPath: "/app/configs"
 
 image:
-  repository: amancevice/superset
+  repository: apache/superset
   tag: 2.0.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
-
 
 service:
   type: ClusterIP
@@ -200,7 +197,7 @@ supersetNode:
   connections:
     redis_host: "{{ .Values.redis_host }}"
     redis_port: "{{ .Values.redis_port }}"
-    db_host: '{{ template "superset.fullname" . }}-postgres-headless'
+    db_host: "{{ .Values.postgres.db_host }}"
     db_port: "{{ .Values.postgres.db_port }}"
     db_user: "{{ .Values.postgres.superset.db_username }}"
     db_pass: "{{ .Values.postgres.superset.db_password }}"

@@ -34,6 +34,7 @@ resource "helm_release" "flink" {
     values = [
       templatefile("${path.module}/${var.flink_custom_values_yaml}",
       {
+          env                            = var.env
           flink_container_registry       = "${var.flink_container_registry}"
           flink_image_tag                = var.flink_image_tag
           flink_image_name               = each.value

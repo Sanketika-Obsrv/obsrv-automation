@@ -1,6 +1,7 @@
 postgres:
   adminUser: ${pg_admin_username}
   adminPassword: ${pg_admin_password}
+  db_host: ${postgresql_service_name}
   db_port: 5432
   superset:
     db_name: superset
@@ -8,7 +9,7 @@ postgres:
     db_password: '${pg_superset_user_password}'
 
 image:
-  repository: amancevice/superset
+  repository: apache/superset
   tag: ${superset_image_tag}
   pullPolicy: Always
 

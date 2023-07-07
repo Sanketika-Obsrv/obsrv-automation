@@ -18,6 +18,18 @@ resource "aws_s3_bucket" "storage_bucket" {
     var.additional_tags)
 }
 
+resource "aws_s3_bucket_cors_configuration" "storage_bucket_cors" {
+  bucket = aws_s3_bucket.storage_bucket.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "POST", "DELETE"]
+    allowed_origins = ["*"]
+    expose_headers  = []
+    max_age_seconds = 3000
+  }
+}
+
 resource "aws_s3_bucket" "checkpoint_storage_bucket" {
   bucket = "checkpoint-${local.storage_bucket}"
   tags = merge(
