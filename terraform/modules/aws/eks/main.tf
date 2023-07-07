@@ -212,8 +212,3 @@ resource "aws_iam_role" "secor_sa_iam_role" {
     local.common_tags,
     var.additional_tags)
 }
-
-resource "local_file" "kubeconfig" {
-  content  = local.kubeconfig
-  filename = "${var.building_block}-${var.env}-kubeconfig.yaml"
-}
