@@ -95,3 +95,7 @@ variable "redis_release_name" {
   default     = "obsrv-redis"
 }
 
+variable "postgresql_service_name" {
+  type        = string
+  description = "Postgresql service name"
+}

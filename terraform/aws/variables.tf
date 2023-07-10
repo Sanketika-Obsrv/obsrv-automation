@@ -43,7 +43,7 @@ variable "dataset_api_container_registry" {
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.4"
+  default     = "1.0.0"
 }
 
 variable "flink_container_registry" {
@@ -55,7 +55,7 @@ variable "flink_container_registry" {
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "release-0.5.0_RC10"
+   default     = "release-0.5.0_RC23"
 }
 
 variable "web_console_configs" {

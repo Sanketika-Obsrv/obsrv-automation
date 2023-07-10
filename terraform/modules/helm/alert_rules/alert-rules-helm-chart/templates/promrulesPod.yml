@@ -6,7 +6,7 @@ metadata:
     role: alert-rules
     app: {{ .Values.prometheus_rule_selector_app }}
     release: {{ .Values.prometheus_rule_selector_release }}
-  name: {{ .Values.fullnameOverride }}-alertrules
+  name: {{ .Values.fullnameOverride }}-pod-rules
   namespace: {{ .Values.namespace }}
 spec:
   groups:
@@ -34,7 +34,7 @@ spec:
           description: Container CPU usage has been above 90% for the last 10 minutes.
 
     - alert: container_memory_usage_high
-      expr: (1 - sum(:node_memory_MemAvailable_bytes:sum{cluster=""}) / sum(node_memory_MemTotal_bytes{job="node-exporter",cluster=""})) > 0.9
+      expr: sum(rate(container_cpu_usage_seconds_total[3m])*100)  by (container, namespace) > 90
       for: 15m
       labels:
         severity: warning
@@ -44,7 +44,7 @@ spec:
         summary: Container Memory usage high
         description: Container Memory usage is above 90% for the last 15 minutes
     - alert: container_memory_usage_medium
-      expr: (1 - sum(:node_memory_MemAvailable_bytes:sum{cluster=""}) / sum(node_memory_MemTotal_bytes{job="node-exporter",cluster=""})) > 0.8 and (1 - sum(:node_memory_MemAvailable_bytes:sum{cluster=""}) / sum(node_memory_MemTotal_bytes{job="node-exporter",cluster=""})) > 0.9 
+      expr: sum(rate(container_cpu_usage_seconds_total[3m])*100)  by (container, namespace) > 80 and sum(rate(container_cpu_usage_seconds_total[3m])*100)  by (container, namespace) > 90
       for: 30m
       labels:
         severity: warning

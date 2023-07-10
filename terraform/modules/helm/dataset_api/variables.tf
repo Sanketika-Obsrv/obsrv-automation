@@ -103,3 +103,9 @@ variable "redis_release_name" {
   description = "Release name for Redis installation."
   default     = "obsrv-redis"
 }
+
+variable "s3_bucket" {
+  type        = string
+  description = "S3 bucket name for dataset api exhaust."
+  default     = ""
+}

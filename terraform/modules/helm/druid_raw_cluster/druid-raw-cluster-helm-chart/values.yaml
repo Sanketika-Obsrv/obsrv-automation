@@ -223,7 +223,7 @@ druid_indexer_fork_property_druid_server_http_numThreads: 25 # max(10, (Number o
 # druid_indexer_pod_memory_request: 512Mi
 # druid_indexer_pod_memory_limit: 768Mi
 druid_indexer_pod_memory_request: 2Gi
-druid_indexer_pod_memory_limit: 2Gi
+druid_indexer_pod_memory_limit: 4708Mi
 druid_indexer_pod_cpu_request: 1
 druid_indexer_pod_cpu_limit: 2
 druid_indexer_numConcurrentMerges: 1

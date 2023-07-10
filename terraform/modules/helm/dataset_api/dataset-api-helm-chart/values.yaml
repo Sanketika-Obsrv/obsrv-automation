@@ -2,7 +2,7 @@ namespace: "dev"
 dockerhub: "sanketikahub"
 replicaCount: 1
 repository: "obsrv-api-service"
-image_tag: 1.0.4
+image_tag: 1.0.0
 network:
   port: 3000
   targetport: 3000
@@ -27,5 +27,12 @@ postgres_service:
 redis_service:
   REDIS_HOST: obsrv-redis-headless.redis.svc.cluster.local
   REDIS_PORT: 6379
+exhaust_service:
+  CLOUD_STORAGE_PROVIDER: "aws"
+  CLOUD_STORAGE_REGION: "us-east-2"
+  CONTAINER: ""
+  CONTAINER_PREFIX: "telemetry-data"
+  STORAGE_URL_EXPIRY: 3600
+  EXHAUST_QUERY_RANGE: 31 # In Days
 
 service_account_annotations: ""

@@ -73,3 +73,8 @@ variable "monitoring_custom_values_yaml" {
   description = "Monitoring chart values.yaml path."
   default     = "monitoring.yaml.tfpl"
 }
+variable "prometheus_metrics_retention" {
+  type        = string
+  description = "Prometheus metrics retention period."
+  default     = "90d"
+}

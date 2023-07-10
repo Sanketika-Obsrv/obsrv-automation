@@ -77,7 +77,7 @@ spec:
     druid.azure.key = {{ .Values.azure_storage_account_key }}
     druid.azure.container = {{ .Values.azure_storage_container }}
     #druid.storage.storageDirectory = {{ .Values.druid_storage_directory }}
-    #druid.storage.disableAcl=true
+    druid.storage.disableAcl=true
     # Google Cloud Storage
     druid.google.bucket = {{ .Values.gcs_bucket }}
     druid.google.prefix = druid/segments
@@ -87,10 +87,11 @@ spec:
     # # For local disk (only viable in a cluster if this is a network mount):
     druid.indexer.logs.type={{ .Values.druid_indexer_logs_type }}
     druid.indexer.logs.prefix={{ .Values.druid_indexer_logs_prefix }}
+    druid.indexer.logs.disableAcl=true
 
     {{- if eq .Values.druid_deepstorage_type "s3" }}
-    druid.indexer.logs.container={{ .Values.s3_bucket }}
-    druid.indexer.logs.s3Bucket={{ .Values.druid_indexer_logs_container }}
+    druid.indexer.logs.container={{ .Values.druid_indexer_logs_container }}
+    druid.indexer.logs.s3Bucket={{ .Values.s3_bucket }}
     druid.indexer.logs.s3Prefix= {{ .Values.druid_indexer_logs_prefix }}
     {{- end }}
 
@@ -385,7 +386,7 @@ spec:
         # Number of tasks per indexer
         druid.worker.capacity={{ .Values.druid_indexer_worker_capacity }}
         # Task launch parameters
-        druid.indexer.runner.javaOpts={{ .Values.druid_indexer_runner_javaOpts }}
+        # druid.indexer.runner.javaOpts={{ .Values.druid_indexer_runner_javaOpts }}
         druid.indexer.task.baseTaskDir={{ .Values.druid_indexer_task_baseTaskDir }}
         # Merge jobs
         druid.worker.numConcurrentMerges={{ .Values.druid_indexer_numConcurrentMerges }}

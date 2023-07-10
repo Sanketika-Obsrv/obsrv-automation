@@ -7,7 +7,7 @@ image:
   registry: ${flink_container_registry}
   repository: ${flink_image_name}
   tag: ${flink_image_tag}
-  imagePullSecrets: []
+  imagePullSecrets: ""
 base_config: |
   job {
     env = "${env}"

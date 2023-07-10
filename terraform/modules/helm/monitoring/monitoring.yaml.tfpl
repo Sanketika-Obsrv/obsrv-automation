@@ -1,5 +1,6 @@
 prometheus:
   prometheusSpec:
+    retention: ${prometheus_metrics_retention}
     storageSpec:
       volumeClaimTemplate:
         spec:
