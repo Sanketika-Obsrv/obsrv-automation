@@ -19,7 +19,7 @@ spec:
       serviceAccountName: {{ .Chart.Name }}-sa
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.dockerhub }}/{{ .Values.image.repository }}:{{ .Values.image.image_tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.image_tag }}"
           imagePullPolicy: Always
           envFrom:
            - configMapRef:

@@ -9,9 +9,9 @@ postgres_service:
   POSTGRES_DATABASE: ${postgresql_obsrv_database}
   POSTGRES_USERNAME: ${postgresql_obsrv_username}
   POSTGRES_PASSWORD: ${postgresql_obsrv_user_password}
-dockerhub: ${dataset_api_container_registry}
-repository: ${dataset_api_image_name}
 image:
+  registry: ${dataset_api_container_registry}
+  repository: ${dataset_api_image_name}
   image_tag: ${dataset_api_image_tag}
   imagePullSecrets: ""
 redis_service:
