@@ -77,8 +77,8 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-jobmanager
-        # component: {{ .Release.Name }}-jobmanager
+        app: flink
+        component: {{ .Release.Name }}-jobmanager
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: "{{ .Values.jobmanager.prom_port }}"
@@ -103,7 +103,7 @@ spec:
       containers:
       - name: {{ .Release.Name }}-jobmanager
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         resources:
           requests:
             cpu: "{{ .Values.jobmanager.cpu_requests }}"
@@ -170,13 +170,13 @@ spec:
   replicas: {{ .Values.taskmanager.replicas }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-taskmanager
-      # component: {{ .Release.Name }}-taskmanager
+      app: flink
+      component: {{ .Release.Name }}-taskmanager
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-taskmanager
-        # component: {{ .Release.Name }}-taskmanager
+        app: flink
+        component: {{ .Release.Name }}-taskmanager
     spec:
       volumes:
       - name: flink-config-volume
@@ -197,7 +197,7 @@ spec:
       containers:
       - name: {{ .Release.Name }}-taskmanager
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         resources:
           requests:
             cpu: "{{ .Values.taskmanager.cpu_requests }}"
