@@ -15,11 +15,11 @@ spec:
         app: {{ .Chart.Name }}
     spec:
       imagePullSecrets:
-      - name: {{ .Values.imagePullSecrets }}
+      - name: {{ .Values.image.imagePullSecrets }}
       serviceAccountName: {{ .Chart.Name }}-sa
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.dockerhub }}/{{ .Values.repository }}:{{ .Values.image_tag }}"
+          image: "{{ .Values.image.dockerhub }}/{{ .Values.image.repository }}:{{ .Values.image.image_tag }}"
           imagePullPolicy: Always
           envFrom:
            - configMapRef:

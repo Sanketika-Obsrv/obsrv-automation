@@ -1,8 +1,9 @@
 namespace: "dev"
-dockerhub: "sanketikahub"
 replicaCount: 1
-repository: "obsrv-api-service"
-image_tag: 1.0.0
+image:
+  registry: "sanketikahub"
+  repository: "obsrv-api-service"
+  image_tag: 1.0.0
 network:
   port: 3000
   targetport: 3000
