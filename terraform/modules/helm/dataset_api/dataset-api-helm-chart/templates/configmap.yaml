@@ -29,3 +29,7 @@ data:
   container_prefix: "{{ .Values.exhaust_service.CONTAINER_PREFIX }}"
   storage_url_expiry: "{{ .Values.exhaust_service.STORAGE_URL_EXPIRY }}"
   exhaust_query_range: "{{ .Values.exhaust_service.EXHAUST_QUERY_RANGE }}"
+  max_query_threshold: "{{ .Values.MAX_QUERY_THRESHOLD }}"
+  max_query_limit: "{{ .Values.MAX_QUERY_LIMIT }}"
+  max_date_range: "{{ .Values.MAX_DATE_RANGE }}"
+  exclude_datasource_validation: "{{ .Values.EXCLUDE_DATASOURCE_VALIDATION }}"
