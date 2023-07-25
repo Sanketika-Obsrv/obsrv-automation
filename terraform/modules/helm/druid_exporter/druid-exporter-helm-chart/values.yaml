@@ -8,7 +8,7 @@ image:
 
 annotations: {}
 
-druidURL: http://druid-raw-dev-routers.druid-raw.svc:8888
+druidURL: http://druid-raw-sb-dev-routers.druid-raw.svc:8888
 logLevel: info
 logFormat: json
 noHistogram: false
@@ -52,7 +52,7 @@ serviceType: NodePort
 
 serviceMonitor:
   enabled: true
-  namespace: monitoring
+  namespace: druid-raw
   interval: 30s
   scrapeTimeout: 10s
   # additionalLabels: {}

@@ -1,0 +1,89 @@
+commonLabels: 
+  system: storage
+image:
+  registry: docker.io
+  repository: bitnami/redis
+  tag: 7.0.5-debian-11-r15
+  digest: ""
+  pullPolicy: IfNotPresent
+
+commonConfiguration: |-
+  # Enable RDB persistence
+  save 300 100
+
+auth:
+  enabled: false
+
+master:
+  count: 1
+  podLabels:
+      system: storage
+  ## @param master.configuration Configuration for Redis&reg; master nodes
+  ## ref: https://redis.io/topics/config
+  ##
+  configuration: ""
+  disableCommands:
+    - FLUSHALL
+  ## @param master.extraFlags Array with additional command line flags for Redis&reg; master
+  ## e.g:
+  extraFlags:
+   - "--maxmemory 1024mb"
+   - "--maxmemory-policy volatile-ttl"
+  containerPorts:
+    redis: 6379
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+  persistence:
+    enabled: true
+    labels:
+      system: storage
+    path: /data
+    subPath: ""
+    subPathExpr: ""
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
+  serviceAccount:
+    create: true
+    name: redis
+    annotations:
+      serviceAccountName: default
+
+replica:
+  replicaCount: 1
+  podLabels:
+      system: storage
+  ## @param replica.configuration Configuration for Redis&reg; replicas nodes
+  ## ref: https://redis.io/topics/config
+  ##
+  configuration: ""
+  disableCommands:
+    - FLUSHALL
+  ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
+  ## e.g:
+  extraFlags:
+   - "--maxmemory 1024mb"
+   - "--maxmemory-policy volatile-ttl"
+  ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
+  ##
+  containerPorts:
+    redis: 6379
+  persistence:
+    enabled: true
+    labels:
+      system: storage
+    path: /data
+    subPath: ""
+    subPathExpr: ""
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
+  serviceAccount:
+    create: true

@@ -30,7 +30,6 @@ spec:
     -server
     -XX:+UseG1GC
     -XX:+ExitOnOutOfMemoryError
-    -XX:MaxDirectMemorySize=10240g
     -Duser.timezone=UTC
     -Dfile.encoding=UTF-8
     -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager

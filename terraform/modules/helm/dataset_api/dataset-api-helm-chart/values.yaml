@@ -1,38 +1,39 @@
-namespace: "dev"
-dockerhub: "sanketikahub"
+namespace: "dataset-api"
+dockerhub: "sunbird"
 replicaCount: 1
-repository: "obsrv-api-service"
+repository: "sb-obsrv-api-service"
 image_tag: 1.0.0
 network:
-  port: 3000
-  targetport: 3000
-SYSTEM_ENV: ""
+  port: '3000'
+  targetport: '3000'
+SYSTEM_ENV: "dev-new"
 TELEMETRY_KAFKA_COMPRESSION: snappy
 druid_service:
   DRUID_HOST: http://druid-raw-routers.druid-raw.svc
-  DRUID_PORT: 8888
+  DRUID_PORT: '8888'
 kafka_service:
   KAFKA_HOST: "kafka-headless.kafka.svc"
-  KAFKA_PORT: 9092
-  KAFKA_INITIAL_RETRY_TIME: 3000
+  KAFKA_PORT: '9092'
+  KAFKA_INITIAL_RETRY_TIME: '3000'
   KAFKA_RETRIES: 5
-  KAFKA_CONNECTION_TIMEOUT: 5000
+  KAFKA_CONNECTION_TIMEOUT: '5000'
   CLIENT_ID: "obsrv-apis"
 postgres_service:
   POSTGRES_HOST: postgresql-hl.postgresql.svc
-  POSTGRES_PORT: 5432
+  POSTGRES_PORT: '5432'
   POSTGRES_DATABASE: "obsrv"
   POSTGRES_USERNAME: "obsrv"
   POSTGRES_PASSWORD: "obsrv123"
 redis_service:
   REDIS_HOST: obsrv-redis-headless.redis.svc.cluster.local
-  REDIS_PORT: 6379
+  REDIS_PORT: '6379'
 exhaust_service:
   CLOUD_STORAGE_PROVIDER: "aws"
   CLOUD_STORAGE_REGION: "us-east-2"
-  CONTAINER: ""
+  CONTAINER: "obsrv-sb-dev-165052186109"
   CONTAINER_PREFIX: "telemetry-data"
-  STORAGE_URL_EXPIRY: 3600
-  EXHAUST_QUERY_RANGE: 31 # In Days
+  STORAGE_URL_EXPIRY: '3600'
+  EXHAUST_QUERY_RANGE: '31' # In Days
 
-service_account_annotations: ""
+service_account_annotations: 
+  eks.amazonaws.com/role-arn: arn:aws:iam::165052186109:role/sb-dev-dataset-api-sa-iam-role

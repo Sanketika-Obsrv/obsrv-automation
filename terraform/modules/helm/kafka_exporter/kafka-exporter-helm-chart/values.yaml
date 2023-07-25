@@ -44,11 +44,12 @@ kafkaExporter:
 prometheus:
   serviceMonitor:
     enabled: true
-    namespace: monitoring
+    namespace: kafka
     interval: "30s"
     additionalLabels:
       app: kafka-exporter
       system.monitoring: "true"
+      release: monitoring
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

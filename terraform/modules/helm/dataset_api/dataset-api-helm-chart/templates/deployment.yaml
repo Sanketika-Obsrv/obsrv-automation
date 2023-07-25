@@ -17,6 +17,8 @@ spec:
         system.querying: "true"
         system.api: "true"
     spec:
+      imagePullSecrets:
+      - name: {{ .Values.image.imagePullSecrets }}
       serviceAccountName: {{ .Chart.Name }}-sa
       containers:
         - name: {{ .Chart.Name }}

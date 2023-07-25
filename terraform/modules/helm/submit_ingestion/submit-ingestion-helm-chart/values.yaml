@@ -1,5 +1,5 @@
-namespace: "druid-raw"
-druid_router_host: "druid-raw-dev-routers.druid-raw.svc.cluster.local:8888"
+namespace: "submit-ingestion"
+druid_router_host: "druid-raw-routers.druid-raw.svc.cluster.local:8888"
 supervisor_path: "druid/indexer/v1/supervisor"
 bootstrap_servers: "kafka-headless.kafka.svc.cluster.local:9092"
 ingestion_spec:

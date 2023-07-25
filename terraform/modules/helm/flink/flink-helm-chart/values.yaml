@@ -1,8 +1,9 @@
 namespace: ""
 imagepullsecrets: ""
-registry: ""
-repository: "sanketikahub/obsrv-core"
-image_tag: "1.0.2"
+image:
+  registry: sunbird
+  repository: sb-obsrv-merged-pipeline
+  tag: 1.0.0
 serviceMonitor:
   enabled: false
 replicaCount: 1
@@ -30,7 +31,7 @@ taskmanager:
   cpu_requests: 0.7
   cpu_limits: 1
 
-checkpoint_store_type: ""
+checkpoint_store_type: "s3"
 
 # AWS S3 Details
 s3_access_key: ""
@@ -88,10 +89,10 @@ log4j_console_properties: |
 
 base_config: |
   job {
-    env = "dev"
+    env = "sb-dev"
     enable.distributed.checkpointing = true
     statebackend {
-      base.url = "s3://checkpoint-obsrv-dev"
+      base.url = "s3://checkpoint-obsrv-sb-dev-165052186109"
     }
   }
   kafka {
