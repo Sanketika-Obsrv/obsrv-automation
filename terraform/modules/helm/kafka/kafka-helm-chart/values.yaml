@@ -33,6 +33,7 @@ clusterDomain: cluster.local
 ## @param commonLabels Labels to add to all deployed objects
 ##
 commonLabels: {}
+  
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}
@@ -1487,7 +1488,13 @@ provisioning:
   replicationFactor: 1
   ## @param provisioning.topics Kafka topics to provision
 
-  topics: []
+  topics: 
+  - name: "ingest"
+    partitions: 1
+    replicationFactor: 1
+  - name: "masterdata.ingest"
+    partitions: 1
+    replicationFactor: 1
 
   ## @param provisioning.nodeSelector Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/

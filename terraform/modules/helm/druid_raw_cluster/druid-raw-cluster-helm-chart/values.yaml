@@ -4,7 +4,7 @@ druid_image: "apache/druid:25.0.0"
 druid_namespace: "druid-raw"
 druid_monitoring: True
 mount_path: /druid/data
-storageClass: "default"
+storageClass: "gp2"
 
 ######################### Druid common variables ########################
 druid_directory: "/opt/druid"
@@ -18,16 +18,16 @@ druid.startup.logging.logProperties: true
 druid_metadata_storage_type: "postgresql"
 druid_metadata_storage_connector_connectURI: "jdbc:postgresql://postgresql-hl.postgresql.svc.cluster.local:5432/druid_raw"
 druid_metadata_storage_connector_user: "druid_raw"
-druid_metadata_storage_connector_password: "druid_raw"
+druid_metadata_storage_connector_password: "druidraw123"
 
 # Druid Storage Type
-druid_deepstorage_type: ""
+druid_deepstorage_type: "s3"
 druid_storage_directory: "/data"
 
 # AWS S3 Details
 s3_access_key: ""
 s3_secret_key: ""
-s3_bucket: "obsrv-dev-725876873105"
+s3_bucket: "obsrv-sb-dev-165052186109"
 
 # Azure Container Details
 azure_storage_account_name: ""
@@ -39,7 +39,7 @@ gcs_bucket: ""
 
 # Indexing service logs
 # For local disk (only viable in a cluster_type if this is a network mount):
-druid_indexer_logs_type: ""
+druid_indexer_logs_type: "s3"
 druid_indexer_logs_container: ""
 druid_indexer_logs_prefix: "backups/druid/druid-task-logs"
 
@@ -223,7 +223,7 @@ druid_indexer_fork_property_druid_server_http_numThreads: 25 # max(10, (Number o
 # druid_indexer_pod_memory_request: 512Mi
 # druid_indexer_pod_memory_limit: 768Mi
 druid_indexer_pod_memory_request: 2Gi
-druid_indexer_pod_memory_limit: 4708Mi
+druid_indexer_pod_memory_limit: 2Gi
 druid_indexer_pod_cpu_request: 1
 druid_indexer_pod_cpu_limit: 2
 druid_indexer_numConcurrentMerges: 1
@@ -354,7 +354,8 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {}
+  annotations: 
+    serviceAccountName: "arn:aws:iam::165052186109:role/sb-dev-druid-raw-sa-iam-role"
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: druid-raw-sa

@@ -10,8 +10,8 @@ postgres:
     db_password: "superset123"
 
 redis_host: obsrv-redis-master.redis.svc.cluster.local
-redis_port: 6379
-superset_redis_db_index: 3
+redis_port: '6379'
+superset_redis_db_index: '3'
 
 replicaCount: 1
 oauth_enabled: False
@@ -151,13 +151,13 @@ extraConfigMountPath: "/app/configs"
 
 image:
   repository: apache/superset
-  tag: 2.0.0
+  tag: 2.1.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 8088
   annotations: {}
 
