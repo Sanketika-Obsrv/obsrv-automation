@@ -1,19 +1,20 @@
+# create a user with s3 full access and update the keys below
 credentials:
   secretContents:
     cloud: |
       [default]
-      aws_access_key_id=${velero_aws_access_key_id}
-      aws_secret_access_key=${velero_aws_secret_access_key}
+      aws_access_key_id=""
+      aws_secret_access_key=""
 configuration:
-  provider: ${cloud_provider}
+  provider: "aws"
   backupStorageLocation:
-    bucket: ${velero_backup_bucket}
+    bucket: "velero-obsrv-dev-725876873105"
     config:
-      region: ${velero_backup_bucket_region}
+      region: "us-east-2"
   volumeSnapshotLocation:
     name: default
     config:
-      region: ${velero_backup_bucket_region}
+      region: "us-east-2"
 initContainers:
   - name: velero-plugin-for-aws
     image: velero/velero-plugin-for-aws
