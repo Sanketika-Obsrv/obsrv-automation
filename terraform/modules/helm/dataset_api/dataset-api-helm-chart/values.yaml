@@ -6,7 +6,7 @@ image_tag: 1.0.0
 network:
   port: '3000'
   targetport: '3000'
-SYSTEM_ENV: "dev-new"
+SYSTEM_ENV: "sb-dev"
 TELEMETRY_KAFKA_COMPRESSION: snappy
 druid_service:
   DRUID_HOST: http://druid-raw-routers.druid-raw.svc
@@ -37,7 +37,7 @@ exhaust_service:
   MAX_QUERY_THRESHOLD: "5000"
 MAX_QUERY_LIMIT: "5000"
 MAX_DATE_RANGE: "30"
-EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-system-stats
+EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-system-stats"
 
 service_account_annotations: 
   eks.amazonaws.com/role-arn: arn:aws:iam::165052186109:role/sb-dev-dataset-api-sa-iam-role

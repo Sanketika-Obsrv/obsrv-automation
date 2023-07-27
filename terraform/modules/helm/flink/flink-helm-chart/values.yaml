@@ -1,4 +1,4 @@
-namespace: ""
+namespace: "flink"
 imagepullsecrets: ""
 image:
   registry: sunbird

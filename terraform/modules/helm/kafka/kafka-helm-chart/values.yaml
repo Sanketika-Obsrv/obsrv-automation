@@ -1489,10 +1489,10 @@ provisioning:
   ## @param provisioning.topics Kafka topics to provision
 
   topics: 
-  - name: "ingest"
+  - name: "sb-dev.ingest"
     partitions: 1
     replicationFactor: 1
-  - name: "masterdata.ingest"
+  - name: "sb-dev.masterdata.ingest"
     partitions: 1
     replicationFactor: 1
 
