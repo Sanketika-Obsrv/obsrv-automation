@@ -1,17 +1,18 @@
 loki:
-  auth_enabled: ${loki_auth_enabled}
+  auth_enabled: false
+  
   limits_config:
-    enforce_metric_name: ${limits_config_enforce_metric_name}
-    reject_old_samples: ${limits_config_reject_old_samples}
-    reject_old_samples_max_age: "${limits_config_reject_old_samples_max_age}"
-    max_cache_freshness_per_query: "${limits_config_max_cache_freshness_per_query}"
-    split_queries_by_interval: "${limits_config_split_queries_by_interval}"
-    retention_period: "${limits_config_retention_period}"
+    enforce_metric_name: false
+    reject_old_samples: true
+    reject_old_samples_max_age: "168h"
+    max_cache_freshness_per_query: "10m"
+    split_queries_by_interval: "15m"
+    retention_period: "48h"
 compactor:
-  retention_enabled: ${compactor_retention_enabled}
-  working_directory: ${compactor_working_directory}
+  retention_enabled: true
+  working_directory: /var/loki/compactor/retention
 minio:
-  enabled: ${minio_enabled}
+  enabled: true
   resources:
     limits: 
       cpu: 128m
@@ -21,13 +22,13 @@ minio:
       memory: 128Mi
   metrics:
     serviceMonitor:
-      enabled: ${minio_service_monitor_enabled}
-      includeNode: ${minio_include_node_metrics}
+      enabled: true
+      includeNode: true
       additionalLabels:
         release: monitoring
 monitoring:
   dashboards:
-    namespace: "${loki_dashboards_namespace}"
+    namespace: "monitoring"
   lokiCanary:
     resources:
       limits: 

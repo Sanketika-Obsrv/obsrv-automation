@@ -21,6 +21,14 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.dockerhub }}/{{ .Values.repository }}:{{ .Values.image_tag }}"
           imagePullPolicy: Always
+          resources: 
+            requests:
+              cpu: "{{ .Values.cpu_requests }}"
+              memory: "{{ .Values.memory_requests }}"
+            limits:
+              cpu: "{{ .Values.cpu_limits }}"
+              memory: "{{ .Values.memory_limits }}"
+
           envFrom:
            - configMapRef:
               name: {{ .Chart.Name }}-config

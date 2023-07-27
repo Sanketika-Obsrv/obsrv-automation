@@ -709,7 +709,9 @@ primary:
   ## @param primary.resources.requests.cpu The requested cpu for the PostgreSQL Primary containers
   ##
   resources:
-    limits: {}
+    limits: 
+      cpu: 250m
+      memory: 512Mi
     requests:
       memory: 256Mi
       cpu: 250m
@@ -1046,7 +1048,9 @@ readReplicas:
   ## @param readReplicas.resources.requests.cpu The requested cpu for the PostgreSQL read only containers
   ##
   resources:
-    limits: {}
+    limits: 
+      cpu: 250m
+      memory: 512Mi
     requests:
       memory: 256Mi
       cpu: 250m

@@ -6,6 +6,6 @@ resources:
     cpu: 100m
     memory: 128Mi
 serviceMonitor:
-  enabled: ${promtail_service_monitor_status}
+  enabled: true
   labels:
     release: monitoring

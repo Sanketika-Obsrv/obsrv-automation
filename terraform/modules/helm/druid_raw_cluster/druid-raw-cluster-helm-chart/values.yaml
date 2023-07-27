@@ -27,7 +27,7 @@ druid_storage_directory: "/data"
 # AWS S3 Details
 s3_access_key: ""
 s3_secret_key: ""
-s3_bucket: "obsrv-sb-dev-165052186109"
+s3_bucket: "obsrv-dev-725876873105"
 
 # Azure Container Details
 azure_storage_account_name: ""
@@ -50,7 +50,7 @@ druid_selectors_coordinator_serviceName: druid/coordinator
 # Monitoring
 druid_monitoring_monitors: '"com.metamx.metrics.JvmMonitor","org.apache.druid.java.util.metrics.JvmMonitor"'
 druid_emitter: composing
-druid_emitter_http_recipientBaseUrl: http://druid-exporter-prometheus-druid-exporter.${druid_exporter_namespace}.svc:8080
+druid_emitter_http_recipientBaseUrl: http://druid-exporter-prometheus-druid-exporter.druid-raw.svc:8080
 druid_emitter_composing_emitters: '"logging"'
 druid_emitter_logging_logLevel: INFO
 
@@ -355,7 +355,7 @@ serviceAccount:
   create: true
   # Annotations to add to the service account
   annotations: 
-    serviceAccountName: "arn:aws:iam::165052186109:role/sb-dev-druid-raw-sa-iam-role"
+    serviceAccountName: "arn:aws:iam::725876873105:role/dev-druid-raw-sa-iam-role"
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: druid-raw-sa

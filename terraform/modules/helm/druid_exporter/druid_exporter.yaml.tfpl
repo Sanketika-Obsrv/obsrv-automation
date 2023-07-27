@@ -1,4 +1,4 @@
-druidURL: http://druid-raw-${env}-routers.druid-raw.svc:8888
+druidURL: http://druid-raw-routers.druid-raw.svc:8888
 serviceMonitor:
   enabled: true
   namespace: ${druid_exporter_namespace}
