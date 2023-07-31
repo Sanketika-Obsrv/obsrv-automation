@@ -1,6 +1,6 @@
 cloud_store_provider: "s3"
 upload_manager: "com.pinterest.secor.uploader.S3UploadManager"
-cloud_storage_bucket: "obsrv-dev-725876873105"
+cloud_storage_bucket: ""
 namespace: "secor"
 storageClass: "gp2"
 secor_env: "dev"

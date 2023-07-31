@@ -8,7 +8,7 @@ credentials:
 configuration:
   provider: "aws"
   backupStorageLocation:
-    bucket: "velero-obsrv-dev-725876873105"
+    bucket: ""
     config:
       region: "us-east-2"
   volumeSnapshotLocation:

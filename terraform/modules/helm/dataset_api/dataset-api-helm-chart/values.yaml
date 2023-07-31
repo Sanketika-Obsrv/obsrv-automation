@@ -34,7 +34,7 @@ redis_service:
 exhaust_service:
   CLOUD_STORAGE_PROVIDER: "aws"
   CLOUD_STORAGE_REGION: "us-east-2"
-  CONTAINER: "obsrv-dev-725876873105"
+  CONTAINER: ""
   CONTAINER_PREFIX: "telemetry-data"
   STORAGE_URL_EXPIRY: 3600
   EXHAUST_QUERY_RANGE: 31 # In Days
@@ -44,4 +44,4 @@ MAX_DATE_RANGE: "30"
 EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-system-stats"
 
 service_account_annotations: 
-  eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-dataset-api-sa-iam-role
+  eks.amazonaws.com/role-arn: ""
