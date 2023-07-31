@@ -1,25 +1,3 @@
-variable "terraform_backend_bucket_name" {
-  type        = string
-  description = "Terraform backend bucket name to store the tfstate"
-}
-
-variable "terraform_backend_bucket_region" {
-  type        = string
-  description = "Terraform backend bucket region"
-}
-
-variable "aws_access_key_id" {
-  type        = string
-  description = "AWS_ACCESS_KEY_ID"
-  sensitive   = true
-}
-
-variable "aws_secret_access_key" {
-  type        = string
-  description = "AWS_SECRET_ACCESS_KEY"
-  sensitive   = true
-}
-
 variable "env" {
   type        = string
   description = "Environment name. All resources will be prefixed with this value."
