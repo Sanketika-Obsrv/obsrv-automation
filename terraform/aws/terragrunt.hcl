@@ -8,11 +8,6 @@ remote_state {
   }
 }
 
-inputs = {
-  terraform_backend_bucket_name = get_env("AWS_TERRAFORM_BACKEND_BUCKET_NAME")
-  terraform_backend_bucket_region = get_env("AWS_TERRAFORM_BACKEND_BUCKET_REGION")
-}
-
 # inputs = {
 #   region                         = "us-east-2"
 #   env                            = "dev"
