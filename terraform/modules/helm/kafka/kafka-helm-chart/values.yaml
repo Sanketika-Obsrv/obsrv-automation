@@ -510,7 +510,7 @@ resources:
     cpu: 1
     memory: 2048Mi
   requests: 
-    cpu: 0.75
+    cpu: 750m
     memory: 1024Mi
 ## Kafka pods' Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
