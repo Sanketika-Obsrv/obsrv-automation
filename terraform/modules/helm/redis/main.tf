@@ -14,11 +14,9 @@ resource "helm_release" "redis" {
       templatefile("${path.module}/${var.redis_custom_values_yaml}",
         {
             redis_master_maxmemory          = var.redis_master_maxmemory
-            redis_replica_maxmemory         = var.redis_replica_maxmemory
             redis_maxmemory_eviction_policy = var.redis_maxmemory_eviction_policy
             redis_persistence_path          = var.redis_persistence_path
             redis_master_persistence_size   = var.redis_master_persistence_size
-            redis_replica_persistence_size  = var.redis_replica_persistence_size
         }
       )
     ]

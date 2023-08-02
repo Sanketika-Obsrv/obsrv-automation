@@ -1,16 +1,16 @@
 alertmanager:
   alertmanagerSpec:
-      resources:
-          limits:
-              cpu: 128m
-              memory: 256Mi
-          requests:
-              cpu: 128m
-              memory: 256Mi
+    resources:
+        limits:
+            cpu: 100m
+            memory: 256Mi
+        requests:
+            cpu: 100m
+            memory: 256Mi
 prometheusOperator:
   resources:
     limits:
-        cpu: 200m
+        cpu: 100m
         memory: 200Mi
     requests:
         cpu: 100m
@@ -29,16 +29,16 @@ kube-state-metrics:
       cpu: 100m
       memory: 64Mi
     requests:
-      cpu: 10m
+      cpu: 100m
       memory: 32Mi
 grafana:
   resources:
     limits:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 256m
+      memory: 512Mi
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 256m
+      memory: 512Mi
 prometheus:
   server:
     resources:

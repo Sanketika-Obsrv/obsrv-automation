@@ -62,12 +62,6 @@ variable "redis_master_maxmemory" {
   default     = "1024mb"
 }
 
-variable "redis_replica_maxmemory" {
-  type        = string
-  description = "Redis maxmemory assigned for the replica"
-  default     = "1024mb"
-}
-
 variable "redis_maxmemory_eviction_policy" {
   type        = string
   description = "Redis maxmemory eviction policy"
@@ -86,11 +80,6 @@ variable "redis_master_persistence_size" {
   default     = "2Gi"
 }
 
-variable "redis_replica_persistence_size" {
-  type        = string
-  description = "Redis disk path for persistence"
-  default     = "2Gi"
-}
 
 variable "redis_custom_values_yaml" {
   type        = string

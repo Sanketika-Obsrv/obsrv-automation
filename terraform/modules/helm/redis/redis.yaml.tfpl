@@ -5,6 +5,7 @@ image:
   digest: ""
   pullPolicy: IfNotPresent
 
+architecture: standalone
 commonConfiguration: |-
   # Enable RDB persistence
   save 300 100
@@ -29,10 +30,10 @@ master:
     redis: 6379
   resources:
     limits:
-      cpu: 1
+      cpu: 512m
       memory: 2Gi
     requests:
-      cpu: 1
+      cpu: 512m
       memory: 1Gi
   persistence:
     enabled: true
@@ -43,31 +44,3 @@ master:
     accessModes:
       - ReadWriteOnce
     size: ${redis_master_persistence_size}
-
-replica:
-  replicaCount: 1
-  ## @param replica.configuration Configuration for Redis&reg; replicas nodes
-  ## ref: https://redis.io/topics/config
-  ##
-  configuration: ""
-  disableCommands:
-    - FLUSHALL
-  ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
-  ## e.g:
-  extraFlags:
-   - "--maxmemory ${redis_replica_maxmemory}"
-   - "--maxmemory-policy ${redis_maxmemory_eviction_policy}"
-  ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
-  ##
-  containerPorts:
-    redis: 6379
-  persistence:
-    enabled: true
-    path: ${redis_persistence_path}
-    subPath: ""
-    subPathExpr: ""
-    storageClass: ""
-    accessModes:
-      - ReadWriteOnce
-    size: ${redis_replica_persistence_size}
-
