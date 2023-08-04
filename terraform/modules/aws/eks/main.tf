@@ -162,7 +162,7 @@ resource "aws_iam_openid_connect_provider" "eks_openid" {
 }
 
 resource "aws_iam_role" "dataset_api_sa_iam_role" {
-  name                = "${var.env}-${var.dataset_api_sa_iam_role_name}"
+  name                = "${var.env}-${var.building_block}-${var.dataset_api_sa_iam_role_name}"
   assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.dataset_api_namespace}", SA_NAME = "${var.dataset_api_namespace}-sa" })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
   depends_on          = [aws_iam_openid_connect_provider.eks_openid]
