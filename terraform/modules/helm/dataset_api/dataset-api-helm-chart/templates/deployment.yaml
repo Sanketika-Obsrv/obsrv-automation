@@ -14,8 +14,10 @@ spec:
       labels:
         app: {{ .Chart.Name }}
     spec:
+      {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.image.imagePullSecrets }}
+      {{- end }}
       serviceAccountName: {{ .Chart.Name }}-sa
       containers:
         - name: {{ .Chart.Name }}
