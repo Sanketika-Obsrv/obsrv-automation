@@ -1,12 +1,16 @@
 namespace: "dataset-api"
-dockerhub: "sunbird"
+dockerhub: "sanketikahub"
 replicaCount: 1
-repository: "sb-obsrv-api-service"
+repository: "obsrv-api-service"
 image_tag: 1.0.0
+cpu_requests: 0.5
+cpu_limits: 0.5
+memory_requests: 512Mi
+memory_limits: 1024Mi
 network:
   port: '3000'
   targetport: '3000'
-SYSTEM_ENV: "dev-new"
+SYSTEM_ENV: "dev"
 TELEMETRY_KAFKA_COMPRESSION: snappy
 druid_service:
   DRUID_HOST: http://druid-raw-routers.druid-raw.svc
@@ -30,10 +34,14 @@ redis_service:
 exhaust_service:
   CLOUD_STORAGE_PROVIDER: "aws"
   CLOUD_STORAGE_REGION: "us-east-2"
-  CONTAINER: "obsrv-sb-dev-165052186109"
+  CONTAINER: ""
   CONTAINER_PREFIX: "telemetry-data"
-  STORAGE_URL_EXPIRY: '3600'
-  EXHAUST_QUERY_RANGE: '31' # In Days
+  STORAGE_URL_EXPIRY: 3600
+  EXHAUST_QUERY_RANGE: 31 # In Days
+  MAX_QUERY_THRESHOLD: "5000"
+MAX_QUERY_LIMIT: "5000"
+MAX_DATE_RANGE: "30"
+EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-system-stats"
 
 service_account_annotations: 
-  eks.amazonaws.com/role-arn: arn:aws:iam::165052186109:role/sb-dev-dataset-api-sa-iam-role
+  eks.amazonaws.com/role-arn: ""

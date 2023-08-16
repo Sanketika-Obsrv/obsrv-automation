@@ -1,9 +1,9 @@
-namespace: ""
+namespace: "flink"
 imagepullsecrets: ""
 image:
-  registry: sunbird
-  repository: sb-obsrv-merged-pipeline
-  tag: 1.0.0
+  registry: sanketikahub
+  repository: merged-pipeline
+  tag: release-0.5.0_RC23
 serviceMonitor:
   enabled: false
 replicaCount: 1
@@ -89,10 +89,10 @@ log4j_console_properties: |
 
 base_config: |
   job {
-    env = "sb-dev"
+    env = "dev"
     enable.distributed.checkpointing = true
     statebackend {
-      base.url = "s3://checkpoint-obsrv-sb-dev-165052186109"
+      base.url = "s3://checkpoint-obsrv-dev-725876873105"
     }
   }
   kafka {

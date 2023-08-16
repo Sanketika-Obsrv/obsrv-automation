@@ -1,0 +1,70 @@
+loki:
+  auth_enabled: false
+  
+  limits_config:
+    enforce_metric_name: false
+    reject_old_samples: true
+    reject_old_samples_max_age: "168h"
+    max_cache_freshness_per_query: "10m"
+    split_queries_by_interval: "15m"
+    retention_period: "48h"
+compactor:
+  retention_enabled: true
+  working_directory: /var/loki/compactor/retention
+minio:
+  enabled: true
+  resources:
+    limits: 
+      cpu: 128m
+      memory: 256Mi
+    requests: 
+      cpu: 128m
+      memory: 128Mi
+  metrics:
+    serviceMonitor:
+      enabled: true
+      includeNode: true
+      additionalLabels:
+        release: monitoring
+monitoring:
+  dashboards:
+    namespace: "monitoring"
+  lokiCanary:
+    resources:
+      limits: 
+        cpu: 128m
+        memory: 256Mi
+      requests: 
+        cpu: 128m
+        memory: 128Mi
+  serviceMonitor:
+    labels:
+      release: monitoring
+gateway:
+  resources:
+    limits: 
+      cpu: 256m
+      memory: 512Mi
+    requests: 
+      cpu: 128m
+      memory: 256Mi 
+read:
+  affinity: {}
+  replicas: 1
+  resources:
+    limits: 
+      cpu: 512m
+      memory: 1024Mi
+    requests: 
+      cpu: 256m
+      memory: 512Mi
+write:
+  affinity: {}
+  replicas: 1
+  resources:
+    limits: 
+      cpu: 512m
+      memory: 1024Mi
+    requests: 
+      cpu: 256m
+      memory: 512Mi

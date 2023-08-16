@@ -1,10 +1,10 @@
 cloud_store_provider: "s3"
 upload_manager: "com.pinterest.secor.uploader.S3UploadManager"
-cloud_storage_bucket: "obsrv-sb-dev-165052186109"
+cloud_storage_bucket: ""
 namespace: "secor"
 storageClass: "gp2"
-secor_env: "sb-dev"
-image_repository: "sunbird/secor"
+secor_env: "dev"
+image_repository: "sanketikahub/secor"
 region: "us-east-2"
 pullPolicy: "IfNotPresent"
 jvm_memory: 1024m
@@ -14,12 +14,12 @@ parser_timezone: "Asia/Kolkata"
 secor_jobs:
   ingest-backup:
     replicas: 1
-    consumer_group: "sb-dev_ingest"
+    consumer_group: "dev_ingest"
     service_name: "ingest-backup"
     base_path: "telemetry-data/ingest"
     timestamp_key: "syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.ingest"
+    topic: "dev.ingest"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -44,12 +44,12 @@ secor_jobs:
 
   extractor-duplicate-backup:
     replicas: 1
-    consumer_group: "sb-dev_extractor_duplicate"
+    consumer_group: "dev_extractor_duplicate"
     service_name: "extractor_duplicate"
     base_path: "telemetry-data/extractor-duplicates"
     timestamp_key: "syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.extractor.duplicate"
+    topic: "dev.extractor.duplicate"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -74,12 +74,12 @@ secor_jobs:
 
   extractor-failed-backup:
     replicas: 1
-    consumer_group: "sb-dev_extractor_failed"
+    consumer_group: "dev_extractor_failed"
     service_name: "extractor_failed"
     base_path: "telemetry-data/extractor-failed"
     timestamp_key: "syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.extractor.failed"
+    topic: "dev.extractor.failed"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -104,12 +104,12 @@ secor_jobs:
 
   raw-backup:
     replicas: 1
-    consumer_group: "sb-dev_raw"
+    consumer_group: "dev_raw"
     service_name: "raw"
     base_path: "telemetry-data/raw"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.raw"
+    topic: "dev.raw"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -134,12 +134,12 @@ secor_jobs:
 
   failed-backup:
     replicas: 1
-    consumer_group: "sb-dev_failed"
+    consumer_group: "dev_failed"
     service_name: "failed"
     base_path: "telemetry-data/failed"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.failed"
+    topic: "dev.failed"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -164,12 +164,12 @@ secor_jobs:
 
   invalid-backup:
     replicas: 1
-    consumer_group: "sb-dev_invalid"
+    consumer_group: "dev_invalid"
     service_name: "invalid"
     base_path: "telemetry-data/invalid"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.invalid"
+    topic: "dev.invalid"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -194,12 +194,12 @@ secor_jobs:
 
   unique-backup:
     replicas: 1
-    consumer_group: "sb-dev_unique"
+    consumer_group: "dev_unique"
     service_name: "unique"
     base_path: "telemetry-data/unique"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.unique"
+    topic: "dev.unique"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -224,12 +224,12 @@ secor_jobs:
 
   duplicate-backup:
     replicas: 1
-    consumer_group: "sb-dev_duplicate"
+    consumer_group: "dev_duplicate"
     service_name: "duplicate"
     base_path: "telemetry-data/duplicates"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.duplicate"
+    topic: "dev.duplicate"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -254,12 +254,12 @@ secor_jobs:
 
   denorm-backup:
     replicas: 1
-    consumer_group: "sb-dev_denorm"
+    consumer_group: "dev_denorm"
     service_name: "denorm"
     base_path: "telemetry-data/denorm"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.denorm"
+    topic: "dev.denorm"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -284,12 +284,12 @@ secor_jobs:
 
   denorm-failed-backup:
     replicas: 1
-    consumer_group: "sb-dev_denorm_failed"
+    consumer_group: "dev_denorm_failed"
     service_name: "denorm_failed"
     base_path: "telemetry-data/denorm-failed"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.denorm.failed"
+    topic: "dev.denorm.failed"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -314,12 +314,12 @@ secor_jobs:
 
   transform-backup:
     replicas: 1
-    consumer_group: "sb-dev_transform"
+    consumer_group: "dev_transform"
     service_name: "transform"
     base_path: "telemetry-data/transformed"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.transform"
+    topic: "dev.transform"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -344,12 +344,12 @@ secor_jobs:
 
   system-stats:
     replicas: 1
-    consumer_group: "sb-dev_system_stats"
+    consumer_group: "dev_system_stats"
     service_name: "system-stats"
     base_path: "telemetry-data/system-stats"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.stats"
+    topic: "dev.stats"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -374,12 +374,12 @@ secor_jobs:
 
   system-events:
     replicas: 1
-    consumer_group: "sb-dev_system_events"
+    consumer_group: "dev_system_events"
     service_name: "system-events"
     base_path: "telemetry-data/system-events"
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
-    topic: "sb-dev.system.events"
+    topic: "dev.system.events"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"

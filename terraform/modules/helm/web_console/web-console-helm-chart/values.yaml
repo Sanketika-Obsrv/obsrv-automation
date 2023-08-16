@@ -1,9 +1,13 @@
 namespace: "web-console"
 replicaCount: 1
+cpu_requests: 0.5
+cpu_limits: 0.5
+memory_requests: 512Mi
+memory_limits: 1024Mi
 image: 
-  repository: sunbird
-  image_name: sb-obsrv-web-console
-  tag: "1.0.0"
+  repository: sanketikahub
+  image_name: obsrv-web-console
+  tag: "1.0.1"
   pullPolicy: "IfNotPresent"
 ENV: development
 PORT: 3000

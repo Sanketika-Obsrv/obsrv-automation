@@ -1,5 +1,9 @@
 namespace: ${dataset_api_namespace}
 SYSTEM_ENV: ${env}
+cpu_requests: 0.5
+cpu_limits: 0.5
+memory_requests: 512Mi
+memory_limits: 1024Mi
 druid_service:
   DRUID_HOST: http://druid-raw-routers.druid-raw.svc
   DRUID_PORT: 8888
@@ -17,6 +21,6 @@ redis_service:
   REDIS_HOST: ${redis_release_name}-master.${redis_namespace}.svc.cluster.local
   REDIS_PORT: 6379
 exhaust_service:
-  LABEL_CONTAINER: ${s3_bucket}
+  CONTAINER: ${s3_bucket}
 service_account_annotations:
   ${dataset_api_sa_annotations}

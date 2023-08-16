@@ -49,14 +49,14 @@ prometheus:
         cpu: 500m
         memory: 512Mi
   prometheusSpec:
-    retention: ${prometheus_metrics_retention}
+    retention: 90d
     storageSpec:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: ${prometheus_persistent_volume_size}
+              storage: 10Gi
 prometheus-node-exporter:
   resources:
    limits:

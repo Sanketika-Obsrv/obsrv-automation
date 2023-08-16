@@ -70,7 +70,7 @@ variable "web_console_configs" {
     https                              = "false"
     react_app_version                  = "v1.2.0"
     generate_sourcemap                 = "false"
-  } 
+  }
 }
 
 variable "web_console_image_tag" {
