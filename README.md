@@ -15,7 +15,7 @@ export AWS_SECRET_ACCESS_KEY=mysecret
 export AWS_TERRAFORM_BACKEND_BUCKET_NAME=mybucket
 export AWS_TERRAFORM_BACKEND_BUCKET_REGION=myregion
 ```
-3. If you need to run your cluster in multiple availability zones, then please update below line in `terraform/aws/main.tf`
+3. If you need to run your cluster in multiple availability zones, then please update below line in `terraform/aws/main.tf`.
 ```
 # default, single AZ
 eks_nodes_subnet_ids  = module.vpc.single_zone_public_subnets_id
