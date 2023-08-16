@@ -70,7 +70,9 @@ spec:
     druid.s3.accessKey = {{ .Values.s3_access_key }}
     druid.s3.secretKey = {{ .Values.s3_secret_key }}
     druid.storage.bucket={{ .Values.s3_bucket }}
-    druid.storage.baseKey=druid/segments
+    druid.storage.baseKey={{ .Values.druid_storage_baseKey }}
+    druid.s3.endpoint.url={{ .Values.druid_s3_endpoint_url }}
+    druid.s3.endpoint.signingRegion={{ .Values.druid_s3_endpoint_signingRegion }}
     # Azure
     druid.azure.account = {{ .Values.azure_storage_account_name }}
     druid.azure.key = {{ .Values.azure_storage_account_key }}

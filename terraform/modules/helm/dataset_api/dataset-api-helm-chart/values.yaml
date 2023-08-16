@@ -36,7 +36,7 @@ redis_service:
 exhaust_service:
   CLOUD_STORAGE_PROVIDER: "aws"
   CLOUD_STORAGE_REGION: "us-east-2"
-  CONTAINER: ""
+  CONTAINER: "" # Bucket name.
   CONTAINER_PREFIX: "telemetry-data"
   STORAGE_URL_EXPIRY: 3600
   EXHAUST_QUERY_RANGE: 31 # In Days

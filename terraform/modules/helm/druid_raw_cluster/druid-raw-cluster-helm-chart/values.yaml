@@ -27,7 +27,10 @@ druid_storage_directory: "/data"
 # AWS S3 Details
 s3_access_key: ""
 s3_secret_key: ""
-s3_bucket: ""
+s3_bucket: "" # bucket name
+druid_storage_baseKey: druid/segments
+druid_s3_endpoint_url: ""
+druid_s3_endpoint_signingRegion: ""
 
 # Azure Container Details
 azure_storage_account_name: ""
@@ -42,6 +45,7 @@ gcs_bucket: ""
 druid_indexer_logs_type: "s3"
 druid_indexer_logs_container: ""
 druid_indexer_logs_prefix: "backups/druid/druid-task-logs"
+druid_indexer_logs_directory: "backups/druid/druid-task-logs"
 
 # Service discovery
 druid_selectors_indexing_serviceName: druid/overlord
@@ -50,7 +54,6 @@ druid_selectors_coordinator_serviceName: druid/coordinator
 # Monitoring
 druid_monitoring_monitors: '"com.metamx.metrics.JvmMonitor","org.apache.druid.java.util.metrics.JvmMonitor"'
 druid_emitter: composing
-druid_emitter_http_recipientBaseUrl: http://druid-exporter-prometheus-druid-exporter.druid-raw.svc:8080
 druid_emitter_composing_emitters: '"logging"'
 druid_emitter_logging_logLevel: INFO
 

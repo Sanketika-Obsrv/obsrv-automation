@@ -5,7 +5,7 @@ serviceAccount:
   create: true
   # Annotations to add to the service account
   annotations: 
-    eks.amazonaws.com/role-arn: ""
+    eks.amazonaws.com/role-arn: "" # Service account role arn to be provided.
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: "secor-sa"

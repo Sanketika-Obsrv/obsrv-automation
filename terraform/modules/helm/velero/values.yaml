@@ -8,7 +8,7 @@ credentials:
 configuration:
   provider: "aws"
   backupStorageLocation:
-    bucket: ""
+    bucket: "" # Bucket name
     config:
       region: "us-east-2"
   volumeSnapshotLocation:
