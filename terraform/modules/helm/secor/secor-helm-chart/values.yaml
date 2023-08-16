@@ -1,3 +1,4 @@
+cloud_store_provider: "s3" # Type of cloud storage provider S3, GS, Azure
 azure_account_name: "" # AZURE access key
 azure_account_key: "" # AZURE secret key
 azure_container_name: "" # blob storage name
