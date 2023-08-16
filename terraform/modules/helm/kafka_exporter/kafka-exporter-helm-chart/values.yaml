@@ -48,6 +48,7 @@ prometheus:
     interval: "30s"
     additionalLabels:
       app: kafka-exporter
+      system.monitoring: "true"
       release: monitoring
 
 resources:

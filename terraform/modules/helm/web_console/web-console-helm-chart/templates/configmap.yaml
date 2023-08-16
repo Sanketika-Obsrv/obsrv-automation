@@ -5,6 +5,7 @@ metadata:
   namespace: "{{ .Values.namespace }}"
   labels:
     app: "{{ .Chart.Name }}"
+    system.infra: "true"
 data:
   ENV: "{{ .Values.ENV }}"
   PORT: "{{ .Values.PORT }}"

@@ -9,3 +9,6 @@ serviceMonitor:
   enabled: ${promtail_service_monitor_status}
   labels:
     release: monitoring
+    system.monitoring: 'true'
+podLabels:
+  system.monitoring: 'true'

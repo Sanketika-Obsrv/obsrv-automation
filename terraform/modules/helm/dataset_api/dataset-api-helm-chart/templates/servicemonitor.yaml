@@ -6,6 +6,9 @@ metadata:
   labels:
     app: {{ .Chart.Name }}
     release: monitoring
+    system.ingestion: "true"
+    system.querying: "true"
+    system.api: "true"
 spec:
   jobLabel: jobLabel
   selector:

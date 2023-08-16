@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: {{ .Chart.Name }}
+        system.ingestion: "true"
+        system.querying: "true"
+        system.api: "true"
     spec:
       imagePullSecrets:
       - name: {{ .Values.image.imagePullSecrets }}
@@ -44,6 +47,9 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Chart.Name }}
+    system.ingestion: "true"
+    system.querying: "true"
+    system.api: "true"
 spec:
   type: LoadBalancer
   ports:

@@ -11,6 +11,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    system.storage: "true"
 spec:
   serviceName: secor
   updateStrategy:
@@ -25,6 +26,7 @@ spec:
       labels:
         app: secor
         release: {{ .Release.Name }}
+        system.storage: "true"
     spec:
       serviceAccountName: {{ .Values.namespace }}-sa
       # imagePullSecrets:
@@ -71,6 +73,7 @@ spec:
         name: {{ .Values.describedobject.name }}
         labels:
           app: secor
+          system.storage: "true"
       spec:
         storageClassName: "{{- .Values.storageClass }}"
         accessModes:

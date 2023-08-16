@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Release.namespace }}
   labels:
     app: flink
+    system.processing: "true"
 data:
   base-config: |+
 {{ .Values.base_config | indent 4 }}

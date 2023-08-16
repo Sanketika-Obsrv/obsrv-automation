@@ -23,6 +23,7 @@ metadata:
     chart: {{ template "superset.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    system.querying: "true"
 {{- if .Values.supersetNode.deploymentAnnotations }}
   annotations:
     {{ toYaml .Values.supersetNode.deploymentAnnotations | nindent 4 }}
@@ -54,6 +55,7 @@ spec:
       labels:
         app: {{ template "superset.name" . }}
         release: {{ .Release.Name }}
+        system.querying: "true"
     spec:
       {{- if .Values.serviceAccountName }}
       serviceAccountName: {{ .Values.serviceAccountName }}

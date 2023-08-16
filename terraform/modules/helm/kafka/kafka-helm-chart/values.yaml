@@ -32,8 +32,9 @@ fullnameOverride: ""
 clusterDomain: cluster.local
 ## @param commonLabels Labels to add to all deployed objects
 ##
-commonLabels: {}
-  
+commonLabels: 
+  system.ingestion: "true"
+  system.processing: "true"
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}
@@ -551,7 +552,9 @@ hostIPC: false
 ## @param podLabels Extra labels for Kafka pods
 ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels: {}
+podLabels: 
+  system.ingestion: "true"
+  system.processing: "true"
 ## @param podAnnotations Extra annotations for Kafka pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 ##
@@ -1179,7 +1182,9 @@ metrics:
     ## @param metrics.kafka.podLabels Extra labels for Kafka exporter pods
     ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     ##
-    podLabels: {}
+    podLabels: 
+      system.ingestion: "true"
+      system.processing: "true"
     ## @param metrics.kafka.podAnnotations Extra annotations for Kafka exporter pods
     ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
     ##
@@ -1620,7 +1625,9 @@ provisioning:
   ## @param provisioning.podLabels Extra labels for Kafka provisioning pods
   ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
-  podLabels: {}
+  podLabels: 
+    system.ingestion: "true"
+    system.processing: "true"
   ## Kafka provisioning pods ServiceAccount
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##

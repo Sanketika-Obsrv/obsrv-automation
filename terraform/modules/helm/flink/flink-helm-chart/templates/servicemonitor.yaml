@@ -7,6 +7,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}-taskmanager
     release: monitoring
+    system.processing: "true"
 spec:
   selector:
     matchLabels:
@@ -23,6 +24,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}-jobmanager
     release: monitoring
+    system.processing: "true"
 spec:
   selector:
     matchLabels:

@@ -1,3 +1,6 @@
+commonLabels: 
+      system.storage: 'true'
+      system.processing: 'true'
 image:
   registry: docker.io
   repository: bitnami/redis
@@ -14,6 +17,9 @@ auth:
 
 master:
   count: 1
+  podLabels:
+      system.storage: 'true'
+      system.processing: 'true'
   ## @param master.configuration Configuration for Redis&reg; master nodes
   ## ref: https://redis.io/topics/config
   ##
@@ -36,6 +42,9 @@ master:
       memory: 1Gi
   persistence:
     enabled: true
+    labels:
+      system.storage: 'true'
+      system.processing: 'true'
     path: ${redis_persistence_path}
     subPath: ""
     subPathExpr: ""
@@ -46,6 +55,9 @@ master:
 
 replica:
   replicaCount: 1
+  podLabels:
+      system.storage: 'true'
+      system.processing: 'true'
   ## @param replica.configuration Configuration for Redis&reg; replicas nodes
   ## ref: https://redis.io/topics/config
   ##
@@ -63,6 +75,9 @@ replica:
     redis: 6379
   persistence:
     enabled: true
+    labels:
+      system.storage: 'true'
+      system.processing: 'true'
     path: ${redis_persistence_path}
     subPath: ""
     subPathExpr: ""

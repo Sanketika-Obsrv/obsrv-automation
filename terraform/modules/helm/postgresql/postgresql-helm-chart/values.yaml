@@ -60,7 +60,11 @@ clusterDomain: cluster.local
 extraDeploy: []
 ## @param commonLabels Add labels to all the deployed resources
 ##
-commonLabels: {}
+commonLabels: 
+  system.storage: "true"
+  system.ingestion: "true"
+  system.querying: "true"
+  system.api: "true"
 ## @param commonAnnotations Add annotations to all the deployed resources
 ##
 commonAnnotations: {}
@@ -942,7 +946,11 @@ primary:
     annotations: {}
     ## @param primary.persistence.labels Labels for the PVC
     ##
-    labels: {}
+    labels: 
+      system.storage: "true"
+      system.ingestion: "true"
+      system.querying: "true"
+      system.api: "true"
     ## @param primary.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
     ## selector:
     ##   matchLabels:
@@ -1281,7 +1289,11 @@ readReplicas:
     annotations: {}
     ## @param readReplicas.persistence.labels Labels for the PVC
     ##
-    labels: {}
+    labels: 
+      system.storage: "true"
+      system.ingestion: "true"
+      system.querying: "true"
+      system.api: "true"
     ## @param readReplicas.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
     ## selector:
     ##   matchLabels:

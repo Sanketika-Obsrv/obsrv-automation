@@ -5,6 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Chart.Name }}
+    system.ingestion: "true"
+    system.querying: "true"
+    system.api: "true"
 data:
   system_env: "{{ .Values.SYSTEM_ENV }}"
   telemetry_kafka_compression: "{{.Values.TELEMETRY_KAFKA_COMPRESSION}}"
