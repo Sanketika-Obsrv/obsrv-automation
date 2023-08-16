@@ -5,7 +5,7 @@
 
 ## AWS
 ### Prerequisites:
-1. You will need key-secret pair to access AWS. Learn how to create or manage these at [Managing access keys for IAM users](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html). Please export these variables in terminal session
+1. You will need key-secret pair to access AWS. Learn how to create or manage these at [Managing access keys for IAM users](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html). Please export these variables in terminal session.
 ```
 export AWS_ACCESS_KEY_ID=mykey
 export AWS_SECRET_ACCESS_KEY=mysecret
