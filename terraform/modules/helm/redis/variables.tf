@@ -61,7 +61,6 @@ variable "redis_master_maxmemory" {
   description = "Redis maxmemory assigned for the master"
   default     = "1024mb"
 }
-
 variable "redis_replica_maxmemory" {
   type        = string
   description = "Redis maxmemory assigned for the replica"

@@ -511,7 +511,7 @@ resources:
     cpu: 1
     memory: 2048Mi
   requests: 
-    cpu: 0.5
+    cpu: 750m
     memory: 1024Mi
 ## Kafka pods' Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
@@ -1146,10 +1146,10 @@ metrics:
     ##
     resources:
       limits: 
-        cpu: 256m
+        cpu: 100m
         memory: 512Mi
       requests: 
-        cpu: 128m
+        cpu: 100m
         memory: 256Mi
     ## Kafka exporter pods' Security Context
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
@@ -1374,10 +1374,10 @@ metrics:
     ##
     resources:
       limits: 
-        cpu: 256m
+        cpu: 100m
         memory: 512Mi
       requests: 
-        cpu: 128m
+        cpu: 100m
         memory: 256Mi
     ## Prometheus JMX exporter service configuration
     ##

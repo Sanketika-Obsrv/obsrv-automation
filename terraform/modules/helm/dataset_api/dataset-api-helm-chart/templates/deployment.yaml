@@ -17,12 +17,14 @@ spec:
         system.querying: "true"
         system.api: "true"
     spec:
+      {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.image.imagePullSecrets }}
+      {{- end }}
       serviceAccountName: {{ .Chart.Name }}-sa
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.dockerhub }}/{{ .Values.repository }}:{{ .Values.image_tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.image_tag }}"
           imagePullPolicy: Always
           resources: 
             requests:

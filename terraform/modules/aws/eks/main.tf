@@ -162,7 +162,7 @@ resource "aws_iam_openid_connect_provider" "eks_openid" {
 }
 
 resource "aws_iam_role" "dataset_api_sa_iam_role" {
-  name                = "${var.env}-${var.dataset_api_sa_iam_role_name}"
+  name                = "${var.env}-${var.building_block}-${var.dataset_api_sa_iam_role_name}"
   assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.dataset_api_namespace}", SA_NAME = "${var.dataset_api_namespace}-sa" })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
   depends_on          = [aws_iam_openid_connect_provider.eks_openid]
@@ -175,7 +175,7 @@ resource "aws_iam_role" "dataset_api_sa_iam_role" {
 }
 
 resource "aws_iam_role" "flink_sa_iam_role" {
-  name                = "${var.env}-${var.flink_sa_iam_role_name}"
+  name                = "${var.env}-${var.building_block}-${var.flink_sa_iam_role_name}"
   assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.flink_namespace}", SA_NAME = "${var.flink_namespace}-sa" })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
   depends_on          = [aws_iam_openid_connect_provider.eks_openid]
@@ -188,7 +188,7 @@ resource "aws_iam_role" "flink_sa_iam_role" {
 }
 
 resource "aws_iam_role" "druid_raw_sa_iam_role" {
-  name                = "${var.env}-${var.druid_raw_sa_iam_role_name}"
+  name                = "${var.env}-${var.building_block}-${var.druid_raw_sa_iam_role_name}"
   assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.druid_raw_namespace}", SA_NAME = "${var.druid_raw_namespace}-sa" })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
   depends_on          = [aws_iam_openid_connect_provider.eks_openid]
@@ -201,7 +201,7 @@ resource "aws_iam_role" "druid_raw_sa_iam_role" {
 }
 
 resource "aws_iam_role" "secor_sa_iam_role" {
-  name                = "${var.env}-${var.secor_sa_iam_role_name}"
+  name                = "${var.env}-${var.building_block}-${var.secor_sa_iam_role_name}"
   assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.secor_namespace}", SA_NAME = "${var.secor_namespace}-sa" })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
   depends_on          = [aws_iam_openid_connect_provider.eks_openid]

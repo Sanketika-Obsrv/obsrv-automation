@@ -31,8 +31,8 @@ metrics:
       release: monitoring
 resources:
   requests:
-    cpu: 500m
+    cpu: 100m
     memory: 128Mi
   limits:
-    cpu: 1000m
+    cpu: 100m
     memory: 512Mi

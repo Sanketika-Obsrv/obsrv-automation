@@ -1,6 +1,14 @@
-cloud_store_provider: "s3"
-upload_manager: "com.pinterest.secor.uploader.S3UploadManager"
-cloud_storage_bucket: ""
+cloud_store_provider: "s3" # Type of cloud storage provider S3, GS, Azure
+azure_account_name: "" # AZURE access key
+azure_account_key: "" # AZURE secret key
+azure_container_name: "" # blob storage name
+aws_access_key: "" # AWS access key
+aws_secret_key: "" # AWS secret key
+gs_credentials_path: "" # Credentials path where access token and secrets are stored.
+upload_manager: "com.pinterest.secor.uploader.S3UploadManager" ## for AWS
+# upload_manager: "com.pinterest.secor.uploader.AzureUploadManager" ## for AZURE
+# upload_manager: "com.pinterest.secor.uploader.GsUploadManager" ## for GCP
+cloud_storage_bucket: "" # bucket name to be provided
 namespace: "secor"
 storageClass: "gp2"
 secor_env: "dev"

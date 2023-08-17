@@ -110,9 +110,11 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: "{{ .Values.jobmanager.cpu_requests }}"
+              cpu: "{{ .Values.jobmanager.cpu_requests }}"
+              memory: "{{ .Values.jobmanager.memory_requests }}"
           limits:
             cpu: "{{ .Values.jobmanager.cpu_limits }}"
+            memory: "{{ .Values.jobmanager.memory_limits }}"
         workingDir: /opt/flink
         command: ["/opt/flink/bin/standalone-job.sh"]
         args: ["start-foreground",
@@ -205,9 +207,11 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: "{{ .Values.taskmanager.cpu_requests }}"
+              cpu: "{{ .Values.taskmanager.cpu_requests }}"
+              memory: "{{ .Values.taskmanager.memory_requests }}"
           limits:
             cpu: "{{ .Values.taskmanager.cpu_limits }}"
+            memory: "{{ .Values.taskmanager.memory_limits }}"
         workingDir: {{ .Values.taskmanager.flink_work_dir }}
         command: ["/opt/flink/bin/taskmanager.sh"]
         args: ["start-foreground",

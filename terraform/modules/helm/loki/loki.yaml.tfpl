@@ -12,14 +12,16 @@ loki:
 compactor:
   retention_enabled: ${compactor_retention_enabled}
   working_directory: ${compactor_working_directory}
+test:
+  enabled: false
 minio:
   enabled: ${minio_enabled}
   resources:
     limits: 
-      cpu: 128m
+      cpu: 100m
       memory: 256Mi
     requests: 
-      cpu: 128m
+      cpu: 100m
       memory: 128Mi
   metrics:
     serviceMonitor:
@@ -31,13 +33,16 @@ minio:
 monitoring:
   dashboards:
     namespace: "${loki_dashboards_namespace}"
+  selfMonitoring:
+    enabled: false
   lokiCanary:
+    enabled: false
     resources:
       limits: 
-        cpu: 128m
+        cpu: 100m
         memory: 256Mi
       requests: 
-        cpu: 128m
+        cpu: 100m
         memory: 128Mi
   serviceMonitor:
     labels:
@@ -46,10 +51,10 @@ monitoring:
 gateway:
   resources:
     limits: 
-      cpu: 256m
+      cpu: 100m
       memory: 512Mi
     requests: 
-      cpu: 128m
+      cpu: 100m
       memory: 256Mi 
 read:
   affinity: {}
@@ -58,10 +63,10 @@ read:
   replicas: 1
   resources:
     limits: 
-      cpu: 512m
+      cpu: 100m
       memory: 1024Mi
     requests: 
-      cpu: 256m
+      cpu: 100m
       memory: 512Mi
 write:
   affinity: {}
@@ -70,7 +75,7 @@ write:
   replicas: 1
   resources:
     limits: 
-      cpu: 512m
+      cpu: 100m
       memory: 1024Mi
     requests: 
       cpu: 256m

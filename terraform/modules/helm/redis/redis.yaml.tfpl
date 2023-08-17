@@ -8,6 +8,7 @@ image:
   digest: ""
   pullPolicy: IfNotPresent
 
+architecture: standalone
 commonConfiguration: |-
   # Enable RDB persistence
   save 300 100
@@ -35,10 +36,10 @@ master:
     redis: 6379
   resources:
     limits:
-      cpu: 1
+      cpu: 512m
       memory: 2Gi
     requests:
-      cpu: 1
+      cpu: 512m
       memory: 1Gi
   persistence:
     enabled: true
@@ -52,7 +53,6 @@ master:
     accessModes:
       - ReadWriteOnce
     size: ${redis_master_persistence_size}
-
 replica:
   replicaCount: 1
   podLabels:
@@ -85,4 +85,3 @@ replica:
     accessModes:
       - ReadWriteOnce
     size: ${redis_replica_persistence_size}
-
