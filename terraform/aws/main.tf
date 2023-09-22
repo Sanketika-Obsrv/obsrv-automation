@@ -100,45 +100,43 @@ module "postgresql" {
   source               = "../modules/helm/postgresql"
   env                  = var.env
   building_block       = var.building_block
-  depends_on           = [module.eks]
+  depends_on           = [module.eks, module.monitoring]
 }
 
 module "redis" {
   source               = "../modules/helm/redis"
   env                  = var.env
   building_block       = var.building_block
-  depends_on           = [module.eks]
+  depends_on           = [module.eks, module.monitoring]
 }
 
 module "kafka" {
   source         = "../modules/helm/kafka"
   env            = var.env
   building_block = var.building_block
-  depends_on     = [module.eks]
+  depends_on     = [module.eks, module.monitoring]
 }
 
 module "flink" {
-  source                         = "../modules/helm/flink"
-  env                            = var.env
-  building_block                 = var.building_block
-  flink_container_registry       = var.flink_container_registry
-  flink_image_tag                = var.flink_image_tag
+  source                              = "../modules/helm/flink"
+  env                                 = var.env
+  building_block                      = var.building_block
+  flink_container_registry            = var.flink_container_registry
+  flink_image_tag                     = var.flink_image_tag
   flink_merged_pipeline_release_names = var.flink_merged_pipeline_release_names
-  flink_release_names              = var.flink_release_names
-  merged_pipeline_enabled        = var.merged_pipeline_enabled
-  # s3_access_key                  = module.iam.s3_access_key
-  # s3_secret_key                  = module.iam.s3_secret_key
-  flink_checkpoint_store_type    = var.flink_checkpoint_store_type
-  flink_chart_depends_on         = [module.kafka, module.postgresql, module.redis]
-  postgresql_obsrv_username      = module.postgresql.postgresql_obsrv_username
-  postgresql_obsrv_user_password = module.postgresql.postgresql_obsrv_user_password
-  postgresql_obsrv_database      = module.postgresql.postgresql_obsrv_database
-  checkpoint_base_url            = "s3://${module.s3.checkpoint_storage_bucket}"
-  redis_namespace                = module.redis.redis_namespace
-  redis_release_name             = module.redis.redis_release_name
-  flink_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
-  flink_namespace                = module.eks.flink_namespace
-  postgresql_service_name        = module.postgresql.postgresql_service_name
+  flink_release_names                 = var.flink_release_names
+  merged_pipeline_enabled             = var.merged_pipeline_enabled
+  flink_checkpoint_store_type         = var.flink_checkpoint_store_type
+  flink_chart_depends_on              = [module.kafka, module.postgresql, module.redis]
+  postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
+  checkpoint_base_url                 = "s3://${module.s3.checkpoint_storage_bucket}"
+  redis_namespace                     = module.redis.redis_namespace
+  redis_release_name                  = module.redis.redis_release_name
+  flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
+  flink_namespace                     = module.eks.flink_namespace
+  postgresql_service_name             = module.postgresql.postgresql_service_name
 }
 
 module "druid_raw_cluster" {
@@ -243,7 +241,7 @@ module "web_console" {
   env                              = var.env
   building_block                   = var.building_block
   web_console_configs              = var.web_console_configs
-  depends_on                       = [module.eks]
+  depends_on                       = [module.eks, module.monitoring]
   web_console_image_repository     = var.web_console_image_repository
   web_console_image_tag            = var.web_console_image_tag
 }
