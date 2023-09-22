@@ -2,6 +2,8 @@ loki:
   auth_enabled: ${loki_auth_enabled}
   podLabels:
     system.monitoring: 'true'
+  commonConfig:
+    replication_factor: 1
   limits_config:
     enforce_metric_name: ${limits_config_enforce_metric_name}
     reject_old_samples: ${limits_config_reject_old_samples}
