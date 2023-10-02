@@ -13,8 +13,8 @@ resource "helm_release" "monitoring" {
     values = [
       templatefile("${path.module}/${var.monitoring_custom_values_yaml}",
         {
-            prometheus_persistent_volume_size      = var.prometheus_persistent_volume_size
-            prometheus_metrics_retention           = var.prometheus_metrics_retention
+            prometheus_persistent_volume_size = var.prometheus_persistent_volume_size
+            prometheus_metrics_retention      = var.prometheus_metrics_retention
         }
       )
     ]
