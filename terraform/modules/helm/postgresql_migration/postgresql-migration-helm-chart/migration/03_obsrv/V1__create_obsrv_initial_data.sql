@@ -1,4 +1,21 @@
-CREATE USER obsrv WITH ENCRYPTED PASSWORD '${postgresql_obsrv_user_password}';
+DO
+$do$
+BEGIN
+   IF EXISTS (
+      SELECT FROM pg_catalog.pg_roles
+      WHERE  rolname = 'obsrv') THEN
+
+      RAISE NOTICE 'Role "obsrv" already exists. Skipping.';
+   ELSE
+      BEGIN
+         CREATE ROLE obsrv LOGIN PASSWORD '{{ .Values.postgresql_obsrv_user_password }}';
+      EXCEPTION
+         WHEN duplicate_object THEN
+            RAISE NOTICE 'Role "obsrv" was just created by a concurrent transaction. Skipping.';
+      END;
+   END IF;
+END
+$do$;
 
 ALTER DATABASE obsrv OWNER TO obsrv;
 
