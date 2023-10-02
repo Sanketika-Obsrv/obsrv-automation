@@ -57,11 +57,24 @@ variable "postgresql_url" {
 variable "postgresql_admin_username" {
   type        = string
   description = "Postgresql admin username."
-  default     = ""
 }
 
 variable "postgresql_admin_password" {
   type        = string
   description = "Postgresql admin password."
-  default   = ""
+}
+
+variable "postgresql_superset_user_password" {
+  type        = string
+  description = "Postgresql superset user password."
+}
+
+variable "postgresql_druid_raw_user_password" {
+  type        = string
+  description = "Postgresql druid user password."
+}
+
+variable "postgresql_obsrv_user_password" {
+  type        = string
+  description = "Postgresql obsrv user password."
 }

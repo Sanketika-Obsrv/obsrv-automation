@@ -38,11 +38,6 @@ output "postgresql_obsrv_user_password" {
   sensitive = true
 }
 
-output "postgresql_obsrv_database" {
-  value     = var.postgresql_obsrv_database
-  sensitive = true
-}
-
 output "postgresql_service_name" {
   value = contains([var.postgresql_release_name], "postgresql") ? "${var.postgresql_release_name}.${var.postgresql_namespace}" : "${var.postgresql_release_name}-postgresql.${var.postgresql_namespace}"
 }
