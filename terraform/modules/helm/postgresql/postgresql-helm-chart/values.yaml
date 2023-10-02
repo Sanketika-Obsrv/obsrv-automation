@@ -60,7 +60,7 @@ clusterDomain: cluster.local
 extraDeploy: []
 ## @param commonLabels Add labels to all the deployed resources
 ##
-commonLabels: 
+commonLabels:
   system.storage: "true"
   system.ingestion: "true"
   system.querying: "true"
@@ -338,7 +338,7 @@ primary:
     ##      #!/bin/sh
     ##      echo "Do something."
     ##
-    scripts: 
+    scripts:
       00_create_superset_db.sql: |
         CREATE DATABASE superset;
       01_create_superset_user.sql: |
@@ -357,7 +357,7 @@ primary:
         GRANT ALL PRIVILEGES ON DATABASE obsrv TO obsrv;
       06_create_tables.sql: |
         \c obsrv
-        
+
         CREATE TABLE IF NOT EXISTS datasets (
             id TEXT PRIMARY KEY,
             dataset_id TEXT,
@@ -400,7 +400,7 @@ primary:
           published_date TIMESTAMP NOT NULL,
           UNIQUE (dataset_id, datasource)
         );
-        
+
         CREATE INDEX IF NOT EXISTS datasources_dataset ON datasources(dataset_id);
 
         CREATE INDEX IF NOT EXISTS datasources_status ON datasources(status);
@@ -418,7 +418,7 @@ primary:
           published_date TIMESTAMP NOT NULL,
           UNIQUE (dataset_id, field_key)
         );
-        
+
         CREATE INDEX IF NOT EXISTS dataset_transformations_dataset ON dataset_transformations (dataset_id);
 
         CREATE INDEX IF NOT EXISTS dataset_transformations_status ON dataset_transformations (status);
@@ -713,12 +713,12 @@ primary:
   ## @param primary.resources.requests.cpu The requested cpu for the PostgreSQL Primary containers
   ##
   resources:
-    limits: 
+    limits:
       cpu: 250m
       memory: 512Mi
-    requests:
-      memory: 256Mi
-      cpu: 250m
+    # requests:
+    #   memory: 256Mi
+    #   cpu: 250m
   ## Pod Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ## @param primary.podSecurityContext.enabled Enable security context
@@ -946,7 +946,7 @@ primary:
     annotations: {}
     ## @param primary.persistence.labels Labels for the PVC
     ##
-    labels: 
+    labels:
       system.storage: "true"
       system.ingestion: "true"
       system.querying: "true"
@@ -1056,12 +1056,12 @@ readReplicas:
   ## @param readReplicas.resources.requests.cpu The requested cpu for the PostgreSQL read only containers
   ##
   resources:
-    limits: 
+    limits:
       cpu: 250m
       memory: 512Mi
-    requests:
-      memory: 256Mi
-      cpu: 250m
+    # requests:
+    #   memory: 256Mi
+    #   cpu: 250m
   ## Pod Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ## @param readReplicas.podSecurityContext.enabled Enable security context
@@ -1289,7 +1289,7 @@ readReplicas:
     annotations: {}
     ## @param readReplicas.persistence.labels Labels for the PVC
     ##
-    labels: 
+    labels:
       system.storage: "true"
       system.ingestion: "true"
       system.querying: "true"

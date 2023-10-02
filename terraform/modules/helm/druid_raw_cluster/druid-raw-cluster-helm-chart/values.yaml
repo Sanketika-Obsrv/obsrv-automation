@@ -296,9 +296,9 @@ zookeeper:
     requests:
       memory: 128Mi
       cpu: 256m
-    limits:
-      memory: 256Mi
-      cpu: 512m
+    # limits:
+    #   memory: 256Mi
+    #   cpu: 512m
 
   tickTime: 2000
   initLimit: 10
@@ -360,7 +360,7 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: 
+  annotations:
     serviceAccountName: ""
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template

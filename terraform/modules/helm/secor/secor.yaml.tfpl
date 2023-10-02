@@ -32,9 +32,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -62,9 +62,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -122,9 +122,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -152,9 +152,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -182,9 +182,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -212,9 +212,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -242,9 +242,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -272,9 +272,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -302,9 +302,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -332,9 +332,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -362,9 +362,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
@@ -392,9 +392,9 @@ secor_jobs:
     message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
     storage:
       size: "${backup_pv_size}"
-    requests:
-      cpu: "${request_cpu}"
-      memory: "${request_memory}"
+#    requests:
+#      cpu: "${request_cpu}"
+#      memory: "${request_memory}"
     limits:
       cpu: "${secor_cpu_limit}"
       memory: "${secor_memory_limit}"
