@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: flyway-postgresql
-  namespace: postgresql
+  namespace: {{ .Values.namespace }}
   labels:
     name: flyway-postgresql
     app: flyway-postgresql

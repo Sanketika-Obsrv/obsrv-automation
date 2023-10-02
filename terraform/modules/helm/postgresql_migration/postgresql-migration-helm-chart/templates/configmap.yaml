@@ -2,7 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: flyway-postgresql-cm
-  namespace: postgresql
+  namespace: {{ .Values.namespace }}
   labels:
     name: flyway-postgresql-cm
     app: flyway-postgresql

@@ -1,3 +1,5 @@
+namespace: ""
+
 image:
   repository: flyway/flyway
   tag: latest

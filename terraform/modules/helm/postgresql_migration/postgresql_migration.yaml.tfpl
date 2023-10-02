@@ -1,3 +1,4 @@
+namespace: ${postgresql_namespace}
 config:
   db:
     url: jdbc:postgresql://${postgresql_url}:5432/

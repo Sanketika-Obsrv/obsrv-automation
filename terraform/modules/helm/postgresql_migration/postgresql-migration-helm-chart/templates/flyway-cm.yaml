@@ -2,7 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: car-sql-files
-  namespace: postgresql
+  namespace: {{ .Values.namespace }}
   labels:
     name: car-sql-files
     app: flyway-postgresql
@@ -14,7 +14,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: person-sql-files
-  namespace: postgresql
+  namespace: {{ .Values.namespace }}
   labels:
     name: person-sql-files
     app: flyway-postgresql
@@ -26,7 +26,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: person-sql-files
-  namespace: postgresql
+  namespace: {{ .Values.namespace }}
   labels:
     name: person-sql-files
     app: flyway-postgresql
@@ -38,7 +38,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: flyway-migrate-script
-  namespace: postgresql
+  namespace: {{ .Values.namespace }}
   labels:
     name: flyway-migrate-script
     app: flyway-postgresql
