@@ -121,4 +121,3 @@ variable "postgresql_druid_raw_user_password" {
   description = "Postgresql druid user password."
   default   = "druidraw123"
 }
-
