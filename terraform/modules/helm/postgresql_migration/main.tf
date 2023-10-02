@@ -11,7 +11,7 @@ resource "helm_release" "postgresql_migration" {
     values = [
         templatefile("${path.module}/${var.postgresql_migration_custom_values_yaml}",
         {
-          namespace                          = var.postgresql_namespace
+          postgresql_namespace               = var.postgresql_namespace
           postgresql_url                     = var.postgresql_url
           postgresql_admin_username          = var.postgresql_admin_username
           postgresql_admin_password          = var.postgresql_admin_password
