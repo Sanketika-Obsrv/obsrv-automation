@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyway-postgresql
+  namespace: postgresql
+  labels:
+    name: flyway-postgresql
+    app: flyway-postgresql
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 30
+  template:
+    metadata:
+      name: flyway-postgresql
+      labels:
+        app: flyway-postgresql
+        name: flyway-postgresql
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: flyway-postgresql
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        command: ["/flyway/script/migrate.sh"]
+        env:
+        - name: FLYWAY_LOCATIONS
+          value: 'filesystem:/flyway/migrations'
+        envFrom:
+          - configMapRef:
+              name: flyway-postgresql-cm
+        volumeMounts:
+        - name: flyway-migrate-script
+          mountPath: /flyway/script
+        - name: car-sql-files
+          mountPath: /flyway/migrations/01_person
+        - name: person-sql-files
+          mountPath: /flyway/migrations/02_car
+      volumes:
+        - name: flyway-migrate-script
+          configMap:
+             name: flyway-migrate-script
+             defaultMode: 0755
+        - name: car-sql-files
+          configMap:
+             name: car-sql-files
+        - name: person-sql-files
+          configMap:
+             name: person-sql-files

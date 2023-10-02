@@ -83,7 +83,7 @@ module "superset" {
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
-  superset_chart_depends_on         = [module.postgresql, module.redis]
+  superset_chart_depends_on         = [module.postgresql_migration, module.redis]
   redis_namespace                   = module.redis.redis_namespace
   redis_release_name                = module.redis.redis_release_name
   postgresql_service_name           = module.postgresql.postgresql_service_name
@@ -127,7 +127,7 @@ module "flink" {
   flink_release_names                 = var.flink_release_names
   merged_pipeline_enabled             = var.merged_pipeline_enabled
   flink_checkpoint_store_type         = var.flink_checkpoint_store_type
-  flink_chart_depends_on              = [module.kafka, module.postgresql, module.redis]
+  flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis]
   postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
   postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
@@ -147,7 +147,7 @@ module "druid_raw_cluster" {
 #  s3_secret_key                      = module.iam.s3_secret_key
   s3_bucket                          = module.s3.s3_bucket
   druid_deepstorage_type             = var.druid_deepstorage_type
-  druid_raw_cluster_chart_depends_on = [module.postgresql, module.druid_operator]
+  druid_raw_cluster_chart_depends_on = [module.postgresql_migration, module.druid_operator]
   kubernetes_storage_class           = var.kubernetes_storage_class
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
   druid_raw_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.druid_raw_sa_iam_role}"
@@ -193,7 +193,7 @@ module "dataset_api" {
   postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
   dataset_api_sa_annotations         = "eks.amazonaws.com/role-arn: ${module.eks.dataset_api_sa_annotations}"
-  dataset_api_chart_depends_on       = [module.postgresql, module.kafka]
+  dataset_api_chart_depends_on       = [module.postgresql_migration, module.kafka]
   redis_namespace                    = module.redis.redis_namespace
   redis_release_name                 = module.redis.redis_release_name
   dataset_api_namespace              = module.eks.dataset_api_namespace
@@ -250,4 +250,17 @@ module "get_kubeconfig" {
   source         = "../modules/aws/get_kubeconfig"
   env            = var.env
   building_block = var.building_block
+}
+
+module "postgresql_migration" {
+  source                                = "../modules/helm/postgresql_migration"
+  env                                   = var.env
+  building_block                        = var.building_block
+  postgresql_admin_username             = module.postgresql.postgresql_admin_username
+  postgresql_admin_password             = module.postgresql.postgresql_admin_password
+  postgresql_migration_chart_depends_on = [module.postgresql]
+  postgresql_url                        = module.postgresql.postgresql_service_name
+  postgresql_superset_user_password     = module.postgresql.postgresql_superset_user_password
+  postgresql_druid_raw_user_password    = module.postgresql.postgresql_druid_raw_user_password
+  postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
 }

@@ -1,0 +1,46 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: car-sql-files
+  namespace: postgresql
+  labels:
+    name: car-sql-files
+    app: flyway-postgresql
+data:
+  {{- (tpl (.Files.Glob "migration/01_superset/*.sql").AsConfig .) | nindent 2 }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: person-sql-files
+  namespace: postgresql
+  labels:
+    name: person-sql-files
+    app: flyway-postgresql
+data:
+  {{- (tpl (.Files.Glob "migration/03_obsrv/*.sql").AsConfig .) | nindent 2 }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: person-sql-files
+  namespace: postgresql
+  labels:
+    name: person-sql-files
+    app: flyway-postgresql
+data:
+  {{- (tpl (.Files.Glob "migration/02_car/*.sql").AsConfig .) | nindent 2 }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: flyway-migrate-script
+  namespace: postgresql
+  labels:
+    name: flyway-migrate-script
+    app: flyway-postgresql
+data:
+  {{- (.Files.Glob "migration/script/*.sh").AsConfig | nindent 2 }}

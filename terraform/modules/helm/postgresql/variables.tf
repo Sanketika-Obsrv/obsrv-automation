@@ -74,11 +74,11 @@ variable "postgresql_obsrv_user_password" {
   default   = "obsrv123"
 }
 
-variable "postgresql_obsrv_database" {
-  type        = string
-  description = "Postgresql obsrv database name."
-  default   = "obsrv"
-}
+# variable "postgresql_obsrv_database" {
+#   type        = string
+#   description = "Postgresql obsrv database name."
+#   default   = "obsrv"
+# }
 
 variable "postgresql_druid_database" {
   type        = string
