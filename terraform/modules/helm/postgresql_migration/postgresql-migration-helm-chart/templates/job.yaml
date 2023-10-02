@@ -30,18 +30,23 @@ spec:
         volumeMounts:
         - name: flyway-migrate-script
           mountPath: /flyway/script
-        - name: car-sql-files
-          mountPath: /flyway/migrations/01_person
-        - name: person-sql-files
-          mountPath: /flyway/migrations/02_car
+        - name: superset-sql-files
+          mountPath: /flyway/migrations/01_superset
+        - name: druid-raw-sql-files
+          mountPath: /flyway/migrations/02_druid_raw
+        - name: obsrv-sql-files
+          mountPath: /flyway/migrations/03_obsrv
       volumes:
         - name: flyway-migrate-script
           configMap:
              name: flyway-migrate-script
              defaultMode: 0755
-        - name: car-sql-files
+        - name: superset-sql-files
           configMap:
-             name: car-sql-files
-        - name: person-sql-files
+             name: superset-sql-files
+        - name: druid-raw-sql-files
           configMap:
-             name: person-sql-files
+             name: druid-raw-sql-files
+        - name: obsrv-sql-files
+          configMap:
+             name: obsrv-sql-files
