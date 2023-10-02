@@ -22,6 +22,9 @@ minio:
     limits:
       cpu: 0.5
       memory: 1024Mi
+#    requests:
+#      cpu: 0.25
+#      memory: 512Mi
   metrics:
     serviceMonitor:
       enabled: ${minio_service_monitor_enabled}
@@ -40,6 +43,9 @@ monitoring:
       limits:
         cpu: 0.5
         memory: 1024Mi
+#      requests:
+#        cpu: 0.25
+#        memory: 512Mi
   serviceMonitor:
     labels:
       release: monitoring
@@ -49,6 +55,9 @@ gateway:
     limits:
       cpu: 0.5
       memory: 1024Mi
+#    requests:
+#      cpu: 0.25
+#      memory: 512Mi
 read:
   affinity: {}
   podLabels:
@@ -58,6 +67,9 @@ read:
     limits:
       cpu: 0.5
       memory: 1024Mi
+#    requests:
+#      cpu: 0.25
+#      memory: 512Mi
 write:
   affinity: {}
   podLabels:
@@ -67,3 +79,6 @@ write:
     limits:
       cpu: 0.5
       memory: 1024Mi
+#    requests:
+#      cpu: 0.25
+#      memory: 512Mi
