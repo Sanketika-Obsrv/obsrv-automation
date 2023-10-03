@@ -47,7 +47,7 @@ variable "eks_node_group_ami_type" {
 variable "eks_node_group_instance_type" {
   type        = list(string)
   description = "EKS nodegroup instance types."
-  default     = ["t2.2xlarge"]
+  default     = ["t2.xlarge"]
 }
 
 variable "eks_node_group_capacity_type" {
@@ -60,8 +60,8 @@ variable "eks_node_group_scaling_config" {
   type        = map(number)
   description = "EKS node group auto scaling configuration."
   default = {
-    desired_size = 3
-    max_size     = 3
+    desired_size = 4
+    max_size     = 4
     min_size     = 0
   }
 }

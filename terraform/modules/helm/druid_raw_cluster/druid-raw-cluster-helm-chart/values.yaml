@@ -296,9 +296,9 @@ zookeeper:
     requests:
       memory: 128Mi
       cpu: 256m
-    # limits:
-    #   memory: 256Mi
-    #   cpu: 512m
+    limits:
+      memory: 256Mi
+      cpu: 512m
 
   tickTime: 2000
   initLimit: 10

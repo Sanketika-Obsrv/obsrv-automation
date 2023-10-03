@@ -35,9 +35,9 @@ master:
     limits:
       cpu: 1
       memory: 2Gi
-    # requests:
-    #   cpu: 1
-    #   memory: 1Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
   persistence:
     enabled: true
     labels:

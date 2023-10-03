@@ -26,10 +26,10 @@ metrics:
     enabled: true
     additionalLabels:
       release: monitoring
-resources: {}
-  # requests:
-  #   cpu: 500m
-  #   memory: 128Mi
-  # limits:
-  #   cpu: 1000m
-  #   memory: 512Mi
+resources:
+  requests:
+    cpu: 0.2
+    memory: 256Mi
+  limits:
+    cpu: 0.1
+    memory: 128Mi

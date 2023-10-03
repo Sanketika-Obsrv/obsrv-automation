@@ -318,9 +318,9 @@ resources:
   limits:
     memory: 512Mi
     cpu: 512m
-  # requests:
-  #   memory: 256Mi
-  #   cpu: 250m
+  requests:
+    memory: 256Mi
+    cpu: 250m
 ## Configure Pods Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## @param podSecurityContext.enabled Enabled ZooKeeper pods' Security Context

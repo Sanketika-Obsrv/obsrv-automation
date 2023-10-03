@@ -187,9 +187,9 @@ resources:
   limits:
     cpu: 512m
     memory: 1024Mi
-  # requests:
-  #   cpu: 250m
-  #   memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 512Mi
 
 ##
 ## Superset node configuration

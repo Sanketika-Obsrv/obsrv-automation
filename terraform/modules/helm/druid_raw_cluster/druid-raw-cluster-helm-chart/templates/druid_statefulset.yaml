@@ -178,11 +178,9 @@ spec:
       #          averageUtilization: 50
 
       resources:
-{{- /*
         requests:
           memory: {{ .Values.druid_broker_pod_memory_request }}
           cpu: {{ .Values.druid_broker_pod_cpu_request }}
-*/}}
         limits:
           memory: {{ .Values.druid_broker_pod_memory_limit }}
           cpu: {{ .Values.druid_broker_pod_cpu_limit }}
@@ -213,11 +211,9 @@ spec:
           port: {{ .Values.druid_coordinator_port }}
 
       resources:
-{{- /*
         requests:
           memory: {{ .Values.druid_coordinator_pod_memory_request }}
           cpu: {{ .Values.druid_coordinator_pod_cpu_request }}
-*/}}
         limits:
           memory: {{ .Values.druid_coordinator_pod_memory_limit }}
           cpu: {{ .Values.druid_coordinator_pod_cpu_limit }}
@@ -249,12 +245,9 @@ spec:
           port: {{ .Values.druid_overlord_port }}
 
       resources:
-{{- /*
-
         requests:
           memory: {{ .Values.druid_overlord_pod_memory_request }}
           cpu: {{ .Values.druid_overlord_pod_cpu_request }}
-*/}}
         limits:
           memory: {{ .Values.druid_overlord_pod_memory_limit }}
           cpu: {{ .Values.druid_overlord_pod_cpu_limit }}
@@ -313,11 +306,9 @@ spec:
                 storage: {{ .Values.druid_historical_persistent_volume_size }}
 
       resources:
-{{- /*
         requests:
           memory: {{ .Values.druid_historical_pod_memory_request }}
           cpu: {{ .Values.druid_historical_pod_cpu_request }}
-*/}}
         limits:
           memory: {{ .Values.druid_historical_pod_memory_limit }}
           cpu: {{ .Values.druid_historical_pod_cpu_limit }}
@@ -440,11 +431,9 @@ spec:
               requests:
                 storage: {{ .Values.druid_indexer_persistent_volume_size }}
       resources:
-{{- /*
         requests:
           memory: {{ .Values.druid_indexer_pod_memory_request }}
           cpu: {{ .Values.druid_indexer_pod_cpu_request }}
-*/}}
         limits:
           memory: {{ .Values.druid_indexer_pod_memory_limit }}
           cpu: {{ .Values.druid_indexer_pod_cpu_limit }}
@@ -512,11 +501,9 @@ spec:
           port: {{ .Values.druid_router_plaintextPort }}
 
       resources:
-{{- /*
         requests:
           memory: {{ .Values.druid_router_pod_memory_request }}
           cpu: {{ .Values.druid_router_pod_cpu_request }}
-*/}}
         limits:
           memory: {{ .Values.druid_router_pod_memory_limit }}
           cpu: {{ .Values.druid_router_pod_cpu_limit }}

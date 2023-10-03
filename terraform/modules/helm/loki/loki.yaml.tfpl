@@ -20,11 +20,11 @@ minio:
   enabled: ${minio_enabled}
   resources:
     limits:
-      cpu: 0.5
-      memory: 1024Mi
-#    requests:
-#      cpu: 0.25
-#      memory: 512Mi
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
   metrics:
     serviceMonitor:
       enabled: ${minio_service_monitor_enabled}
@@ -40,12 +40,12 @@ monitoring:
   lokiCanary:
     enabled: false
     resources:
-      limits:
-        cpu: 0.5
-        memory: 1024Mi
-#      requests:
-#        cpu: 0.25
-#        memory: 512Mi
+    limits:
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
   serviceMonitor:
     labels:
       release: monitoring
@@ -53,11 +53,11 @@ monitoring:
 gateway:
   resources:
     limits:
-      cpu: 0.5
-      memory: 1024Mi
-#    requests:
-#      cpu: 0.25
-#      memory: 512Mi
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
 read:
   affinity: {}
   podLabels:
@@ -65,11 +65,11 @@ read:
   replicas: 1
   resources:
     limits:
-      cpu: 0.5
-      memory: 1024Mi
-#    requests:
-#      cpu: 0.25
-#      memory: 512Mi
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
 write:
   affinity: {}
   podLabels:
@@ -77,8 +77,8 @@ write:
   replicas: 1
   resources:
     limits:
-      cpu: 0.5
-      memory: 1024Mi
-#    requests:
-#      cpu: 0.25
-#      memory: 512Mi
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi

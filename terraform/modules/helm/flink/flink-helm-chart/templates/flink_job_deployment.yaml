@@ -109,9 +109,9 @@ spec:
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: IfNotPresent
         resources:
-          # requests:
-          #     cpu: "{{ .Values.jobmanager.cpu_requests }}"
-          #     memory: "{{ .Values.jobmanager.memory_requests }}"
+          requests:
+              cpu: "{{ .Values.jobmanager.cpu_requests }}"
+              memory: "{{ .Values.jobmanager.memory_requests }}"
           limits:
             cpu: "{{ .Values.jobmanager.cpu_limits }}"
             memory: "{{ .Values.jobmanager.memory_limits }}"
@@ -206,11 +206,9 @@ spec:
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: IfNotPresent
         resources:
-{{- /*
           requests:
               cpu: "{{ .Values.taskmanager.cpu_requests }}"
               memory: "{{ .Values.taskmanager.memory_requests }}"
-*/}}
           limits:
             cpu: "{{ .Values.taskmanager.cpu_limits }}"
             memory: "{{ .Values.taskmanager.memory_limits }}"
