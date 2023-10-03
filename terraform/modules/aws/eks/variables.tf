@@ -111,7 +111,7 @@ variable eks_nodes_subnet_ids {
 variable "eks_node_disk_size" {
   type        = number
   description = "EKS nodes disk size"
-  default     = 128
+  default     = 30
 }
 
 variable "oidc_thumbprint_list" {
