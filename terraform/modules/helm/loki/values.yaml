@@ -15,7 +15,7 @@ minio:
   enabled: true
   resources:
     limits:
-      cpu: 0.2
+      cpu: 0.1
       memory: 256Mi
     requests:
       cpu: 0.1
@@ -32,7 +32,7 @@ monitoring:
   lokiCanary:
     resources:
       limits:
-        cpu: 0.2
+        cpu: 0.1
         memory: 256Mi
       requests:
         cpu: 0.1
@@ -43,7 +43,7 @@ monitoring:
 gateway:
   resources:
     limits:
-      cpu: 0.2
+      cpu: 0.1
       memory: 256Mi
     requests:
       cpu: 0.1
@@ -53,7 +53,7 @@ read:
   replicas: 1
   resources:
     limits:
-      cpu: 0.2
+      cpu: 0.1
       memory: 256Mi
     requests:
       cpu: 0.1
@@ -63,7 +63,7 @@ write:
   replicas: 1
   resources:
     limits:
-      cpu: 0.2
+      cpu: 0.1
       memory: 256Mi
     requests:
       cpu: 0.1
