@@ -7,7 +7,6 @@ metadata:
     name: flyway-postgresql
     app: flyway-postgresql
 spec:
-  ttlSecondsAfterFinished: 300
   backoffLimit: 30
   template:
     metadata:
