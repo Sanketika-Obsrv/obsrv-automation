@@ -4,7 +4,7 @@ alertmanager:
       limits:
         cpu: 0.1
         memory: 256Mi
-       requests:
+      requests:
          cpu: 0.1
          memory: 128Mi
 prometheusOperator:
@@ -12,7 +12,7 @@ prometheusOperator:
     limits:
       cpu: 0.1
       memory: 256Mi
-     requests:
+    requests:
        cpu: 0.1
        memory: 128Mi
   prometheusConfigReloader:
@@ -20,7 +20,7 @@ prometheusOperator:
       limits:
         cpu: 0.1
         memory: 256Mi
-       requests:
+      requests:
          cpu: 0.1
          memory: 128Mi
 kube-state-metrics:
@@ -28,7 +28,7 @@ kube-state-metrics:
     limits:
       cpu: 0.1
       memory: 256Mi
-     requests:
+    requests:
        cpu: 0.1
        memory: 128Mi
 grafana:
@@ -36,7 +36,7 @@ grafana:
     limits:
       cpu: 0.2
       memory: 256Mi
-     requests:
+    requests:
        cpu: 0.1
        memory: 128Mi
 prometheus:
@@ -45,7 +45,7 @@ prometheus:
       limits:
         cpu: 0.5
         memory: 512Mi
-       requests:
+      requests:
          cpu: 0.5
          memory: 512Mi
   prometheusSpec:
@@ -62,6 +62,6 @@ prometheus-node-exporter:
     limits:
       cpu: 0.1
       memory: 256Mi
-     requests:
+    requests:
        cpu: 0.1
        memory: 128Mi
