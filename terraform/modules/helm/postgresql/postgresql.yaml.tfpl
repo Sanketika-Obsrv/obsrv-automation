@@ -115,7 +115,7 @@ primary:
           created_date TIMESTAMP NOT NULL DEFAULT now(),
           updated_date TIMESTAMP NOT NULL,
           published_date TIMESTAMP NOT NULL,
-          UNIQUE (dataset_id)
+          UNIQUE (dataset_id, connector_type)
         );
         CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config(dataset_id);
 
