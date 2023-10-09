@@ -381,7 +381,7 @@ auth:
       ## @param auth.zookeeper.tls.passwordsSecretTruststoreKey The secret key from the auth.zookeeper.tls.passwordsSecret containing the password for the Truststore.
       ##
       passwordsSecretTruststoreKey: truststore-password
-## @param listeners The address(es) the socket server listens on. Auto-calculated it's set to an empty array
+## @param listenerss The address(es) the socket server listens on. Auto-calculated it's set to an empty array
 ## When it's set to an empty array, the listeners will be configured
 ## based on the authentication protocols (auth.clientProtocol, auth.externalClientProtocol and auth.interBrokerProtocol parameters)
 ##
