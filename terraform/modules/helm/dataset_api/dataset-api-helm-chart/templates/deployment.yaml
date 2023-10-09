@@ -38,7 +38,7 @@ spec:
            - configMapRef:
               name: {{ .Chart.Name }}-config
           
-          {{- if .Values.grafana_endpoint_enabled }}
+          {{- if .Values.grafana_service.enabled }}
           env:
           - name: grafana_token 
             valueFrom: 
