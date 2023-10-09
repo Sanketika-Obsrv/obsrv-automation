@@ -37,12 +37,16 @@ spec:
           envFrom:
            - configMapRef:
               name: {{ .Chart.Name }}-config
+          
+          {{- if .Values.grafana_endpoint_enabled }}
           env:
           - name: grafana_token 
             valueFrom: 
-              secretKeyRef:
-                name: grafana-secret 
-                key: bearer_token
+            secretKeyRef:
+              name: grafana-secret 
+              key: bearer_token
+          {{- end }}
+
 
           ports:
             - containerPort: 3000
@@ -66,3 +70,6 @@ spec:
       port: {{ .Values.network.targetport }}
   selector:
     app: {{ .Chart.Name }}
+
+
+
