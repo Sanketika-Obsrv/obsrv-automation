@@ -23,5 +23,3 @@ redis_service:
   REDIS_PORT: 6379
 exhaust_service:
   CONTAINER: ${s3_bucket}
-service_account_annotations:
-  ${dataset_api_sa_annotations}
