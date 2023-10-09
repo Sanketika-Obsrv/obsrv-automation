@@ -168,7 +168,7 @@ logSegmentBytes: _1073741824
 logsDirs: /bitnami/kafka/data
 ## @param maxMessageBytes The largest record batch size allowed by Kafka
 ##
-maxMessageBytes: _1000012
+maxMessageBytes: _5000012
 ## @param defaultReplicationFactor Default replication factors for automatically created topics
 ##
 defaultReplicationFactor: 1
