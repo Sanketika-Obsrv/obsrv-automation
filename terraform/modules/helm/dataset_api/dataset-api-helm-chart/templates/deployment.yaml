@@ -38,13 +38,13 @@ spec:
            - configMapRef:
               name: {{ .Chart.Name }}-config
           
-          {{- if .Values.grafana_service.enabled }}
+          {{- if .Values.grafana_service }}
           env:
           - name: grafana_token 
             valueFrom: 
             secretKeyRef:
               name: grafana-secret 
-              key: bearer_token
+              key: bearer_token    
           {{- end }}
 
 

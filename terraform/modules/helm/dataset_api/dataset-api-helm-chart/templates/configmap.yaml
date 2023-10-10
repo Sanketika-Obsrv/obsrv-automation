@@ -36,7 +36,7 @@ data:
   max_query_limit: "{{ .Values.MAX_QUERY_LIMIT }}"
   max_date_range: "{{ .Values.MAX_DATE_RANGE }}"
   exclude_datasource_validation: "{{ .Values.EXCLUDE_DATASOURCE_VALIDATION }}"
-  {{- if .Values.grafana_service.enabled }}
+  {{- if .Values.grafana_service }}
   grafana_url: "{{ .Values.grafana_service.GRAFANA_URL }}"
   grafana_token: "{{ .Values.grafana_service.GRAFANA_TOKEN }}"
   {{- end }}
