@@ -1,0 +1,34 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: superset-sql-files
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: superset-sql-files
+    app: flyway-postgresql
+data:
+  {{- (tpl (.Files.Glob "migration/01_superset/*.sql").AsConfig .) | nindent 2 }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: druid-raw-sql-files
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: druid-raw-sql-files
+    app: flyway-postgresql
+data:
+  {{- (tpl (.Files.Glob "migration/02_druid_raw/*.sql").AsConfig .) | nindent 2 }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: obsrv-sql-files
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: obsrv-sql-files
+    app: flyway-postgresql
+data:
+  {{- (tpl (.Files.Glob "migration/03_obsrv/*.sql").AsConfig .) | nindent 2 }}

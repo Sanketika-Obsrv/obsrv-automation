@@ -16,4 +16,4 @@ metadata:
 {{- range $key, $value := .Values.datasources.label }}
 {{ $key | indent 4 }}: {{ $value | quote }}
 {{- end }}
-      system.monitoring: "true"
+    system.monitoring: "true"

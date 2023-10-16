@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyway-postgresql
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: flyway-postgresql
+    app: flyway-postgresql
+spec:
+  backoffLimit: 30
+  template:
+    metadata:
+      name: flyway-postgresql
+      labels:
+        app: flyway-postgresql
+        name: flyway-postgresql
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: flyway-postgresql
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        command: ["/flyway/script/migrate.sh"]
+        env:
+        - name: FLYWAY_LOCATIONS
+          value: 'filesystem:/flyway/migrations'
+        envFrom:
+          - configMapRef:
+              name: flyway-postgresql-cm
+        volumeMounts:
+        - name: flyway-migrate-script
+          mountPath: /flyway/script
+        - name: superset-sql-files
+          mountPath: /flyway/migrations/01_superset
+        - name: druid-raw-sql-files
+          mountPath: /flyway/migrations/02_druid_raw
+        - name: obsrv-sql-files
+          mountPath: /flyway/migrations/03_obsrv
+      volumes:
+        - name: flyway-migrate-script
+          configMap:
+             name: flyway-migrate-script
+             defaultMode: 0755
+        - name: superset-sql-files
+          configMap:
+             name: superset-sql-files
+        - name: druid-raw-sql-files
+          configMap:
+             name: druid-raw-sql-files
+        - name: obsrv-sql-files
+          configMap:
+             name: obsrv-sql-files

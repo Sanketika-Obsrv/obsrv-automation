@@ -1,52 +1,52 @@
 alertmanager:
   alertmanagerSpec:
     resources:
-        limits:
-            cpu: 100m
-            memory: 256Mi
-        requests:
-            cpu: 100m
-            memory: 256Mi
+      limits:
+        cpu: "0.1"
+        memory: 256Mi
+      requests:
+        cpu: "0.1"
+        memory: 128Mi
 prometheusOperator:
   resources:
     limits:
-        cpu: 100m
-        memory: 200Mi
+      cpu: "0.1"
+      memory: 256Mi
     requests:
-        cpu: 100m
-        memory: 100Mi
-    prometheusConfigReloader:
-        resources:
-            limits:
-                cpu: 200m
-                memory: 50Mi
-            requests:
-                cpu: 200m
-                memory: 50Mi
+      cpu: "0.1"
+      memory: 128Mi
+  prometheusConfigReloader:
+    resources:
+      limits:
+        cpu: "0.1"
+        memory: 256Mi
+      requests:
+        cpu: "0.1"
+        memory: 128Mi
 kube-state-metrics:
   resources:
     limits:
-      cpu: 100m
-      memory: 64Mi
+      cpu: "0.1"
+      memory: 256Mi
     requests:
-      cpu: 100m
-      memory: 32Mi
+      cpu: "0.1"
+      memory: 128Mi
 grafana:
   resources:
     limits:
-      cpu: 256m
-      memory: 512Mi
+      cpu: 0.2
+      memory: 256Mi
     requests:
-      cpu: 256m
-      memory: 512Mi
+      cpu: "0.1"
+      memory: 128Mi
 prometheus:
   server:
     resources:
       limits:
-        cpu: 500m
+        cpu: 0.5
         memory: 512Mi
       requests:
-        cpu: 500m
+        cpu: 0.5
         memory: 512Mi
   prometheusSpec:
     retention: ${prometheus_metrics_retention}
@@ -59,9 +59,9 @@ prometheus:
               storage: ${prometheus_persistent_volume_size}
 prometheus-node-exporter:
   resources:
-   limits:
-      cpu: 100m
-      memory: 64Mi
-   requests:
-    cpu: 100m
-    memory: 32Mi
+    limits:
+      cpu: "0.1"
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi

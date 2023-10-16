@@ -2,6 +2,8 @@ loki:
   auth_enabled: ${loki_auth_enabled}
   podLabels:
     system.monitoring: 'true'
+  commonConfig:
+    replication_factor: 1
   limits_config:
     enforce_metric_name: ${limits_config_enforce_metric_name}
     reject_old_samples: ${limits_config_reject_old_samples}
@@ -17,11 +19,11 @@ test:
 minio:
   enabled: ${minio_enabled}
   resources:
-    limits: 
-      cpu: 100m
+    limits:
+      cpu: 0.1
       memory: 256Mi
-    requests: 
-      cpu: 100m
+    requests:
+      cpu: 0.1
       memory: 128Mi
   metrics:
     serviceMonitor:
@@ -38,45 +40,45 @@ monitoring:
   lokiCanary:
     enabled: false
     resources:
-      limits: 
-        cpu: 100m
-        memory: 256Mi
-      requests: 
-        cpu: 100m
-        memory: 128Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
   serviceMonitor:
     labels:
       release: monitoring
       system.monitoring: 'true'
 gateway:
   resources:
-    limits: 
-      cpu: 100m
-      memory: 512Mi
-    requests: 
-      cpu: 100m
-      memory: 256Mi 
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
 read:
   affinity: {}
   podLabels:
     system.monitoring: 'true'
   replicas: 1
   resources:
-    limits: 
-      cpu: 100m
-      memory: 1024Mi
-    requests: 
-      cpu: 100m
-      memory: 512Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
 write:
   affinity: {}
   podLabels:
     system.monitoring: 'true'
   replicas: 1
   resources:
-    limits: 
-      cpu: 100m
-      memory: 1024Mi
-    requests: 
-      cpu: 256m
-      memory: 512Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi

@@ -64,7 +64,7 @@ variable "postgresql_admin_password" {
 
 variable "postgresql_obsrv_username" {
   type        = string
-  description = "Postgresql obsrv username."
+  description = "Postgresql obsrv user username."
   default     = "obsrv"
 }
 
@@ -88,13 +88,13 @@ variable "postgresql_druid_database" {
 
 variable "postgresql_druid_user_name" {
   type        = string
-  description = "Postgresql database name."
+  description = "Postgresql druid user username."
   default   = "druid_raw"
 }
 
 variable "postgresql_druid_user_password" {
   type        = string
-  description = "Postgresql database name."
+  description = "Postgresql druid user password."
   default   = "druid_raw"
 }
 
@@ -121,4 +121,3 @@ variable "postgresql_druid_raw_user_password" {
   description = "Postgresql druid user password."
   default   = "druidraw123"
 }
-

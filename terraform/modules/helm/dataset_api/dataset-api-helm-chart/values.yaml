@@ -45,5 +45,5 @@ MAX_QUERY_LIMIT: "5000"
 MAX_DATE_RANGE: "30"
 EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-system-stats"
 
-service_account_annotations: 
+service_account_annotations:
   eks.amazonaws.com/role-arn: ""

@@ -60,7 +60,7 @@ clusterDomain: cluster.local
 extraDeploy: []
 ## @param commonLabels Add labels to all the deployed resources
 ##
-commonLabels: 
+commonLabels:
   system.storage: "true"
   system.ingestion: "true"
   system.querying: "true"
@@ -338,273 +338,7 @@ primary:
     ##      #!/bin/sh
     ##      echo "Do something."
     ##
-    scripts: 
-      00_create_superset_db.sql: |
-        CREATE DATABASE superset;
-      01_create_superset_user.sql: |
-        CREATE USER superset WITH ENCRYPTED PASSWORD 'superset123';
-        GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
-      02_create_druid_raw_db.sql: |
-        CREATE DATABASE druid_raw;
-      03_create_druid_raw_user.sql: |
-        CREATE USER druid_raw WITH ENCRYPTED PASSWORD 'druid_raw';
-        GRANT ALL PRIVILEGES ON DATABASE druid_raw TO druid_raw;
-      04_create_obsrv_db.sql: |
-        CREATE DATABASE obsrv;
-      05_create_obsrv_user.sql: |
-        CREATE USER obsrv WITH ENCRYPTED PASSWORD 'obsrv123';
-        ALTER DATABASE obsrv OWNER TO obsrv;
-        GRANT ALL PRIVILEGES ON DATABASE obsrv TO obsrv;
-      06_create_tables.sql: |
-        \c obsrv
-        
-        CREATE TABLE IF NOT EXISTS datasets (
-            id TEXT PRIMARY KEY,
-            dataset_id TEXT,
-            type TEXT NOT NULL,
-            name TEXT,
-            validation_config JSON,
-            extraction_config JSON,
-            dedup_config JSON,
-            data_schema JSON,
-            denorm_config JSON,
-            router_config JSON,
-            dataset_config JSON,
-            tags TEXT[],
-            data_version INT,
-            status TEXT,
-            created_by TEXT,
-            updated_by TEXT,
-            created_date TIMESTAMP NOT NULL DEFAULT now(),
-            updated_date TIMESTAMP NOT NULL,
-            published_date TIMESTAMP NOT NULL
-        );
-
-        CREATE INDEX IF NOT EXISTS datasets_status ON datasets(status);
-
-        CREATE TABLE IF NOT EXISTS datasources (
-          id TEXT PRIMARY KEY,
-          datasource text NOT NULL,
-          dataset_id TEXT NOT NULL REFERENCES datasets (id),
-          ingestion_spec json NOT NULL,
-          datasource_ref text NOT NULL,
-          retention_period json,
-          archival_policy json,
-          purge_policy json,
-          backup_config json NOT NULL,
-          status text NOT NULL,
-          created_by text NOT NULL,
-          updated_by text NOT NULL,
-          created_date TIMESTAMP NOT NULL DEFAULT now(),
-          updated_date TIMESTAMP NOT NULL,
-          published_date TIMESTAMP NOT NULL,
-          UNIQUE (dataset_id, datasource)
-        );
-        
-        CREATE INDEX IF NOT EXISTS datasources_dataset ON datasources(dataset_id);
-
-        CREATE INDEX IF NOT EXISTS datasources_status ON datasources(status);
-
-        CREATE TABLE IF NOT EXISTS dataset_transformations (
-          id TEXT PRIMARY KEY,
-          dataset_id TEXT NOT NULL REFERENCES datasets (id),
-          field_key TEXT NOT NULL,
-          transformation_function JSON,
-          status TEXT NOT NULL,
-          created_by TEXT NOT NULL,
-          updated_by TEXT NOT NULL,
-          created_date TIMESTAMP NOT NULL DEFAULT now(),
-          updated_date TIMESTAMP NOT NULL,
-          published_date TIMESTAMP NOT NULL,
-          UNIQUE (dataset_id, field_key)
-        );
-        
-        CREATE INDEX IF NOT EXISTS dataset_transformations_dataset ON dataset_transformations (dataset_id);
-
-        CREATE INDEX IF NOT EXISTS dataset_transformations_status ON dataset_transformations (status);
-
-        CREATE TABLE IF NOT EXISTS dataset_source_config (
-          id TEXT PRIMARY KEY,
-          dataset_id TEXT NOT NULL REFERENCES datasets (id),
-          connector_type text NOT NULL,
-          connector_config json NOT NULL,
-          status text NOT NULL,
-          connector_stats json,
-          created_by text NOT NULL,
-          updated_by text NOT NULL,
-          created_date TIMESTAMP NOT NULL DEFAULT now(),
-          updated_date TIMESTAMP NOT NULL,
-          published_date TIMESTAMP NOT NULL,
-          UNIQUE (dataset_id)
-        );
-
-        CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config (dataset_id);
-
-        CREATE INDEX IF NOT EXISTS dataset_source_config_status ON dataset_source_config (status);
-
-        CREATE TABLE IF NOT EXISTS datasets_draft (
-          id TEXT PRIMARY KEY,
-          dataset_id TEXT,
-          version INTEGER NOT NULL,
-          type TEXT NOT NULL,
-          name TEXT,
-          validation_config JSON,
-          extraction_config JSON,
-          dedup_config JSON,
-          data_schema JSON,
-          denorm_config JSON,
-          router_config JSON,
-          dataset_config JSON,
-          client_state JSON,
-          tags TEXT[],
-          status TEXT,
-          created_by TEXT,
-          updated_by TEXT,
-          created_date TIMESTAMP NOT NULL DEFAULT now(),
-          updated_date TIMESTAMP NOT NULL,
-          published_date TIMESTAMP,
-          UNIQUE (dataset_id, version)
-        );
-
-        CREATE INDEX datasets_draft_status ON datasets_draft (status);
-
-        CREATE TABLE IF NOT EXISTS datasources_draft (
-          id TEXT PRIMARY KEY,
-          datasource text NOT NULL,
-          dataset_id TEXT NOT NULL REFERENCES datasets_draft (id),
-          ingestion_spec json NOT NULL,
-          datasource_ref text NOT NULL,
-          retention_period json,
-          archival_policy json,
-          purge_policy json,
-          backup_config json NOT NULL,
-          status text NOT NULL,
-          created_by text NOT NULL,
-          updated_by text NOT NULL,
-          created_date TIMESTAMP NOT NULL DEFAULT now(),
-          updated_date TIMESTAMP NOT NULL,
-          published_date TIMESTAMP,
-          UNIQUE (dataset_id, datasource)
-        );
-
-        CREATE INDEX IF NOT EXISTS datasources_draft_dataset ON datasources_draft(dataset_id);
-
-        CREATE INDEX IF NOT EXISTS datasources_draft_status ON datasources_draft(status);
-
-        CREATE TABLE IF NOT EXISTS dataset_transformations_draft (
-          id TEXT PRIMARY KEY,
-          dataset_id TEXT NOT NULL REFERENCES datasets_draft (id),
-          field_key TEXT NOT NULL,
-          transformation_function JSON,
-          status TEXT NOT NULL,
-          created_by TEXT NOT NULL,
-          updated_by TEXT NOT NULL,
-          created_date TIMESTAMP NOT NULL DEFAULT now(),
-          updated_date TIMESTAMP NOT NULL,
-          published_date TIMESTAMP,
-          UNIQUE (dataset_id, field_key)
-        );
-
-        CREATE INDEX IF NOT EXISTS dataset_transformations_draft_dataset ON dataset_transformations_draft (dataset_id);
-
-        CREATE INDEX IF NOT EXISTS dataset_transformations_draft_status ON dataset_transformations_draft (status);
-
-        CREATE TABLE IF NOT EXISTS dataset_source_config_draft (
-          id TEXT PRIMARY KEY,
-          dataset_id TEXT NOT NULL REFERENCES datasets_draft (id),
-          connector_type text NOT NULL,
-          connector_config json NOT NULL,
-          status text NOT NULL,
-          connector_stats JSON,
-          created_by text NOT NULL,
-          updated_by text NOT NULL,
-          created_date TIMESTAMP NOT NULL DEFAULT now(),
-          updated_date TIMESTAMP NOT NULL,
-          published_date TIMESTAMP,
-          UNIQUE (dataset_id)
-        );
-
-        CREATE INDEX IF NOT EXISTS  dataset_source_config_draft_dataset ON dataset_source_config_draft (dataset_id);
-
-        CREATE INDEX IF NOT EXISTS dataset_source_config_draft_status ON dataset_source_config_draft (status);
-
-        CREATE TABLE "public"."system_settings" (
-          "key" text NOT NULL,
-          "value" text NOT NULL,
-          "category" text NOT NULL DEFAULT 'SYSTEM'::text,
-          "type" text NOT NULL,
-          "created_date" timestamp NOT NULL DEFAULT now(),
-          "updated_date" timestamp,
-          "label" text,
-          PRIMARY KEY ("key")
-        );
-
-        CREATE TABLE IF NOT EXISTS "user_session" (
-          "sid" varchar NOT NULL COLLATE "default",
-          "sess" json NOT NULL,
-          "expire" timestamp(6) NOT NULL
-        )
-        WITH (OIDS=FALSE);
-
-        ALTER TABLE "user_session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
-
-        CREATE INDEX "IDX_session_expire" ON "user_session" ("expire");
-
-
-        CREATE TABLE IF NOT EXISTS "oauth_access_tokens" (
-          id VARCHAR(255) PRIMARY KEY,
-          user_id VARCHAR(255),
-          client_id VARCHAR(255),
-          created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-
-        CREATE TABLE IF NOT EXISTS "oauth_refresh_tokens" (
-          id VARCHAR(255) PRIMARY KEY,
-          user_id VARCHAR(255),
-          client_id VARCHAR(255),
-          created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-
-
-        CREATE TABLE IF NOT EXISTS "oauth_authorization_codes" (
-          id VARCHAR(255) PRIMARY KEY,
-          client_id VARCHAR(255),
-          redirect_uri VARCHAR(255),
-          user_id VARCHAR(255),
-          user_name VARCHAR(255),
-          created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-
-
-        CREATE TABLE IF NOT EXISTS "oauth_clients" (
-          id VARCHAR(255) PRIMARY KEY,
-          name VARCHAR(255),
-          client_id VARCHAR(255) UNIQUE,
-          client_secret VARCHAR(255),
-          redirect_uri VARCHAR(255),
-          is_trusted BOOLEAN,
-          created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          last_updated_on TIMESTAMP NULL
-        );
-
-
-        CREATE TABLE IF NOT EXISTS "oauth_users" (
-          id VARCHAR(255) PRIMARY KEY,
-          user_name VARCHAR(255),
-          password VARCHAR(255) NULL,
-          first_name VARCHAR(255) NULL,
-          last_name VARCHAR(255) NULL,
-          provider VARCHAR(255) NULL,
-          email_address VARCHAR(255) UNIQUE,
-          mobile_number VARCHAR(255) NULL,
-          created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          last_updated_on TIMESTAMP NULL
-          );
-
-        CREATE SEQUENCE redis_db_index START 3;
-
-        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
-        GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
+    scripts: {}
 
     ## @param primary.initdb.scriptsConfigMap ConfigMap with scripts to be run at first boot
     ## NOTE: This will override `primary.initdb.scripts`
@@ -713,7 +447,7 @@ primary:
   ## @param primary.resources.requests.cpu The requested cpu for the PostgreSQL Primary containers
   ##
   resources:
-    limits: 
+    limits:
       cpu: 250m
       memory: 512Mi
     requests:
@@ -946,7 +680,7 @@ primary:
     annotations: {}
     ## @param primary.persistence.labels Labels for the PVC
     ##
-    labels: 
+    labels:
       system.storage: "true"
       system.ingestion: "true"
       system.querying: "true"
@@ -1056,7 +790,7 @@ readReplicas:
   ## @param readReplicas.resources.requests.cpu The requested cpu for the PostgreSQL read only containers
   ##
   resources:
-    limits: 
+    limits:
       cpu: 250m
       memory: 512Mi
     requests:
@@ -1289,7 +1023,7 @@ readReplicas:
     annotations: {}
     ## @param readReplicas.persistence.labels Labels for the PVC
     ##
-    labels: 
+    labels:
       system.storage: "true"
       system.ingestion: "true"
       system.querying: "true"

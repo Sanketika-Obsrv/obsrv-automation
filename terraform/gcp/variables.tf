@@ -307,3 +307,9 @@ variable "velero_namespace" {
   description = "Velero namespace."
   default     = "velero"
 }
+
+variable "command_service_image_tag" {
+  type        = string
+  description = "CommandService image tag."
+  default     = "1.0.0"
+}

@@ -1,4 +1,4 @@
-commonLabels: 
+commonLabels:
   system: storage
 image:
   registry: docker.io

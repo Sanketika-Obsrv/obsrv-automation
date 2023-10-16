@@ -1,4 +1,4 @@
-commonLabels: 
+commonLabels:
       system.storage: 'true'
       system.processing: 'true'
 image:

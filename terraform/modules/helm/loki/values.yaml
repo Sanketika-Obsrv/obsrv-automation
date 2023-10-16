@@ -1,6 +1,6 @@
 loki:
   auth_enabled: false
-  
+
   limits_config:
     enforce_metric_name: false
     reject_old_samples: true
@@ -14,11 +14,11 @@ compactor:
 minio:
   enabled: true
   resources:
-    limits: 
-      cpu: 128m
+    limits:
+      cpu: 0.1
       memory: 256Mi
-    requests: 
-      cpu: 128m
+    requests:
+      cpu: 0.1
       memory: 128Mi
   metrics:
     serviceMonitor:
@@ -31,40 +31,40 @@ monitoring:
     namespace: "monitoring"
   lokiCanary:
     resources:
-      limits: 
-        cpu: 128m
+      limits:
+        cpu: 0.1
         memory: 256Mi
-      requests: 
-        cpu: 128m
+      requests:
+        cpu: 0.1
         memory: 128Mi
   serviceMonitor:
     labels:
       release: monitoring
 gateway:
   resources:
-    limits: 
-      cpu: 256m
-      memory: 512Mi
-    requests: 
-      cpu: 128m
-      memory: 256Mi 
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
 read:
   affinity: {}
   replicas: 1
   resources:
-    limits: 
-      cpu: 512m
-      memory: 1024Mi
-    requests: 
-      cpu: 256m
-      memory: 512Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
 write:
   affinity: {}
   replicas: 1
   resources:
-    limits: 
-      cpu: 512m
-      memory: 1024Mi
-    requests: 
-      cpu: 256m
-      memory: 512Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi

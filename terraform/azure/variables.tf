@@ -51,3 +51,9 @@ variable "flink_image_tag" {
    description = "Flink kubernetes service name."
    default     = "2.1"
 }
+
+variable "command_service_image_tag" {
+  type        = string
+  description = "CommandService image tag."
+  default     = "1.0.0"
+}

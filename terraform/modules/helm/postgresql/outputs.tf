@@ -40,7 +40,6 @@ output "postgresql_obsrv_user_password" {
 
 output "postgresql_obsrv_database" {
   value     = var.postgresql_obsrv_database
-  sensitive = true
 }
 
 output "postgresql_service_name" {

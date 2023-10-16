@@ -1,0 +1,16 @@
+namespace: ""
+
+image:
+  repository: flyway/flyway
+  tag: latest
+
+config:
+  db:
+    url: jdbc:postgresql://postgresql-hl:5432/
+    username: postgres
+    password: postgres
+    driver_class_name: org.postgresql.Driver
+
+postgresql_superset_user_password: ""
+postgresql_druid_raw_user_password: ""
+postgresql_obsrv_user_password: ""

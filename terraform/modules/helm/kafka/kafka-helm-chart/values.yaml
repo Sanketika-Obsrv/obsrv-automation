@@ -32,7 +32,7 @@ fullnameOverride: ""
 clusterDomain: cluster.local
 ## @param commonLabels Labels to add to all deployed objects
 ##
-commonLabels: 
+commonLabels:
   system.ingestion: "true"
   system.processing: "true"
 ## @param commonAnnotations Annotations to add to all deployed objects
@@ -507,10 +507,10 @@ lifecycleHooks: {}
 ## @param resources.requests The requested resources for the container
 ##
 resources:
-  limits: 
+  limits:
     cpu: 1
     memory: 2048Mi
-  requests: 
+  requests:
     cpu: 750m
     memory: 1024Mi
 ## Kafka pods' Security Context
@@ -552,7 +552,7 @@ hostIPC: false
 ## @param podLabels Extra labels for Kafka pods
 ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels: 
+podLabels:
   system.ingestion: "true"
   system.processing: "true"
 ## @param podAnnotations Extra annotations for Kafka pods
@@ -1145,10 +1145,10 @@ metrics:
     ## @param metrics.kafka.resources.requests The requested resources for the container
     ##
     resources:
-      limits: 
+      limits:
         cpu: 100m
         memory: 512Mi
-      requests: 
+      requests:
         cpu: 100m
         memory: 256Mi
     ## Kafka exporter pods' Security Context
@@ -1182,7 +1182,7 @@ metrics:
     ## @param metrics.kafka.podLabels Extra labels for Kafka exporter pods
     ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     ##
-    podLabels: 
+    podLabels:
       system.ingestion: "true"
       system.processing: "true"
     ## @param metrics.kafka.podAnnotations Extra annotations for Kafka exporter pods
@@ -1373,10 +1373,10 @@ metrics:
     ## @param metrics.jmx.resources.requests The requested resources for the JMX exporter container
     ##
     resources:
-      limits: 
+      limits:
         cpu: 100m
         memory: 512Mi
-      requests: 
+      requests:
         cpu: 100m
         memory: 256Mi
     ## Prometheus JMX exporter service configuration
@@ -1505,7 +1505,7 @@ provisioning:
   replicationFactor: 1
   ## @param provisioning.topics Kafka topics to provision
 
-  topics: 
+  topics:
   - name: "dev.ingest"
     partitions: 1
     replicationFactor: 1
@@ -1625,7 +1625,7 @@ provisioning:
   ## @param provisioning.podLabels Extra labels for Kafka provisioning pods
   ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
-  podLabels: 
+  podLabels:
     system.ingestion: "true"
     system.processing: "true"
   ## Kafka provisioning pods ServiceAccount

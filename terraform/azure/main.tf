@@ -180,3 +180,15 @@ module "alert_rules" {
   building_block               = var.building_block
   alertrules_chart_depends_on  = [module.monitoring]
 }
+
+module "command_service" {
+  source                           = "../modules/helm/command_service"
+  env                              = var.env
+  command_service_chart_depends_on = [module.flink, module.postgresql]
+  command_service_image_tag        = var.command_service_image_tag
+  postgresql_obsrv_username        = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password   = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database        = module.postgresql.postgresql_obsrv_database
+  flink_namespace                  = module.flink.flink_namespace
+  docker_registry_secret_name      = module.kubernetes_reflector.docker_registry_secret_name
+}

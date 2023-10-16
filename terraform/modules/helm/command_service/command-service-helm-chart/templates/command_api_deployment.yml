@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-service"
+  namespace: {{ .Release.namespace }}
+  labels:
+    run: "{{ .Release.Name }}-service"
+    system.ingestion: "true"
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: {{ .Values.http_port }}
+  selector:
+    run: {{ .Release.Name }}
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.namespace }}
+  labels:
+    system.ingestion: "true"
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        run: {{ .Release.Name }}
+        system.ingestion: "true"
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      volumes:
+      - name: commandapi-config-volume
+        configMap:
+          name: "{{ .Release.Name }}-config"
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecrets }}
+      containers:
+      - name: {{ .Release.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: "IfNotPresent"
+        resources: 
+          requests:
+            cpu: "{{ .Values.cpu_requests }}"
+            memory: "{{ .Values.memory_requests }}"
+          limits:
+            cpu: "{{ .Values.cpu_limits }}"
+            memory: "{{ .Values.memory_limits }}"
+        ports:
+        - containerPort: {{ .Values.http_port }}
+          name: http
+        volumeMounts:
+        - name: commandapi-config-volume
+          mountPath: /app/src/config/service_config.yml
+          subPath: service_config

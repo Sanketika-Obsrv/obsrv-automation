@@ -112,3 +112,9 @@ variable "merged_pipeline_enabled" {
   type = bool
   default = true
 }
+
+variable "command_service_image_tag" {
+  type        = string
+  description = "CommandService image tag."
+  default     = "1.0.0"
+}

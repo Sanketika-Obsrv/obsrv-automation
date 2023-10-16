@@ -21,7 +21,7 @@ spec:
         - image: "{{ .Values.image.repository }}/{{ .Values.image.image_name }}:{{ .Values.image.tag }}"
           imagePullPolicy: Always
           name: web-console
-          resources: 
+          resources:
             requests:
               cpu: "{{ .Values.cpu_requests }}"
               memory: "{{ .Values.memory_requests }}"
