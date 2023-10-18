@@ -3,7 +3,7 @@ imagepullsecrets: ""
 image:
   registry: sanketikahub
   repository: merged-pipeline
-  tag: release-0.5.0_RC23
+  tag: release-0.5.0_RC27
 serviceMonitor:
   enabled: false
 replicaCount: 1

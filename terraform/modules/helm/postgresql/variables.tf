@@ -113,7 +113,7 @@ variable "postgresql_persistence_size" {
 variable "postgresql_image_tag" {
   type = string
   description = "Postgresql image tag."
-  default = "14.5.0-debian-11-r14"
+  default = "14.9.0-debian-11-r2"
 }
 
 variable "postgresql_druid_raw_user_password" {

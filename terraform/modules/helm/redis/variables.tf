@@ -23,7 +23,7 @@ variable "redis_chart_name" {
 variable "redis_chart_version" {
   type        = string
   description = "Redis chart version."
-  default     = "17.3.11"
+  default     = "17.14.3"
 }
 
 variable "redis_install_timeout" {

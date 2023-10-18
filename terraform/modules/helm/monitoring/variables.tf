@@ -53,7 +53,7 @@ variable "monitoring_chart_name" {
 variable "monitoring_chart_version" {
   type        = string
   description = "Monitoring chart version."
-  default     = "44.2.1"
+  default     = "46.5.0"
 }
 
 variable "monitoring_install_timeout" {

@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: danielqsj/kafka-exporter
-  tag: latest
+  repository: docker.io/bitnami/kafka-exporter
+  tag: 1.7.0-debian-11-r81
   pullPolicy: IfNotPresent
 
 nameOverride: ""

@@ -60,7 +60,7 @@ variable "command_service_image_repository" {
 variable "command_service_image_tag" {
   type        = string
   description = "CommandService image tag."
-  default     = "1.0.0"
+  default     = "1.0.2"
 }
 
 variable "postgresql_obsrv_username" {

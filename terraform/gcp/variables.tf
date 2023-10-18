@@ -205,7 +205,7 @@ variable "dataset_api_container_registry" {
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.4"
+  default     = "1.0.2"
 }
 
 variable "flink_container_registry" {
@@ -244,7 +244,7 @@ variable "merged_pipeline_enabled" {
 variable "flink_image_tag" {
   type        = string
   description = "Flink kubernetes service name."
-  default     = "build_deploy_v2"
+  default     = "release-0.5.0_RC27"
 }
 
 
@@ -311,5 +311,5 @@ variable "velero_namespace" {
 variable "command_service_image_tag" {
   type        = string
   description = "CommandService image tag."
-  default     = "1.0.0"
+  default     = "1.0.2"
 }

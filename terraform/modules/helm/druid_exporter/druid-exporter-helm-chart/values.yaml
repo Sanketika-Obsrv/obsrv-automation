@@ -2,7 +2,7 @@
 name: druid-exporter
 
 image:
-  name: quay.io/opstree/druid-exporter
+  name: docker.io/sanketikahub/druid-exporter
   tag: v0.11
   pullPolicy: IfNotPresent
 

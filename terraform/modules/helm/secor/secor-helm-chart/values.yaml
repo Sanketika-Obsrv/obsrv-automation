@@ -16,7 +16,7 @@ image_repository: "sanketikahub/secor"
 region: "us-east-2"
 pullPolicy: "IfNotPresent"
 jvm_memory: 1024m
-image_tag: "0.29.16-java-11-gs"
+image_tag: "0.30-jdk-11"
 message_timezone: "UTC"
 parser_timezone: "Asia/Kolkata"
 secor_jobs:
