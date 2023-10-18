@@ -85,8 +85,3 @@ variable "flink_namespace" {
   description = "Flink installation namespace"
   default     = "flink"
 }
-
-variable "docker_registry_secret_name" {
-  type        = string
-  description = "Kubernetes secret name to pull images from private docker registry."
-}

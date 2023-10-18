@@ -261,7 +261,6 @@ module "command_service" {
   postgresql_obsrv_user_password   = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database        = module.postgresql.postgresql_obsrv_database
   flink_namespace                  = module.flink.flink_namespace
-  docker_registry_secret_name      = module.kubernetes_reflector.docker_registry_secret_name
 }
 
 module "postgresql_migration" {

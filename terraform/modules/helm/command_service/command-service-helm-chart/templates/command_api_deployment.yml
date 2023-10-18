@@ -39,8 +39,8 @@ spec:
       - name: commandapi-config-volume
         configMap:
           name: "{{ .Release.Name }}-config"
-      imagePullSecrets:
-        - name: {{ .Values.image.imagePullSecrets }}
+      # imagePullSecrets:
+      #   - name: {{ .Values.image.imagePullSecrets }}
       containers:
       - name: {{ .Release.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

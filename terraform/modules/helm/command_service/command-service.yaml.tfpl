@@ -3,7 +3,6 @@ http_port: 8000
 image: 
   repository: ${command_service_image_repository}
   tag: ${command_service_image_tag}
-  imagePullSecrets: ${docker_registry_secret_name}
 
 service_config: |
   flink:
