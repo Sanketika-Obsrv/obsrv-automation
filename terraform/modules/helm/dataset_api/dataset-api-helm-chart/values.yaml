@@ -47,3 +47,7 @@ EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-sy
 
 service_account_annotations:
   eks.amazonaws.com/role-arn: ""
+
+druid_auth_enabled: false
+druid_admin_username: admin
+druid_admin_password: admin

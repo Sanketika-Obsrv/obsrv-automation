@@ -25,3 +25,6 @@ exhaust_service:
   CONTAINER: ${s3_bucket}
 service_account_annotations:
   ${dataset_api_sa_annotations}
+druid_auth_enabled = ${druid_auth_enabled}
+druid_admin_username = ${druid_admin_username}
+druid_admin_password = ${druid_admin_password}

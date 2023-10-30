@@ -16,6 +16,9 @@ resource "helm_release" "submit_ingestion" {
            submit_ingestion_namespace = var.submit_ingestion_namespace
            druid_cluster_namespace    = var.druid_cluster_namespace
            druid_cluster_release_name = var.druid_cluster_release_name
+           druid_auth_enabled         = var.druid_auth_enabled
+           druid_admin_username       = var.druid_admin_username
+           druid_admin_password       = var.druid_admin_password
         }
       )
     ]

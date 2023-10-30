@@ -64,6 +64,12 @@ variable "druid_auth_enabled" {
   default     = true
 }
 
+variable "druid_admin_username" {
+  type        = string
+  description = "name of druid initial admin user"
+  default     = "admin"
+}
+
 variable "druid_admin_password" {
   type        = string
   description = "Password for druid initial admin user"

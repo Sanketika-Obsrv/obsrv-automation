@@ -71,3 +71,18 @@ variable "druid_cluster_namespace" {
   type        = any
   description = "druid namespace"
 }
+
+variable "druid_auth_enabled" {
+  type        = bool
+  description = "Toggle to enable/disable druid basic auth"
+}
+
+variable "druid_admin_username" {
+  type        = string
+  description = "name of druid initial admin user"
+}
+
+variable "druid_admin_password" {
+  type        = string
+  description = "Password for druid initial admin user"
+}

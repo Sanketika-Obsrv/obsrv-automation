@@ -24,6 +24,9 @@ resource "helm_release" "dataset_api" {
           redis_namespace                    = var.redis_namespace
           redis_release_name                 = var.redis_release_name
           s3_bucket                          = var.s3_bucket
+          druid_admin_password               = var.druid_admin_password
+          druid_auth_enabled                 = var.druid_auth_enabled
+          druid_admin_username               = var.druid_admin_username
         }
       )
     ]

@@ -200,6 +200,9 @@ module "dataset_api" {
   redis_release_name                 = module.redis.redis_release_name
   dataset_api_namespace              = module.eks.dataset_api_namespace
   s3_bucket                          = module.s3.s3_bucket
+  druid_admin_password               = var.druid_admin_password
+  druid_auth_enabled                 = var.druid_auth_enabled
+  druid_admin_username               = var.druid_admin_username
 }
 
 module "secor" {
@@ -220,6 +223,9 @@ module "submit_ingestion" {
   submit_ingestion_chart_depends_on = [module.kafka, module.druid_raw_cluster]
   druid_cluster_release_name        = module.druid_raw_cluster.druid_cluster_release_name
   druid_cluster_namespace           = module.druid_raw_cluster.druid_cluster_namespace
+  druid_auth_enabled                = var.druid_auth_enabled
+  druid_admin_username              = var.druid_admin_username
+  druid_admin_password              = var.druid_admin_password
 }
 
 module "velero" {

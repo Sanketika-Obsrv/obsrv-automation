@@ -431,6 +431,9 @@ module "dataset_api" {
   redis_release_name                 = module.redis.redis_release_name
   dataset_api_namespace              = var.dataset_api_namespace
   depends_on                         = [ module.dataset_api_sa_iam_role ]
+  druid_admin_password               = var.druid_admin_password
+  druid_auth_enabled                 = var.druid_auth_enabled
+  druid_admin_username               = var.druid_admin_username
 }
 
 module "secor" {
@@ -452,6 +455,9 @@ module "submit_ingestion" {
   env                               = var.env
   building_block                    = var.building_block
   submit_ingestion_chart_depends_on = [ module.kafka, module.druid_raw_cluster ]
+  druid_auth_enabled                = var.druid_auth_enabled
+  druid_admin_username              = var.druid_admin_username
+  druid_admin_password              = var.druid_admin_password
 }
 
 module "velero" {
