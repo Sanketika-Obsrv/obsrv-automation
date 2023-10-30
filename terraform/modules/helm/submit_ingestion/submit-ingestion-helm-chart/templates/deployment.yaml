@@ -21,6 +21,8 @@ spec:
               
               {{ if .Values.druid_auth_enabled }}
               headers="$headers -H 'Authorization: Basic {{ printf "%s" (printf "%s:%s" .Values.druid_admin_username .Values.druid_admin_password | b64enc) }}'"
+              curl -XPOST $headers -d @/etc/ingestion-spec/system-stats-ingestion-spec.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }}
+              curl -XPOST $headers -d @/etc/ingestion-spec/masterdata-system-stats-ingestion-spec.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }}
               {{ end }}
               
               curl -XPOST $headers -d @/etc/ingestion-spec/system-stats-ingestion-spec.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }}

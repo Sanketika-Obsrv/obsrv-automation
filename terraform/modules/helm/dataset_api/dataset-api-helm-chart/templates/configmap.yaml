@@ -40,7 +40,7 @@ data:
   grafana_url: "{{ .Values.grafana_service.GRAFANA_URL }}"
   grafana_token: "{{ .Values.grafana_service.GRAFANA_TOKEN }}"
   {{- end }}
-  druid_auth_enabled: {{ .Values.druid_auth_enabled }}
+  druid_auth_enabled: "{{ .Values.druid_auth_enabled }}"
   druid_admin_username: "{{ .Values.druid_admin_username }}"
   druid_admin_password: "{{ .Values.druid_admin_password }}"
 
