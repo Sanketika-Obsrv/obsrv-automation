@@ -23,10 +23,10 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 100m
+    cpu: 50m
     memory: 128Mi
   requests:
-    cpu: 100m
+    cpu: 50m
     memory: 128Mi
 
 # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity

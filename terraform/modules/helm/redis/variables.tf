@@ -59,7 +59,7 @@ variable "redis_wait_for_jobs" {
 variable "redis_master_maxmemory" {
   type        = string
   description = "Redis maxmemory assigned for the master"
-  default     = "1024mb"
+  default     = "2048mb"
 }
 variable "redis_replica_maxmemory" {
   type        = string

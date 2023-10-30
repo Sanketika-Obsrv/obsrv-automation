@@ -11,7 +11,7 @@ image:
 architecture: standalone
 commonConfiguration: |-
   # Enable RDB persistence
-  save 300 100
+  save 300 10
 
 auth:
   enabled: false
@@ -36,11 +36,11 @@ master:
     redis: 6379
   resources:
     limits:
-      cpu: 512m
-      memory: 2Gi
+      cpu: 300m
+      memory: 2560Mi
     requests:
-      cpu: 512m
-      memory: 1Gi
+      cpu: 300m
+      memory: 2Gi
   persistence:
     enabled: true
     labels:

@@ -30,8 +30,8 @@ taskmanager:
   rpc_port: 6122
   heap_memory: 1024
   replicas: 1
-  cpu_requests: 0.5
-  cpu_limits: 0.5
+  cpu_requests: 0.25
+  cpu_limits: 0.25
   memory_requests: 1024Mi
   memory_limits: 1024Mi
 

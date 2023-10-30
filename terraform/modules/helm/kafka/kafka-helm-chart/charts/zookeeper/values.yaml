@@ -317,7 +317,7 @@ lifecycleHooks: {}
 resources:
   limits:
     memory: 512Mi
-    cpu: 512m
+    cpu: 312m
   requests:
     memory: 256Mi
     cpu: 250m

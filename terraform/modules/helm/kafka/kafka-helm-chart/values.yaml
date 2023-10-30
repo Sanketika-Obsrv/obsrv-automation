@@ -508,10 +508,10 @@ lifecycleHooks: {}
 ##
 resources:
   limits:
-    cpu: 1
+    cpu: 500m
     memory: 2048Mi
   requests:
-    cpu: 750m
+    cpu: 500m
     memory: 1024Mi
 ## Kafka pods' Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
@@ -1320,7 +1320,7 @@ metrics:
   jmx:
     ## @param metrics.jmx.enabled Whether or not to expose JMX metrics to Prometheus
     ##
-    enabled: true
+    enabled: false
     ## Bitnami JMX exporter image
     ## ref: https://hub.docker.com/r/bitnami/jmx-exporter/tags/
     ## @param metrics.jmx.image.registry JMX exporter image registry
