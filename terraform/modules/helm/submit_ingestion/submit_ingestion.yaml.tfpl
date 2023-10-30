@@ -7,6 +7,6 @@ ingestion_spec:
   masterdata_system_stats:
      topic: "${env}.masterdata.stats"
      name: "masterdata-system-stats"
-druid_auth_enabled = ${druid_auth_enabled}
-druid_admin_username = ${druid_admin_username}
-druid_admin_password = ${druid_admin_password}
+druid_auth_enabled : ${druid_auth_enabled}
+druid_admin_username : ${druid_admin_username}
+druid_admin_password : ${druid_admin_password}
