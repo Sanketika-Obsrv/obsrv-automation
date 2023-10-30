@@ -147,8 +147,8 @@ druid_historical_max_direct_size: 2560
 
 druid_historical_pod_memory_request: 3800Mi
 druid_historical_pod_memory_limit: 2500Mi
-druid_historical_pod_cpu_request: 500m
-druid_historical_pod_cpu_limit: 500m
+druid_historical_pod_cpu_request: 650m
+druid_historical_pod_cpu_limit: 850m
 
 # HTTP server threads
 druid_historical_http_numThreads: 50
