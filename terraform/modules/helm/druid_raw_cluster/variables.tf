@@ -135,3 +135,13 @@ variable "druid_raw_sa_annotations" {
   description = "Service account annotations for druid raw service account."
   default     = "serviceAccountName: default"
 }
+
+variable "druid_auth_enabled" {
+  type        = bool
+  description = "Toggle to enable/disable druid basic auth"
+}
+
+variable "druid_admin_password" {
+  type        = string
+  description = "Password for druid initial admin user"
+}

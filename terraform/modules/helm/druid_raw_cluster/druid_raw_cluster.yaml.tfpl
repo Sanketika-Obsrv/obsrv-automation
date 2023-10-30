@@ -19,3 +19,6 @@ serviceAccount:
   annotations:
     ${druid_raw_sa_annotations}
   name: ${druid_raw_service_account_name}
+
+druid_auth_enabled: ${druid_auth_enabled}
+druid_admin_password: ${druid_admin_password}

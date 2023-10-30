@@ -29,6 +29,8 @@ resource "helm_release" "druid_cluster" {
         gcs_bucket                     = var.gcs_bucket
         druid_raw_sa_annotations       = var.druid_raw_sa_annotations
         druid_raw_service_account_name = "${var.druid_cluster_namespace}-sa"
+        druid_admin_password           = var.druid_admin_password
+        druid_auth_enabled             = var.druid_auth_enabled
       }
     )
   ]

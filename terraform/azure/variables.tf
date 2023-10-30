@@ -57,3 +57,15 @@ variable "command_service_image_tag" {
   description = "CommandService image tag."
   default     = "1.0.0"
 }
+
+variable "druid_auth_enabled" {
+  type        = bool
+  description = "Toggle to enable/disable druid basic auth"
+  default     = true
+}
+
+variable "druid_admin_password" {
+  type        = string
+  description = "Password for druid initial admin user"
+  default     = "admin"
+}

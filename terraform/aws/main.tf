@@ -152,6 +152,8 @@ module "druid_raw_cluster" {
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
   druid_raw_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.druid_raw_sa_iam_role}"
   druid_cluster_namespace            = module.eks.druid_raw_namespace
+  druid_admin_password               = var.druid_admin_password
+  druid_auth_enabled                 = var.druid_auth_enabled
 }
 
 module "druid_operator" {

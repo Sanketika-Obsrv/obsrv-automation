@@ -391,6 +391,8 @@ module "druid_raw_cluster" {
   druid_raw_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.druid_raw_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   druid_cluster_namespace            = var.druid_raw_namespace
   depends_on                         = [ module.druid_raw_sa_iam_role ]
+  druid_admin_password               = var.druid_admin_password
+  druid_auth_enabled                 = var.druid_auth_enabled
 }
 
 module "kafka_exporter" {
