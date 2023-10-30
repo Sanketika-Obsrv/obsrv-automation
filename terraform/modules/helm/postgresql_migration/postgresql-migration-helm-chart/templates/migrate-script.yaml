@@ -1,0 +1,25 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: flyway-migrate-script
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: flyway-migrate-script
+    app: flyway-postgresql
+data:
+  migrate.sh: |
+    #!/bin/bash
+    set -euo pipefail
+    apt update && apt install -y postgresql-client
+    while read -r line
+    do
+      db=$(echo $line | cut -d '_' -f2-)
+      echo "Creating database \"$db\" if not exists";
+      echo ""
+      echo "SELECT 'CREATE DATABASE $db' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$db')\gexec" | psql -U postgres -h postgresql-hl
+      echo ""
+      echo "Running fly migration for \"$db\"";
+      echo ""
+      flyway migrate -url=jdbc:postgresql://postgresql-hl:5432/$db -locations=migrations/$line
+      echo ""
+    done <<< $(ls migrations | sort -n)

@@ -1,0 +1,49 @@
+http_port: 8000
+image: 
+  repository: sanketikahub/flink-command-service
+  tag: 1.0.0
+  pullPolicy: "IfNotPresent"
+  imagePullSecrets: ""
+cpu_requests: 0.1
+cpu_limits: 0.1
+memory_requests: 512Mi
+memory_limits: 512Mi
+
+service_config: |
+  flink:
+    namespace: flink
+    reinstall_sleep_time: 3
+    jobs:
+      - name: "PipelineMergedJob"
+        release_name: merged-pipeline
+        job_manager_url: "merged-pipeline-jobmanager.flink.svc.cluster.local:8081"
+      - name: "MasterDataProcessorJob"
+        release_name: master-data-processor
+        job_manager_url: "master-data-processor-jobmanager.flink.svc.cluster.local:8081"
+      - name: "KafkaConnectorJob"
+        release_name: kafka-connector
+        job_manager_url: "kafka-connector-jobmanager.flink.svc.cluster.local:8081"
+
+  commands:
+    RESTART_PIPELINE:
+      workflow:
+        - RESTART_PIPELINE_JOBS
+
+  postgres:
+    db_host: postgresql-hl.postgresql.svc.cluster.local
+    db_port: 5432
+    db_user: postgres
+    db_password: postgres
+    database: obsrv
+
+  helm_charts_base_dir: /app/helm-charts
+
+rbac:
+  # kubernetes.rest-service.exposed.type: NodePort requires
+  # list permission for nodes at the cluster scope.
+  # Set create to true if you are using NodePort type.
+  nodesRule:
+    create: true
+
+serviceAccount:
+  name: command-api-serviceaccount

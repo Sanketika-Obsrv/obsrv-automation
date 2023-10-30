@@ -1,0 +1,20 @@
+image:
+  registry: docker.io
+  repository: bitnami/postgresql
+  tag: ${postgresql_image_tag}
+
+auth:
+  enablePostgresUser: true
+  postgresPassword: ${postgresql_admin_password}
+
+primary:
+  extendedConfiguration: |
+      password_encryption = md5
+  persistence:
+    size: ${postgresql_persistence_size}
+    enabled: true
+    mountPath: /bitnami/postgresql
+
+  initdb:
+    user: ${postgresql_admin_username}
+    password: ${postgresql_admin_password}

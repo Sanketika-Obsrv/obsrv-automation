@@ -1,1 +1,0 @@
-../helm/promtail_vars.tf

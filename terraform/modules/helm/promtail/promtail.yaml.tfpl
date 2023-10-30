@@ -1,0 +1,14 @@
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+serviceMonitor:
+  enabled: ${promtail_service_monitor_status}
+  labels:
+    release: monitoring
+    system.monitoring: 'true'
+podLabels:
+  system.monitoring: 'true'

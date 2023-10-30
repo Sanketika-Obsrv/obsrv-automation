@@ -1,79 +1,13 @@
 variable "env" {
-    type        = string
-    description = "Environment name. All resources will be prefixed with this value."
-    default     = "dev"
+  type        = string
+  description = "Environment name. All resources will be prefixed with this value."
+  default     = "dev"
 }
 
 variable "building_block" {
-    type        = string
-    description = "Building block name. All resources will be prefixed with this value."
-    default     = "obsrv"
-}
-
-variable "location" {
-    type        = string
-    description = "Azure location to create the resources."
-    default     = "East US 2"
-}
-
-variable "additional_tags" {
-    type        = map(string)  
-    description = "Additional tags for the resources. These tags will be applied to all the resources."
-    default     = {}
-}
-
-variable "vnet_cidr" {
-    type        = list(string)
-    description = "Azure vnet CIDR range."
-    default     = ["10.0.0.0/16"]
-}
-
-variable "aks_subnet_cidr" {
-    type        = list(string)
-    description = "Azure AKS subnet CIDR range."
-    default     = ["10.0.0.0/22"]
-}
-
-variable "aks_subnet_service_endpoints" {
-    type        = list(string)
-    description = "Azure AKS subnet service endpoints."
-    default     = ["Microsoft.Sql", "Microsoft.Storage"]
-}
-
-variable "azure_storage_tier" {
-    type        = string
-    description = "Azure storage tier - Standard / Premium."
-    default     = "Standard"
-}
-
-variable "azure_storage_replication" {
-    type        = string
-    description = "Azure storage replication - LRS / ZRS / GRS etc."
-    default     = "LRS"
-}
-
-variable "aks_nodepool_name" {
-    type        = string
-    description = "AKS node pool name."
-    default     = "aksnodepool1"
-}
-
-variable "aks_node_count" {
-    type        = number
-    description = "AKS node count."
-    default     = 4
-}
-
-variable "aks_node_size" {
-    type        = string
-    description = "AKS node size."
-    default     = "Standard_D2s_v4"
-}
-
-variable "aks_cluster_identity" {
-    type        = string
-    description = "AKS cluster identity."
-    default     = "SystemAssigned"
+  type        = string
+  description = "Building block name. All resources will be prefixed with this value."
+  default     = "obsrv"
 }
 
 variable "kubernetes_storage_class" {
@@ -92,4 +26,34 @@ variable "flink_checkpoint_store_type" {
     type        = string
     description = "Flink checkpoint store type."
     default     = "azure"
+}
+
+variable "dataset_api_container_registry" {
+  type        = string
+  description = "Container registry. For example docker.io/obsrv"
+  default     = "sanketikahub"
+}
+
+variable "dataset_api_image_tag" {
+  type        = string
+  description = "Dataset api image tag."
+  default     = "1.0.0"
+}
+
+variable "flink_container_registry" {
+  type        = string
+  description = "Container registry. For example docker.io/obsrv"
+  default     = "manjudr"
+}
+
+variable "flink_image_tag" {
+   type        = string
+   description = "Flink kubernetes service name."
+   default     = "1.1.0"
+}
+
+variable "command_service_image_tag" {
+  type        = string
+  description = "CommandService image tag."
+  default     = "1.0.0"
 }

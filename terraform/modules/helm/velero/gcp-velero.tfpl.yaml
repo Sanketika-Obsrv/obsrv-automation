@@ -1,0 +1,34 @@
+serviceAccount:
+  server:
+    create: true
+    name: ${sa_name}
+    annotations:
+      ${velero_sa_annotations}
+    labels:
+credentials:
+    useSecret: false
+configuration:
+  provider: ${cloud_provider}
+  backupStorageLocation:
+    bucket: ${velero_backup_bucket}
+    config:
+      serviceAccount: ${velero_sa_iam_role_name}@${project_id}.iam.gserviceaccount.com
+  volumeSnapshotLocation:
+    name: default
+    config:
+      project: ${project_id}
+      region: ${velero_backup_bucket_region}
+  backupSyncPeriod: 15m
+podAnnotations:
+  ${velero_sa_annotations}
+initContainers:
+  - name: velero-plugin-for-gcp
+    image: velero/velero-plugin-for-gcp
+    volumeMounts:
+      - name: plugins
+        mountPath: /target
+metrics:
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: monitoring

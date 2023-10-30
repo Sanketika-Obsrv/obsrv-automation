@@ -1,0 +1,6 @@
+druidURL: http://druid-raw-routers.druid-raw.svc:8888
+serviceMonitor:
+  enabled: true
+  namespace: ${druid_exporter_namespace}
+  interval: 30s
+  scrapeTimeout: 10s

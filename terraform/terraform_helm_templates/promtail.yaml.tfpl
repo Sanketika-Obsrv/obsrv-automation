@@ -1,4 +1,0 @@
-serviceMonitor:
-  enabled: ${promtail_service_monitor_status}
-  labels:
-    release: "${promtail_service_monitor_label}"

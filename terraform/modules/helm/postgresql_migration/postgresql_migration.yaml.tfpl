@@ -1,0 +1,11 @@
+namespace: ${postgresql_namespace}
+config:
+  db:
+    url: jdbc:postgresql://${postgresql_url}:5432/
+    username: ${postgresql_admin_username}
+    password: ${postgresql_admin_password}
+    driver_class_name: org.postgresql.Driver
+
+postgresql_superset_user_password: "${postgresql_superset_user_password}"
+postgresql_druid_raw_user_password: "${postgresql_druid_raw_user_password}"
+postgresql_obsrv_user_password: "${postgresql_obsrv_user_password}"

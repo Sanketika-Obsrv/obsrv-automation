@@ -1,1 +1,0 @@
-../helm/alert_rules.tf
