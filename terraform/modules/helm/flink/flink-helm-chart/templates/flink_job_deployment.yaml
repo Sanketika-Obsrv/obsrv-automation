@@ -71,12 +71,16 @@ spec:
     app: flink
     component: {{ .Release.Name }}-taskmanager
 ---
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: {{ .Release.Name }}-jobmanager
   namespace: {{ .Release.Namespace }}
 spec:
+  selector:
+    matchLabels:
+      app: flink
+      component: {{ .Release.Name }}-jobmanager
   template:
     metadata:
       labels:
@@ -165,7 +169,6 @@ spec:
         - name: flink-config-volume
           mountPath: /opt/flink/conf/log4j-console.properties
           subPath: log4j-console.properties
-
 ---
 apiVersion: apps/v1
 kind: Deployment
