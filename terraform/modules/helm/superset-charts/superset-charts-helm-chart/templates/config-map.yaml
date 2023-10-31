@@ -49,10 +49,10 @@ data:
     #   "datasource_type": "table"
     # })
 
-    failed_events_count = json.dumps({
-      "slice_name": "Failed Events Count",
-      "viz_type": "big_number_total",
-      "params": "{\n        \"datasource\": \"19__table\",\n        \"viz_type\": \"big_number_total\",\n        \"slice_id\": 36,\n        \"granularity_sqla\": \"__time\",\n        \"time_range\": \"No filter\",\n        \"metric\": \"count\",\n        \"adhoc_filters\": [],\n        \"header_font_size\": 0.4,\n        \"subheader_font_size\": 0.15,\n        \"y_axis_format\": \"SMART_NUMBER\",\n        \"time_format\": \"smart_date\",\n        \"extra_form_data\": {},\n        \"dashboards\": [7]\n    }",
+    failed_events_count_by_error_code = json.dumps({
+      "slice_name": "Failed Events Count By Error Code",
+      "viz_type": "pie",
+      "params": "{\n    \"datasource\": \"19__table\",\n    \"viz_type\": \"pie\",\n    \"granularity_sqla\": \"__time\",\n    \"time_range\": \"No filter\",\n    \"groupby\": [\n      \"error_code\"\n    ],\n    \"metric\": \"count\",\n    \"adhoc_filters\": [],\n    \"row_limit\": 100,\n    \"sort_by_metric\": true,\n    \"color_scheme\": \"supersetColors\",\n    \"show_labels_threshold\": 5,\n    \"show_legend\": false,\n    \"legendType\": \"scroll\",\n    \"legendOrientation\": \"top\",\n    \"legendMargin\": null,\n    \"label_type\": \"key\",\n    \"number_format\": \"SMART_NUMBER\",\n    \"date_format\": \"smart_date\",\n    \"show_labels\": true,\n    \"labels_outside\": true,\n    \"show_total\": true,\n    \"outerRadius\": 70,\n    \"donut\": false,\n    \"innerRadius\": 30,\n    \"extra_form_data\": {},\n    \"dashboards\": [\n      7\n    ]\n  }",
       "cache_timeout": None,
       "datasource_id": "19",
       "datasource_type": "table"
@@ -76,7 +76,7 @@ data:
       "datasource_type": "table"
     })
 
-    charts = [failed_events_count, failed_events_by_dataset, failed_events_table]
+    charts = [failed_events_count_by_error_code, failed_events_by_dataset, failed_events_table]
     headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + jwt_token
