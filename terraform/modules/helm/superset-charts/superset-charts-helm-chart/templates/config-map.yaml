@@ -31,25 +31,52 @@ data:
 
     create_chart_url = "{{ .Values.superset_url }}/api/v1/chart"
 
-    time_series_chart_payload = json.dumps({
-      "slice_name": "dataset-summary",
-      "viz_type": "echarts_timeseries_bar",
-      "params": "{\n  \"adhoc_filters\": [],\n  \"annotation_layers\": [],\n  \"color_scheme\": \"d3Category10\",\n  \"comparison_type\": \"values\",\n  \"datasource\": \"1__table\",\n  \"extra_form_data\": {},\n  \"forecastInterval\": 0.8,\n  \"forecastPeriods\": 10,\n  \"granularity_sqla\": \"__time\",\n  \"groupby\": [\n    \"dataset\",\n    \"__time\"\n  ],\n  \"legendMargin\": 10,\n  \"legendOrientation\": \"bottom\",\n  \"legendType\": \"scroll\",\n  \"logAxis\": false,\n  \"metrics\": [\n    \"count\"\n  ],\n  \"minorSplitLine\": true,\n  \"only_total\": true,\n  \"order_desc\": true,\n  \"orientation\": \"vertical\",\n  \"rich_tooltip\": true,\n  \"row_limit\": 10000,\n  \"show_legend\": true,\n  \"show_value\": true,\n  \"slice_id\": 6,\n  \"stack\": false,\n  \"time_grain_sqla\": \"P1D\",\n  \"time_range\": \"No filter\",\n  \"tooltipSortByMetric\": true,\n  \"tooltipTimeFormat\": \"%d/%m/%Y\",\n  \"truncateYAxis\": false,\n  \"truncate_metric\": true,\n  \"viz_type\": \"echarts_timeseries_bar\",\n  \"xAxisLabelRotation\": 0,\n  \"x_axis_time_format\": \"%d/%m/%Y\",\n  \"x_axis_title\": \"Time Range\",\n  \"x_axis_title_margin\": 15,\n  \"y_axis_bounds\": [\n    null,\n    null\n  ],\n  \"y_axis_format\": \".3s\",\n  \"y_axis_title\": \"Count\",\n  \"y_axis_title_margin\": 15,\n  \"y_axis_title_position\": \"Left\",\n  \"zoomable\": true\n}",
-      "cache_timeout": None,
-      "datasource_id": "1",
-      "datasource_type": "table"
-    })
+    # time_series_chart_payload = json.dumps({
+    #   "slice_name": "dataset-summary",
+    #   "viz_type": "echarts_timeseries_bar",
+    #   "params": "{\n  \"adhoc_filters\": [],\n  \"annotation_layers\": [],\n  \"color_scheme\": \"d3Category10\",\n  \"comparison_type\": \"values\",\n  \"datasource\": \"1__table\",\n  \"extra_form_data\": {},\n  \"forecastInterval\": 0.8,\n  \"forecastPeriods\": 10,\n  \"granularity_sqla\": \"__time\",\n  \"groupby\": [\n    \"dataset\",\n    \"__time\"\n  ],\n  \"legendMargin\": 10,\n  \"legendOrientation\": \"bottom\",\n  \"legendType\": \"scroll\",\n  \"logAxis\": false,\n  \"metrics\": [\n    \"count\"\n  ],\n  \"minorSplitLine\": true,\n  \"only_total\": true,\n  \"order_desc\": true,\n  \"orientation\": \"vertical\",\n  \"rich_tooltip\": true,\n  \"row_limit\": 10000,\n  \"show_legend\": true,\n  \"show_value\": true,\n  \"slice_id\": 6,\n  \"stack\": false,\n  \"time_grain_sqla\": \"P1D\",\n  \"time_range\": \"No filter\",\n  \"tooltipSortByMetric\": true,\n  \"tooltipTimeFormat\": \"%d/%m/%Y\",\n  \"truncateYAxis\": false,\n  \"truncate_metric\": true,\n  \"viz_type\": \"echarts_timeseries_bar\",\n  \"xAxisLabelRotation\": 0,\n  \"x_axis_time_format\": \"%d/%m/%Y\",\n  \"x_axis_title\": \"Time Range\",\n  \"x_axis_title_margin\": 15,\n  \"y_axis_bounds\": [\n    null,\n    null\n  ],\n  \"y_axis_format\": \".3s\",\n  \"y_axis_title\": \"Count\",\n  \"y_axis_title_margin\": 15,\n  \"y_axis_title_position\": \"Left\",\n  \"zoomable\": true\n}",
+    #   "cache_timeout": None,
+    #   "datasource_id": "1",
+    #   "datasource_type": "table"
+    # })
 
-    event_validator_processing_time_payload = json.dumps({
-      "slice_name": "event_validator_avg_processing_time",
+    # event_validator_processing_time_payload = json.dumps({
+    #   "slice_name": "event_validator_avg_processing_time",
+    #   "viz_type": "big_number_total",
+    #   "params": "{\n  \"adhoc_filters\": [],\n  \"datasource\": \"1__table\",\n  \"extra_form_data\": {},\n  \"force_timestamp_formatting\": false,\n  \"granularity_sqla\": \"__time\",\n  \"header_font_size\": 0.4,\n  \"metric\": {\n    \"aggregate\": \"AVG\",\n    \"column\": {\n      \"advanced_data_type\": null,\n      \"certification_details\": null,\n      \"certified_by\": null,\n      \"column_name\": \"event_validator_job_processing_time\",\n      \"description\": null,\n      \"expression\": null,\n      \"filterable\": true,\n      \"groupby\": true,\n      \"id\": 6,\n      \"is_certified\": false,\n      \"is_dttm\": false,\n      \"python_date_format\": null,\n      \"type\": \"FLOAT\",\n      \"type_generic\": 0,\n      \"verbose_name\": null,\n      \"warning_markdown\": null\n    },\n    \"expressionType\": \"SIMPLE\",\n    \"hasCustomLabel\": false,\n    \"isNew\": false,\n    \"label\": \"AVG(event_validator_job_processing_time)\",\n    \"optionName\": \"metric_bbwf5s2i055_8a3t6ovz1lc\",\n    \"sqlExpression\": null\n  },\n  \"subheader\": \"Event Validator - Avg Processing Time\",\n  \"subheader_font_size\": 0.125,\n  \"time_format\": \"%d/%m/%Y\",\n  \"time_grain_sqla\": \"PT10M\",\n  \"time_range\": \"2023-01-01T09:40:00 : now\",\n  \"viz_type\": \"big_number_total\",\n  \"y_axis_format\": \"DURATION\"\n}",
+    #   "cache_timeout": None,
+    #   "datasource_id": "1",
+    #   "datasource_type": "table"
+    # })
+
+    failed_events_count = json.dumps({
+      "slice_name": "Failed Events Count",
       "viz_type": "big_number_total",
-      "params": "{\n  \"adhoc_filters\": [],\n  \"datasource\": \"1__table\",\n  \"extra_form_data\": {},\n  \"force_timestamp_formatting\": false,\n  \"granularity_sqla\": \"__time\",\n  \"header_font_size\": 0.4,\n  \"metric\": {\n    \"aggregate\": \"AVG\",\n    \"column\": {\n      \"advanced_data_type\": null,\n      \"certification_details\": null,\n      \"certified_by\": null,\n      \"column_name\": \"event_validator_job_processing_time\",\n      \"description\": null,\n      \"expression\": null,\n      \"filterable\": true,\n      \"groupby\": true,\n      \"id\": 6,\n      \"is_certified\": false,\n      \"is_dttm\": false,\n      \"python_date_format\": null,\n      \"type\": \"FLOAT\",\n      \"type_generic\": 0,\n      \"verbose_name\": null,\n      \"warning_markdown\": null\n    },\n    \"expressionType\": \"SIMPLE\",\n    \"hasCustomLabel\": false,\n    \"isNew\": false,\n    \"label\": \"AVG(event_validator_job_processing_time)\",\n    \"optionName\": \"metric_bbwf5s2i055_8a3t6ovz1lc\",\n    \"sqlExpression\": null\n  },\n  \"subheader\": \"Event Validator - Avg Processing Time\",\n  \"subheader_font_size\": 0.125,\n  \"time_format\": \"%d/%m/%Y\",\n  \"time_grain_sqla\": \"PT10M\",\n  \"time_range\": \"2023-01-01T09:40:00 : now\",\n  \"viz_type\": \"big_number_total\",\n  \"y_axis_format\": \"DURATION\"\n}",
+      "params": "{\n        \"datasource\": \"19__table\",\n        \"viz_type\": \"big_number_total\",\n        \"slice_id\": 36,\n        \"granularity_sqla\": \"__time\",\n        \"time_range\": \"No filter\",\n        \"metric\": \"count\",\n        \"adhoc_filters\": [],\n        \"header_font_size\": 0.4,\n        \"subheader_font_size\": 0.15,\n        \"y_axis_format\": \"SMART_NUMBER\",\n        \"time_format\": \"smart_date\",\n        \"extra_form_data\": {},\n        \"dashboards\": [7]\n    }",
       "cache_timeout": None,
-      "datasource_id": "1",
+      "datasource_id": "19",
       "datasource_type": "table"
     })
 
-    charts = [time_series_chart_payload, event_validator_processing_time_payload]
+    failed_events_by_dataset = json.dumps({
+      "slice_name": "Failed Events By Dataset",
+      "viz_type": "dist_bar",
+      "params": "{\n    \"datasource\": \"19__table\",\n    \"viz_type\": \"dist_bar\",\n    \"slice_id\": 37,\n    \"granularity_sqla\": \"__time\",\n    \"time_range\": \"No filter\",\n    \"metrics\": [\n      \"count\"\n    ],\n    \"adhoc_filters\": [],\n    \"groupby\": [\n      \"dataset\"\n    ],\n    \"columns\": [],\n    \"row_limit\": 10000,\n    \"order_desc\": true,\n    \"color_scheme\": \"supersetColors\",\n    \"show_legend\": true,\n    \"show_bar_value\": true,\n    \"rich_tooltip\": true,\n    \"y_axis_format\": \"SMART_NUMBER\",\n    \"y_axis_bounds\": [\n      null,\n      null\n    ],\n    \"bottom_margin\": \"auto\",\n    \"x_ticks_layout\": \"auto\",\n    \"extra_form_data\": {},\n    \"dashboards\": [\n      7\n    ]\n  }",
+      "cache_timeout": None,
+      "datasource_id": "19",
+      "datasource_type": "table"
+    })
+
+    failed_events_table = json.dumps({
+      "slice_name": "Failed Events Details",
+      "viz_type": "table",
+      "params": "{\n    \"datasource\": \"19__table\",\n    \"viz_type\": \"table\",\n    \"slice_id\": 48,\n    \"granularity_sqla\": \"__time\",\n    \"time_grain_sqla\": \"P1D\",\n    \"time_range\": \"Last week\",\n    \"query_mode\": \"aggregate\",\n    \"groupby\": [\n      \"__time\",\n      \"dataset\",\n      \"error_source\",\n      \"error_code\",\n      \"error_message\"\n    ],\n    \"all_columns\": [],\n    \"percent_metrics\": [],\n    \"adhoc_filters\": [],\n    \"order_by_cols\": [],\n    \"row_limit\": 1000,\n    \"server_page_length\": 10,\n    \"order_desc\": true,\n    \"table_timestamp_format\": \"smart_date\",\n    \"show_cell_bars\": true,\n    \"color_pn\": true,\n    \"extra_form_data\": {},\n    \"dashboards\": [\n      7\n    ]\n  }",
+      "cache_timeout": None,
+      "datasource_id": "19",
+      "datasource_type": "table"
+    })
+
+    charts = [failed_events_count, failed_events_by_dataset, failed_events_table]
     headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + jwt_token
