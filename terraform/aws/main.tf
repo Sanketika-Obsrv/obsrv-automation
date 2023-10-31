@@ -89,6 +89,13 @@ module "superset" {
   postgresql_service_name           = module.postgresql.postgresql_service_name
 }
 
+module "superset_charts" {
+  source                            = "../modules/helm/superset-charts"
+  env                               = var.env
+  building_block                    = var.building_block
+  superset_charts_depends_on         = [module.superset]
+}
+
 module "grafana_configs" {
   source                           = "../modules/helm/grafana_configs"
   env                              = var.env

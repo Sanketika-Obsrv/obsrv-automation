@@ -2,14 +2,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: superset-charts-config
-  namespace: superset-charts
+  namespace: {{ .Values.namespace }}
 data:
   create-charts.py: |-
     import json
     import requests
 
     login_url = '{{ .Values.superset_url }}/api/v1/security/login'
-    print("login_url" + login_url)
+    print("login_url: " + login_url)
     headers = {'Content-Type': 'application/json'}
     data = {
         'username': '{{ .Values.superset_user }}',
@@ -25,6 +25,7 @@ data:
         print('Token Generated')
     else:
         print('Failed to generate token. Status code:', login_response.status_code)
+        print(login_response.text)
 
     import json
 
@@ -59,4 +60,5 @@ data:
             print("Chart created successfully.")
         else:
             print("Failed to create chart. Status code:", response.status_code)
+            print(response.text)
 

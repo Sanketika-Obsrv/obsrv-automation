@@ -1,0 +1,4 @@
+namespace: ${superset_charts_namespace}
+superset_url: "http://${superset_release_name}.${superset_namespace}.svc.cluster.local:8088"
+superset_user: ${superset_username}
+superset_password: ${superset_password}
