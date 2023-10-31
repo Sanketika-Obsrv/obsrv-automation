@@ -9,6 +9,8 @@ ingestion_spec:
   masterdata_system_stats:
     topic: "sb-dev.masterdata.stats"
     name: "masterdata-system-stats"
+
+# The basic authentication credentials for the druid will be replaced by the credentials specified in the submit_ingestion.yaml.tfpl file located in the base directory.
 druid_auth_enabled: false
 druid_admin_username: admin
 druid_admin_password: admin
