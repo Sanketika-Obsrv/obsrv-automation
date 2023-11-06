@@ -103,8 +103,15 @@ module "postgresql" {
   depends_on           = [module.eks, module.monitoring]
 }
 
-module "redis" {
-  source               = "../modules/helm/redis"
+module "redis-dedup" {
+  source               = "../modules/helm/redis-dedup"
+  env                  = var.env
+  building_block       = var.building_block
+  depends_on           = [module.eks, module.monitoring]
+}
+
+module "redis-denorm" {
+  source               = "../modules/helm/redis-denorm"
   env                  = var.env
   building_block       = var.building_block
   depends_on           = [module.eks, module.monitoring]
@@ -132,8 +139,9 @@ module "flink" {
   postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
   checkpoint_base_url                 = "s3://${module.s3.checkpoint_storage_bucket}"
-  redis_namespace                     = module.redis.redis_namespace
-  redis_release_name                  = module.redis.redis_release_name
+  redis_namespace                     = module.redis-dedup.redis_namespace
+  dedup_redis_release_name            = module.redis-dedup.dedup_redis_release_name
+  denorm_redis_release_name           = module.redis-denorm.denorm_redis_release_name
   flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
   flink_namespace                     = module.eks.flink_namespace
   postgresql_service_name             = module.postgresql.postgresql_service_name
