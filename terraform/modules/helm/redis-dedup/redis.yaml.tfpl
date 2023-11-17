@@ -36,10 +36,10 @@ master:
     redis: 6379
   resources:
     limits:
-      cpu: 256m
+      cpu: 0.5
       memory: 512Mi
     requests:
-      cpu: 256m
+      cpu: 0.5
       memory: 512Mi
   persistence:
     enabled: true
