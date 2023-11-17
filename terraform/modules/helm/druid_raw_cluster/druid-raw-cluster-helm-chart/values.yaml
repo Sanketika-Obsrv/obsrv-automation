@@ -143,10 +143,10 @@ druid_historical_service: druid/historical
 druid_historical_port: 8084
 druid_historical_min_heap_size: 768M
 druid_historical_max_heap_size: 1024M
-druid_historical_max_direct_size: 2560
+druid_historical_max_direct_size: 2560M
 
-druid_historical_pod_memory_request: 3800Mi
-druid_historical_pod_memory_limit: 2500Mi
+druid_historical_pod_memory_request: 3000Mi
+druid_historical_pod_memory_limit: 3800Mi
 druid_historical_pod_cpu_request: 650m
 druid_historical_pod_cpu_limit: 850m
 
