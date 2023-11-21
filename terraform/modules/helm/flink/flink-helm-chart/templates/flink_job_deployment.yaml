@@ -104,7 +104,6 @@ spec:
             path: {{ .Release.Name }}.conf
           - key: log4j_console_properties
             path: log4j-console.properties
-      restartPolicy: OnFailure
       imagePullSecrets:
       - name: {{ .Values.image.imagePullSecrets }}
       serviceAccount: {{ .Release.Namespace }}-sa
