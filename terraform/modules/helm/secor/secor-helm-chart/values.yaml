@@ -13,7 +13,7 @@ namespace: "secor"
 storageClass: "gp2"
 secor_env: "dev"
 image_repository: "sanketikahub/secor"
-region: "us-east-2"
+region: ""
 pullPolicy: "IfNotPresent"
 jvm_memory: 1024m
 image_tag: "0.29.16-java-11-gs"

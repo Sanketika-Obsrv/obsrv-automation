@@ -28,9 +28,11 @@ provider "helm" {
 }
 
 module "vpc" {
-  source         = "../modules/aws/vpc"
-  env            = var.env
-  building_block = var.building_block
+  source             = "../modules/aws/vpc"
+  env                = var.env
+  building_block     = var.building_block
+  region             = var.region
+  availability_zones = var.availability_zones
 }
 
 module "eks" {
@@ -39,6 +41,7 @@ module "eks" {
   building_block        = var.building_block
   eks_master_subnet_ids = module.vpc.multi_zone_public_subnets_ids
   eks_nodes_subnet_ids  = module.vpc.single_zone_public_subnets_id
+  region                = var.region
   depends_on            = [module.vpc]
 }
 
@@ -201,14 +204,15 @@ module "dataset_api" {
 }
 
 module "secor" {
-  source                  = "../modules/helm/secor"
-  env                     = var.env
-  building_block          = var.building_block
-  secor_sa_annotations    = "eks.amazonaws.com/role-arn: ${module.eks.secor_sa_iam_role}"
-  secor_chart_depends_on  = [module.kafka]
-  secor_namespace         = module.eks.secor_namespace
-  cloud_storage_bucket    = module.s3.s3_bucket
-  kubernetes_storage_class = var.kubernetes_storage_class
+  source                    = "../modules/helm/secor"
+  env                       = var.env
+  building_block            = var.building_block
+  secor_sa_annotations      = "eks.amazonaws.com/role-arn: ${module.eks.secor_sa_iam_role}"
+  secor_chart_depends_on    = [module.kafka]
+  secor_namespace           = module.eks.secor_namespace
+  cloud_storage_bucket      = module.s3.s3_bucket
+  kubernetes_storage_class  = var.kubernetes_storage_class
+  region                    = var.region
 }
 
 module "submit_ingestion" {
@@ -250,6 +254,7 @@ module "get_kubeconfig" {
   source         = "../modules/aws/get_kubeconfig"
   env            = var.env
   building_block = var.building_block
+  region         = var.region
 }
 
 module "command_service" {

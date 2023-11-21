@@ -35,7 +35,7 @@ redis_service:
   REDIS_PORT: '6379'
 exhaust_service:
   CLOUD_STORAGE_PROVIDER: "aws"
-  CLOUD_STORAGE_REGION: "us-east-2"
+  CLOUD_STORAGE_REGION: ""
   CONTAINER: "" # Bucket name.
   CONTAINER_PREFIX: "telemetry-data"
   STORAGE_URL_EXPIRY: 3600

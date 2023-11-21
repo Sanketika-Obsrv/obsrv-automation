@@ -17,7 +17,6 @@ variable "additional_tags" {
 variable "region" {
   type        = string
   description = "AWS region to create the resources."
-  default     = "us-east-2"
 }
 
 variable "eks_master_role" {
