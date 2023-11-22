@@ -195,7 +195,6 @@ variable "secor_chart_depends_on" {
 variable "region" {
   type        = string
   description = "AWS region to create the resources."
-  default     = "us-east-2"
 }
 
 variable "kubernetes_storage_class" {
