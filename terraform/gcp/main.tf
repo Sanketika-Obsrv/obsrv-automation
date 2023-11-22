@@ -373,8 +373,8 @@ module "flink" {
   postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
   checkpoint_base_url                 = "gs://${module.cloud_storage.checkpoint_storage_bucket}"
   redis_namespace                     = module.redis-dedup.redis_namespace
-  dedup_redis_release_name            = module.redis-dedup.dedup_redis_release_name
-  denorm_redis_release_name           = module.redis-denorm.denorm_redis_release_name
+  dedup_redis_release_name            = module.redis-dedup.redis_release_name
+  denorm_redis_release_name           = module.redis-denorm.redis_release_name
   flink_sa_annotations                = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   flink_namespace                     = var.flink_namespace
   depends_on                          = [ module.flink_sa_iam_role ]
