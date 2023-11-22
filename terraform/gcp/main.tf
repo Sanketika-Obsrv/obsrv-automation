@@ -433,8 +433,10 @@ module "dataset_api" {
   postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
   dataset_api_sa_annotations         = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.dataset_api_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   dataset_api_chart_depends_on       = [ module.postgresql, module.kafka ]
-  redis_namespace                    = module.redis.redis_namespace
-  redis_release_name                 = module.redis.redis_release_name
+  denorm_redis_namespace             = module.redis-denorm.redis_namespace
+  denorm_redis_release_name          = module.redis-denorm.redis_release_name
+  dedup_redis_namespace              = module.redis-dedup.redis_namespace
+  dedup_redis_release_name           = module.redis-dedup.redis_release_name
   dataset_api_namespace              = var.dataset_api_namespace
   depends_on                         = [ module.dataset_api_sa_iam_role ]
 }
