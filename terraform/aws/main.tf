@@ -83,9 +83,9 @@ module "superset" {
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
-  superset_chart_depends_on         = [module.postgresql_migration, module.redis]
-  redis_namespace                   = module.redis.redis_namespace
-  redis_release_name                = module.redis.redis_release_name
+  superset_chart_depends_on         = [module.postgresql_migration, module.redis-denorm]
+  redis_namespace                   = module.redis-denorm.redis_namespace
+  redis_release_name                = module.redis-denorm.redis_release_name
   postgresql_service_name           = module.postgresql.postgresql_service_name
 }
 
@@ -134,7 +134,7 @@ module "flink" {
   flink_release_names                 = var.flink_release_names
   merged_pipeline_enabled             = var.merged_pipeline_enabled
   flink_checkpoint_store_type         = var.flink_checkpoint_store_type
-  flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis]
+  flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis-dedup, module.redis-denorm]
   postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
   postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database

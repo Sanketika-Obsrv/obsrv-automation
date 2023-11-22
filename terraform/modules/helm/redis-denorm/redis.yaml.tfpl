@@ -33,7 +33,7 @@ master:
    - "--maxmemory ${redis_master_maxmemory}"
    - "--maxmemory-policy ${redis_maxmemory_eviction_policy}"
   containerPorts:
-    redis: 6380
+    redis: 6379
   resources:
     limits:
       cpu: 0.5
@@ -72,7 +72,7 @@ replica:
   ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
   ##
   containerPorts:
-    redis: 6380
+    redis: 6379
   persistence:
     enabled: true
     labels:
