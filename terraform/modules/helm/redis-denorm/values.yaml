@@ -28,15 +28,15 @@ master:
   ## e.g:
   extraFlags:
    - "--maxmemory 1024mb"
-   - "--maxmemory-policy volatile-ttl"
+   - "--maxmemory-policy noeviction"
   containerPorts:
     redis: 6379
   resources:
     limits:
-      cpu: 1
+      cpu: 0.5
       memory: 2Gi
     requests:
-      cpu: 1
+      cpu: 0.5
       memory: 1Gi
   persistence:
     enabled: true
@@ -69,7 +69,7 @@ replica:
   ## e.g:
   extraFlags:
    - "--maxmemory 1024mb"
-   - "--maxmemory-policy volatile-ttl"
+   - "--maxmemory-policy noeviction"
   ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
   ##
   containerPorts:

@@ -27,17 +27,17 @@ master:
   ## @param master.extraFlags Array with additional command line flags for Redis&reg; master
   ## e.g:
   extraFlags:
-   - "--maxmemory 1024mb"
+   - "--maxmemory 512mb"
    - "--maxmemory-policy volatile-ttl"
   containerPorts:
     redis: 6379
   resources:
     limits:
-      cpu: 1
-      memory: 2Gi
+      cpu: 0.5
+      memory: 512Mi
     requests:
-      cpu: 1
-      memory: 1Gi
+      cpu: 0.5
+      memory: 512Mi
   persistence:
     enabled: true
     labels:
@@ -48,7 +48,7 @@ master:
     storageClass: ""
     accessModes:
       - ReadWriteOnce
-    size: 2Gi
+    size: 1Gi
   serviceAccount:
     create: true
     name: redis
@@ -68,7 +68,7 @@ replica:
   ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
   ## e.g:
   extraFlags:
-   - "--maxmemory 1024mb"
+   - "--maxmemory 512Mi"
    - "--maxmemory-policy volatile-ttl"
   ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
   ##
@@ -84,6 +84,6 @@ replica:
     storageClass: ""
     accessModes:
       - ReadWriteOnce
-    size: 2Gi
+    size: 1Gi
   serviceAccount:
     create: true
