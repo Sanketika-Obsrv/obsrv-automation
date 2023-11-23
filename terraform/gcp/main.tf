@@ -324,15 +324,15 @@ module "postgresql" {
   depends_on           = [ module.gke_cluster ]
 }
 
-module "redis-dedup" {
-  source               = "../modules/helm/redis-dedup"
+module "redis_dedup" {
+  source               = "../modules/helm/redis_dedup"
   env                  = var.env
   building_block       = var.building_block
   depends_on           = [module.eks, module.monitoring]
 }
 
-module "redis-denorm" {
-  source               = "../modules/helm/redis-denorm"
+module "redis_denorm" {
+  source               = "../modules/helm/redis_denorm"
   env                  = var.env
   building_block       = var.building_block
   depends_on           = [module.eks, module.monitoring]
@@ -352,9 +352,9 @@ module "superset" {
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
-  superset_chart_depends_on         = [ module.postgresql, module.redis-dedup ]
-  redis_namespace                   = module.redis-dedup.redis_namespace
-  redis_release_name                = module.redis-dedup.redis_release_name
+  superset_chart_depends_on         = [ module.postgresql, module.redis_dedup ]
+  redis_namespace                   = module.redis_dedup.redis_namespace
+  redis_release_name                = module.redis_dedup.redis_release_name
 }
 
 module "flink" {
@@ -367,14 +367,15 @@ module "flink" {
   flink_release_names                 = var.flink_release_names
   merged_pipeline_enabled             = var.merged_pipeline_enabled
   flink_checkpoint_store_type         = var.flink_checkpoint_store_type
-  flink_chart_depends_on              = [ module.kafka, module.redis-denorm, module.redis-dedup, module.postgresql ]
+  flink_chart_depends_on              = [ module.kafka, module.redis_denorm, module.redis_dedup, module.postgresql ]
   postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
   postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
   checkpoint_base_url                 = "gs://${module.cloud_storage.checkpoint_storage_bucket}"
-  redis_namespace                     = module.redis-dedup.redis_namespace
-  dedup_redis_release_name            = module.redis-dedup.redis_release_name
-  denorm_redis_release_name           = module.redis-denorm.redis_release_name
+  denorm_redis_namespace              = module.redis_denorm.redis_namespace
+  denorm_redis_release_name           = module.redis_denorm.redis_release_name
+  dedup_redis_namespace               = module.redis_dedup.redis_namespace
+  dedup_redis_release_name            = module.redis_dedup.redis_release_name
   flink_sa_annotations                = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   flink_namespace                     = var.flink_namespace
   depends_on                          = [ module.flink_sa_iam_role ]
@@ -433,10 +434,10 @@ module "dataset_api" {
   postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
   dataset_api_sa_annotations         = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.dataset_api_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   dataset_api_chart_depends_on       = [ module.postgresql, module.kafka ]
-  denorm_redis_namespace             = module.redis-denorm.redis_namespace
-  denorm_redis_release_name          = module.redis-denorm.redis_release_name
-  dedup_redis_namespace              = module.redis-dedup.redis_namespace
-  dedup_redis_release_name           = module.redis-dedup.redis_release_name
+  denorm_redis_namespace             = module.redis_denorm.redis_namespace
+  denorm_redis_release_name          = module.redis_denorm.redis_release_name
+  dedup_redis_namespace              = module.redis_dedup.redis_namespace
+  dedup_redis_release_name           = module.redis_dedup.redis_release_name
   dataset_api_namespace              = var.dataset_api_namespace
   depends_on                         = [ module.dataset_api_sa_iam_role ]
 }
