@@ -21,8 +21,10 @@ resource "helm_release" "dataset_api" {
           dataset_api_image_name             = var.dataset_api_image_name
           dataset_api_image_tag              = var.dataset_api_image_tag
           dataset_api_sa_annotations         = var.dataset_api_sa_annotations
-          redis_namespace                    = var.redis_namespace
-          redis_release_name                 = var.redis_release_name
+          denorm_redis_namespace             = var.denorm_redis_namespace
+          denorm_redis_release_name          = var.denorm_redis_release_name
+          dedup_redis_namespace              = var.dedup_redis_namespace
+          dedup_redis_release_name           = var.dedup_redis_release_name
           s3_bucket                          = var.s3_bucket
         }
       )

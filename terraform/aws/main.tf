@@ -139,9 +139,10 @@ module "flink" {
   postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
   checkpoint_base_url                 = "s3://${module.s3.checkpoint_storage_bucket}"
-  redis_namespace                     = module.redis-dedup.redis_namespace
-  dedup_redis_release_name            = module.redis-dedup.redis_release_name
+  denorm_redis_namespace              = module.redis-denorm.redis_namespace
   denorm_redis_release_name           = module.redis-denorm.redis_release_name
+  dedup_redis_namespace               = module.redis-dedup.redis_namespace
+  dedup_redis_release_name            = module.redis-dedup.redis_release_name
   flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
   flink_namespace                     = module.eks.flink_namespace
   postgresql_service_name             = module.postgresql.postgresql_service_name
