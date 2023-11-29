@@ -154,7 +154,6 @@ merged-pipeline:
       output.unique.topic = ${job.env}".unique"
       output.duplicate.topic = ${job.env}".duplicate"
       output.denorm.topic = ${job.env}".denorm"
-      output.denorm.failed.topic = ${job.env}".denorm.failed"
       output.transform.topic = ${job.env}".transform"
       groupId = ${job.env}"-single-pipeline-group"
       producer {
@@ -278,7 +277,6 @@ denormalizer:
     kafka {
       input.topic = ${job.env}".unique"
       output.denorm.topic = ${job.env}".denorm"
-      output.denorm.failed.topic = ${job.env}".denorm.failed"
       groupId = ${job.env}"-denormalizer-group"
     }
 
