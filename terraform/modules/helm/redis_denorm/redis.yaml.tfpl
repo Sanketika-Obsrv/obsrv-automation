@@ -1,5 +1,6 @@
 commonLabels:
-  system: storage
+      system.storage: 'true'
+      system.processing: 'true'
 image:
   registry: docker.io
   repository: bitnami/redis
@@ -7,6 +8,7 @@ image:
   digest: ""
   pullPolicy: IfNotPresent
 
+architecture: standalone
 commonConfiguration: |-
   # Enable RDB persistence
   save 300 100
@@ -17,7 +19,8 @@ auth:
 master:
   count: 1
   podLabels:
-      system: storage
+      system.storage: 'true'
+      system.processing: 'true'
   ## @param master.configuration Configuration for Redis&reg; master nodes
   ## ref: https://redis.io/topics/config
   ##
@@ -27,38 +30,34 @@ master:
   ## @param master.extraFlags Array with additional command line flags for Redis&reg; master
   ## e.g:
   extraFlags:
-   - "--maxmemory 1024mb"
-   - "--maxmemory-policy volatile-ttl"
+   - "--maxmemory ${redis_master_maxmemory}"
+   - "--maxmemory-policy ${redis_maxmemory_eviction_policy}"
   containerPorts:
     redis: 6379
   resources:
     limits:
-      cpu: 1
+      cpu: 0.5
       memory: 2Gi
     requests:
-      cpu: 1
+      cpu: 0.5
       memory: 1Gi
   persistence:
     enabled: true
     labels:
-      system: storage
-    path: /data
+      system.storage: 'true'
+      system.processing: 'true'
+    path: ${redis_persistence_path}
     subPath: ""
     subPathExpr: ""
     storageClass: ""
     accessModes:
       - ReadWriteOnce
-    size: 2Gi
-  serviceAccount:
-    create: true
-    name: redis
-    annotations:
-      serviceAccountName: default
-
+    size: ${redis_master_persistence_size}
 replica:
   replicaCount: 1
   podLabels:
-      system: storage
+      system.storage: 'true'
+      system.processing: 'true'
   ## @param replica.configuration Configuration for Redis&reg; replicas nodes
   ## ref: https://redis.io/topics/config
   ##
@@ -68,8 +67,8 @@ replica:
   ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
   ## e.g:
   extraFlags:
-   - "--maxmemory 1024mb"
-   - "--maxmemory-policy volatile-ttl"
+   - "--maxmemory ${redis_replica_maxmemory}"
+   - "--maxmemory-policy ${redis_maxmemory_eviction_policy}"
   ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
   ##
   containerPorts:
@@ -77,13 +76,12 @@ replica:
   persistence:
     enabled: true
     labels:
-      system: storage
-    path: /data
+      system.storage: 'true'
+      system.processing: 'true'
+    path: ${redis_persistence_path}
     subPath: ""
     subPathExpr: ""
     storageClass: ""
     accessModes:
       - ReadWriteOnce
-    size: 2Gi
-  serviceAccount:
-    create: true
+    size: ${redis_replica_persistence_size}
