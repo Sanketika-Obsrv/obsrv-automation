@@ -93,16 +93,28 @@ variable "dataset_api_sa_annotations" {
   default     = "serviceAccountName: default"
 }
 
-variable "redis_namespace" {
+variable "denorm_redis_namespace" {
   type        = string
   description = "Namespace of Redis installation."
   default     = "redis"
 }
 
-variable "redis_release_name" {
+variable "denorm_redis_release_name" {
   type        = string
   description = "Release name for Redis installation."
-  default     = "obsrv-redis"
+  default     = "obsrv-denorm-redis"
+}
+
+variable "dedup_redis_release_name" {
+  type        = string
+  description = "Redis helm release name."
+  default     = "obsrv-dedup-redis"
+}
+
+variable "dedup_redis_namespace" {
+  type        = string
+  description = "Redis namespace."
+  default     = "redis"
 }
 
 variable "s3_bucket" {

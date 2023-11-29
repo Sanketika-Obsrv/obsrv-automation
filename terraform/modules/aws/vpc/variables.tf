@@ -17,7 +17,6 @@ variable "additional_tags" {
 variable "region" {
   type        = string
   description = "AWS region to create the resources."
-  default     = "us-east-2"
 }
 
 variable "vpc_cidr" {
@@ -35,7 +34,6 @@ variable "vpc_instance_tenancy" {
 variable "availability_zones" {
   type        = list(string)
   description = "AWS Availability Zones."
-  default     = ["us-east-2a", "us-east-2b", "us-east-2c"]
 }
 
 variable "public_subnet_cidrs" {

@@ -10,11 +10,11 @@ configuration:
   backupStorageLocation:
     bucket: "" # Bucket name
     config:
-      region: "us-east-2"
+      region: ""
   volumeSnapshotLocation:
     name: default
     config:
-      region: "us-east-2"
+      region: "" # Region name Ex: "us-east-2"
 initContainers:
   - name: velero-plugin-for-aws
     image: velero/velero-plugin-for-aws

@@ -35,7 +35,7 @@ variable "redis_install_timeout" {
 variable "redis_release_name" {
   type        = string
   description = "Redis helm release name."
-  default     = "obsrv-redis"
+  default     = "obsrv-dedup-redis"
 }
 
 variable "redis_namespace" {
@@ -59,12 +59,12 @@ variable "redis_wait_for_jobs" {
 variable "redis_master_maxmemory" {
   type        = string
   description = "Redis maxmemory assigned for the master"
-  default     = "1024mb"
+  default     = "512mb"
 }
 variable "redis_replica_maxmemory" {
   type        = string
   description = "Redis maxmemory assigned for the replica"
-  default     = "1024mb"
+  default     = "512mb"
 }
 
 variable "redis_maxmemory_eviction_policy" {
@@ -82,13 +82,13 @@ variable "redis_persistence_path" {
 variable "redis_master_persistence_size" {
   type        = string
   description = "Redis disk path for persistence"
-  default     = "2Gi"
+  default     = "1Gi"
 }
 
 variable "redis_replica_persistence_size" {
   type        = string
   description = "Redis disk path for persistence"
-  default     = "2Gi"
+  default     = "1Gi"
 }
 
 variable "redis_custom_values_yaml" {

@@ -13,7 +13,11 @@ variable "building_block" {
 variable "region" {
   type        = string
   description = "AWS region to create the resources."
-  default     = "us-east-2"
+}
+
+variable "availability_zones" {
+  type        = list(string)
+  description = "AWS Availability Zones."
 }
 
 variable "flink_checkpoint_store_type" {
