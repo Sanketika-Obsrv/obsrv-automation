@@ -29,6 +29,7 @@ base_config: |
       compression = "snappy"
     }
     output.system.event.topic = $${job.env}".system.events"
+    output.failed.topic = ${job.env}".failed"
   }
   task {
     parallelism = 1
@@ -57,9 +58,4 @@ base_config: |
     user = ${postgresql_obsrv_username}
     password = ${postgresql_obsrv_user_password}
     database = ${postgresql_obsrv_database}
-  }
-
-  lms-cassandra {
-    host = "localhost"
-    port = "9042"
   }

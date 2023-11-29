@@ -110,6 +110,7 @@ base_config: |
       compression = "snappy"
     }
     output.system.event.topic = ${job.env}".system.events"
+    output.failed.topic = ${job.env}".failed"
   }
   task {
     parallelism = 1
@@ -140,11 +141,6 @@ base_config: |
     database = "obsrv"
   }
 
-  lms-cassandra {
-    host = "localhost"
-    port = "9042"
-  }
-
 merged-pipeline:
   merged-pipeline: |+
     include file("/data/flink/conf/baseconfig.conf")
@@ -152,7 +148,6 @@ merged-pipeline:
       input.topic = ${job.env}".ingest"
       output.raw.topic = ${job.env}".raw"
       output.extractor.duplicate.topic = ${job.env}".extractor.duplicate"
-      output.failed.topic = ${job.env}".failed"
       output.batch.failed.topic = ${job.env}".extractor.failed"
       event.max.size = "1048576" # Max is only 1MB
       output.invalid.topic = ${job.env}".invalid"
@@ -161,7 +156,6 @@ merged-pipeline:
       output.denorm.topic = ${job.env}".denorm"
       output.denorm.failed.topic = ${job.env}".denorm.failed"
       output.transform.topic = ${job.env}".transform"
-      stats.topic = ${job.env}".stats"
       groupId = ${job.env}"-single-pipeline-group"
       producer {
         max-request-size = 5242880
@@ -205,7 +199,6 @@ extractor:
       input.topic = ${job.env}".ingest"
       output.raw.topic = ${job.env}".raw"
       output.extractor.duplicate.topic = ${job.env}".extractor.duplicate"
-      output.failed.topic = ${job.env}".failed"
       output.batch.failed.topic = ${job.env}".extractor.failed"
       event.max.size = "1048576" # Max is only 1MB
       groupId = ${job.env}"-extractor-group"
@@ -246,7 +239,6 @@ preprocessor:
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".raw"
-      output.failed.topic = ${job.env}".failed"
       output.invalid.topic = ${job.env}".invalid"
       output.unique.topic = ${job.env}".unique"
       output.duplicate.topic = ${job.env}".duplicate"
@@ -350,7 +342,6 @@ druid-router:
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".transform"
-      stats.topic = ${job.env}".stats"
       groupId = ${job.env}"-druid-router-group"
     }
 
@@ -381,7 +372,6 @@ kafka-connector:
     kafka {
       input.topic = ${job.env}".test"
       output.topic = ${job.env}".ingest"  # output and input topics will be fetched from postgres records
-      output.failed.topic = ${job.env}".failed"
       event.max.size = "1048576" # Max is only 1MB
       groupId = ${job.env}"-kafkaconnector-group"
       producer {
@@ -421,8 +411,8 @@ master-data-processor:
       output.invalid.topic = ${job.env}".masterdata.invalid"
       output.unique.topic = ${job.env}".masterdata.unique"
       output.duplicate.topic = ${job.env}".masterdata.duplicate"
+      output.denorm.topic = ${job.env}".masterdata.denorm"
       output.transform.topic = ${job.env}".masterdata.transform"
-      stats.topic = ${job.env}".masterdata.stats"
       groupId = ${job.env}"-masterdata-pipeline-group"
 
       producer {
