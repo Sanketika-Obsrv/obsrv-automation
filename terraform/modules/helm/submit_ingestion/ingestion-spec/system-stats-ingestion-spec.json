@@ -7,36 +7,60 @@
         "dimensions": [
           {
             "type": "string",
-            "name": "dataset"
+            "name": "etype"
+          },
+          {
+            "type": "string",
+            "name": "ctx_module"
+          },
+          {
+            "type": "string",
+            "name": "ctx_pdata_id"
+          },
+          {
+            "type": "string",
+            "name": "ctx_pdata_type"
+          },
+          {
+            "type": "string",
+            "name": "ctx_pdata_pid"
+          },
+          {
+            "type": "string",
+            "name": "ctx_dataset"
+          },
+          {
+            "type": "string",
+            "name": "data_error_pdata_id"
+          },
+          {
+            "type": "string",
+            "name": "data_error_pdata_status"
+          },
+          {
+            "type": "string",
+            "name": "data_error_error_type"
+          },
+          {
+            "type": "string",
+            "name": "data_error_error_code"
+          },
+          {
+            "type": "string",
+            "name": "data_error_error_message"
+          },
+          {
+            "type": "string",
+            "name": "data_error_error_level"
           },
           {
             "type": "long",
-            "name": "data_version"
-          },
-          {
-            "type": "boolean",
-            "name": "extractor_job_status"
-          },
-          {
-            "type": "boolean",
-            "name": "event_validator_job_status"
-          },
-          {
-            "type": "boolean",
-            "name": "deduplication_job_status"
-          },
-          {
-            "type": "boolean",
-            "name": "transformer_job_status"
-          },
-          {
-            "type": "boolean",
-            "name": "denorm_job_status"
+            "name": "data_error_error_count"
           }
         ]
       },
       "timestampSpec": {
-        "column": "sync_ts",
+        "column": "ets",
         "format": "auto"
       },
       "metricsSpec": [
@@ -45,45 +69,21 @@
           "name": "count"
         },
         {
-          "type": "doubleSum",
-          "name": "total_processing_time",
-          "fieldName": "total_processing_time"
-        },
-        {
-          "type": "doubleSum",
-          "name": "processing_time",
-          "fieldName": "processing_time"
-        },
-        {
-          "type": "doubleSum",
-          "name": "latency_time",
-          "fieldName": "latency_time"
-        },
-        {
-          "type": "doubleSum",
-          "name": "extractor_job_processing_time",
-          "fieldName": "extractor_job_processing_time"
-        },
-        {
-          "type": "doubleSum",
-          "name": "event_validator_job_processing_time",
-          "fieldName": "event_validator_processing_time"
-        },
-        {
-          "type": "doubleSum",
-          "name": "transformer_job_processing_time",
-          "fieldName": "transformer_processing_time"
+          "type": "longSum",
+          "name": "data_error_error_count",
+          "fieldName": "data_error_error_count"
         }
       ],
       "granularitySpec": {
         "type": "uniform",
-        "segmentGranularity": "hour",
+        "segmentGranularity": "DAY",
         "rollup": true
       }
     },
     "tuningConfig": {
       "type": "kafka",
-      "maxRowsPerSegment": 5000000,
+      "maxRowsPerSegment": 500000,
+      "maxBytesInMemory": 134217728,
       "logParseExceptions": true
     },
     "ioConfig": {
@@ -92,7 +92,7 @@
       "consumerProperties": {
         "bootstrap.servers": "kafka-headless.kafka.svc.cluster.local:9092"
       },
-      "taskCount": "1",
+      "taskCount": 1,
       "replicas": 1,
       "taskDuration": "PT1H",
       "useEarliestOffset": true,
@@ -100,97 +100,77 @@
       "inputFormat": {
         "type": "json",
         "flattenSpec": {
-          "useFieldDiscovery": false,
+          "useFieldDiscovery": true,
           "fields": [
             {
               "type": "path",
-              "name": "sync_ts",
-              "expr": "$.obsrv_meta.syncts"
+              "expr": "$.etype",
+              "name": "etype"
             },
             {
               "type": "path",
-              "name": "dataset",
-              "expr": "$.dataset"
+              "expr": "$.ctx.module",
+              "name": "ctx_module"
             },
             {
               "type": "path",
-              "name": "data_version",
-              "expr": "$.data_version"
+              "expr": "$.ctx.pdata.id",
+              "name": "ctx_pdata_id"
             },
             {
               "type": "path",
-              "name": "prev_processing_time",
-              "expr": "$.obsrv_meta.prevProcessingTime"
+              "expr": "$.ctx.pdata.type",
+              "name": "ctx_pdata_type"
             },
             {
               "type": "path",
-              "name": "processing_start_time",
-              "expr": "$.obsrv_meta.processingStartTime"
+              "expr": "$.ctx.pdata.pid",
+              "name": "ctx_pdata_pid"
             },
             {
               "type": "path",
-              "name": "deduplication_job_processing_time",
-              "expr": "$.obsrv_meta.timespans.Deduplication"
+              "expr": "$.ctx.dataset",
+              "name": "ctx_dataset"
             },
             {
               "type": "path",
-              "name": "denorm_job_processing_time",
-              "expr": "$.obsrv_meta.timespans.DenormalizerJob"
+              "expr": "$.data.error.pdata_id",
+              "name": "data_error_pdata_id"
             },
             {
               "type": "path",
-              "name": "extractor_job_processing_time",
-              "expr": "$.obsrv_meta.timespans.ExtractorJob"
+              "expr": "$.data.error.pdata_status",
+              "name": "data_error_pdata_status"
             },
             {
               "type": "path",
-              "name": "total_processing_time",
-              "expr": "$.obsrv_meta.total_processing_time"
+              "expr": "$.data.error.error_type",
+              "name": "data_error_error_type"
             },
             {
               "type": "path",
-              "name": "processing_time",
-              "expr": "$.obsrv_meta.processing_time"
+              "expr": "$.data.error.error_code",
+              "name": "data_error_error_code"
             },
             {
               "type": "path",
-              "name": "latency_time",
-              "expr": "$.obsrv_meta.latency_time"
+              "expr": "$.data.error.error_message",
+              "name": "data_error_error_message"
             },
             {
               "type": "path",
-              "name": "transformer_processing_time",
-              "expr": "$.obsrv_meta.timespans.TransformerJob"
+              "expr": "$.data.error.error_level",
+              "name": "data_error_error_level"
             },
             {
               "type": "path",
-              "name": "event_validator_processing_time",
-              "expr": "$.obsrv_meta.timespans.EventValidation"
+              "expr": "$.data.error.error_count",
+              "name": "data_error_error_count"
             },
             {
               "type": "path",
-              "name": "deduplication_job_status",
-              "expr": "$.obsrv_meta.flags.Deduplication"
-            },
-            {
-              "type": "path",
-              "name": "extractor_job_status",
-              "expr": "$.obsrv_meta.flags.ExtractorJob"
-            },
-            {
-              "type": "path",
-              "name": "transformer_job_status",
-              "expr": "$.obsrv_meta.flags.TransformerJob"
-            },
-            {
-              "type": "path",
-              "name": "event_validator_job_status",
-              "expr": "$.obsrv_meta.flags.EventValidation"
-            },
-            {
-              "type": "path",
-              "name": "denorm_job_status",
-              "expr": "$.obsrv_meta.flags.DenormalizerJob"
+              "expr": "$.ets",
+              "name": "ets"
             }
           ]
         }
