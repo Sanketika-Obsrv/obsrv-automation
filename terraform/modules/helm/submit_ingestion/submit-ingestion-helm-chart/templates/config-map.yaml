@@ -14,32 +14,60 @@ data:
             "dimensions": [
               {
                 "type": "string",
-                "name": "dataset"
+                "name": "etype"
               },
               {
-                "type": "boolean",
-                "name": "extractor_job_status"
+                "type": "string",
+                "name": "ctx_module"
               },
               {
-                "type": "boolean",
-                "name": "event_validator_job_status"
+                "type": "string",
+                "name": "ctx_pdata_id"
               },
               {
-                "type": "boolean",
-                "name": "deduplication_job_status"
+                "type": "string",
+                "name": "ctx_pdata_type"
               },
               {
-                "type": "boolean",
-                "name": "transformer_job_status"
+                "type": "string",
+                "name": "ctx_pdata_pid"
               },
               {
-                "type": "boolean",
-                "name": "denorm_job_status"
+                "type": "string",
+                "name": "ctx_dataset"
+              },
+              {
+                "type": "string",
+                "name": "data_error_pdata_id"
+              },
+              {
+                "type": "string",
+                "name": "data_error_pdata_status"
+              },
+              {
+                "type": "string",
+                "name": "data_error_error_type"
+              },
+              {
+                "type": "string",
+                "name": "data_error_error_code"
+              },
+              {
+                "type": "string",
+                "name": "data_error_error_message"
+              },
+              {
+                "type": "string",
+                "name": "data_error_error_level"
+              },
+              {
+                "type": "long",
+                "name": "data_error_error_count"
               }
             ]
           },
           "timestampSpec": {
-            "column": "sync_ts",
+            "column": "ets",
             "format": "auto"
           },
           "metricsSpec": [
@@ -48,45 +76,21 @@ data:
               "name": "count"
             },
             {
-              "type": "doubleSum",
-              "name": "total_processing_time",
-              "fieldName": "total_processing_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "latency_time",
-              "fieldName": "latency_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "processing_time",
-              "fieldName": "processing_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "extractor_job_processing_time",
-              "fieldName": "extractor_job_processing_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "event_validator_job_processing_time",
-              "fieldName": "event_validator_processing_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "transformer_job_processing_time",
-              "fieldName": "transformer_processing_time"
+              "type": "longSum",
+              "name": "data_error_error_count",
+              "fieldName": "data_error_error_count"
             }
           ],
           "granularitySpec": {
             "type": "uniform",
-            "segmentGranularity": "hour",
+            "segmentGranularity": "DAY",
             "rollup": true
           }
         },
         "tuningConfig": {
           "type": "kafka",
-          "maxRowsPerSegment": 5000000,
+          "maxBytesInMemory": 134217728,
+          "maxRowsPerSegment": 500000,
           "logParseExceptions": true
         },
         "ioConfig": {
@@ -95,7 +99,7 @@ data:
           "consumerProperties": {
             "bootstrap.servers": "{{ .Values.bootstrap_servers }}"
           },
-          "taskCount": "1",
+          "taskCount": 1,
           "replicas": 1,
           "taskDuration": "PT1H",
           "useEarliestOffset": true,
@@ -103,82 +107,77 @@ data:
           "inputFormat": {
             "type": "json",
             "flattenSpec": {
-              "useFieldDiscovery": false,
+              "useFieldDiscovery": true,
               "fields": [
                 {
                   "type": "path",
-                  "name": "sync_ts",
-                  "expr": "$.obsrv_meta.syncts"
+                  "expr": "$.etype",
+                  "name": "etype"
                 },
                 {
                   "type": "path",
-                  "name": "dataset",
-                  "expr": "$.dataset"
+                  "expr": "$.ctx.module",
+                  "name": "ctx_module"
                 },
                 {
                   "type": "path",
-                  "name": "deduplication_job_processing_time",
-                  "expr": "$.obsrv_meta.timespans.Deduplication"
+                  "expr": "$.ctx.pdata.id",
+                  "name": "ctx_pdata_id"
                 },
                 {
                   "type": "path",
-                  "name": "denorm_job_processing_time",
-                  "expr": "$.obsrv_meta.timespans.DenormalizerJob"
+                  "expr": "$.ctx.pdata.type",
+                  "name": "ctx_pdata_type"
                 },
                 {
                   "type": "path",
-                  "name": "extractor_job_processing_time",
-                  "expr": "$.obsrv_meta.timespans.ExtractorJob"
+                  "expr": "$.ctx.pdata.pid",
+                  "name": "ctx_pdata_pid"
                 },
                 {
                   "type": "path",
-                  "name": "total_processing_time",
-                  "expr": "$.obsrv_meta.total_processing_time"
+                  "expr": "$.ctx.dataset",
+                  "name": "ctx_dataset"
                 },
                 {
                   "type": "path",
-                  "name": "latency_time",
-                  "expr": "$.obsrv_meta.latency_time"
+                  "expr": "$.data.error.pdata_id",
+                  "name": "data_error_pdata_id"
                 },
                 {
                   "type": "path",
-                  "name": "processing_time",
-                  "expr": "$.obsrv_meta.processing_time"
+                  "expr": "$.data.error.pdata_status",
+                  "name": "data_error_pdata_status"
                 },
                 {
                   "type": "path",
-                  "name": "transformer_processing_time",
-                  "expr": "$.obsrv_meta.timespans.TransformerJob"
+                  "expr": "$.data.error.error_type",
+                  "name": "data_error_error_type"
                 },
                 {
                   "type": "path",
-                  "name": "event_validator_processing_time",
-                  "expr": "$.obsrv_meta.timespans.EventValidation"
+                  "expr": "$.data.error.error_code",
+                  "name": "data_error_error_code"
                 },
                 {
                   "type": "path",
-                  "name": "deduplication_job_status",
-                  "expr": "$.obsrv_meta.flags.Deduplication"
+                  "expr": "$.data.error.error_message",
+                  "name": "data_error_error_message"
                 },
                 {
                   "type": "path",
-                  "name": "extractor_job_status",
-                  "expr": "$.obsrv_meta.flags.ExtractorJob"
+                  "expr": "$.data.error.error_level",
+                  "name": "data_error_error_level"
                 },
                 {
                   "type": "path",
-                  "name": "transformer_job_status",
-                  "expr": "$.obsrv_meta.flags.TransformerJob"
+                  "expr": "$.data.error.error_count",
+                  "name": "data_error_error_count"
                 },
                 {
                   "type": "path",
-                  "name": "event_validator_job_status",
-                  "expr": "$.obsrv_meta.flags.EventValidation"
-                },
-                {
-                  "type": "path",
-                  "name": "denorm_job_status",
-                  "expr": "$.obsrv_meta.flags.DenormalizerJob"
+                  "expr": "$.ets",
+                  "name": "ets"
                 }
               ]
             }
@@ -187,84 +186,82 @@ data:
         }
       }
     }
-  masterdata-system-stats-ingestion-spec.json: |-
+
+  failed-events-ingestion-spec.json: |- 
     {
       "type": "kafka",
       "spec": {
         "dataSchema": {
-          "dataSource": "{{ .Values.ingestion_spec.masterdata_system_stats.name }}",
+          "dataSource": "{{ .Values.ingestion_spec.failed_events.name }}",
           "dimensionsSpec": {
             "dimensions": [
               {
                 "type": "string",
+                "name": "obsrv_meta_flags_validator"
+              },
+              {
+                "type": "long",
+                "name": "obsrv_meta_prevProcessingTime"
+              },
+              {
+                "type": "string",
+                "name": "obsrv_meta_error_src_enumClass"
+              },
+              {
+                "type": "string",
+                "name": "obsrv_meta_error_src_value"
+              },
+              {
+                "type": "string",
+                "name": "obsrv_meta_error_error_code"
+              },
+              {
+                "type": "string",
+                "name": "obsrv_meta_error_error_msg"
+              },
+              {
+                "type": "long",
+                "name": "obsrv_meta_processingStartTime"
+              },
+              {
+                "type": "long",
+                "name": "obsrv_meta_timespans_validator"
+              },
+              {
+                "type": "string",
+                "name": "event"
+              },
+              {
+                "type": "string",
                 "name": "dataset"
-              },
-              {
-                "type": "boolean",
-                "name": "extractor_job_status"
-              },
-              {
-                "type": "boolean",
-                "name": "event_validator_job_status"
-              },
-              {
-                "type": "boolean",
-                "name": "deduplication_job_status"
-              },
-              {
-                "type": "boolean",
-                "name": "transformer_job_status"
               }
             ]
           },
           "timestampSpec": {
-            "column": "sync_ts",
+            "column": "obsrv_meta_syncts",
             "format": "auto"
           },
-          "metricsSpec": [
-            {
-              "type": "count",
-              "name": "count"
-            },
-            {
-              "type": "doubleSum",
-              "name": "total_processing_time",
-              "fieldName": "total_processing_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "extractor_job_processing_time",
-              "fieldName": "extractor_job_processing_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "event_validator_job_processing_time",
-              "fieldName": "event_validator_processing_time"
-            },
-            {
-              "type": "doubleSum",
-              "name": "transformer_job_processing_time",
-              "fieldName": "transformer_processing_time"
-            }
-          ],
+          "metricsSpec": [],
           "granularitySpec": {
             "type": "uniform",
-            "segmentGranularity": "hour",
-            "rollup": true
+            "segmentGranularity": "day",
+            "queryGranularity": "none",
+            "rollup": false
           }
         },
         "tuningConfig": {
           "type": "kafka",
-          "maxRowsPerSegment": 5000000,
+          "maxBytesInMemory": 134217728,
+          "maxRowsPerSegment": 500000,
           "logParseExceptions": true
         },
         "ioConfig": {
           "type": "kafka",
-          "topic": "{{ .Values.ingestion_spec.masterdata_system_stats.topic }}",
+          "topic": "{{ .Values.ingestion_spec.failed_events.topic }}",
           "consumerProperties": {
             "bootstrap.servers": "{{ .Values.bootstrap_servers }}"
           },
-          "taskCount": "1",
+          "taskCount": 1,
           "replicas": 1,
           "taskDuration": "PT1H",
           "useEarliestOffset": true,
@@ -272,67 +269,62 @@ data:
           "inputFormat": {
             "type": "json",
             "flattenSpec": {
-              "useFieldDiscovery": false,
+              "useFieldDiscovery": true,
               "fields": [
                 {
                   "type": "path",
-                  "name": "sync_ts",
-                  "expr": "$.obsrv_meta.syncts"
+                  "expr": "$.obsrv_meta.flags.validator",
+                  "name": "obsrv_meta_flags_validator"
                 },
                 {
                   "type": "path",
-                  "name": "dataset",
-                  "expr": "$.dataset"
+                  "expr": "$.obsrv_meta.syncts",
+                  "name": "obsrv_meta_syncts"
                 },
                 {
                   "type": "path",
-                  "name": "prev_processing_time",
-                  "expr": "$.obsrv_meta.flags.prevProcessingTime"
+                  "expr": "$.obsrv_meta.prevProcessingTime",
+                  "name": "obsrv_meta_prevProcessingTime"
                 },
                 {
                   "type": "path",
-                  "name": "deduplication_job_processing_time",
-                  "expr": "$.obsrv_meta.timespans.Deduplication"
+                  "expr": "$.obsrv_meta.error.src.enumClass",
+                  "name": "obsrv_meta_error_src_enumClass"
                 },
                 {
                   "type": "path",
-                  "name": "extractor_job_processing_time",
-                  "expr": "$.obsrv_meta.timespans.ExtractorJob"
+                  "expr": "$.obsrv_meta.error.src.value",
+                  "name": "obsrv_meta_error_src_value"
                 },
                 {
                   "type": "path",
-                  "name": "total_processing_time",
-                  "expr": "$.obsrv_meta.timespans.total_processing_time"
+                  "expr": "$.obsrv_meta.error.error_code",
+                  "name": "obsrv_meta_error_error_code"
                 },
                 {
                   "type": "path",
-                  "name": "transformer_processing_time",
-                  "expr": "$.obsrv_meta.timespans.TransformerJob"
+                  "expr": "$.obsrv_meta.error.error_msg",
+                  "name": "obsrv_meta_error_error_msg"
                 },
                 {
                   "type": "path",
-                  "name": "event_validator_processing_time",
-                  "expr": "$.obsrv_meta.timespans.EventValidation"
+                  "expr": "$.obsrv_meta.processingStartTime",
+                  "name": "obsrv_meta_processingStartTime"
                 },
                 {
                   "type": "path",
-                  "name": "deduplication_job_status",
-                  "expr": "$.obsrv_meta.flags.Deduplication"
+                  "expr": "$.obsrv_meta.timespans.validator",
+                  "name": "obsrv_meta_timespans_validator"
                 },
                 {
                   "type": "path",
-                  "name": "extractor_job_status",
-                  "expr": "$.obsrv_meta.flags.ExtractorJob"
+                  "expr": "$.event",
+                  "name": "event"
                 },
                 {
                   "type": "path",
-                  "name": "transformer_job_status",
-                  "expr": "$.obsrv_meta.flags.TransformerJob"
-                },
-                {
-                  "type": "path",
-                  "name": "event_validator_job_status",
-                  "expr": "$.obsrv_meta.flags.EventValidation"
+                  "expr": "$.dataset",
+                  "name": "dataset"
                 }
               ]
             }
@@ -340,4 +332,4 @@ data:
           "appendToExisting": false
         }
       }
-    }
+    } 

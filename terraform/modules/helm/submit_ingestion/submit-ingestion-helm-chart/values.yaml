@@ -6,6 +6,6 @@ ingestion_spec:
   system_stats:
     topic: "sb-dev.stats"
     name: "system-stats"
-  masterdata_system_stats:
-    topic: "sb-dev.masterdata.stats"
-    name: "masterdata-system-stats"
+  failed_events:
+    topic: "sb-dev.failed"
+    name: "failed-events"

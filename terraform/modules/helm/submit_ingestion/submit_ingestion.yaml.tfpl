@@ -4,6 +4,6 @@ ingestion_spec:
   system_stats:
      topic: "${env}.stats"
      name: "system-stats"
-  masterdata_system_stats:
-     topic: "${env}.masterdata.stats"
-     name: "masterdata-system-stats"
+  failed_events:
+     topic: "${env}.failed"
+     name: "failed-events"
