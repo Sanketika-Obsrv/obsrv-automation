@@ -201,11 +201,21 @@ variable "kubernetes_storage_class" {
   type        = string
   description = "Storage Class"
 }
-variable "dataset_tz_property"{
+
+variable "message_timezone" {
   type        = string
-  description = "dataset timezone property name"
-  default     = "obsrv_meta.dataset_tz"
+  description = "message timezone"
+  default     = "UTC"
 }
+
+variable "parser_timezone" {
+  type        = string
+  description = "parser timezone"
+  default     = "Asia/Kolkata"
+}
+
+
+
 variable "image_pull_policy" {
   type        = string
   description = "Docker image pull policy"
