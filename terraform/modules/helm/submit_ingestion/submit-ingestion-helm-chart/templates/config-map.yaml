@@ -17,6 +17,10 @@ data:
                 "name": "dataset"
               },
               {
+                "type": "string",
+                "name": "data_version"
+              },
+              {
                 "type": "boolean",
                 "name": "extractor_job_status"
               },
@@ -233,6 +237,16 @@ data:
             },
             {
               "type": "doubleSum",
+              "name": "latency_time",
+              "fieldName": "latency_time"
+            },
+            {
+              "type": "doubleSum",
+              "name": "processing_time",
+              "fieldName": "processing_time"
+            },
+            {
+              "type": "doubleSum",
               "name": "extractor_job_processing_time",
               "fieldName": "extractor_job_processing_time"
             },
@@ -286,8 +300,18 @@ data:
                 },
                 {
                   "type": "path",
+                  "name": "data_version",
+                  "expr": "$.data_version"
+                },
+                {
+                  "type": "path",
                   "name": "prev_processing_time",
-                  "expr": "$.obsrv_meta.flags.prevProcessingTime"
+                  "expr": "$.obsrv_meta.prevProcessingTime"
+                },
+                {
+                  "type": "path",
+                  "name": "processing_start_time",
+                  "expr": "$.obsrv_meta.processingStartTime"
                 },
                 {
                   "type": "path",
@@ -302,7 +326,17 @@ data:
                 {
                   "type": "path",
                   "name": "total_processing_time",
-                  "expr": "$.obsrv_meta.timespans.total_processing_time"
+                  "expr": "$.obsrv_meta.total_processing_time"
+                },
+                {
+                  "type": "path",
+                  "name": "processing_time",
+                  "expr": "$.obsrv_meta.processing_time"
+                },
+                {
+                  "type": "path",
+                  "name": "latency_time",
+                  "expr": "$.obsrv_meta.latency_time"
                 },
                 {
                   "type": "path",
