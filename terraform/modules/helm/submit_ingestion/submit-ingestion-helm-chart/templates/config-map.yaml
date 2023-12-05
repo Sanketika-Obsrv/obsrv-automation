@@ -237,6 +237,16 @@ data:
             },
             {
               "type": "doubleSum",
+              "name": "latency_time",
+              "fieldName": "latency_time"
+            },
+            {
+              "type": "doubleSum",
+              "name": "processing_time",
+              "fieldName": "processing_time"
+            },
+            {
+              "type": "doubleSum",
               "name": "extractor_job_processing_time",
               "fieldName": "extractor_job_processing_time"
             },
