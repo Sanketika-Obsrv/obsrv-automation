@@ -277,7 +277,7 @@ data:
             "type": "json",
             "flattenSpec": {
               "useFieldDiscovery": false,
-              "fields": "fields": [
+              "fields": [
                 {
                   "type": "path",
                   "name": "sync_ts",
