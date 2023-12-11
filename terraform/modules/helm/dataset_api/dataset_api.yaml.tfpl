@@ -18,8 +18,11 @@ image:
   repository: ${dataset_api_image_name}
   image_tag: ${dataset_api_image_tag}
   imagePullSecrets: ""
-redis_service:
-  REDIS_HOST: ${redis_release_name}-master.${redis_namespace}.svc.cluster.local
+dedup_redis_service:
+  REDIS_HOST: ${dedup_redis_release_name}-master.${dedup_redis_namespace}.svc.cluster.local
+  REDIS_PORT: 6379
+denorm_redis_service:
+  REDIS_HOST: ${denorm_redis_release_name}-master.${denorm_redis_namespace}.svc.cluster.local
   REDIS_PORT: 6379
 exhaust_service:
   CONTAINER: ${s3_bucket}

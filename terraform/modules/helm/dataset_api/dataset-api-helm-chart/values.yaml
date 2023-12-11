@@ -30,9 +30,12 @@ postgres_service:
   POSTGRES_DATABASE: "obsrv"
   POSTGRES_USERNAME: "obsrv"
   POSTGRES_PASSWORD: "obsrv123"
-redis_service:
-  REDIS_HOST: obsrv-redis-headless.redis.svc.cluster.local
-  REDIS_PORT: '6379'
+dedup_redis_service:
+  REDIS_HOST: obsrv-dedup-redis-headless.redis.svc.cluster.local
+  REDIS_PORT: 6379
+denorm_redis_service:
+  REDIS_HOST: obsrv-denorm-redis-headless.redis.svc.cluster.local
+  REDIS_PORT: 6379
 exhaust_service:
   CLOUD_STORAGE_PROVIDER: "aws"
   CLOUD_STORAGE_REGION: ""
