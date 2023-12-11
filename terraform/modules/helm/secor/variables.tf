@@ -210,6 +210,11 @@ variable "dataset_tz_property"{
   default     = "obsrv_meta.dataset_tz"
 }
 
+variable "dataset_default_timezone"{
+  type        = string
+  description = "dataset default timezone value"
+}
+
 variable "image_pull_policy" {
   type        = string
   description = "Docker image pull policy"

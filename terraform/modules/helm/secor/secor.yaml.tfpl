@@ -10,6 +10,7 @@ pullPolicy: "${image_pull_policy}"
 jvm_memory: "${jvm_memory}"
 image_tag: "${secor_image_tag}"
 dataset_tz_property: ${dataset_tz_property}
+dataset_default_timezone: "${dataset_default_timezone}" 
 secor_jobs:
   ingest-backup:
     replicas: 1

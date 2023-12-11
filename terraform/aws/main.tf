@@ -224,6 +224,7 @@ module "secor" {
   cloud_storage_bucket      = module.s3.s3_bucket
   kubernetes_storage_class  = var.kubernetes_storage_class
   region                    = var.region
+  dataset_default_timezone = var.dataset_default_timezone
 }
 
 module "submit_ingestion" {

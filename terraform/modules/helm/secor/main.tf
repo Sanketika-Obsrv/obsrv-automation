@@ -43,6 +43,7 @@ resource "helm_release" "secor" {
         extractor_timestamp_key    = var.secor_extractor_timestamp_key
         fallback_timestamp_key     = var.fallback_timestamp_key
         dataset_tz_property        = var.dataset_tz_property
+        dataset_default_timezone = var.dataset_default_timezone
         image_pull_policy          = var.image_pull_policy
         storage_class              = var.kubernetes_storage_class
         env                        = var.env

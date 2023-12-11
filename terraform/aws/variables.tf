@@ -15,6 +15,11 @@ variable "region" {
   description = "AWS region to create the resources."
 }
 
+variable "dataset_default_timezone"{
+  type        = string
+  description = "dataset default timezone value"
+}
+
 variable "availability_zones" {
   type        = list(string)
   description = "AWS Availability Zones."
