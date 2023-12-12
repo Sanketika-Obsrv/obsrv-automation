@@ -119,7 +119,7 @@ data:
             {
               "type": "doubleSum",
               "name": "dedup_time",
-              "fieldName": "deduplication_time"
+              "fieldName": "dedup_time"
             },
             {
               "type": "doubleSum",
