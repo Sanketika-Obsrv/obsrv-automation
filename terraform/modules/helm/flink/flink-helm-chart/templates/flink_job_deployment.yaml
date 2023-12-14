@@ -71,12 +71,16 @@ spec:
     app: flink
     component: {{ .Release.Name }}-taskmanager
 ---
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: {{ .Release.Name }}-jobmanager
   namespace: {{ .Release.Namespace }}
 spec:
+  selector:
+    matchLabels:
+      app: flink
+      component: {{ .Release.Name }}-jobmanager
   template:
     metadata:
       labels:
@@ -100,7 +104,6 @@ spec:
             path: {{ .Release.Name }}.conf
           - key: log4j_console_properties
             path: log4j-console.properties
-      restartPolicy: OnFailure
       imagePullSecrets:
       - name: {{ .Values.image.imagePullSecrets }}
       serviceAccount: {{ .Release.Namespace }}-sa
@@ -165,7 +168,6 @@ spec:
         - name: flink-config-volume
           mountPath: /opt/flink/conf/log4j-console.properties
           subPath: log4j-console.properties
-
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -29,6 +29,7 @@ base_config: |
       compression = "snappy"
     }
     output.system.event.topic = $${job.env}".system.events"
+    output.failed.topic = $${job.env}".failed"
   }
   task {
     parallelism = 1
@@ -41,12 +42,12 @@ base_config: |
 
   redis.connection.timeout = 100
   redis {
-    host = ${redis_release_name}-master.${redis_namespace}.svc.cluster.local
+    host = ${dedup_redis_release_name}-master.${dedup_redis_namespace}.svc.cluster.local
     port = 6379
   }
 
   redis-meta {
-    host = ${redis_release_name}-master.${redis_namespace}.svc.cluster.local
+    host = ${denorm_redis_release_name}-master.${denorm_redis_namespace}.svc.cluster.local
     port = 6379
   }
 
