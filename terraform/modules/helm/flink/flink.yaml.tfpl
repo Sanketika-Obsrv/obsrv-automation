@@ -29,6 +29,7 @@ base_config: |
       compression = "snappy"
     }
     output.system.event.topic = $${job.env}".system.events"
+    output.failed.topic = $${job.env}".failed"
   }
   task {
     parallelism = 1

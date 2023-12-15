@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS datasources (
   archival_policy json,
   purge_policy json,
   backup_config json NOT NULL,
+  metadata json,
   status text NOT NULL,
   created_by text NOT NULL,
   updated_by text NOT NULL,
@@ -97,7 +98,8 @@ CREATE TABLE IF NOT EXISTS dataset_source_config (
   updated_by text NOT NULL,
   created_date TIMESTAMP NOT NULL DEFAULT now(),
   updated_date TIMESTAMP NOT NULL,
-  published_date TIMESTAMP NOT NULL DEFAULT now()
+  published_date TIMESTAMP NOT NULL DEFAULT now(),
+  UNIQUE(connector_type, dataset_id)
 );
 
 CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config(dataset_id);
