@@ -62,6 +62,10 @@ data:
               },
               {
                 "type": "string",
+                "name": "ctx_dataset_type"
+              },
+              {
+                "type": "string",
                 "name": "extractor_status"
               },
               {
@@ -119,7 +123,7 @@ data:
             {
               "type": "doubleSum",
               "name": "dedup_time",
-              "fieldName": "deduplication_time"
+              "fieldName": "dedup_time"
             },
             {
               "type": "doubleSum",
@@ -194,6 +198,11 @@ data:
                   "type": "path",
                   "name": "ctx_dataset",
                   "expr": "$.ctx.dataset"
+                },
+                {
+                  "type": "path",
+                  "name": "ctx_dataset_type",
+                  "expr": "$.ctx.dataset_type"
                 },
                 {
                   "type": "path",
