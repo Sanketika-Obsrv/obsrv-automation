@@ -11,7 +11,6 @@ variable "building_block" {
 variable "location" {
   type        = string
   description = "Azure location to create the resources."
-  default     = "East US 2"
 }
 
 variable "additional_tags" {
