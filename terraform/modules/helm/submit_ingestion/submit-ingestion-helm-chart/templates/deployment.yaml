@@ -13,7 +13,7 @@ spec:
           command:
             - sh
             - -c
-            - "apt-get update && apt-get install -y curl && curl -XPOST -H 'Content-Type: application/json' -d @/etc/ingestion-spec/system-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }}
+            - "apt-get update && apt-get install -y curl && curl -XPOST -H 'Content-Type: application/json' -d @/etc/ingestion-spec/system-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }}"
           volumeMounts:
             - name: config-volume
               mountPath: /etc/ingestion-spec
