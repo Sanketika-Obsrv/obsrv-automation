@@ -11,7 +11,6 @@ variable "building_block" {
 variable "location" {
   type        = string
   description = "Azure location to create the resources."
-  default     = "East US 2"
 }
 
 variable "additional_tags" {
@@ -29,13 +28,13 @@ variable "aks_nodepool_name" {
 variable "aks_node_count" {
   type        = number
   description = "AKS node count."
-  default     = 4
+  default     = 5
 }
 
 variable "aks_node_size" {
   type        = string
   description = "AKS node size."
-  default     = "Standard_D2s_v4"
+  default     = "Standard_D4s_v3"
 }
 
 variable "aks_cluster_identity" {

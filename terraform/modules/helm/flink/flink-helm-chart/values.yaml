@@ -63,6 +63,7 @@ log4j_console_properties: |
   # This affects logging for both user code and Flink
   rootLogger.level = INFO
   rootLogger.appenderRef.console.ref = ConsoleAppender
+  rootLogger.appenderRef.rolling.ref = RollingFileAppender
 
   # Uncomment this if you want to _only_ change Flink's logging
   logger.flink.name = org.apache.flink
@@ -85,6 +86,20 @@ log4j_console_properties: |
   appender.console.type = CONSOLE
   appender.console.layout.type = PatternLayout
   appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+
+  # Log all infos in the given rolling file
+  appender.rolling.name = RollingFileAppender
+  appender.rolling.type = RollingFile
+  appender.rolling.append = false
+  appender.rolling.fileName = ${sys:log.file}
+  appender.rolling.filePattern = ${sys:log.file}.%i
+  appender.rolling.layout.type = PatternLayout
+  appender.rolling.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+  appender.rolling.policies.type = Policies
+  appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+  appender.rolling.policies.size.size=10MB
+  appender.rolling.strategy.type = DefaultRolloverStrategy
+  appender.rolling.strategy.max = 5
 
   # Suppress the irrelevant (wrong) warnings from the Netty channel handler
   logger.netty.name = org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline
@@ -110,6 +125,7 @@ base_config: |
       compression = "snappy"
     }
     output.system.event.topic = ${job.env}".system.events"
+    output.failed.topic = ${job.env}".failed"
   }
   task {
     parallelism = 1
@@ -151,15 +167,14 @@ merged-pipeline:
     kafka {
       input.topic = ${job.env}".ingest"
       output.raw.topic = ${job.env}".raw"
-      output.extractor.duplicate.topic = ${job.env}".extractor.duplicate"
-      output.failed.topic = ${job.env}".failed"
-      output.batch.failed.topic = ${job.env}".extractor.failed"
+      output.extractor.duplicate.topic = ${job.env}".failed"
+      output.batch.failed.topic = ${job.env}".failed"
       event.max.size = "1048576" # Max is only 1MB
-      output.invalid.topic = ${job.env}".invalid"
+      output.invalid.topic = ${job.env}".failed"
       output.unique.topic = ${job.env}".unique"
-      output.duplicate.topic = ${job.env}".duplicate"
+      output.duplicate.topic = ${job.env}".failed"
       output.denorm.topic = ${job.env}".denorm"
-      output.denorm.failed.topic = ${job.env}".denorm.failed"
+      output.denorm.failed.topic = ${job.env}".failed"
       output.transform.topic = ${job.env}".transform"
       stats.topic = ${job.env}".stats"
       groupId = ${job.env}"-single-pipeline-group"
@@ -204,9 +219,8 @@ extractor:
     kafka {
       input.topic = ${job.env}".ingest"
       output.raw.topic = ${job.env}".raw"
-      output.extractor.duplicate.topic = ${job.env}".extractor.duplicate"
-      output.failed.topic = ${job.env}".failed"
-      output.batch.failed.topic = ${job.env}".extractor.failed"
+      output.extractor.duplicate.topic = ${job.env}".failed"
+      output.batch.failed.topic = ${job.env}".failed"
       event.max.size = "1048576" # Max is only 1MB
       groupId = ${job.env}"-extractor-group"
       producer {
@@ -246,10 +260,9 @@ preprocessor:
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".raw"
-      output.failed.topic = ${job.env}".failed"
-      output.invalid.topic = ${job.env}".invalid"
+      output.invalid.topic = ${job.env}".failed"
       output.unique.topic = ${job.env}".unique"
-      output.duplicate.topic = ${job.env}".duplicate"
+      output.duplicate.topic = ${job.env}".failed"
       groupId = ${job.env}"-pipeline-preprocessor-group"
     }
 
@@ -286,7 +299,7 @@ denormalizer:
     kafka {
       input.topic = ${job.env}".unique"
       output.denorm.topic = ${job.env}".denorm"
-      output.denorm.failed.topic = ${job.env}".denorm.failed"
+      output.denorm.failed.topic = ${job.env}".failed"
       groupId = ${job.env}"-denormalizer-group"
     }
 
@@ -380,7 +393,7 @@ kafka-connector:
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".test"
-      output.topic = ${job.env}".ingest"  # output and input topics will be fetched from postgres records
+      // output.topic = ${job.env}".ingest"  # output and input topics will be fetched from postgres records
       output.failed.topic = ${job.env}".failed"
       event.max.size = "1048576" # Max is only 1MB
       groupId = ${job.env}"-kafkaconnector-group"
@@ -414,13 +427,14 @@ master-data-processor:
     kafka {
       input.topic = ${job.env}".masterdata.ingest"
       output.raw.topic = ${job.env}".masterdata.raw"
-      output.extractor.duplicate.topic = ${job.env}".masterdata.extractor.duplicate"
+      output.extractor.duplicate.topic = ${job.env}".masterdata.failed"
       output.failed.topic = ${job.env}".masterdata.failed"
       output.batch.failed.topic = ${job.env}".masterdata.extractor.failed"
       event.max.size = "1048576" # Max is only 1MB
-      output.invalid.topic = ${job.env}".masterdata.invalid"
+      output.invalid.topic = ${job.env}".masterdata.failed"
       output.unique.topic = ${job.env}".masterdata.unique"
-      output.duplicate.topic = ${job.env}".masterdata.duplicate"
+      output.duplicate.topic = ${job.env}".masterdata.failed"
+      output.denorm.topic = ${job.env}".masterdata.denorm"
       output.transform.topic = ${job.env}".masterdata.transform"
       stats.topic = ${job.env}".masterdata.stats"
       groupId = ${job.env}"-masterdata-pipeline-group"

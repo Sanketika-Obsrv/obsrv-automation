@@ -36,7 +36,7 @@ resource "helm_release" "secor" {
       {
         cloud_store_provider       = var.cloud_store_provider
         upload_manager             = var.upload_manager
-        deployment_stage           = var.env
+        env                        = var.env
         secor_namespace            = var.secor_namespace
         base_path                  = var.secor_backup_basepath
         default_timestamp_key      = var.secor_default_timestamp_key
