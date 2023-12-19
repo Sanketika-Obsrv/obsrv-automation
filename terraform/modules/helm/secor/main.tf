@@ -34,6 +34,7 @@ resource "helm_release" "secor" {
   values = [
     templatefile("${path.module}/${var.secor_custom_values_yaml}",
       {
+        timezone                   = var.timezone
         cloud_store_provider       = var.cloud_store_provider
         upload_manager             = var.upload_manager
         env                        = var.env

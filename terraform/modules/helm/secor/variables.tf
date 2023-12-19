@@ -211,7 +211,10 @@ variable "parser_timezone" {
   default     = "Asia/Kolkata"
 }
 
-
+variable "timezone" {
+  type        = string
+  description = "Timezone property to backup the data"
+}
 
 variable "image_pull_policy" {
   type        = string

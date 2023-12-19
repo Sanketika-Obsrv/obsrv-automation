@@ -50,6 +50,8 @@ spec:
               value: "/opt/secor/config/log4j.docker.properties"
             - name: "JVM_MEMORY"
               value: "{{ .Values.jvm_memory }}"
+            - name: "TIMEZONE"
+              value: "{{ .Values.timezone }}"  
           volumeMounts:
            - mountPath: /opt/secor/config
              name: secor-config

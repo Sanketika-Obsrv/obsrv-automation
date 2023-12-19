@@ -19,6 +19,7 @@ jvm_memory: 1024m
 image_tag: "0.29.16-java-11-gs"
 message_timezone: "UTC"
 parser_timezone: "Asia/Kolkata"
+timezone: "UTC"
 secor_jobs:
   ingest-backup:
     replicas: 1
