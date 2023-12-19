@@ -112,7 +112,7 @@ data:
             },
             {
               "type": "doubleSum",
-              "name": "extractor_job_time",
+              "name": "extractor_time",
               "fieldName": "extractor_time"
             },
             {
