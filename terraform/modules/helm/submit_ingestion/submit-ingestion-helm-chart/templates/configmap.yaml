@@ -317,7 +317,7 @@ data:
       }
     }
 
-  system-telemetry-events: |+
+  system-telemetry-events.json: |+
     {
       "type": "kafka",
       "spec": {
