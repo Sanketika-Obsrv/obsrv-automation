@@ -96,6 +96,11 @@ spec:
               mountPath: {{ .Values.extraConfigMountPath | quote }}
               readOnly: true
           {{- end }}
+          {{- if .Values.dashboardConfig }}
+            - name: superset-dashboards
+              mountPath: {{ .Values.dashboardMountPath | quote }}
+              readOnly: true
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -127,4 +132,9 @@ spec:
         - name: superset-extra-config
           configMap:
             name: {{ template "superset.fullname" . }}-extra-config
+        {{- end }}
+        {{- if .Values.dashboardConfig }}
+        - name: superset-dashboards
+          configMap:
+            name: {{ template "superset.fullname" . }}-dashboards
         {{- end }}
