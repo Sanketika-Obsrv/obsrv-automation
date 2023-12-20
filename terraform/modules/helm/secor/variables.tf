@@ -27,7 +27,7 @@ variable "jobs" {
   "ingest-backup", "raw-backup",
   "failed-backup", "unique-backup",
   "denorm-backup", "transform-backup",
-  "system-events"
+  "system-events", "system-telemetry-events"
   ]
 }
 
