@@ -194,6 +194,11 @@ module "druid_exporter" {
   druid_exporter_chart_depends_on = [module.druid_raw_cluster, module.monitoring]
 }
 
+resource "random_string" "data_encryption_key" {
+  length = 32
+  special = false
+}
+
 module "dataset_api" {
   source                             = "../modules/helm/dataset_api"
   env                                = var.env
@@ -290,4 +295,5 @@ module "postgresql_migration" {
   postgresql_superset_user_password     = module.postgresql.postgresql_superset_user_password
   postgresql_druid_raw_user_password    = module.postgresql.postgresql_druid_raw_user_password
   postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
+  data_encryption_key                   = resource.random_string.data_encryption_key.result
 }
