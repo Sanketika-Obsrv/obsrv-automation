@@ -221,6 +221,36 @@ secor_jobs:
     threads: "${threads}"
     lag_threshold_critical: 200000
 
+  system-telemetry-events:
+    replicas: 1
+    consumer_group: "${env}_system_telemetry_events"
+    service_name: "system-telemetry-events"
+    base_path: "${base_path}/system-telemetry-events"
+    timestamp_key: "ets"
+    fallback_timestamp_key: "${fallback_timestamp_key}"
+    topic: "${env}.system.telemetry.events"
+    kafka_broker_host: "${kafka_broker_host}"
+    zookeeper_quorum: "${zookeeper_quorum}"
+    max_file_size: "${file_size}"
+    max_file_age: "${file_age}"
+    partition_prefix_enabled: "false"
+    partition_prefix_key: ""
+    partition_prefix_mapping: "{}"
+    message_channel_identifier: ""
+    output_file_pattern: "{partition}-{currentTimestamp}.json"
+    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser" 
+    storage:
+      size: "${backup_pv_size}"
+    requests:
+      cpu: "${request_cpu}"
+      memory: "${request_memory}"
+    limits:
+      cpu: "${secor_cpu_limit}"
+      memory: "${secor_memory_limit}"
+    lag_threshold_warning: 100000
+    threads: "${threads}"
+    lag_threshold_critical: 200000  
+
 alertrules:
   enabled: false
 
