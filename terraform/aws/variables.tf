@@ -18,6 +18,11 @@ variable "availability_zones" {
   description = "AWS Availability Zones."
 }
 
+variable "timezone" {
+  type        = string
+  description = "Timezone property to backup the data"
+}
+
 variable "flink_checkpoint_store_type" {
   type        = string
   description = "Flink checkpoint store type."
