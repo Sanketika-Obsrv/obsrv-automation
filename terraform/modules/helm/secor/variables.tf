@@ -198,19 +198,6 @@ variable "kubernetes_storage_class" {
   type        = string
   description = "Storage Class"
 }
-
-variable "message_timezone" {
-  type        = string
-  description = "message timezone"
-  default     = "UTC"
-}
-
-variable "parser_timezone" {
-  type        = string
-  description = "parser timezone"
-  default     = "Asia/Kolkata"
-}
-
 variable "timezone" {
   type        = string
   description = "Timezone property to backup the data"

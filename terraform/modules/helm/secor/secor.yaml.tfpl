@@ -8,8 +8,6 @@ region: "${region}"
 pullPolicy: "${image_pull_policy}"
 jvm_memory: "${jvm_memory}"
 image_tag: "${secor_image_tag}"
-message_timezone: "${message_timezone}"
-parser_timezone: "${parser_timezone}"
 timezone: "${timezone}"
 secor_jobs:
   ingest-backup:
