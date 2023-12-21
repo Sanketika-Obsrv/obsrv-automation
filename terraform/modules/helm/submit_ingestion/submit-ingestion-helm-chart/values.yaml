@@ -12,3 +12,15 @@ datasource:
     task_completion: "PT1H"
     task_count: 1
     replicas: 1
+    enable: true
+
+  system_telemetry_events:
+    topic: "sb-dev.system.telemetry.events"
+    name: "system-telemetry-events"
+    segment_granularity: "hour"
+    query_granularity: "hour"
+    task_duration: "PT1H"
+    task_completion: "PT1H"   
+    task_count: 1
+    replicas: 1 
+    enable: true
