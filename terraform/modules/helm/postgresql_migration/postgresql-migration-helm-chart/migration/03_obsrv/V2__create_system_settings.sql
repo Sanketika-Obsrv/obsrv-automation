@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS  system_settings (
+CREATE TABLE IF NOT EXISTS system_settings (
   "key" TEXT NOT NULL,
   "value" TEXT NOT NULL,
   category TEXT NOT NULL DEFAULT 'SYSTEM'::text,
@@ -14,3 +14,6 @@ INSERT INTO system_settings VALUES
    ('defaultDatasetId', '{{ .Values.system_settings.default_dataset_id }}', 'SYSTEM', 'string', now(), now(), 'Default Dataset ID'),
    ('maxEventSize', '{{ .Values.system_settings.max_event_size }}', 'SYSTEM', 'long', now(), now(), 'Maximum Event Size (per event)'),
    ('defaultDedupPeriodInSeconds', '{{ .Values.system_settings.dedup_period }}', 'SYSTEM', 'int', now(), now(), 'Default Dedup Period (in seconds)');
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
