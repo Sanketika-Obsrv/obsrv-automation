@@ -17,7 +17,7 @@ variable "secor_release_name" {
 variable "secor_image_tag" {
   type        = string
   description = "secor image version"
-  default     = "0.29.16-java-11-gs"
+  default     = "deveop-ga"
 }
 
 variable "jobs" {
