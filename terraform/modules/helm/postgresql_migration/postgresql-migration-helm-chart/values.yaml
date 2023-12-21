@@ -14,3 +14,9 @@ config:
 postgresql_superset_user_password: ""
 postgresql_druid_raw_user_password: ""
 postgresql_obsrv_user_password: ""
+
+system_settings:
+  encryption_key: "strong_encryption_key_to_encrypt"
+  default_dataset_id: "ALL"
+  max_event_size: 1048576
+  dedup_period: 604800 # In seconds (7 days)

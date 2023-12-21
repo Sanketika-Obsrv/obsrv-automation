@@ -78,3 +78,8 @@ variable "postgresql_obsrv_user_password" {
   type        = string
   description = "Postgresql obsrv user password."
 }
+
+variable "data_encryption_key" {
+  type        = string
+  description = "Data encryption key. This is used to encrypt data in pipeline. This is a 32 character string."
+}
