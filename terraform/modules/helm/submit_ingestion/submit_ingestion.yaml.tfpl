@@ -10,6 +10,7 @@ datasource:
     task_completion: "PT1H"
     task_count: 1
     replicas: 1
+    enable: true
 
   system_telemetry_events:
     topic: "${env}.system.telemetry.events"
@@ -19,4 +20,5 @@ datasource:
     task_duration: "PT1H"
     task_completion: "PT1H"
     task_count: 1
-    replicas: 1  
+    replicas: 1
+    enable: true  
