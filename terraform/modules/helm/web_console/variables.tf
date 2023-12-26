@@ -52,7 +52,7 @@ variable "web_console_image_repository" {
 variable "web_console_image_tag" {
   type        = string
   description = "web console image tag."
-  default     = "1.0.0"
+  default     = "1.0.0-GA"
 }
 
 variable "web_console_image_name" {
