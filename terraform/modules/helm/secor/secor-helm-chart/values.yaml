@@ -16,7 +16,7 @@ image_repository: "sanketikahub/secor"
 region: "" # region name to be provided for ex: "us-east-2"
 pullPolicy: "IfNotPresent"
 jvm_memory: 1024m
-image_tag: "0.29.16-java-11-gs" # TODO - Update the right version of secor image
+image_tag: "1.0.0-GA" # TODO - Update the right version of secor image
 timezone: "UTC"
 secor_jobs:
   ingest-backup:

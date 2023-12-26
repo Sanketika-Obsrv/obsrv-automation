@@ -7,7 +7,7 @@ memory_limits: 1024Mi
 image:
   repository: sanketikahub
   image_name: sb-obsrv-web-console
-  tag: "1.0.0"
+  tag: "1.0.0-GA"
   pullPolicy: "IfNotPresent"
 ENV: development
 PORT: 3000
