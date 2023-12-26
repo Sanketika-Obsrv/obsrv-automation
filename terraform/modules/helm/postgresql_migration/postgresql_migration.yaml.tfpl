@@ -9,3 +9,6 @@ config:
 postgresql_superset_user_password: "${postgresql_superset_user_password}"
 postgresql_druid_raw_user_password: "${postgresql_druid_raw_user_password}"
 postgresql_obsrv_user_password: "${postgresql_obsrv_user_password}"
+
+system_settings:
+  encryption_key: "${data_encryption_key}"

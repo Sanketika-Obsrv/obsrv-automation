@@ -17,7 +17,7 @@ variable "secor_release_name" {
 variable "secor_image_tag" {
   type        = string
   description = "secor image version"
-  default     = "0.29.16-java-11-gs"
+  default     = "deveop-ga"
 }
 
 variable "jobs" {
@@ -27,7 +27,7 @@ variable "jobs" {
   "ingest-backup", "raw-backup",
   "failed-backup", "unique-backup",
   "denorm-backup", "transform-backup",
-  "system-events"
+  "system-events", "system-telemetry-events"
   ]
 }
 
@@ -198,20 +198,10 @@ variable "kubernetes_storage_class" {
   type        = string
   description = "Storage Class"
 }
-
-variable "message_timezone" {
+variable "timezone" {
   type        = string
-  description = "message timezone"
-  default     = "UTC"
+  description = "Timezone property to backup the data"
 }
-
-variable "parser_timezone" {
-  type        = string
-  description = "parser timezone"
-  default     = "Asia/Kolkata"
-}
-
-
 
 variable "image_pull_policy" {
   type        = string

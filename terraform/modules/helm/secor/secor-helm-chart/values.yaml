@@ -16,9 +16,8 @@ image_repository: "sanketikahub/secor"
 region: "" # region name to be provided for ex: "us-east-2"
 pullPolicy: "IfNotPresent"
 jvm_memory: 1024m
-image_tag: "0.29.16-java-11-gs"
-message_timezone: "UTC"
-parser_timezone: "Asia/Kolkata"
+image_tag: "0.29.16-java-11-gs" # TODO - Update the right version of secor image
+timezone: "UTC"
 secor_jobs:
   ingest-backup:
     replicas: 1
@@ -229,6 +228,36 @@ secor_jobs:
     lag_threshold_warning: 100000
     threads: "2"
     lag_threshold_critical: 200000
+
+  system-telemetry-events:
+    replicas: 1
+    consumer_group: "dev_system_telemetry_events"
+    service_name: "system-telemetry-events"
+    base_path: "telemetry-data/system-telemetry-events"
+    timestamp_key: "ets"
+    fallback_timestamp_key: "ets"
+    topic: "dev.system.telemetry.events"
+    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
+    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
+    max_file_size: "100000000"
+    max_file_age: "60"
+    partition_prefix_enabled: "false"
+    partition_prefix_key: ""
+    partition_prefix_mapping: "{}"
+    message_channel_identifier: ""
+    output_file_pattern: "{partition}-{currentTimestamp}.json"
+    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser" 
+    storage:
+      size: "1Gi"
+    requests:
+      cpu: "128m"
+      memory: "512Mi"
+    limits:
+      cpu: "128m"
+      memory: "512Mi"
+    lag_threshold_warning: 100000
+    threads: "2"
+    lag_threshold_critical: 200000  
 
 alertrules:
   enabled: false

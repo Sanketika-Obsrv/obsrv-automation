@@ -18,6 +18,11 @@ variable "availability_zones" {
   description = "AWS Availability Zones."
 }
 
+variable "timezone" {
+  type        = string
+  description = "Timezone property to backup the data"
+}
+
 variable "flink_checkpoint_store_type" {
   type        = string
   description = "Flink checkpoint store type."
@@ -45,7 +50,7 @@ variable "dataset_api_container_registry" {
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.3.1"
+  default     = "develop-ga"
 }
 
 variable "flink_container_registry" {
@@ -57,7 +62,7 @@ variable "flink_container_registry" {
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "1.3.1"
+   default     = "develop-ga"
 }
 
 variable "web_console_configs" {
@@ -78,7 +83,7 @@ variable "web_console_configs" {
 variable "web_console_image_tag" {
   type        = string
   description = "web console image tag."
-  default = "1.3.1"
+  default = "develop-ga"
 }
 
 variable "web_console_image_repository" {
@@ -120,5 +125,5 @@ variable "merged_pipeline_enabled" {
 variable "command_service_image_tag" {
   type        = string
   description = "CommandService image tag."
-  default     = "1.3.1"
+  default     = "develop-ga"
 }

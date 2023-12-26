@@ -148,6 +148,7 @@ configOverrides:
 
 configMountPath: "/app/pythonpath"
 extraConfigMountPath: "/app/configs"
+dashboardMountPath: "/app/dashboards"
 
 image:
   repository: apache/superset
@@ -262,6 +263,13 @@ init:
     if [ -f "{{ .Values.extraConfigMountPath }}/import_datasources.yaml" ]; then
       echo "Importing database connections.... "
       superset import_datasources -p {{ .Values.extraConfigMountPath }}/import_datasources.yaml
+    fi
+
+    if [ -f "{{ .Values.dashboardMountPath }}/dashboards.zip" ]; then
+      echo "Importing dashboards.... "
+      superset import-dashboards --path "{{ .Values.dashboardMountPath }}/dashboards.zip"
+    else
+      echo "File /app/dashboards/dashboards.zip not found..."
     fi
 
 ## Configuration values for the Redis dependency.
