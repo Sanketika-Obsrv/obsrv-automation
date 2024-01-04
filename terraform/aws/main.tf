@@ -30,6 +30,7 @@ provider "helm" {
 module "vpc" {
   source             = "../modules/aws/vpc"
   env                = var.env
+  count              = var.create_vpc ? 1 : 0
   building_block     = var.building_block
   region             = var.region
   availability_zones = var.availability_zones
@@ -39,8 +40,8 @@ module "eks" {
   source                = "../modules/aws/eks"
   env                   = var.env
   building_block        = var.building_block
-  eks_master_subnet_ids = module.vpc.multi_zone_public_subnets_ids
-  eks_nodes_subnet_ids  = module.vpc.single_zone_public_subnets_id
+  eks_master_subnet_ids = var.create_vpc ? module.vpc[0].multi_zone_public_subnets_ids : var.eks_master_subnet_ids
+  eks_nodes_subnet_ids  = var.create_vpc ? module.vpc[0].single_zone_public_subnets_id : var.eks_nodes_subnet_ids
   region                = var.region
   depends_on            = [module.vpc]
 }
@@ -248,8 +249,8 @@ module "velero" {
   cloud_provider               = "aws"
   velero_backup_bucket         = module.s3.velero_storage_bucket
   velero_backup_bucket_region  = var.region
-  velero_aws_access_key_id     = module.iam.velero_user_access_key
-  velero_aws_secret_access_key = module.iam.velero_user_secret_key
+  velero_aws_access_key_id     = var.create_velero_user ? var.velero_aws_access_key_id : module.iam.velero_user_access_key
+  velero_aws_secret_access_key = var.create_velero_user ? var.velero_aws_secret_access_key: module.iam.velero_user_secret_key
 }
 
 module "alert_rules" {
