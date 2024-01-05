@@ -18,6 +18,15 @@ variable "region" {
   type        = string
   description = "AWS region to create the resources."
 }
+variable "cluster_logs_enabled" {
+  type = bool
+  description = "Toggle to enable eks cluster logs"
+}
+variable "eks_cluster_logs_retention" {
+  type = number
+  description = "EKS cluster logs retention period"
+  default = 1 
+}
 
 variable "eks_master_role" {
   type        = string

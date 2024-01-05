@@ -40,6 +40,7 @@ module "eks" {
   source                = "../modules/aws/eks"
   env                   = var.env
   building_block        = var.building_block
+  cluster_logs_enabled  = var.cluster_logs_enabled
   eks_master_subnet_ids = var.create_vpc ? module.vpc[0].multi_zone_public_subnets_ids : var.eks_master_subnet_ids
   eks_nodes_subnet_ids  = var.create_vpc ? module.vpc[0].single_zone_public_subnets_id : var.eks_nodes_subnet_ids
   region                = var.region

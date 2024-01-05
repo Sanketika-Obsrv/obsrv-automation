@@ -57,6 +57,10 @@ variable "service_type" {
   description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
   default = "NodePort"
 }
+variable "cluster_logs_enabled" {
+  type = bool
+  description = "Toggle to enable eks cluster logs"
+}
 variable "flink_checkpoint_store_type" {
   type        = string
   description = "Flink checkpoint store type."
