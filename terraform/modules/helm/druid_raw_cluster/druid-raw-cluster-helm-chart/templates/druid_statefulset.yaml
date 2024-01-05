@@ -448,7 +448,7 @@ spec:
         system.ingestion: "true"
       services:
         - spec:
-            type: ClusterIP
+            type: {{ .Values.druid_router_service_type }}
             ports:
               - name: druidrouterport
                 port: 8888

@@ -50,8 +50,12 @@ variable "velero_aws_access_key_id" {
 variable "velero_aws_secret_access_key" {
   type = string
   description = "AWs Secret access key to access bucket"
-  default = ""
-  
+  default = "" 
+}
+variable "service_type" {
+  type = string
+  description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
+  default = "NodePort"
 }
 variable "flink_checkpoint_store_type" {
   type        = string

@@ -92,6 +92,7 @@ module "superset" {
   redis_namespace                   = module.redis_dedup.redis_namespace
   redis_release_name                = module.redis_dedup.redis_release_name
   postgresql_service_name           = module.postgresql.postgresql_service_name
+  service_type                      = var.service_type
 }
 
 module "grafana_configs" {
@@ -166,6 +167,7 @@ module "druid_raw_cluster" {
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
   druid_raw_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.druid_raw_sa_iam_role}"
   druid_cluster_namespace            = module.eks.druid_raw_namespace
+  service_type                       = var.service_type
 }
 
 module "druid_operator" {
@@ -219,6 +221,7 @@ module "dataset_api" {
   dedup_redis_release_name           = module.redis_dedup.redis_release_name
   dataset_api_namespace              = module.eks.dataset_api_namespace
   s3_bucket                          = module.s3.s3_bucket
+  service_type                       = var.service_type
 }
 
 module "secor" {
@@ -267,6 +270,7 @@ module "web_console" {
   depends_on                       = [module.eks, module.monitoring]
   web_console_image_repository     = var.web_console_image_repository
   web_console_image_tag            = var.web_console_image_tag
+  service_type                     = var.service_type
 }
 
 module "get_kubeconfig" {

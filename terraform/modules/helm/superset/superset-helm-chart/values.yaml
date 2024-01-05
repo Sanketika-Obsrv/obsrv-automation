@@ -158,7 +158,7 @@ image:
 imagePullSecrets: []
 
 service:
-  type: LoadBalancer
+  type: NodePort
   port: 8088
   annotations: {}
 

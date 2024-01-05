@@ -26,6 +26,7 @@ resource "helm_release" "dataset_api" {
           dedup_redis_namespace              = var.dedup_redis_namespace
           dedup_redis_release_name           = var.dedup_redis_release_name
           s3_bucket                          = var.s3_bucket
+          service_type                       = var.service_type
         }
       )
     ]
