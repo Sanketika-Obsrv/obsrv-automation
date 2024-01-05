@@ -34,19 +34,20 @@ Ensure the installation of the following tools:
 
 ## Setup Process
 
-Before running the following command, ensure that the `curl` command is installed on your machine. If not, you can install it using the following commands:
+Before executing the `setup` shell script, ensure that the `curl` and `unzip` utilities are present on your system. If they are not installed, you can use the following commands to install them. Execute the provided `setup.sh`` script as a root user to avoid potential permission issues:
 
+**Prerequisites**
 ```bash
 sudo apt-get update
 sudo apt-get install -y curl
+sudo apt-get install -y unzip
 ```
 
-Once `curl` is installed, you can proceed with the setup by running the following command:
+Once the `curl` and `unzip` utility is successfully installed, proceed with the setup by running the following command:
 
 ```bash
 sh setup.sh ./setup.conf
 ```
 
-This will use the configurations provided in the `setup.conf` file to initialize the setup process.
-
+This command utilizes the configurations specified in the `setup.conf` file to initiate the setup process.
 
