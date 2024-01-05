@@ -7,9 +7,9 @@ version_compare() {
     IFS='.' read v2_major v2_minor v2_patch <<< "$version2"
 
     if [ "$v1_major" -gt "$v2_major" ] || [ "$v1_major" -eq "$v2_major" -a "$v1_minor" -gt "$v2_minor" ] || [ "$v1_major" -eq "$v2_major" -a "$v1_minor" -eq "$v2_minor" -a "$v1_patch" -ge "$v2_patch" ]; then
-        echo true  # version1 is greater than or equal to version2
+        echo true  
     else
-        echo false  # version1 is less than version2
+        echo false
     fi
 }
 
