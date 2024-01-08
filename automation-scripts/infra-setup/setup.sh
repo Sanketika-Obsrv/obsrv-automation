@@ -67,7 +67,7 @@ validate_tools() {
     # Define all the required tools with version
     tool_versions=(
         "aws:2.13.8"
-        "helm:3.50.2"
+        "helm:3.10.2"
         "terraform:1.5.7"
         "terrahelp:0.7.5"
         "terragrunt:0.45.6"
