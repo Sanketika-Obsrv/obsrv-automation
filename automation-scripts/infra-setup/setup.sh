@@ -152,25 +152,27 @@ export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 export KUBE_CONFIG_PATH=$KUBE_CONFIG_PATH
-export TF_VAR_availability_zones=$TF_VAR_availability_zones
-export TF_VAR_building_block=$TF_VAR_building_block
-export TF_VAR_env=$TF_VAR_env
-export TF_VAR_region=$TF_VAR_region
-export TF_VAR_timezone=$TF_VAR_timezone
+tfvars_file="../../terraform/aws/vars/overrides.tfvars"
 
+# Create the tfvars file
+cat <<EOF > "$tfvars_file"
+eks_nodes_subnet_ids = $EKS_NODES_SUBNET_IDS
+eks_master_subnet_ids = $EKS_MASTER_SUBNET_IDS
+velero_aws_access_key_id = "$VELERO_AWS_ACCESS_KEY_ID"
+velero_aws_secret_access_key = "$VELERO_AWS_SECRET_ACCESS_KEY"
+service_type = "$SERVICE_TYPE"
+vpc_id = "$VPC_ID"
+availability_zones = $AVAILABILITY_ZONES
+building_block  = "$BUILDING_BLOCK"
+env = "$ENV"
+regiion = "$REGION"
+timezone = "$TIMEZONE"
+create_vpc = "$ALLOW_VPC_CREATION"
+create_velero_user = "$ALLOW_VELERO_USER_CREATION"
+create_kong_ingress = "$ALLOW_KONG_INGRESS_SETUP"
+EOF
 
-for var in ALLOW_VPC_CREATION ALLOW_VELERO_USER_CREATION ALLOW_KONG_INGRESS_SETUP; do
-    if [[ "${!var}" == "true" ]]; then
-        # Assign boolean true value
-        eval "$var=true"
-    elif [[ "${!var}" == "false" ]]; then
-        # Assign boolean false value
-        eval "$var=false"
-    else
-        echo "Error: $var must be either 'true' or 'false'"
-        exit 1
-    fi
-done
+echo "terraform.tfvars file created successfully at $tfvars_file."
 
 validate_tools
 setup_kube_config
@@ -178,7 +180,7 @@ setup_kube_config
 # Script related to terraform and deployment will start from here
 cd ../../terraform/aws
 terragrunt init
-terragrunt apply -target module.eks -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=overrides.tfvars -auto-approve
-terragrunt apply -target module.get_kubeconfig -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=overrides.tfvars -auto-approve
-terragrunt apply  -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=overrides.tfvars -auto-approve
+terragrunt apply -target module.eks -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
+terragrunt apply -target module.get_kubeconfig -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
+terragrunt apply  -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
 
