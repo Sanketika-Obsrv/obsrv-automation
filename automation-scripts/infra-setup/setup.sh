@@ -86,7 +86,7 @@ validate_tools() {
                 ;;
             "terraform")
                 terraform_version='terraform version | awk '\''/Terraform/{gsub(/[^0-9.]/, "", $2); print $2}'\'''
-                install_tool "terraform" 'curl -LO "https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip" -o "terraform.zip" && unzip terraform.zip && sudo mv terraform /usr/local/bin/' "$terraform_version" "$required_version"
+                install_tool "terraform" 'curl -LO "https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip" -o "terraform.zip" && unzip terraform_1.5.7_linux_amd64.zip && sudo mv terraform /usr/local/bin/' "$terraform_version" "$required_version"
                 ;;
             "terrahelp")
                 terrahelp_version='terrahelp --version | awk '\''/terrahelp version/ {print $3}'\'''
@@ -145,7 +145,7 @@ fi
 source "$config_file"
 
 # Set up AWS environment variables
-echo "Setup Infa configurations"
+echo "Setup Infra configurations"
 export AWS_TERRAFORM_BACKEND_BUCKET_NAME=$AWS_TERRAFORM_BACKEND_BUCKET_NAME
 export AWS_TERRAFORM_BACKEND_BUCKET_REGION=$AWS_TERRAFORM_BACKEND_BUCKET_REGION
 export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
