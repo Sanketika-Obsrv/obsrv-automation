@@ -18,3 +18,4 @@ END
 $do$;
 
 GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
+GRANT ALL ON SCHEMA public TO superset;
