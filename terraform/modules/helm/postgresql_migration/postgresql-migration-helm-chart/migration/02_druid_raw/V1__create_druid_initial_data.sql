@@ -18,4 +18,4 @@ END
 $do$;
 
 GRANT ALL PRIVILEGES ON DATABASE druid_raw TO druid_raw;
-GRANT ALL ON SCHEMA public TO druid_raw;
+ALTER DATABASE druid_raw OWNER TO druid_raw;
