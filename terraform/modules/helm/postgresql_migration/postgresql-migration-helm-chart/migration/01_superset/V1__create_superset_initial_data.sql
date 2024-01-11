@@ -18,3 +18,4 @@ END
 $do$;
 
 GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
+ALTER DATABASE superset OWNER TO superset;

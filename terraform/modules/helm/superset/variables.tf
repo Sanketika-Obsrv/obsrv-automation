@@ -68,7 +68,7 @@ variable "postgresql_superset_user_password" {
 variable "superset_image_tag" {
   type        = string
   description = "Superset image tag."
-  default     = "2.1.0"
+  default     = "3.0.2"
 }
 
 variable "superset_install_timeout" {
