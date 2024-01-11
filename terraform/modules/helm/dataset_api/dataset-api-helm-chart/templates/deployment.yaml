@@ -63,7 +63,7 @@ metadata:
     system.querying: "true"
     system.api: "true"
 spec:
-  type: LoadBalancer
+  type: {{ .Values.service.type }}
   ports:
     - name: http-{{ .Chart.Name }}
       protocol: TCP

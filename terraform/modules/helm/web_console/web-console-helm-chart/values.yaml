@@ -18,3 +18,5 @@ REACT_APP_VERSION: v1.2.0
 GENERATE_SOURCEMAP: false
 REACT_APP_GRAFANA_URL: http://localhost
 REACT_APP_SUPERSET_URL: http://localhost
+service:
+  type: LoadBalancer

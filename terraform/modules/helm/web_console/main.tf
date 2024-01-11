@@ -24,6 +24,7 @@ resource "helm_release" "web_console" {
           https                              = var.web_console_configs["https"]
           react_app_version                  = var.web_console_configs["react_app_version"]
           generate_sourcemap                 = var.web_console_configs["generate_sourcemap"]
+          service_type                       = var.service_type
         }
       )
     ]

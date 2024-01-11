@@ -14,4 +14,4 @@ spec:
       targetPort: 3000
   selector:
     app: web-console
-  type: LoadBalancer
+  type: {{ .Values.service_type }}
