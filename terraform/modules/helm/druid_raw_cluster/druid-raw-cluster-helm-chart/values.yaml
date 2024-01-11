@@ -255,7 +255,7 @@ druid_indexer_replicas: 1
 
 druid_router_service: druid/router
 druid_router_plaintextPort: 8888
-druid_router_service_type: NodePort
+druid_router_service_type: LoadBalancer
 
 druid_router_min_heap_size: 256M
 druid_router_max_heap_size: 512M
