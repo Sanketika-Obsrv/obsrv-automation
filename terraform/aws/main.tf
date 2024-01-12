@@ -254,8 +254,8 @@ module "velero" {
   cloud_provider               = "aws"
   velero_backup_bucket         = module.s3.velero_storage_bucket
   velero_backup_bucket_region  = var.region
-  velero_aws_access_key_id     = var.create_velero_user ?  module.iam.velero_user_access_key : var.velero_aws_access_key_id
-  velero_aws_secret_access_key = var.create_velero_user ? module.iam.velero_user_secret_key : var.velero_aws_secret_access_key 
+  velero_aws_access_key_id     = var.create_velero_user ?  module.iam[0].velero_user_access_key : var.velero_aws_access_key_id
+  velero_aws_secret_access_key = var.create_velero_user ? module.iam[0].velero_user_secret_key : var.velero_aws_secret_access_key 
 }
 
 module "alert_rules" {
