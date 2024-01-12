@@ -13,6 +13,12 @@ variable "location" {
   description = "Azure location to create the resources."
 }
 
+variable "aks_version" {
+  type = string
+  description = "AKS cluster version"
+  default = "1.27"
+  
+}
 variable "additional_tags" {
   type        = map(string)
   description = "Additional tags for the resources. These tags will be applied to all the resources."

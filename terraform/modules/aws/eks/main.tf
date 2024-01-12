@@ -98,6 +98,7 @@ resource "aws_eks_cluster" "eks_master" {
   name     = "${var.building_block}-${var.env}-eks"
   role_arn = aws_iam_role.eks_master_role.arn
   version  = var.eks_version
+  enabled_cluster_log_types = ["api"]
 
   vpc_config {
    subnet_ids = var.eks_master_subnet_ids
@@ -113,6 +114,11 @@ resource "aws_eks_cluster" "eks_master" {
   depends_on = [
   aws_iam_role_policy_attachment.eks_master_policy_attachment
   ]
+}
+resource "aws_cloudwatch_log_group" "eks_cw_log_group" {
+  count   = var.cluster_logs_enabled ? 1 : 0
+  name    = "/aws/eks/${var.building_block}-${var.env}-eks/cluster"
+  retention_in_days = var.eks_cluster_logs_retention
 }
 
 resource "aws_eks_node_group" "eks_nodes" {

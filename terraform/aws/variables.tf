@@ -23,6 +23,44 @@ variable "timezone" {
   description = "Timezone property to backup the data"
 }
 
+variable "create_vpc" {
+  type = bool
+  description = "Toggle to create to a vpc"
+}
+variable "eks_nodes_subnet_ids" {
+  type = list(string)
+  description = "The VPC's subnet id which will be used to create the EKS node groups"
+  default = [""]
+}
+variable "eks_master_subnet_ids" {
+  type = list(string)
+  description = "The VPC's subnet id which will be used to create the EKS cluster"
+  default = [""]
+}
+
+variable "create_velero_user" {
+  type = bool
+  description = "Toggle to create a velero user"
+}
+variable "velero_aws_access_key_id" {
+  type = string
+  description = "AWS Access key to access bucket"
+  default = ""
+}
+variable "velero_aws_secret_access_key" {
+  type = string
+  description = "AWs Secret access key to access bucket"
+  default = "" 
+}
+variable "service_type" {
+  type = string
+  description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
+  default = "LoadBalancer"
+}
+variable "cluster_logs_enabled" {
+  type = bool
+  description = "Toggle to enable eks cluster logs"
+}
 variable "flink_checkpoint_store_type" {
   type        = string
   description = "Flink checkpoint store type."

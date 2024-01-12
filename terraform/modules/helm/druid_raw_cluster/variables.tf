@@ -7,6 +7,10 @@ variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
 }
+variable "service_type" {
+  type = string
+  description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
+}
 
 variable "druid_cluster_release_name" {
   type        = string

@@ -1,6 +1,6 @@
 druid_env: "dev"
 druid_cluster_type: "raw"
-druid_image: "apache/druid:25.0.0"
+druid_image: "apache/druid:28.0.1"
 druid_namespace: "druid-raw"
 druid_monitoring: True
 mount_path: /druid/data
@@ -255,6 +255,7 @@ druid_indexer_replicas: 1
 
 druid_router_service: druid/router
 druid_router_plaintextPort: 8888
+druid_router_service_type: LoadBalancer
 
 druid_router_min_heap_size: 256M
 druid_router_max_heap_size: 512M
