@@ -19,6 +19,7 @@ resource "helm_release" "superset" {
         redis_namespace           = var.redis_namespace
         redis_release_name        = var.redis_release_name
         postgresql_service_name   = var.postgresql_service_name
+        service_type              = var.service_type
       }
       )
     ]

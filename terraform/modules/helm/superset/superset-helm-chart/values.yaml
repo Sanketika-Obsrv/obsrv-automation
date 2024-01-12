@@ -152,7 +152,7 @@ dashboardMountPath: "/app/dashboards"
 
 image:
   repository: apache/superset
-  tag: 2.1.0
+  tag: 3.0.2
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

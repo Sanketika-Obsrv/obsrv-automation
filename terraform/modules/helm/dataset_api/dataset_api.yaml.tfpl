@@ -28,3 +28,5 @@ exhaust_service:
   CONTAINER: ${s3_bucket}
 service_account_annotations:
   ${dataset_api_sa_annotations}
+service:
+  type: ${service_type}

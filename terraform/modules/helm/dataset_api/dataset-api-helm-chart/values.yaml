@@ -50,3 +50,5 @@ EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-sy
 
 service_account_annotations:
   eks.amazonaws.com/role-arn: ""
+service:
+  type: LoadBalancer

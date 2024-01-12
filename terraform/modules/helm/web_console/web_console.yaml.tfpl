@@ -12,3 +12,5 @@ REACT_APP_SUPERSET_URL: ${react_app_superset_url}
 HTTPS: ${https}
 REACT_APP_VERSION: ${react_app_version}
 GENERATE_SOURCEMAP: ${generate_sourcemap}
+service:
+  type: ${service_type}

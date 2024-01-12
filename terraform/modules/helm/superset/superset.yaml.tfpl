@@ -16,3 +16,5 @@ image:
 redis_host: ${redis_release_name}-master.${redis_namespace}.svc.cluster.local
 redis_port: '6379'
 superset_redis_db_index: '3'
+service:
+  type: ${service_type}

@@ -7,6 +7,10 @@ variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
 }
+variable "service_type" {
+  type = string
+  description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
+}
 
 variable "superset_release_name" {
   type        = string
@@ -68,7 +72,7 @@ variable "postgresql_superset_user_password" {
 variable "superset_image_tag" {
   type        = string
   description = "Superset image tag."
-  default     = "2.1.0"
+  default     = "3.0.2"
 }
 
 variable "superset_install_timeout" {
