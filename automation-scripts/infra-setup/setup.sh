@@ -165,7 +165,7 @@ vpc_id = "$VPC_ID"
 availability_zones = $AVAILABILITY_ZONES
 building_block  = "$BUILDING_BLOCK"
 env = "$ENV"
-regiion = "$REGION"
+region = "$REGION"
 timezone = "$TIMEZONE"
 create_vpc = "$ALLOW_VPC_CREATION"
 create_velero_user = "$ALLOW_VELERO_USER_CREATION"
@@ -175,7 +175,7 @@ EOF
 echo "terraform.tfvars file created successfully at $tfvars_file."
 
 validate_tools
-setup_kube_config
+#setup_kube_config - TODO - Required to verify 
 
 # Script related to terraform and deployment will start from here
 cd ../../terraform/aws
