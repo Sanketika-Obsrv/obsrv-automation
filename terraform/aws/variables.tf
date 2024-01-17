@@ -54,7 +54,7 @@ variable "velero_aws_secret_access_key" {
 }
 variable "service_type" {
   type = string
-  description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
+  description = "Kubernetes service type either NodePort or LoadBalancer. It is LoadBalancer by default"
   default = "LoadBalancer"
 }
 variable "cluster_logs_enabled" {
