@@ -60,6 +60,7 @@ variable "service_type" {
 variable "cluster_logs_enabled" {
   type = bool
   description = "Toggle to enable eks cluster logs"
+  default = true
 }
 variable "flink_checkpoint_store_type" {
   type        = string
