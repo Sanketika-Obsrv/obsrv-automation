@@ -419,7 +419,7 @@ kafka-connector:
     heartbeat.interval: 5000
     state.savepoints.dir: file:///tmp
 
-  job_classname: org.sunbird.obsrv.kafkaconnector.task.KafkaConnectorStreamTask
+  job_classname: org.sunbird.obsrv.connector.task.KafkaConnectorStreamTask
   
 master-data-processor:
   master-data-processor: |+
