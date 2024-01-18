@@ -32,6 +32,9 @@ kube-state-metrics:
       cpu: "0.1"
       memory: 128Mi
 grafana:
+  service:
+    enabled: true
+    type: ${service_type}
   resources:
     limits:
       cpu: 0.2

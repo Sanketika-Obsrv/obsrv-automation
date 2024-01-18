@@ -7,6 +7,10 @@ variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
 }
+variable "service_type" {
+  type = string
+  default = "Kubernetes service type either LoadBalancer or NodePort. It is LoadBalancer by default"
+}
 
 variable "monitoring_release_name" {
   type        = string

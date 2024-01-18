@@ -15,6 +15,7 @@ resource "helm_release" "monitoring" {
         {
             prometheus_persistent_volume_size = var.prometheus_persistent_volume_size
             prometheus_metrics_retention      = var.prometheus_metrics_retention
+            service_type                      = var.service_type
         }
       )
     ]

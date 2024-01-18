@@ -77,7 +77,7 @@ variable "eks_node_group_scaling_config" {
 variable "eks_version" {
   type        = string
   description = "EKS version."
-  default     = "1.27"
+  default     = "1.28"
 }
 
 variable "eks_addons" {

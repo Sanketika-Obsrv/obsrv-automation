@@ -54,12 +54,13 @@ variable "velero_aws_secret_access_key" {
 }
 variable "service_type" {
   type = string
-  description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
+  description = "Kubernetes service type either NodePort or LoadBalancer. It is LoadBalancer by default"
   default = "LoadBalancer"
 }
 variable "cluster_logs_enabled" {
   type = bool
   description = "Toggle to enable eks cluster logs"
+  default = true
 }
 variable "flink_checkpoint_store_type" {
   type        = string
@@ -140,7 +141,7 @@ variable "flink_release_names" {
     transformer     = "transformer"
     druid-router    = "druid-router"
     master-data-processor = "master-data-processor"
-    # kafka-connector = "kafka-connector"
+    kafka-connector = "kafka-connector"
   }
 }
 
@@ -150,7 +151,7 @@ variable "flink_merged_pipeline_release_names" {
   default = {
     merged-pipeline = "merged-pipeline"
     master-data-processor = "master-data-processor"
-    # kafka-connector = "kafka-connector"
+    kafka-connector = "kafka-connector"
   }
 }
 
