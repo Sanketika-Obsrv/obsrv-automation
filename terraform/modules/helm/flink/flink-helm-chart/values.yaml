@@ -293,11 +293,44 @@ preprocessor:
 
   job_classname: org.sunbird.obsrv.preprocessor.task.PipelinePreprocessorStreamTask
 
+transformer:
+  transformer: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = ${job.env}".unique"
+      output.transform.topic = ${job.env}".transform"
+      groupId = ${job.env}"-transformer-group"
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+
+  job_classname: org.sunbird.obsrv.transformer.task.TransformerStreamTask
+
+
 denormalizer:
   denormalizer: |+
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
-      input.topic = ${job.env}".unique"
+      input.topic = ${job.env}".transform"
       output.denorm.topic = ${job.env}".denorm"
       output.denorm.failed.topic = ${job.env}".failed"
       groupId = ${job.env}"-denormalizer-group"
@@ -326,43 +359,11 @@ denormalizer:
 
   job_classname: org.sunbird.obsrv.denormalizer.task.DenormalizerWindowStreamTask
 
-transformer:
-  transformer: |+
-    include file("/data/flink/conf/baseconfig.conf")
-    kafka {
-      input.topic = ${job.env}".denorm"
-      output.transform.topic = ${job.env}".transform"
-      groupId = ${job.env}"-transformer-group"
-      producer {
-        max-request-size = 5242880
-      }
-    }
-
-    task {
-      consumer.parallelism = 1
-      downstream.operators.parallelism = 1
-    }
-
-  flink-conf: |+
-    jobmanager.memory.flink.size: 1024m
-    taskmanager.memory.flink.size: 1024m
-    taskmanager.numberOfTaskSlots: 1
-    jobManager.numberOfTaskSlots: 1
-    parallelism.default: 1
-    jobmanager.execution.failover-strategy: region
-    taskmanager.memory.network.fraction: 0.1
-    scheduler-mode: reactive
-    heartbeat.timeout: 8000
-    heartbeat.interval: 5000
-    state.savepoints.dir: file:///tmp
-
-  job_classname: org.sunbird.obsrv.transformer.task.TransformerStreamTask
-
 druid-router:
   druid-router: |+
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
-      input.topic = ${job.env}".transform"
+      input.topic = ${job.env}".denorm"
       stats.topic = ${job.env}".stats"
       groupId = ${job.env}"-druid-router-group"
     }
