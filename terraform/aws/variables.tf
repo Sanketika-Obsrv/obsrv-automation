@@ -89,7 +89,7 @@ variable "dataset_api_container_registry" {
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.0-GA"
+  default     = "1.0.2"
 }
 
 variable "flink_container_registry" {
@@ -101,7 +101,7 @@ variable "flink_container_registry" {
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "1.0.0-GA"
+   default     = "1.0.2"
 }
 
 variable "web_console_configs" {
@@ -122,7 +122,7 @@ variable "web_console_configs" {
 variable "web_console_image_tag" {
   type        = string
   description = "web console image tag."
-  default = "1.0.0-GA"
+  default = "1.0.2"
 }
 
 variable "web_console_image_repository" {
@@ -164,5 +164,5 @@ variable "merged_pipeline_enabled" {
 variable "command_service_image_tag" {
   type        = string
   description = "CommandService image tag."
-  default     = "1.0.0-GA"
+  default     = "1.0.2"
 }
