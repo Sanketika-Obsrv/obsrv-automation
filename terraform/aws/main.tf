@@ -79,6 +79,7 @@ module "monitoring" {
   source                           = "../modules/helm/monitoring"
   env                              = var.env
   building_block                   = var.building_block
+  service_type                     = var.service_type
   depends_on                       = [module.eks]
 }
 

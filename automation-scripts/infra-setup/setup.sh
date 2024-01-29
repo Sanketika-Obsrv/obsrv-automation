@@ -179,6 +179,7 @@ validate_tools
 
 # Script related to terraform and deployment will start from here
 cd ../../terraform/aws
+terrahelp decrypt  -simple-key=<decryption_key> -file=vars/dev.tfvars
 terragrunt init
 terragrunt apply -target module.eks -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
 terragrunt apply -target module.get_kubeconfig -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
