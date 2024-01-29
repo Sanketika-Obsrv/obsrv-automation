@@ -101,7 +101,7 @@ variable "flink_container_registry" {
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "1.0.0-GA"
+   default     = "1.0.2-GA"
 }
 
 variable "web_console_configs" {
