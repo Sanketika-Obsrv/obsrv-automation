@@ -89,7 +89,6 @@ variable "dataset_api_container_registry" {
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.2-GA"
 }
 
 variable "flink_container_registry" {
@@ -101,7 +100,6 @@ variable "flink_container_registry" {
 variable "flink_image_tag" {
    type        = string
    description = "Flink kubernetes service name."
-   default     = "1.0.2-GA"
 }
 
 variable "web_console_configs" {
@@ -122,7 +120,6 @@ variable "web_console_configs" {
 variable "web_console_image_tag" {
   type        = string
   description = "web console image tag."
-  default = "1.0.2-GA"
 }
 
 variable "web_console_image_repository" {
@@ -141,7 +138,6 @@ variable "flink_release_names" {
     transformer     = "transformer"
     druid-router    = "druid-router"
     master-data-processor = "master-data-processor"
-    kafka-connector = "kafka-connector"
   }
 }
 
@@ -151,7 +147,6 @@ variable "flink_merged_pipeline_release_names" {
   default = {
     merged-pipeline = "merged-pipeline"
     master-data-processor = "master-data-processor"
-    kafka-connector = "kafka-connector"
   }
 }
 
@@ -164,5 +159,4 @@ variable "merged_pipeline_enabled" {
 variable "command_service_image_tag" {
   type        = string
   description = "CommandService image tag."
-  default     = "1.0.2-GA"
 }

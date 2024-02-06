@@ -1,4 +1,4 @@
-resource "helm_release" "command-service" {
+resource "helm_release" "command_service" {
     name             = var.command_service_release_name
     chart            = "${path.module}/${var.command_service_chart_path}"
     namespace        = var.command_service_namespace
@@ -11,7 +11,7 @@ resource "helm_release" "command-service" {
     atomic           = true
     values = [
       templatefile("${path.module}/${var.command_service_custom_values_yaml}",
-      {
+            {
           env                                         = var.env
           command_service_image_repository            = var.command_service_image_repository
           command_service_image_tag                   = var.command_service_image_tag

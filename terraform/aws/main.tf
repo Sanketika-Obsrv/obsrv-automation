@@ -122,7 +122,7 @@ module "redis_denorm" {
   source               = "../modules/helm/redis_denorm"
   env                  = var.env
   building_block       = var.building_block
-  depends_on           = [module.eks, module.monitoring]
+  depends_on           = [module.eks, module.monitoring,module.redis_dedup]
 }
 
 module "kafka" {
@@ -269,7 +269,7 @@ module "web_console" {
   env                              = var.env
   building_block                   = var.building_block
   web_console_configs              = var.web_console_configs
-  depends_on                       = [module.eks, module.monitoring]
+  depends_on                       = [module.eks, module.monitoring, module.dataset_api]
   web_console_image_repository     = var.web_console_image_repository
   web_console_image_tag            = var.web_console_image_tag
   service_type                     = var.service_type
