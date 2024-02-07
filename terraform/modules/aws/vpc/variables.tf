@@ -39,7 +39,7 @@ variable "availability_zones" {
 variable "public_subnet_cidrs" {
   type        = list(string)
   description = "Public subnet CIDR values."
-  default     = ["10.10.1.0/24", "10.10.4.0/22", "10.10.8.0/22"]
+  default     = ["10.10.0.0/23", "10.10.4.0/23", "10.10.8.0/23"]
 }
 
 variable "auto_assign_public_ip" {

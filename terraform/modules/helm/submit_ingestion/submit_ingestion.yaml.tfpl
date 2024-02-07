@@ -4,8 +4,8 @@ datasource:
   system_events:
     topic: "${env}.system.events"
     name: "system-events"
-    segment_granularity: "hour"
-    query_granularity: "hour"
+    segment_granularity: "DAY"
+    query_granularity: "MINUTE"
     task_duration: "PT1H"
     task_completion: "PT1H"
     task_count: 1
@@ -15,8 +15,8 @@ datasource:
   system_telemetry_events:
     topic: "${env}.system.telemetry.events"
     name: "system-telemetry-events"
-    segment_granularity: "hour"
-    query_granularity: "hour"
+    segment_granularity: "DAY"
+    query_granularity: "MINUTE"
     task_duration: "PT1H"
     task_completion: "PT1H"
     task_count: 1

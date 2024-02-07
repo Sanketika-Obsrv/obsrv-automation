@@ -88,7 +88,6 @@ variable "dataset_api_image_name" {
 variable "dataset_api_image_tag" {
   type        = string
   description = "Dataset api image tag."
-  default     = "1.0.0-GA"
 }
 
 variable "dataset_api_sa_annotations" {

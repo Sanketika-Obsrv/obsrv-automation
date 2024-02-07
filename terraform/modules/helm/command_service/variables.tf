@@ -42,7 +42,7 @@ variable "command_service_wait_for_jobs" {
 variable "command_service_custom_values_yaml" {
   type        = string
   description = "Command Service chart values.yaml path."
-  default     = "command-service.yaml.tfpl"
+  default     = "command_service.yaml.tfpl"
 }
 
 variable "command_service_chart_depends_on" {
@@ -60,7 +60,6 @@ variable "command_service_image_repository" {
 variable "command_service_image_tag" {
   type        = string
   description = "CommandService image tag."
-  default     = "1.0.0"
 }
 
 variable "postgresql_obsrv_username" {

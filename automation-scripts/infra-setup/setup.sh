@@ -152,27 +152,6 @@ export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 export KUBE_CONFIG_PATH=$KUBE_CONFIG_PATH
-tfvars_file="../../terraform/aws/vars/overrides.tfvars"
-
-# Create the tfvars file
-cat <<EOF > "$tfvars_file"
-eks_nodes_subnet_ids = $EKS_NODES_SUBNET_IDS
-eks_master_subnet_ids = $EKS_MASTER_SUBNET_IDS
-velero_aws_access_key_id = "$VELERO_AWS_ACCESS_KEY_ID"
-velero_aws_secret_access_key = "$VELERO_AWS_SECRET_ACCESS_KEY"
-service_type = "$SERVICE_TYPE"
-vpc_id = "$VPC_ID"
-availability_zones = $AVAILABILITY_ZONES
-building_block  = "$BUILDING_BLOCK"
-env = "$ENV"
-region = "$REGION"
-timezone = "$TIMEZONE"
-create_vpc = "$ALLOW_VPC_CREATION"
-create_velero_user = "$ALLOW_VELERO_USER_CREATION"
-create_kong_ingress = "$ALLOW_KONG_INGRESS_SETUP"
-EOF
-
-echo "terraform.tfvars file created successfully at $tfvars_file."
 
 validate_tools
 #setup_kube_config - TODO - Required to verify 
@@ -181,7 +160,7 @@ validate_tools
 cd ../../terraform/aws
 terrahelp decrypt  -simple-key=<decryption_key> -file=vars/dev.tfvars
 terragrunt init
-terragrunt apply -target module.eks -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
-terragrunt apply -target module.get_kubeconfig -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
-terragrunt apply  -var "create_vpc=$ALLOW_VPC_CREATION" -var "create_velero_user=$ALLOW_VELERO_USER_CREATION"  -var-file=vars/dev.tfvars -var-file=vars/overrides.tfvars -auto-approve
+terragrunt apply -target module.eks -var-file=vars/dev.tfvars -var-file=vars/cluster_overrides.tfvars -auto-approve
+terragrunt apply -target module.get_kubeconfig -var-file=vars/dev.tfvars -var-file=vars/cluster_overrides.tfvars -auto-approve
+terragrunt apply  -var-file=vars/dev.tfvars -var-file=vars/cluster_overrides.tfvars -auto-approve
 

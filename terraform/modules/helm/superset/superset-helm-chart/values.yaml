@@ -9,7 +9,7 @@ postgres:
     db_username: "superset"
     db_password: "superset123"
 
-redis_host: obsrv-redis-master.redis.svc.cluster.local
+redis_host: obsrv-dedup-redis-headless.redis.svc.cluster.local
 redis_port: '6379'
 superset_redis_db_index: '3'
 
