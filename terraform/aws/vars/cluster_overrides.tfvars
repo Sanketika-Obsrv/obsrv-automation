@@ -1,5 +1,5 @@
-building_block                = "obsrv-helm"
-env                           = "test"
+building_block                = "obsrv-op"
+env                           = "dev"
 region                        = "us-east-2"
 availability_zones            = ["us-east-2a", "us-east-2b", "us-east-2c"]
 timezone                      = "UTC"
@@ -26,9 +26,9 @@ eks_node_group_scaling_config = {
 eks_node_disk_size            = 30
 
 # Image Tags
-command_service_image_tag         = "1.0.0"
+command_service_image_tag         = "1.0.0-GA"
 web_console_image_tag             = "1.0.0-GA"
-dataset_api_image_tag             = "1.0.0-GA"
-flink_image_tag                   = "1.0.0-GA"
+dataset_api_image_tag             = "1.0.2-GA"
+flink_image_tag                   = "1.0.1-GA"
 secor_image_tag                   = "1.0.0-GA"
 superset_image_tag                = "3.0.2"

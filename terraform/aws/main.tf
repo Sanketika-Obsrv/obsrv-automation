@@ -95,6 +95,8 @@ module "superset" {
   redis_release_name                = module.redis_dedup.redis_release_name
   postgresql_service_name           = module.postgresql.postgresql_service_name
   service_type                      = var.service_type
+  superset_image_tag                = var.superset_image_tag
+  
 }
 
 module "grafana_configs" {
@@ -237,6 +239,7 @@ module "secor" {
   cloud_storage_bucket      = module.s3.s3_bucket
   kubernetes_storage_class  = var.kubernetes_storage_class
   region                    = var.region
+  secor_image_tag           = var.secor_image_tag
 }
 
 module "submit_ingestion" {
