@@ -188,7 +188,7 @@ fi
 cd ../../terraform/aws
 case "$action" in
     install)
-        #install_obsrv
+        install_obsrv
         ;;
     destroy)
         destroy_obsrv
