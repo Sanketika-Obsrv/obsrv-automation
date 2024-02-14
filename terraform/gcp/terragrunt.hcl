@@ -1,11 +1,9 @@
 remote_state {
   backend = "gcs"
   config = {
-    # project = getenv("GOOGLE_PROJECT_ID")
-    project = "obsrv-gcp"
+    project = get_env("GOOGLE_PROJECT_ID")
     location = "us-central1"
-    # bucket  = getenv("GOOGLE_TERRAFORM_BACKEND_BUCKET")
-    bucket  = "obsrv-gcp-dev-configs"
+    bucket  = get_env("GOOGLE_TERRAFORM_BACKEND_BUCKET")
     prefix  = "terraform/state"
   }
 }

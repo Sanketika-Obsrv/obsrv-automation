@@ -63,8 +63,7 @@ variable "description" {
 variable "kubernetes_version" {
   description = "The Kubernetes version of the masters. If set to 'latest' it will pull latest available version in the selected region."
   type        = string
-  # default     = "STABLE"
-  default     = "1.25.8-gke.500"
+  default     = "1.28.3-gke.1286000"
 }
 
 variable "gke_node_pool_instance_type" {
@@ -76,11 +75,6 @@ variable "gke_node_pool_instance_type" {
 variable "gke_node_pool_scaling_config" {
   type        = map(number)
   description = "EKS node group auto scaling configuration."
-  default = {
-    desired_size = 3
-    max_size   = 4
-    min_size   = 0
-  }
 }
 
 variable "gke_node_pool_network_tags" {

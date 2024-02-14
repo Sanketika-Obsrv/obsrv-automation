@@ -137,6 +137,9 @@ module "gke_cluster" {
     module.networking.public
   ]
 
+  gke_node_pool_instance_type     = var.gke_node_pool_instance_type
+  gke_node_pool_scaling_config    = var.gke_node_pool_scaling_config
+
   enable_vertical_pod_autoscaling = var.enable_vertical_pod_autoscaling
 
   alternative_default_service_account = var.override_default_node_pool_service_account ? module.gke_service_account.email : null
@@ -152,7 +155,7 @@ resource "null_resource" "configure_kubectl" {
 
     # Use environment variables to allow custom kubectl config paths
     environment = {
-      KUBECONFIG = var.kubectl_config_path != "" ? var.kubectl_config_path : ""
+      KUBECONFIG = var.kubectl_config_path != "" ? var.kubectl_config_path : "config-${var.building_block}-${var.env}.yaml"
     }
   }
 
@@ -228,9 +231,9 @@ module "velero_sa_iam_role" {
 
 resource "google_storage_bucket_object" "kubeconfig" {
   name   = "kubeconfig/config-${var.building_block}-${var.env}.yaml"
-  source = var.kubectl_config_path != "" ? var.kubectl_config_path : ""
-  bucket = "${var.project}-${var.env}-configs"
-  depends_on = [ null_resource.configure_kubectl ]
+  source = var.kubectl_config_path != "" ? var.kubectl_config_path : "kubeconfig/config-${var.building_block}-${var.env}.yaml"
+  bucket = module.cloud_storage.name
+  depends_on = [ null_resource.configure_kubectl, module.cloud_storage ]
 }
 
 # We use this data provider to expose an access token for communicating with the GKE cluster.
@@ -289,10 +292,16 @@ data "template_file" "cluster_ca_certificate" {
   template = module.gke_cluster.cluster_ca_certificate
 }
 
+resource "random_string" "data_encryption_key" {
+  length = 32
+  special = false
+}
+
 module "monitoring" {
   source          = "../modules/helm/monitoring"
   env             = var.env
   building_block  = var.building_block
+  service_type    = var.service_type
   depends_on      = [ module.gke_cluster ]
 }
 
@@ -324,18 +333,33 @@ module "postgresql" {
   depends_on           = [ module.gke_cluster ]
 }
 
+module "postgresql_migration" {
+  source                                = "../modules/helm/postgresql_migration"
+  env                                   = var.env
+  building_block                        = var.building_block
+  postgresql_admin_username             = module.postgresql.postgresql_admin_username
+  postgresql_admin_password             = module.postgresql.postgresql_admin_password
+  postgresql_migration_chart_depends_on = [ module.postgresql ]
+  postgresql_url                        = module.postgresql.postgresql_service_name
+  postgresql_superset_user_password     = module.postgresql.postgresql_superset_user_password
+  postgresql_druid_raw_user_password    = module.postgresql.postgresql_druid_raw_user_password
+  postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
+  data_encryption_key                   = resource.random_string.data_encryption_key.result
+}
+
+
 module "redis_dedup" {
   source               = "../modules/helm/redis_dedup"
   env                  = var.env
   building_block       = var.building_block
-  depends_on           = [module.eks, module.monitoring]
+  depends_on           = [ module.gke_cluster, module.monitoring ]
 }
 
 module "redis_denorm" {
   source               = "../modules/helm/redis_denorm"
   env                  = var.env
   building_block       = var.building_block
-  depends_on           = [module.eks, module.monitoring]
+  depends_on           = [ module.gke_cluster, module.monitoring ]
 }
 
 module "kafka" {
@@ -352,9 +376,12 @@ module "superset" {
   postgresql_admin_username         = module.postgresql.postgresql_admin_username
   postgresql_admin_password         = module.postgresql.postgresql_admin_password
   postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
-  superset_chart_depends_on         = [ module.postgresql, module.redis_dedup ]
+  superset_chart_depends_on         = [ module.postgresql_migration, module.redis_dedup ]
+  superset_image_tag                = var.superset_image_tag
   redis_namespace                   = module.redis_dedup.redis_namespace
   redis_release_name                = module.redis_dedup.redis_release_name
+  postgresql_service_name           = module.postgresql.postgresql_service_name
+  service_type                      = var.service_type
 }
 
 module "flink" {
@@ -367,7 +394,7 @@ module "flink" {
   flink_release_names                 = var.flink_release_names
   merged_pipeline_enabled             = var.merged_pipeline_enabled
   flink_checkpoint_store_type         = var.flink_checkpoint_store_type
-  flink_chart_depends_on              = [ module.kafka, module.redis_denorm, module.redis_dedup, module.postgresql ]
+  flink_chart_depends_on              = [ module.kafka, module.postgresql_migration, module.redis_dedup, module.redis_denorm ]
   postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
   postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
@@ -379,6 +406,7 @@ module "flink" {
   flink_sa_annotations                = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.flink_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   flink_namespace                     = var.flink_namespace
   depends_on                          = [ module.flink_sa_iam_role ]
+  postgresql_service_name             = module.postgresql.postgresql_service_name
 }
 
 module "druid_operator" {
@@ -394,12 +422,13 @@ module "druid_raw_cluster" {
   building_block                     = var.building_block
   gcs_bucket                         = module.cloud_storage.name
   druid_deepstorage_type             = var.druid_deepstorage_type
-  druid_raw_cluster_chart_depends_on = [ module.postgresql, module.druid_operator ]
+  druid_raw_cluster_chart_depends_on = [ module.postgresql_migration, module.druid_operator ]
   kubernetes_storage_class           = var.kubernetes_storage_class_raw
   druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
   druid_raw_sa_annotations           = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.druid_raw_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
   druid_cluster_namespace            = var.druid_raw_namespace
   depends_on                         = [ module.druid_raw_sa_iam_role ]
+  service_type                       = var.service_type
 }
 
 module "kafka_exporter" {
@@ -433,27 +462,31 @@ module "dataset_api" {
   postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
   dataset_api_sa_annotations         = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.dataset_api_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
-  dataset_api_chart_depends_on       = [ module.postgresql, module.kafka ]
+  dataset_api_chart_depends_on       = [ module.postgresql_migration, module.kafka ]
   denorm_redis_namespace             = module.redis_denorm.redis_namespace
   denorm_redis_release_name          = module.redis_denorm.redis_release_name
   dedup_redis_namespace              = module.redis_dedup.redis_namespace
   dedup_redis_release_name           = module.redis_dedup.redis_release_name
   dataset_api_namespace              = var.dataset_api_namespace
   depends_on                         = [ module.dataset_api_sa_iam_role ]
+  service_type                       = var.service_type
 }
 
 module "secor" {
-  source                  = "../modules/helm/secor"
-  env                     = var.env
-  building_block          = var.building_block
-  storage_class           = var.kubernetes_storage_class_raw
-  secor_sa_annotations    = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.secor_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
-  secor_chart_depends_on  = [ module.kafka ]
-  secor_namespace         = var.secor_namespace
-  cloud_store_provider    = "GS"
-  cloud_storage_bucket    = module.cloud_storage.name
-  upload_manager          = "com.pinterest.secor.uploader.GsUploadManager"
-  depends_on              = [ module.secor_sa_iam_role ]
+  source                    = "../modules/helm/secor"
+  env                       = var.env
+  building_block            = var.building_block
+  kubernetes_storage_class  = var.kubernetes_storage_class_raw
+  secor_sa_annotations      = "iam.gke.io/gcp-service-account: ${var.building_block}-${var.secor_sa_iam_role_name}@${var.project}.iam.gserviceaccount.com"
+  secor_chart_depends_on    = [ module.kafka ]
+  secor_namespace           = var.secor_namespace
+  cloud_store_provider      = "GS"
+  cloud_storage_bucket      = module.cloud_storage.name
+  upload_manager            = "com.pinterest.secor.uploader.GsUploadManager"
+  depends_on                = [ module.secor_sa_iam_role ]
+  timezone                  = var.timezone
+  region                    = var.zone
+  secor_image_tag           = var.secor_image_tag
 }
 
 module "submit_ingestion" {
@@ -461,6 +494,8 @@ module "submit_ingestion" {
   env                               = var.env
   building_block                    = var.building_block
   submit_ingestion_chart_depends_on = [ module.kafka, module.druid_raw_cluster ]
+  druid_cluster_release_name        = module.druid_raw_cluster.druid_cluster_release_name
+  druid_cluster_namespace           = module.druid_raw_cluster.druid_cluster_namespace
 }
 
 module "velero" {
@@ -490,4 +525,15 @@ module "command_service" {
   postgresql_obsrv_user_password   = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database        = module.postgresql.postgresql_obsrv_database
   flink_namespace                  = module.flink.flink_namespace
+}
+
+module "web_console" {
+  source                           = "../modules/helm/web_console"
+  env                              = var.env
+  building_block                   = var.building_block
+  web_console_configs              = var.web_console_configs
+  depends_on                       = [ module.gke_cluster, module.monitoring, module.dataset_api ]
+  web_console_image_repository     = var.web_console_image_repository
+  web_console_image_tag            = var.web_console_image_tag
+  service_type                     = var.service_type
 }
