@@ -1,0 +1,25 @@
+{{ $currentScope := .}}
+{{- $files := .Files.Glob "dashboards/*.json" }}
+{{- if $files }}
+apiVersion: v1
+kind: ConfigMapList
+items:
+{{- range $path, $fileContents := $files }}
+{{- with $currentScope}}
+{{- $dashboardName := base $path }}
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: {{ printf "%s-%s" .Chart.Name $dashboardName | trunc 63 | trimSuffix "-" | trimSuffix ".json" }}
+    namespace: {{ .Values.namespace }}
+    labels:
+      app: {{ template "grafana-configs.name" $ }}
+{{- range $key, $value := .Values.dashboards.label }}
+{{ $key | indent 6 }}: {{ $value | quote }}
+{{- end }}
+{{ include "grafana-configs.labels" $ | indent 6 }}
+  data:
+    {{ $dashboardName }}: {{ $.Files.Get $path | toJson }}
+{{- end }}
+{{- end }}
+{{- end }}

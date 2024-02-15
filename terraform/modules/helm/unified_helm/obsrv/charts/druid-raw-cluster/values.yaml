@@ -1,0 +1,340 @@
+druid_env: "dev"
+druid_cluster_type: "raw"
+druid_image: "apache/druid:25.0.0"
+druid_namespace: "druid-raw"
+druid_monitoring: True
+mount_path: /druid/data
+storageClass: "gp2"
+
+######################### Druid common variables ########################
+druid_directory: "/opt/druid"
+druid_extensions_loadList: '"postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-azure-extensions", "druid-s3-extensions", "druid-google-extensions"'
+
+# Logging
+# Log all runtime properties on startup. Disable to avoid logging properties on startup:
+druid.startup.logging.logProperties: true
+
+# Druid Metadata Store
+druid_metadata_storage_type: "postgresql"
+druid_metadata_storage_connector_connectURI: "jdbc:postgresql://postgresql-hl.postgresql.svc.cluster.local:5432/druid_raw"
+druid_metadata_storage_connector_user: "druid_raw"
+druid_metadata_storage_connector_password: "druidraw123"
+
+# Druid Storage Type
+druid_deepstorage_type: "s3"
+druid_storage_directory: "/data"
+
+# AWS S3 Details
+s3_access_key: ""
+s3_secret_key: ""
+s3_bucket: "obsrv-sb-dev-165052186109"
+
+# Azure Container Details
+azure_storage_account_name: ""
+azure_storage_account_key: ""
+azure_storage_container: ""
+
+# Google Cloud Storage Details
+gcs_bucket: ""
+
+# Indexing service logs
+# For local disk (only viable in a cluster_type if this is a network mount):
+druid_indexer_logs_type: "s3"
+druid_indexer_logs_container: ""
+druid_indexer_logs_prefix: "backups/druid/druid-task-logs"
+
+# Service discovery
+druid_selectors_indexing_serviceName: druid/overlord
+druid_selectors_coordinator_serviceName: druid/coordinator
+
+# Monitoring
+druid_monitoring_monitors: '"com.metamx.metrics.JvmMonitor","org.apache.druid.java.util.metrics.JvmMonitor"'
+druid_emitter: composing
+druid_emitter_http_recipientBaseUrl: http://druid-exporter-prometheus-druid-exporter.druid-raw.svc:8080
+druid_emitter_composing_emitters: '"logging"'
+druid_emitter_logging_logLevel: INFO
+
+
+# Storage type of double columns
+# ommiting this will lead to index double as float at the storage layer
+druid_indexing_doubleStorage: double
+
+#Writing query logs into file
+druid_request_logging_type: composing
+druid_request_logging_dir: "/data/druid/log"
+
+druid_javascript_enabled: true
+druid_sql_enable: true
+
+####################### Druid Broker Variables ##########################
+
+druid_broker_service: druid/broker
+druid_broker_port: 8082
+druid_broker_min_heap_size: 256M
+druid_broker_max_heap_size: 512M
+druid_broker_max_direct_size: 192M
+
+# Processing threads and buffers
+druid_broker_processing_buffer_sizeBytes: 64MiB
+druid_broker_processing_numThreads: 1
+druid_broker_processing_numMergeBuffers: 1
+
+druid_broker_pod_memory_request: 256Mi
+druid_broker_pod_memory_limit: 750Mi
+druid_broker_pod_cpu_request: 250m
+druid_broker_pod_cpu_limit: 500m
+
+# HTTP server threads
+druid_broker_http_numConnections: 5
+#druid_server_http_numThreads: 25
+
+druid_javascript.enabled: true
+#druid_sql_enable: true
+
+druid_broker_replicas: 1
+
+##################### Druid Coordinator Variables #######################
+
+druid_coordinator_service: druid/coordinator
+druid_coordinator_port: 8081
+
+druid_coordinator_min_heap_size: 256M
+druid_coordinator_max_heap_size: 512M
+
+druid_coordinator_pod_memory_request: 256Mi
+druid_coordinator_pod_memory_limit: 512Mi
+druid_coordinator_pod_cpu_request: 250m
+druid_coordinator_pod_cpu_limit: 500m
+
+druid_coordinator_startDelay: PT30S
+druid_coordinator_period: PT30S
+druid_coordinator_balancer_strategy: diskNormalized
+
+druid_coordinator_replicas: 1
+
+####################### Druid Overlord Variables ########################
+
+druid_overlord_service: druid/overlord
+druid_overlord_port: 8090
+druid_overlord_min_heap_size: 256M
+druid_overlord_max_heap_size: 512M
+
+druid_overlord_pod_memory_request: 256Mi
+druid_overlord_pod_memory_limit: 512Mi
+druid_overlord_pod_cpu_request: 250m
+druid_overlord_pod_cpu_limit: 500m
+
+druid_indexer_queue_startDelay: PT30S
+
+druid_indexer_runner_type: remote
+druid_indexer_storage_type: metadata
+
+# Additional parameters for minor compaction
+druid_indexer_tasklock_forceTimeChunkLock: false
+
+druid_overlord_replicas: 1
+
+###################### Druid Historical Variables #######################
+
+druid_historical_service: druid/historical
+druid_historical_port: 8084
+druid_historical_min_heap_size: 256M
+druid_historical_max_heap_size: 512M
+druid_historical_max_direct_size: 320M
+
+druid_historical_pod_memory_request: 512Mi
+druid_historical_pod_memory_limit: 850Mi
+druid_historical_pod_cpu_request: 750m
+druid_historical_pod_cpu_limit: 1
+
+# HTTP server threads
+#druid_server_http_numThreads: 25
+
+# Processing threads and buffers
+druid_historical_processing_buffer_sizeBytes: 64MiB
+druid_historical_processing_numThreads: 2
+druid_historical_processing_numMergeBuffers: 2
+
+druid_query_ondiskstorage_enabled: True
+druid_query_groupBy_maxMergingDictionarySize: 100000000
+druid_query_groupBy_maxOnDiskStorage: 524288000
+
+# Segmentstorage (default 1 gb storage)
+druid_segmentCache_locations: '{"path": "/druid/data/store", "maxSize": 10737418240}'
+druid_historical_persistent_volume_size: 10G
+
+druid_segmentCache_numLoadingThreads: 4
+
+# Caching
+druid_historical_cache_useCache: False
+druid_historical_cache_populateCache: true
+druid_historical_cache_unCacheable: '"select", "scan"'
+druid_cache_type: caffeine
+druid_historical_cache_size: 128MiB
+druid_historical_cache_expiry: 3600000
+
+druid_historical_replicas: 1
+
+#################### Druid Middlemanager Variables ######################
+
+druid_middlemanager_service: druid/middlemanager
+druid_middlemanager_port: 8091
+druid_middlemanager_heap_size: 128M
+
+druid_middlemanager_persistent_volume_size: 1G
+
+# Number of tasks per middleManager
+druid_worker_capacity: 2
+druid_middlemanager_peon_heap_size: 256M
+
+# Task launch parameters
+druid_indexer_runner_javaOpts: "-server -Xms512m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
+#druid_indexer_task_baseTaskDir: "/var/task"
+
+# Peon properties
+#druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 25MiB
+#druid_indexer_fork_property_druid_processing_numThreads: 2
+#druid_indexer_fork_property_druid_server_http_numThreads: 25
+
+#Additional Parameters
+#druid_indexer_task_restoreTasksOnRestart: true
+
+druid_middlemanager_replicas: 1
+
+
+#################### Druid Indexer Variables ######################
+
+druid_indexer_service: druid/indexer
+druid_indexer_port: 8091
+# druid_indexer_min_heap_size: 256M
+# druid_indexer_max_heap_size: 512M
+# druid_indexer_max_direct_size: 256M
+druid_indexer_min_heap_size: 2g
+druid_indexer_max_heap_size: 2g
+druid_indexer_max_direct_size: 2g
+
+# Peon properties
+druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 64M
+druid_indexer_worker_globalIngestionHeapLimitBytes: "512000000"
+druid_indexer_fork_property_druid_processing_numThreads: 2 # Number of cores - 1 (or 1)
+druid_indexer_fork_property_druid_processing_numMergeBuffers: 1
+druid_indexer_fork_property_druid_server_http_numThreads: 25 # max(10, (Number of cores * 17) / 16 + 2) + 30
+
+# druid_indexer_pod_memory_request: 512Mi
+# druid_indexer_pod_memory_limit: 768Mi
+druid_indexer_pod_memory_request: 2Gi
+druid_indexer_pod_memory_limit: 4200Mi
+druid_indexer_pod_cpu_request: 1
+druid_indexer_pod_cpu_limit: 1
+druid_indexer_numConcurrentMerges: 1
+
+druid_indexer_persistent_volume_size: 5Gi
+
+indexer_intial_delay: 30
+
+# Number of tasks per indexer
+druid_indexer_worker_capacity: 4 #(Number of available processors - 1)
+
+# Task launch parameters
+# druid_indexer_runner_javaOpts: "-server -Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxDirectMemorySize=512m"
+druid_indexer_task_baseTaskDir: "/druid/data/task"
+
+
+
+#Additional Parameters
+druid_indexer_task_restoreTasksOnRestart: true
+
+druid_indexer_replicas: 1
+
+######################## Druid Router Variables #########################
+
+druid_router_service: druid/router
+druid_router_plaintextPort: 8888
+
+druid_router_min_heap_size: 256M
+druid_router_max_heap_size: 512M
+
+druid_router_pod_memory_request: 256Mi
+druid_router_pod_memory_limit: 512Mi
+druid_router_pod_cpu_request: 250m
+druid_router_pod_cpu_limit: 512m
+
+# HTTP proxy
+druid_router_http_numConnections: 25
+druid_router_http_readTimeout: PT5M
+druid_router_http_numMaxThreads: 25
+druid_server_http_numThreads: 25
+
+# Service discovery
+druid_router_defaultBrokerServiceName: druid/broker
+druid_router_coordinatorServiceName: druid/coordinator
+
+# Management proxy to coordinator / overlord: required for unified web console.
+druid_router_managementProxy_enabled: True
+
+druid_router_replicas: 1
+
+#################### Zookeeper Variables ######################
+
+## @section ZooKeeper chart parameters
+
+## ZooKeeper chart configuration
+## https://github.com/bitnami/charts/blob/main/bitnami/zookeeper/values.yaml
+##
+zookeeper:
+  ## @param zookeeper.enabled Switch to enable or disable the ZooKeeper helm chart
+  ##
+  enabled: true
+  namespace: druid-raw
+  ## @param zookeeper.replicaCount Number of ZooKeeper nodes
+  ##
+  replicaCount: 1
+  ## ZooKeeper authenticaiton
+  ##
+  auth:
+    client:
+      ## @param zookeeper.auth.client.enabled Enable ZooKeeper auth
+      ##
+      enabled: false
+      ## @param zookeeper.auth.client.clientUser User that will use ZooKeeper clients to auth
+      ##
+      clientUser: ""
+      ## @param zookeeper.auth.client.clientPassword Password that will use ZooKeeper clients to auth
+      ##
+      clientPassword: ""
+      ## @param zookeeper.auth.client.serverUsers Comma, semicolon or whitespace separated list of user to be created. Specify them as a string, for example: "user1,user2,admin"
+      ##
+      serverUsers: ""
+      ## @param zookeeper.auth.client.serverPasswords Comma, semicolon or whitespace separated list of passwords to assign to users when created. Specify them as a string, for example: "pass4user1, pass4user2, pass4admin"
+      ##
+      serverPasswords: ""
+  ## ZooKeeper Persistence parameters
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  ## @param zookeeper.persistence.enabled Enable persistence on ZooKeeper using PVC(s)
+  ## @param zookeeper.persistence.storageClass Persistent Volume storage class
+  ## @param zookeeper.persistence.accessModes Persistent Volume access modes
+  ## @param zookeeper.persistence.size Persistent Volume size
+  ##
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+
+## External Zookeeper Configuration
+## All of these values are only used if `zookeeper.enabled=false`
+##
+externalZookeeper:
+  ## @param externalZookeeper.servers List of external zookeeper servers to use. Typically used in combination with 'zookeeperChrootPath'.
+  ##
+  servers: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: druid-raw-sa

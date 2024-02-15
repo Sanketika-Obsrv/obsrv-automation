@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+data:
+  system_env: "{{ .Values.SYSTEM_ENV }}"
+  telemetry_kafka_compression: "{{.Values.TELEMETRY_KAFKA_COMPRESSION}}"
+  druid_host: "{{ .Values.druid_service.DRUID_HOST }}"
+  druid_port: "{{ .Values.druid_service.DRUID_PORT }}"
+  kafka_host: "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local"
+  kafka_port: "{{ .Values.kafka_service.KAFKA_PORT }}"
+  client_id: "{{ .Values.kafka_service.CLIENT_ID }}"
+  kafka_initial_retry_time: "{{ .Values.kafka_service.KAFKA_INITIAL_RETRY_TIME }}"
+  kafka_retries: "{{ .Values.kafka_service.KAFKA_RETRIES }}"
+  kafka_connection_timeout: "{{ .Values.kafka_service.KAFKA_CONNECTION_TIMEOUT }}"
+  postgres_host: "{{ .Release.Name }}-postgresql-hl.postgresql.svc.cluster.local"
+  postgres_port: "{{ .Values.postgres_service.POSTGRES_PORT }}"
+  postgres_database: "{{ .Values.postgres_service.POSTGRES_DATABASE }}"
+  postgres_username: "{{ .Values.postgres_service.POSTGRES_USERNAME }}"
+  postgres_password: "{{ .Values.postgres_service.POSTGRES_PASSWORD }}"
+  denorm_redis_host: "{{ .Release.Name }}-redis-denorm-master.redis.svc.cluster.local"
+  denorm_redis_port: "{{ .Values.denorm_redis_service.REDIS_PORT }}"
+  dedup_redis_host: "{{ .Release.Name }}-redis-dedup-master.redis.svc.cluster.local"
+  dedup_redis_port: "{{ .Values.dedup_redis_service.REDIS_PORT }}"
+  cloud_storage_provider: "{{ .Values.exhaust_service.CLOUD_STORAGE_PROVIDER }}"
+  cloud_storage_region: "{{ .Values.exhaust_service.CLOUD_STORAGE_REGION }}"
+  container: "{{ .Values.global.azure_storage_container }}"
+  container_prefix: "{{ .Values.exhaust_service.CONTAINER_PREFIX }}"
+  storage_url_expiry: "{{ .Values.exhaust_service.STORAGE_URL_EXPIRY }}"
+  cloud_storage_config: '{"identity":"{{ .Values.global.azure_storage_account_name }}","credential":"{{ .Values.global.azure_storage_account_key }}"}'
+  exhaust_query_range: "{{ .Values.exhaust_service.EXHAUST_QUERY_RANGE }}"

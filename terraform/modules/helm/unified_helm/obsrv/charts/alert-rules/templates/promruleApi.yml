@@ -1,0 +1,33 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: alert-rules
+    app: {{ .Values.prometheus_rule_selector_app }}
+    release: {{ .Values.prometheus_rule_selector_release }}
+  name: {{ .Values.fullnameOverride }}-api-rules
+  namespace: {{ .Values.namespace }}
+spec:
+  groups:
+  - name: alertrules.process
+    rules:  
+    - alert: api_failure_percentage_critical
+      expr: (node_failed_api_calls / node_total_api_calls) * 100 >= 1
+      for: 5m
+      labels:
+        severity: critical
+        bb: {{.Values.bb}}
+        type: {{.Values.api.type}}
+      annotations:
+        message: api failure
+    - alert: api_failure_percentage_warning
+      expr: (node_failed_api_calls / node_total_api_calls) * 100 >= 0.1 and (node_failed_api_calls / node_total_api_calls) * 100 <= 1
+      for: 15m
+      labels:
+        severity: warning
+        bb: {{.Values.bb}}
+        type: {{.Values.api.type}}
+      annotations:
+        message: api failure
+      
