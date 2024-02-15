@@ -119,7 +119,7 @@ base_config: |
     consumer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
     zookeeper = "kafka-headless.kafka.svc.cluster.local:2181"
     producer {
-      max-request-size = 1572864
+      max-request-size = 10000024
       batch.size = 98304
       linger.ms = 10
       compression = "snappy"
@@ -179,7 +179,7 @@ merged-pipeline:
       stats.topic = ${job.env}".stats"
       groupId = ${job.env}"-single-pipeline-group"
       producer {
-        max-request-size = 5242880
+        max-request-size = 10000024
       }
     }
     task {
@@ -224,7 +224,7 @@ extractor:
       event.max.size = "1048576" # Max is only 1MB
       groupId = ${job.env}"-extractor-group"
       producer {
-        max-request-size = 5242880
+        max-request-size = 10000024
       }
     }
 
@@ -334,7 +334,7 @@ transformer:
       output.transform.topic = ${job.env}".transform"
       groupId = ${job.env}"-transformer-group"
       producer {
-        max-request-size = 5242880
+        max-request-size = 10000024
       }
     }
 
@@ -398,7 +398,7 @@ kafka-connector:
       event.max.size = "1048576" # Max is only 1MB
       groupId = ${job.env}"-kafkaconnector-group"
       producer {
-        max-request-size = 5242880
+        max-request-size = 10000024
       }
     }
 
@@ -440,7 +440,7 @@ master-data-processor:
       groupId = ${job.env}"-masterdata-pipeline-group"
 
       producer {
-        max-request-size = 5242880
+        max-request-size = 10000024
       }
     }
 
