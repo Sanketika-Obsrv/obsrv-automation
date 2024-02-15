@@ -160,3 +160,13 @@ variable "command_service_image_tag" {
   type        = string
   description = "CommandService image tag."
 }
+
+variable "superset_image_tag" {
+  type        = string
+  description = "Superset image tag."
+}
+
+variable "secor_image_tag" {
+  type        = string
+  description = "secor image version"
+}

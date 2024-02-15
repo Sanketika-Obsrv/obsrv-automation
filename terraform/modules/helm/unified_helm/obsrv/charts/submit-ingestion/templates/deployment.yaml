@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: submit-ingestion
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+      - name: init
+        image: "{{ .Values.global.azure.images.ubuntu.registry }}/{{ .Values.global.azure.images.ubuntu.image }}@{{ .Values.global.azure.images.ubuntu.digest }}"
+        command:
+        - sh
+        - -c
+        - |
+          apt-get update && apt-get install -y curl
+          while true; do
+            if curl -sSf -o /dev/null http://{{ .Values.druid_router_host }}:{{ .Values.druid_router_port }}/status; then
+              break
+            else
+              echo "Waiting for Druid..."
+              sleep 2
+            fi
+          done
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/ingestion-spec
+      containers:
+      - name: druid
+        {{ if .Values.global.azure.images.ubuntu }}
+        image: "{{ .Values.global.azure.images.ubuntu.registry }}/{{ .Values.global.azure.images.ubuntu.image }}@{{ .Values.global.azure.images.ubuntu.digest }}"
+        {{ else }}
+        image: "{{ .Values.image }}"
+        {{ end }}
+        command:
+        - sh
+        - -c
+        - |
+          apt-get update && apt-get install -y curl
+          curl -XPOST -H 'Content-Type: application/json' -d @/etc/ingestion-spec/system-stats-ingestion-spec.json http://{{ .Values.druid_router_host }}:{{ .Values.druid_router_port }}/{{ .Values.supervisor_path }}
+          curl -XPOST -H 'Content-Type: application/json' -d @/etc/ingestion-spec/masterdata-system-stats-ingestion-spec.json http://{{ .Values.druid_router_host }}:{{ .Values.druid_router_port }}/{{ .Values.supervisor_path }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/ingestion-spec
+      volumes:
+      - name: config-volume
+        configMap:
+          name: ingestion-spec-config

@@ -37,7 +37,7 @@ terragrunt apply
 
 ```
 gcloud init
-gcloud auth login
+gcloud auth application-default login
 ```
 
 3. Install additional dependencies to authenticate with GKE. Please see [Installing the gke-gcloud-auth-plugin](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl) for reference.
@@ -49,7 +49,7 @@ gcloud components install gke-gcloud-auth-plugin
 4. Create a project and export it as variable. Please see [Creating and Managing Projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects) for reference.
 
 ```
-export GOOGLE_CLOUD_PROJECT=myproject
+export GOOGLE_PROJECT_ID=myproject
 export GOOGLE_TERRAFORM_BACKEND_BUCKET=mybucket
 ```
 
@@ -60,8 +60,8 @@ In order to complete the installation, please run the below steps in the same te
 ```
 cd terraform/gcp
 terragrunt init
-terragrunt plan
-terragrunt apply
+terragrunt plan --var-file=vars/cluster_overrides.tfvars
+terragrunt apply --var-file=vars/cluster_overrides.tfvars
 ```
 
 ## Azure

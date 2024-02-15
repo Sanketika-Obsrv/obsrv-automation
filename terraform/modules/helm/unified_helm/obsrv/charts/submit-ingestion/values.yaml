@@ -1,0 +1,13 @@
+namespace: "submit-ingestion"
+druid_router_host: "druid-raw-routers.druid-raw.svc.cluster.local"
+druid_router_port: 8888
+supervisor_path: "druid/indexer/v1/supervisor"
+# bootstrap_servers: "obsrv-kafka-headless.kafka.svc.cluster.local:9092"
+ingestion_spec:
+  system_stats:
+    topic: "dev.stats"
+    name: "system-stats"
+  masterdata_system_stats:
+    topic: "dev.masterdata.stats"
+    name: "masterdata-system-stats"
+image: "ubuntu:20.04"
