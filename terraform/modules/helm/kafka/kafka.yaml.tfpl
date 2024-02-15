@@ -12,6 +12,8 @@ provisioning:
 persistence:
   size: 50Gi
 
+maxMessageBytes: 10000024
+
 zookeeper:
   persistence:
     size: 8Gi
