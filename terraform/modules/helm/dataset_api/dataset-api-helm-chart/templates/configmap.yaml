@@ -11,6 +11,7 @@ metadata:
 data:
   system_env: "{{ .Values.SYSTEM_ENV }}"
   telemetry_kafka_compression: "{{.Values.TELEMETRY_KAFKA_COMPRESSION}}"
+  body_parser_limit: "{{ .Values.body_parser_limit }}"
   druid_host: "{{ .Values.druid_service.DRUID_HOST }}"
   druid_port: "{{ .Values.druid_service.DRUID_PORT }}"
   kafka_host: "{{ .Values.kafka_service.KAFKA_HOST }}"
