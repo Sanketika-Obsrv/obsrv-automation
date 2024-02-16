@@ -24,39 +24,3 @@ variable "druid_deepstorage_type" {
     description = "Druid deep strorage type."
     default     = "azure"
 }
-
-variable "flink_checkpoint_store_type" {
-    type        = string
-    description = "Flink checkpoint store type."
-    default     = "azure"
-}
-
-variable "dataset_api_container_registry" {
-  type        = string
-  description = "Container registry. For example docker.io/obsrv"
-  default     = "sanketikahub"
-}
-
-variable "dataset_api_image_tag" {
-  type        = string
-  description = "Dataset api image tag."
-  default     = "1.0.0"
-}
-
-variable "flink_container_registry" {
-  type        = string
-  description = "Container registry. For example docker.io/obsrv"
-  default     = "manjudr"
-}
-
-variable "flink_image_tag" {
-   type        = string
-   description = "Flink kubernetes service name."
-   default     = "1.1.0"
-}
-
-variable "command_service_image_tag" {
-  type        = string
-  description = "CommandService image tag."
-  default     = "1.0.0"
-}
