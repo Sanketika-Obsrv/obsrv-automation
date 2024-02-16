@@ -52,3 +52,13 @@ provider "helm" {
     cluster_ca_certificate = module.aks.cluster_ca_certificate
   }
 }
+
+module "unified_helm" {
+  source                      = "../modules/helm/unified_helm"
+  building_block              = var.building_block
+  env                         = var.env
+  depends_on                  = [ module.storage,module.aks ]
+  azure_storage_account_key   = module.storage.azurerm_storage_account_key
+  azure_storage_account_name  = module.storage.azurerm_storage_account_name
+  azure_storage_container     = module.storage.azurerm_storage_container
+}
