@@ -5,6 +5,7 @@ metadata:
   name: {{ template "kube-prometheus-stack.prometheus.crname" . }}
   namespace: {{ template "kube-prometheus-stack.namespace" . }}
   labels:
+    azure-extensions-usage-release-identifier: obsrv-base
     app: {{ template "kube-prometheus-stack.name" . }}-prometheus
 {{ include "kube-prometheus-stack.labels" . | indent 4 }}
 {{- if .Values.prometheus.annotations }}
@@ -39,7 +40,7 @@ spec:
 {{ toYaml .Values.prometheus.prometheusSpec.apiserverConfig | indent 4}}
 {{- end }}
 {{- if .Values.global.azure.images.prometheus }}
-  image: "{{ .Values.global.azure.images.prometheus.registry }}/{{ .Values.global.azure.images.prometheus.image }}@{{ .Values.global.azure.images.prometheus.digest }}"
+  image: "{{ .Values.global.azure.images.prometheus.registry }}/{{ .Values.global.azure.images.prometheus.image }}:{{ .Values.global.azure.images.prometheus.digest }}"
   {{- else if .Values.prometheus.prometheusSpec.image }}
   {{- $registry := .Values.global.imageRegistry | default .Values.prometheus.prometheusSpec.image.registry -}}
   {{- if and .Values.prometheus.prometheusSpec.image.tag .Values.prometheus.prometheusSpec.image.sha }}
@@ -59,6 +60,7 @@ spec:
 {{- end -}}
 {{- if .Values.prometheus.prometheusSpec.externalLabels }}
   externalLabels:
+    azure-extensions-usage-release-identifier: obsrv-base
 {{ tpl (toYaml .Values.prometheus.prometheusSpec.externalLabels | indent 4) . }}
 {{- end }}
 {{- if .Values.prometheus.prometheusSpec.prometheusExternalLabelNameClear }}
@@ -254,10 +256,12 @@ spec:
   storage:
 {{ tpl (toYaml .Values.prometheus.prometheusSpec.storageSpec | indent 4) . }}
 {{- end }}
-{{- if .Values.prometheus.prometheusSpec.podMetadata }}
+# {{- if .Values.prometheus.prometheusSpec.podMetadata }}
   podMetadata:
-{{ tpl (toYaml .Values.prometheus.prometheusSpec.podMetadata | indent 4) . }}
-{{- end }}
+    labels:
+      azure-extensions-usage-release-identifier: obsrv-base
+# {{ tpl (toYaml .Values.prometheus.prometheusSpec.podMetadata | indent 4) . }}
+# {{- end }}
 {{- if .Values.prometheus.prometheusSpec.query }}
   query:
 {{ toYaml .Values.prometheus.prometheusSpec.query | indent 4}}

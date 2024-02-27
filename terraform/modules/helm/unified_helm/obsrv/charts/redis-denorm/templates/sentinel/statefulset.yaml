@@ -112,7 +112,7 @@ spec:
       containers:
         - name: redis
         {{ if .Values.global.azure.images.redis }}
-          image: "{{ .Values.global.azure.images.redis.registry }}/{{ .Values.global.azure.images.redis.image }}@{{ .Values.global.azure.images.redis.digest }}"
+          image: "{{ .Values.global.azure.images.redis.registry }}/{{ .Values.global.azure.images.redis.image }}:{{ .Values.global.azure.images.redis.digest }}"
         {{ else }}
           image: {{ template "redis.image" . }}
         {{ end }}
@@ -502,7 +502,7 @@ spec:
         {{- if .Values.metrics.enabled }}
         - name: metrics
         {{ if .Values.global.azure.images.redis_exporter }}
-          image: "{{ .Values.global.azure.images.redis_exporter.registry }}/{{ .Values.global.azure.images.redis_exporter.image }}@{{ .Values.global.azure.images.redis_exporter.digest }}"
+          image: "{{ .Values.global.azure.images.redis_exporter.registry }}/{{ .Values.global.azure.images.redis_exporter.image }}:{{ .Values.global.azure.images.redis_exporter.digest }}"
         {{ else }}
           image: {{ template "redis.metrics.image" . }}
         {{ end }}

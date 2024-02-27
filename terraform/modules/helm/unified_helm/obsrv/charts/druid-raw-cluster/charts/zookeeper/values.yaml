@@ -318,10 +318,12 @@ lifecycleHooks: {}
 ## @param resources.requests.cpu The requested cpu for the ZooKeeper containers
 ##
 resources:
-  limits: {}
   requests:
+    memory: 128Mi
+    cpu: 256m
+  limits:
     memory: 256Mi
-    cpu: 250m
+    cpu: 256m
 ## Configure Pods Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## @param podSecurityContext.enabled Enabled ZooKeeper pods' Security Context
@@ -329,7 +331,7 @@ resources:
 ##
 podSecurityContext:
   enabled: true
-  fsGroup: 1001
+  fsGroup: 0
 ## Configure Container Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 ## @param containerSecurityContext.enabled Enabled ZooKeeper containers' Security Context
@@ -339,8 +341,8 @@ podSecurityContext:
 ##
 containerSecurityContext:
   enabled: true
-  runAsUser: 1001
-  runAsNonRoot: true
+  runAsUser: 0
+  runAsNonRoot: false
   allowPrivilegeEscalation: false
 ## @param hostAliases ZooKeeper pods host aliases
 ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/

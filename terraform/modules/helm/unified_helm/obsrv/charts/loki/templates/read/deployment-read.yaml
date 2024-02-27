@@ -57,7 +57,7 @@ spec:
       containers:
         - name: loki
         {{-  if $.Values.global.azure.images.loki }}
-          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}@{{ $.Values.global.azure.images.loki.digest }}"
+          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}:{{ $.Values.global.azure.images.loki.digest }}"
           {{- else }}
           image: {{ include "loki.image" . }}
           {{- end }}

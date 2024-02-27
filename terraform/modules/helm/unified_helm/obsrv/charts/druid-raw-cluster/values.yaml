@@ -1,6 +1,6 @@
 druid_env: "dev"
 druid_cluster_type: "raw"
-druid_image: "apache/druid:25.0.0"
+druid_image: "apache/druid:28.0.1"
 druid_namespace: "druid-raw"
 druid_monitoring: True
 mount_path: /druid/data
@@ -27,7 +27,8 @@ druid_storage_directory: "/data"
 # AWS S3 Details
 s3_access_key: ""
 s3_secret_key: ""
-s3_bucket: "obsrv-sb-dev-165052186109"
+s3_bucket: ""
+s3_endpoint_url: ""
 
 # Azure Container Details
 azure_storage_account_name: ""
@@ -42,6 +43,7 @@ gcs_bucket: ""
 druid_indexer_logs_type: "s3"
 druid_indexer_logs_container: ""
 druid_indexer_logs_prefix: "backups/druid/druid-task-logs"
+druid_indexer_logs_directory: "backups/druid/druid-task-logs"
 
 # Service discovery
 druid_selectors_indexing_serviceName: druid/overlord
@@ -250,6 +252,15 @@ druid_indexer_replicas: 1
 
 druid_router_service: druid/router
 druid_router_plaintextPort: 8888
+router:
+  service:
+    type: NodePort
+    # Port exposed within the cluster
+    port: 8888
+    # Port on the pods
+    targetPort: 8888
+    # Port accessible externally on each node
+    nodePort: 30503
 
 druid_router_min_heap_size: 256M
 druid_router_max_heap_size: 512M
@@ -321,6 +332,14 @@ zookeeper:
     accessModes:
       - ReadWriteOnce
     size: 8Gi
+
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 256m
+    limits:
+      memory: 256Mi
+      cpu: 512m
 
 ## External Zookeeper Configuration
 ## All of these values are only used if `zookeeper.enabled=false`

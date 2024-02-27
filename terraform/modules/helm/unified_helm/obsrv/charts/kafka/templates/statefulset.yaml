@@ -31,6 +31,7 @@ spec:
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
+        # azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/component: kafka
         {{- if .Values.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
@@ -96,7 +97,7 @@ spec:
         {{- if and .Values.volumePermissions.enabled .Values.persistence.enabled }}
         - name: volume-permissions
         {{ if .Values.global.azure.images.bitnami_shell }}
-          image: "{{ .Values.global.azure.images.bitnami_shell.registry }}/{{ .Values.global.azure.images.bitnami_shell.image }}@{{ .Values.global.azure.images.bitnami_shell.digest }}"
+          image: "{{ .Values.global.azure.images.bitnami_shell.registry }}/{{ .Values.global.azure.images.bitnami_shell.image }}:{{ .Values.global.azure.images.bitnami_shell.digest }}"
         {{ else }}
           image: {{ include "kafka.volumePermissions.image" . }}
         {{ end }}
@@ -126,8 +127,8 @@ spec:
         {{- end }}
         {{- if and .Values.externalAccess.enabled .Values.externalAccess.autoDiscovery.enabled }}
         - name: auto-discovery
-        {{ if .Values.global.azure.images.autodiscovery }}
-          image: "{{ .Values.global.azure.images.autodiscovery.registry }}/{{ .Values.global.azure.images.autodiscovery.image }}@{{ .Values.global.azure.images.autodiscovery.digest }}"
+        {{ if .Values.global.azure.images.kubectl_image }}
+          image: "{{ .Values.global.azure.images.kubectl_image.registry }}/{{ .Values.global.azure.images.kubectl_image.image }}:{{ .Values.global.azure.images.kubectl_image.digest }}"
         {{ else }}
           image: {{ include "kafka.externalAccess.autoDiscovery.image" . }}
         {{ end }}
@@ -160,7 +161,7 @@ spec:
       containers:
         - name: kafka
         {{ if .Values.global.azure.images.kafka }}
-          image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}@{{ .Values.global.azure.images.kafka.digest }}"
+          image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}:{{ .Values.global.azure.images.kafka.digest }}"
         {{ else }}
           image: {{ include "kafka.image" . }}
         {{ end }}
@@ -473,7 +474,7 @@ spec:
         {{- if .Values.metrics.jmx.enabled }}
         - name: jmx-exporter
         {{ if .Values.global.azure.images.jmx_exporter }}
-          image: "{{ .Values.global.azure.images.jmx_exporter.registry }}/{{ .Values.global.azure.images.jmx_exporter.image }}@{{ .Values.global.azure.images.jmx_exporter.digest }}"
+          image: "{{ .Values.global.azure.images.jmx_exporter.registry }}/{{ .Values.global.azure.images.jmx_exporter.image }}:{{ .Values.global.azure.images.jmx_exporter.digest }}"
         {{ else }}
           image: {{ include "kafka.metrics.jmx.image" . }}
         {{ end }}

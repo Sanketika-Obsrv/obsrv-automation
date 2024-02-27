@@ -1,62 +1,61 @@
 global:
+  sanketika_docker_registry: &sanketika_docker_registry "docker.io/sanketikahub"
+  docker_registry_secret_name: &docker_registry_secret_name "docker-registry-secret"
+  image:
+    imagePullSecrets: *docker_registry_secret_name
+  dockerconfigjson: ""
   azure:
     images:
       command_api:
-        # tag: 1.0.2
-        # digest: sha256:88c1a2b627ff9238c906935531117cd387e622eeee37176c1ef2d3ef36a698e3
+        # tag: 1.0.2-GA
         digest: 1.0.2
         image: flink-command-service
-        # tag: 2.0.2
-        # digest: sha256:d7b7a53765ace3e906f6e4a2a5c1f203429f49a1c77e323804dd6eae59200cf6
-        # image: obsrv-command-service
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       dataset_api:
-        # tag:1.0.2
-        # digest: sha256:02e7455eee1194a4fd93cbb8f23e5dc6459a7a001393079358e0a5436f68997d
+        # tag:1.3.1
         digest: 1.0.2-GA
         image: obsrv-api-service
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       druid_exporter:
         # tag: v0.11
-        digest: sha256:fd3ce79c4505b078bd9d382bc3b7c49326f9a13814e6ef30d755a78bf3dc613d
+        digest: v0.11
         image: druid-exporter
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       druid_operator:
-        digest: sha256:2991a809adf4905468faeeca7f1d4d822c22957ea1c17b8c50799b40a4c81023
+        # tag: 0.0.7
+        digest: 0.0.7
         image: druid-operator
         registry: docker.io/druidio
       druid_raw_cluster:
-        # tag 28.0.1
-        # digest: sha256:25f8e8be98f368237138caf611ddfcaafe487b4c5d678ba0bd048a02fef5f84a
+        # tag: 28.0.1
         digest: 28.0.1
         image: druid
         registry: docker.io/apache
       zookeeper:
-        digest: sha256:37f17d102c85227c3cc888a63edac865e8842b43b6af73be508a464055a347f8
+        # tag: 3.9.1
+        digest: 3.9.1
         image: zookeeper
-        registry: docker.io/bitnami
+        registry: *sanketika_docker_registry
       # os_shell:
       #   # tag: 11-debian-11-r37
       #   digest: sha256:77bdba3135998baadc20015e00a9742eebac52167b90c3e46d0c339a2d668b12
       #   image: os-shell
       #   registry: docker.io/bitnami
       merged_pipeline:
-        # tag: release-0.5.0_RC27
-        # digest: sha256:211bc5b9e335fe0f8c5b8470db45ab2fec40cb0d7f64ad256a8d37a3749842d3
-        digest: release-0.5.0_RC27
+        # tag: 1.0.2-GA
+        digest: 1.0.3-GA
         image: merged-pipeline
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       master_data_processor:
-        # tag: release-0.5.0_RC27
-        # digest: sha256:1a48c84305875b7b806a7042a07e7e70f1c383e1b99094df7d5fc18484f7ea6c
-        digest: release-0.5.0_RC27
+        # tag: 1.0.2-GA
+        digest: 1.0.3-GA
         image: master-data-processor
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       kafka:
         # tag: 3.6.0
-        digest: sha256:647a79c852a60b9bac1832f24e26c1654a8efcbc4d839f0ae75dc8c60ba03e4a
+        digest: 3.6.0
         image: kafka
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       # autodiscovery:
       #   # tag: 1.25.12-debian-11-r26
       #   digest: sha256:9774c3452853d3ba9c4744d0acfa36d63f9d87ba7e43fd292caf7dae9115fac4
@@ -64,14 +63,14 @@ global:
       #   registry: docker.io/bitnami
       kafka_exporter:
         # tag: 1.0.1
-        digest: sha256:88c54d4e1328634929cbcc4f0b3cade990b271183b6580d020016683ab86e752
+        digest: 1.0.1
         image: kafka-exporter
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       jmx_exporter:
         # tag: 1.0.0
-        digest: sha256:3b6b7dd0d194939cf463a37a1851bdca610a5aac306cea86c16faf39a2bf8241
+        digest: 1.0.0
         image: jmx-exporter
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       # bitnami_shell:
       #   # tag: 11-debian-11-r136
       #   digest: sha256:0aa4e2314721a29fa2a8ea0ed901e2db2842c4217fc60ed5700ee62dbcd0fcbc
@@ -82,23 +81,17 @@ global:
       #   digest: sha256:f349e5f081c5894c80321fbb22981c00e22f802055d2ac34a3b9260e0be6df44
       #   image: postgresql
       #   registry: docker.io/bitnami
-      # postgres:
-      #   # tag: 15.4-alpine
-      #   digest: sha256:4acb0925f2de9716f925fedd83580f6dc2f48e32623e598a39896942fe2b3783
-      #   image: postgres
-      #   registry: docker.io/sanketikahub
-      #   # registry: docker.io
-      # only for local testing
       postgres:
-        # tag: 16.1-alpine
-        digest: sha256:d9449d47e5bc5ac6b832168b0f38e7ea7762ac75c574963d5ebfd75090f55d35
-        image: postgres
-        registry: docker.io
+        # tag: 15.4-alpine
+        digest: 16.1.0-debian-11-r19
+        image: postgresql
+        registry: docker.io/bitnami
+        # registry: docker.io
       postgresql_exporter:
         # tag: 1.0.1
-        digest: sha256:ca88db0e369a5db389b635fc385147de74df2f1fc4d2194a857fa687e701b1f8
+        digest: 1.0.1
         image: postgres-exporter
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       # redis:
       #   digest: sha256:017aaf627b7e115f6fb036c6e3360a0de4d83f1d62b315db31e89a0c09a4698e
       #   image: redis
@@ -106,74 +99,72 @@ global:
       # using redis alpine image
       redis:
         # tag: 7.2.2-alpine
-        digest: sha256:dbb2b5e28cf1d8b759a39f02479a5c4e03ca5e27d79bf2b20c6f662c57ec814a
+        digest: 7.2.2-alpine
         image: redis
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       # redis_sentinel:
       #   digest: sha256:a0317520a0275f1937a280fec73748b7a7995c17e137dab58b38e4b1fb4dfc15
       #   image: redis-sentinel
       #   registry: docker.io/bitnami
       redis_exporter:
         # tag: 1.0.0
-        digest: sha256:75f36755b86359945962164c1963a93d45ee433e14669a23a7ee8661845a2fe0
+        digest: 1.0.0
         image: redis-exporter
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       secor:
-        # tag: 1.0.0-GA
-        digest: sha256:90c2fc137cc242e5c08c2460298d8bec00d91aabe81c4a6a9c8f28bc67c602f6
+        # tag: 0.30-jdk-11-azure
+        digest: 1.0.0-GA
         image: secor
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       ubuntu:
-        digest: sha256:33a5cc25d22c45900796a1aca487ad7a7cb09f09ea00b779e3b2026b4fc2faba
+        # tag: 20.04
+        digest: 20.04
         image: ubuntu
         registry: docker.io/library
       k8s_sidecar:
         # tag: 1.25.2
-        digest: sha256:bc9996fb095fe5c313658140fab7f398663205d18894df633830fb5eadb680a4
+        digest: 1.25.2
         image: k8s-sidecar
         #registry: quay.io/kiwigrid
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       grafana_image_renderer:
         # tag: 3.11.1
-        digest: sha256:6d21854e5ad94014426f4f5fe18c1573980aea2718b730793d2e65cf17048e83
+        digest: 3.11.1
         image: grafana-image-renderer
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       curl:
         # tag: 8.4.0
-        digest: sha256:9b8e72d8278b18784f805c5ad3dbf4e57fa6f396475b7cf58a75ad3d8242ec68
+        digest: 8.4.0
         image: curl
         #registry: docker.io/alpine
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       busybox:
-        digest: sha256:95cf004f559831017cdf4628aaf1bb30133677be8702a8c5f2994629f637a209
+        # tag: 1.31.1
+        digest: 1.31.1
         image: busybox
         registry: docker.io/library
       grafana:
         # tag: 9.5.2
-        digest: sha256:2aafd24a138277142a86b6ed43b7537e1ec8226478f5240c459e9330a3461cdb
+        digest: 9.5.2
         image: grafana
         registry: docker.io/grafana
-      kube_rbac_proxy:
-        digest: sha256:23959f17f0c06988423b2aa899e9d387b9bfabd4fd005e6aa2444aa66de50793
-        image: kube-rbac-proxy
-        registry: quay.io/brancz
       node_exporter:
         # tag: master
-        digest: sha256:ee95038eb4cd16a0c12afa1fc019224529b2d589cc457bb5eb1ad7ca5b8ac5d0
+        digest: master
         image: node-exporter
         registry: docker.io/prom
       alertmanager:
         # tag: main_v1.0.1
-        digest: sha256:fe15798ee1eabfc366dd5de79629356f0899fdb021b2274a18f8674e7790e082
+        digest: main_v1.0.1
         image: alertmanager
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       prometheus_operator:
         # tag: v0.66.0
-        digest: sha256:116bdf06d6070ba9d1988704c30a5dd82bd63aa31603241aafd858389bd5a748
+        digest: v0.66.0
         image: prometheus-operator
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       prometheus_config_reloader:
-        digest: sha256:65dde6b23d0fe81778c2b1027785f2244a71d1702b67f08700b2308c381e5400
+        digest: v0.60.1
         image: prometheus-config-reloader
         registry: quay.io/prometheus-operator
       # thanos:
@@ -182,16 +173,17 @@ global:
       #   registry: quay.io/thanos
       prometheus:
         # tag: main
-        digest: sha256:17b15b91b841c30df91387c457853b241561b426b7f2cb39fde2f906c35a47c1
+        digest: main
         image: prometheus
         registry: docker.io/prom
       kube_state_metrics:
-        digest: sha256:ec5732e28f151de3847df60f48c5a570aacdb692ff1ce949d97105ae5e5a6722
+        # digest: sha256:ec5732e28f151de3847df60f48c5a570aacdb692ff1ce949d97105ae5e5a6722
+        digest: v2.8.2
         image: kube-state-metrics
         registry: registry.k8s.io/kube-state-metrics
       alpine:
         # tag:3.16
-        digest: sha256:b7976818ac23c46dbc69437dd41c5ba32750f0345ad706209d2208b4db84e1e8
+        digest: 3.16
         image: alpine
         registry: docker.io/library
       kube_webhook_certgen:
@@ -200,28 +192,28 @@ global:
         registry: registry.k8s.io/ingress-nginx
       grafana_agent_operator:
         # tag: main
-        digest: sha256:533ab218f658aac5b58ab79d6054e89dca60a14f0f1598019b6e38ebaa6181c7
+        digest: main
         image: agent-operator
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       minio:
         # tag: 1.0.1
-        digest: sha256:3c32ef6089b3ea230a55f6e7e594aaf47a216cd9b6309f701a5a4facec1b31e8
+        digest: 1.0.1
         image: minio
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       # kubectl_image:
       #   digest: sha256:9774c3452853d3ba9c4744d0acfa36d63f9d87ba7e43fd292caf7dae9115fac4
       #   image: kubectl
       #   registry: docker.io/bitnami
       kubectl_image:
         # tag: 1.0.0
-        digest: sha256:eb0a7c497343851e3e8f15a4f894d87b0b7a0212ae249b735c96679dec6b295e
+        digest: 1.0.0
         image: kubectl
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       mc_image:
         # tag: 1.0.0
-        digest: sha256:3ad2b67ae3f9191745b44133b1a1d1386d9aa081902af47d8c8ea297a49aceaa
+        digest: 1.0.0
         image: minio-client
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       # enterprise_logs:
       #   digest: sha256:469d8fdb73288d7a3e243c74856f155f8c498c9710102c338758ba431b235ef9
       #   image: enterprise-logs
@@ -232,36 +224,34 @@ global:
       #   registry: docker.io/grafana
       loki_test:
         # latest
-        digest: sha256:4eca92e66d9367ba6f0920c6998d9955bb979346d69db315e32e77d6f1b47fe8
+        digest: latest
         image: loki-helm-test
         registry: docker.io/grafana
       loki_canary:
         # tag: 1.0.0
-        digest: sha256:e9bee1c12811406df9712fbd7383bd0a5afe8e3a7c622716303d63cec9012a2b
+        digest: 1.0.0
         image: loki-canary
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       loki:
         # tag: 1.0.0
-        digest: sha256:6a2ae34b94e5074bde4904dc85c2d9eae6c351dcf0568ff88882a851a0368b18
+        digest: 1.0.0
         image: loki
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       loki_gateway:
         # tag: 1.25-alpine-1
-        digest: sha256:341c4f6f422f1aaec1d0f7fb82f8f82f4618a5e0f8d07b026df5f4e26e24727d
+        digest: 1.25-alpine-1
         image: nginx-unprivileged
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       promtail:
         # tag: main-2327789
-        digest: sha256:bab40183b93472314aa7f3f4a6c3c639dda1799664085a7618e026a8dcc95288
+        digest: main-2327789
         image: promtail
-        registry: docker.io/sanketikahub
+        registry: *sanketika_docker_registry
       web_console:
-        # tag: 1.0.2-alert-desc
-        # digest: sha256:be2a77a9b346a3e8946da8df8ec5042112729f5685eb60e34e1448e1a44e184b
-        digest: 1.0.0-GA
-        image: sb-obsrv-web-console
-        # registry: obsrvms.azurecr.io
-        registry: docker.io/sanketikahub
+        # tag: 1.3.1
+        digest: 1.0.2-GA
+        image: obsrv-web-console
+        registry: *sanketika_docker_registry
       # superset:
       #   # tag: 2.0.0
       #   digest: sha256:ca32ff641daca7447edfe78345e1abbc3b278895b1d4a245e69e28020e3310b7
@@ -281,33 +271,36 @@ global:
   postgresql_obsrv_user_password: &psql-obsrv-pwd "obsrv123"
   postgresql_druid_user_password: &psql-druid-pwd "druidraw123"
 
-  s3_bucket: &s3-bucket ""
-  s3_access_key: &s3-key ""
-  s3_secret_key: &s3-secret ""
-  region: &global-region ""
+  cloud-storage-provider: &global-cloud-storage-provider "s3"
+  cloud-storage-region: &global-cloud-storage-region "us-east-2"
 
-  azure_storage_account_name: ""
-  azure_storage_account_key: ""
-  azure_storage_container: ""
+  s3_bucket: &global-s3-bucket ""
+  s3_access_key: &global-s3-access-key ""
+  s3_secret_key: &global-s3-secret-access-key ""
+  region: &global-region ""
+  s3_endpoint_url: &global-s3-endpoint-url ""
+  s3_path_style_access: &global-s3-path-style-access "true"
+
+  azure_storage_account_name: &global-azure-account-name ""
+  azure_storage_account_key: &global-azure-account-key ""
+  azure_storage_container: &global-azure-container ""
 
   gcs_bucket: &gcs-bucket ""
 
-  druid_deepstorage_type: &global-druid-deep-store-type "azure"
-  kubernetes_storage_class: &global-k9s-storage-class "managed-premium"
+  druid_deepstorage_type: &global-druid-deep-store-type ""
+  kubernetes_storage_class: &global-k9s-storage-class ""
 
   sys-events-kafka-topic: &sys-events-kafka-topic "dev.system.events"
   sys-telemetry-events-kafka-topic: &sys-telemetry-events-kafka-topic "dev.system.telemetry.events"
 
 alert-rules:
-  enabled: false
+  enabled: true
   namespace: monitoring
 
 dataset-api:
   enabled: true
   namespace: dataset-api
   SYSTEM_ENV: *global-env
-  service:
-    type: NodePort
   druid_service:
     DRUID_HOST: *global-druid-host
     DRUID_PORT: 8888
@@ -326,12 +319,10 @@ dataset-api:
     REDIS_PORT: 6379
   exhaust_service:
     # LABEL_CONTAINER: *azure-container
-    # CLOUD_STORAGE_PROVIDER: "aws"
-    CLOUD_STORAGE_REGION: "East US 2"
-    CLOUD_STORAGE_PROVIDER: "azure"
+    CLOUD_STORAGE_PROVIDER: &global-cloud-storage-provider ""
+    CLOUD_STORAGE_REGION: &global-cloud-storage-region ""
     # CONTAINER: *azure-container
     CONTAINER_PREFIX: "telemetry-data"
-    # CLOUD_STORAGE_CONFIG: '{"identity":"","credential":""}'
   # service_account_annotations:
   #   meta.helm.sh/release-namespace: dataset-api
 
@@ -367,9 +358,12 @@ druid-raw-cluster:
   druid_deepstorage_type: *global-druid-deep-store-type
   druid_indexer_logs_type: *global-druid-deep-store-type
   # druid_indexer_logs_container: *azure-container
-  s3_bucket: *s3-bucket
-  s3_access_key: *s3-key
-  s3_secret_key: *s3-secret
+  s3_bucket: *global-s3-bucket
+  s3_access_key: *global-s3-access-key
+  s3_secret_key: *global-s3-secret-access-key
+  s3_endpoint_url: *global-s3-endpoint-url
+  s3_path_style_access: *global-s3-path-style-access
+
   # azure_storage_account_name: *azure-account-name
   # azure_storage_account_key: *azure-account-key
   # azure_storage_container: *azure-container
@@ -388,14 +382,14 @@ merged-pipeline:
   name: merged-pipeline
   namespace: flink
   env: *global-env
-  checkpoint_store_type: azure
+  checkpoint_store_type: *global-cloud-storage-provider
 
 master-data-processor:
   enabled: true
   name: master-data-processor
   namespace: flink
   env: *global-env
-  checkpoint_store_type: azure
+  checkpoint_store_type: *global-cloud-storage-provider
 
 flink-sa:
   enabled: false
@@ -421,13 +415,11 @@ kafka:
         replicationFactor: 1
         config:
           max.message.bytes: "10000024"
-        # https://kafka.apache.org/documentation/#topicconfigs
       - name: "dev.masterdata.ingest"
         partitions: 1
         replicationFactor: 1
         config:
           max.message.bytes: "10000024"
-        # https://kafka.apache.org/documentation/#topicconfigs
   persistence:
     size: 50Gi
   zookeeper:
@@ -459,7 +451,7 @@ postgresql:
   image:
     registry: docker.io
     repository: bitnami/postgresql
-    tag: 14.9.0-debian-11-r2
+    tag: 16.1.0-debian-11-r19
   auth:
     enablePostgresUser: true
     postgresPassword: postgres
@@ -864,17 +856,24 @@ secor:
   secor_memory_limit: &secor-memory-limit "512Mi"
   threads: &threads 2
 
-  cloud_store_provider: "azure"
+  # cloud_store_provider: "azure"
   # cloud_storage_bucket: *azure-container
   # azure_account: *azure-account-name
   # azure_secret: *azure-account-key
+  cloud_store_provider: *global-cloud-storage-provider
+  {{- if eq .Values.cloud_store_provider "azure" }}
   upload_manager: "com.pinterest.secor.uploader.AzureUploadManager"
+  {{- else if eq .Values.cloud_store_provider "s3" }}
+  upload_manager: "com.pinterest.secor.uploader.S3UploadManager"
+  {{- else if eq .Values.cloud_store_provider "gcs" }}
+  upload_manager: "com.pinterest.secor.uploader.GcsUploadManager"
+  {{- end }}
   storageClass: *global-k9s-storage-class
   secor_env: *global-env
   region: *global-region
   image_repository: "sanketikahub/secor"
   pullPolicy: "IfNotPresent"
-  image_tag: "0.30"
+  image_tag: "1.0.0-GA"
   jvm_memory: "1024m"
   timezone: "UTC"
   # message_timezone: "UTC"
@@ -1107,7 +1106,7 @@ secor:
       partition_prefix_mapping: "{}"
       message_channel_identifier: ""
       output_file_pattern: "{partition}-{currentTimestamp}.json"
-      message_parser: "com.pinterest.secor.parser.PatternDateMessageParser" 
+      message_parser: "com.pinterest.secor.parser.PatternDateMessageParser"
       storage:
         size: *backup-pv-size
       requests:
@@ -1118,7 +1117,7 @@ secor:
         memory: *secor-memory-limit
       lag_threshold_warning: 100000
       threads: *threads
-      lag_threshold_critical: 200000 
+      lag_threshold_critical: 200000
 
   alertrules:
     enabled: false
@@ -1137,8 +1136,8 @@ submit-ingestion:
     system_events:
       topic: *sys-events-kafka-topic
       name: "system-events"
-      segment_granularity: "hour"
-      query_granularity: "hour"
+      segment_granularity: "day"
+      query_granularity: "PT5M"
       task_duration: "PT1H"
       task_completion: "PT1H"
       task_count: 1
@@ -1150,9 +1149,9 @@ submit-ingestion:
       segment_granularity: "hour"
       query_granularity: "hour"
       task_duration: "PT1H"
-      task_completion: "PT1H"   
+      task_completion: "PT1H"
       task_count: 1
-      replicas: 1 
+      replicas: 1
       enable: true
 
 monitoring:
@@ -1163,7 +1162,7 @@ monitoring:
     system.monitoring: 'true'
   alertmanager:
     alertmanagerSpec:
-      podLabels: 
+      podLabels:
         system.monitoring: 'true'
       resources:
         limits:
@@ -1199,9 +1198,9 @@ monitoring:
         memory: 32Mi
   grafana:
     namespaceOverride: monitoring
-    extraLabels: 
+    extraLabels:
       system.monitoring: 'true'
-    podLabels: 
+    podLabels:
         system.monitoring: 'true'
     resources:
       limits:
@@ -1232,7 +1231,7 @@ monitoring:
                 storage: 10Gi
   prometheus-node-exporter:
     namespaceOverride: monitoring
-    podLabels: 
+    podLabels:
       system.monitoring: 'true'
     resources:
       limits:

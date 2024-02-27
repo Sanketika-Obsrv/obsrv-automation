@@ -17,6 +17,7 @@ spec:
   template:
     metadata:
       labels:
+        # azure-extensions-usage-release-identifier: obsrv-base
 {{ include "ga-operator.selectorLabels" . | indent 8 }}
 {{- with .Values.podLabels }}
 {{- toYaml . | nindent 8 }}
@@ -34,7 +35,7 @@ spec:
       containers:
       - name: {{ include "ga-operator.name" . }}
       {{ if $.Values.global.azure.images.grafana_agent_operator }}
-        image: "{{ $.Values.global.azure.images.grafana_agent_operator.registry }}/{{ $.Values.global.azure.images.grafana_agent_operator.image }}@{{ $.Values.global.azure.images.grafana_agent_operator.digest }}"
+        image: "{{ $.Values.global.azure.images.grafana_agent_operator.registry }}/{{ $.Values.global.azure.images.grafana_agent_operator.image }}:{{ $.Values.global.azure.images.grafana_agent_operator.digest }}"
         {{- else }}
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         {{- end }}

@@ -30,6 +30,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "grafana.imageRenderer.selectorLabels" . | nindent 8 }}
         {{- with .Values.imageRenderer.podLabels }}
         {{- toYaml . | nindent 8 }}
@@ -66,7 +67,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}-image-renderer
           {{- if .Values.global.azure.images.grafana_image_renderer }}
-          image: "{{ .Values.global.azure.images.grafana_image_renderer.registry }}/{{ .Values.global.azure.images.grafana_image_renderer.image }}@{{ .Values.global.azure.images.grafana_image_renderer.digest }}"
+          image: "{{ .Values.global.azure.images.grafana_image_renderer.registry }}/{{ .Values.global.azure.images.grafana_image_renderer.image }}:{{ .Values.global.azure.images.grafana_image_renderer.digest }}"
           {{- else if .Values.imageRenderer.image.sha }}
           image: "{{ .Values.imageRenderer.image.repository }}:{{ .Values.imageRenderer.image.tag }}@sha256:{{ .Values.imageRenderer.image.sha }}"
           {{- else }}

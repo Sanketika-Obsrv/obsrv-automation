@@ -11,7 +11,6 @@ metadata:
     app.kubernetes.io/part-of: memberlist
 spec:
   replicas: {{ .Values.write.replicas }}
-
   podManagementPolicy: Parallel
   updateStrategy:
     rollingUpdate:
@@ -52,6 +51,7 @@ spec:
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
         app.kubernetes.io/part-of: memberlist
+        azure-extensions-usage-release-identifier: obsrv-base
     spec:
       serviceAccountName: {{ include "loki.serviceAccountName" . }}
       automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
@@ -73,7 +73,7 @@ spec:
       containers:
         - name: loki
           {{-  if $.Values.global.azure.images.loki }}
-          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}@{{ $.Values.global.azure.images.loki.digest }}"
+          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}:{{ $.Values.global.azure.images.loki.digest }}"
           {{- else }}
           image: {{ include "loki.image" . }}
           {{- end }}

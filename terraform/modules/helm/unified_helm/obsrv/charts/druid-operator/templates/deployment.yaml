@@ -17,6 +17,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
+        # azure-extensions-usage-release-identifier: obsrv-base
         {{- include "druid-operator.selectorLabels" . | nindent 8 }}
     spec:
       # {{- with .Values.imagePullSecrets }}
@@ -31,7 +32,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
         {{ if .Values.global.azure.images.druid_operator }}
-          image: "{{ .Values.global.azure.images.druid_operator.registry }}/{{ .Values.global.azure.images.druid_operator.image }}@{{ .Values.global.azure.images.druid_operator.digest }}"
+          image: "{{ .Values.global.azure.images.druid_operator.registry }}/{{ .Values.global.azure.images.druid_operator.image }}:{{ .Values.global.azure.images.druid_operator.digest }}"
         {{ else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         {{ end }}

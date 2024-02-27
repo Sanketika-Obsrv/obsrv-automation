@@ -5,6 +5,7 @@ metadata:
   name: {{ template "kube-prometheus-stack.alertmanager.crname" . }}
   namespace: {{ template "kube-prometheus-stack.namespace" . }}
   labels:
+    azure-extensions-usage-release-identifier: obsrv-base
     app: {{ template "kube-prometheus-stack.name" . }}-alertmanager
 {{ include "kube-prometheus-stack.labels" . | indent 4 }}
 {{- if .Values.alertmanager.annotations }}
@@ -13,7 +14,7 @@ metadata:
 {{- end }}
 spec:
 {{- if .Values.global.azure.images.alertmanager }}
-  image: "{{ .Values.global.azure.images.alertmanager.registry }}/{{ .Values.global.azure.images.alertmanager.image }}@{{ .Values.global.azure.images.alertmanager.digest }}"
+  image: "{{ .Values.global.azure.images.alertmanager.registry }}/{{ .Values.global.azure.images.alertmanager.image }}:{{ .Values.global.azure.images.alertmanager.digest }}"
   {{- else if .Values.alertmanager.alertmanagerSpec.image }}
   {{- $registry := .Values.global.imageRegistry | default .Values.alertmanager.alertmanagerSpec.image.registry -}}
   {{- if and .Values.alertmanager.alertmanagerSpec.image.tag .Values.alertmanager.alertmanagerSpec.image.sha }}
@@ -98,10 +99,12 @@ spec:
   storage:
 {{ tpl (toYaml .Values.alertmanager.alertmanagerSpec.storage | indent 4) . }}
 {{- end }}
-{{- if .Values.alertmanager.alertmanagerSpec.podMetadata }}
+# {{- if .Values.alertmanager.alertmanagerSpec.podMetadata }}
   podMetadata:
-{{ toYaml .Values.alertmanager.alertmanagerSpec.podMetadata | indent 4 }}
-{{- end }}
+    labels:
+      azure-extensions-usage-release-identifier: obsrv-base
+# {{ toYaml .Values.alertmanager.alertmanagerSpec.podMetadata | indent 4 }}
+# {{- end }}
 {{- if or .Values.alertmanager.alertmanagerSpec.podAntiAffinity .Values.alertmanager.alertmanagerSpec.affinity }}
   affinity:
 {{- end }}

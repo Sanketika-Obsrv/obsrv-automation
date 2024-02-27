@@ -5,6 +5,7 @@ metadata:
   name: {{ template "kube-state-metrics.fullname" . }}
   namespace: {{ template "kube-state-metrics.namespace" . }}
   labels:
+    azure-extensions-usage-release-identifier: obsrv-base
     {{- include "kube-state-metrics.labels" . | indent 4 }}
 spec:
   resourcePolicy:

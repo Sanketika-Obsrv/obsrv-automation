@@ -39,6 +39,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "loki.singleBinarySelectorLabels" . | nindent 8 }}
         {{- with .Values.loki.podLabels }}
         {{- toYaml . | nindent 8 }}
@@ -71,7 +72,7 @@ spec:
       containers:
         - name: loki
           {{-  if $.Values.global.azure.images.loki }}
-          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}@{{ $.Values.global.azure.images.loki.digest }}"
+          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}:{{ $.Values.global.azure.images.loki.digest }}"
           {{- else }}
           image: {{ include "loki.image" . }}
           {{- end }}

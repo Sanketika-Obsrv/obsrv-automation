@@ -3,7 +3,8 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-
+  annotations:
+    helm.sh/resource-policy: keep
   labels:
     name: flink
   name: flink
@@ -15,13 +16,14 @@ data:
   base-config: |+
     job {
       env = {{ .Values.env }}
-      enable.distributed.checkpointing = true
+      enable.distributed.checkpointing = false
       statebackend {
         base.url = "wasbs://{{ .Values.global.azure_storage_container }}@{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net/flink-jobs"
+        # base.url = "s3://{{ .Values.global.s3_bucket }}/flink-checkpoints"
       }
     }
     kafka {
-      broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
+      broker-servers = "{{ .Release.Name }}-headless.kafka.svc.cluster.local:9092"
       producer.broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
       consumer.broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
       zookeeper = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:2181"
@@ -32,6 +34,7 @@ data:
         compression = "snappy"
       }
       output.system.event.topic = ${job.env}".system.events"
+      output.failed.topic = ${job.env}".failed"
     }
     task {
       parallelism = 1
@@ -116,14 +119,16 @@ data:
     kafka {
       input.topic = ${job.env}".masterdata.ingest"
       output.raw.topic = ${job.env}".masterdata.raw"
-      output.extractor.duplicate.topic = ${job.env}".masterdata.extractor.duplicate"
+      output.extractor.duplicate.topic = ${job.env}".masterdata.failed"
       output.failed.topic = ${job.env}".masterdata.failed"
-      output.batch.failed.topic = ${job.env}".masterdata.extractor.failed"
+      output.batch.failed.topic = ${job.env}".masterdata.failed"
       event.max.size = "1048576" # Max is only 1MB
-      output.invalid.topic = ${job.env}".masterdata.invalid"
+      output.invalid.topic = ${job.env}".masterdata.failed"
       output.unique.topic = ${job.env}".masterdata.unique"
-      output.duplicate.topic = ${job.env}".masterdata.duplicate"
+      output.duplicate.topic = ${job.env}".masterdata.failed"
+      output.denorm.topic = ${job.env}".masterdata.denorm"
       output.transform.topic = ${job.env}".masterdata.transform"
+      output.transform.failed.topic = ${job.env}".masterdata.transform.failed"
       stats.topic = ${job.env}".masterdata.stats"
       groupId = ${job.env}"-masterdata-pipeline-group"
 
@@ -234,13 +239,23 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         app: flink
         component: master-data-processor-taskmanager
     spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.image.imagePullSecrets }}
       containers:
       - args:
         - start-foreground
-        - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
+        {{- if eq .Values.checkpoint_store_type "s3" }}
+        - "-Ds3.access-key={{ .Values.global.s3_access_key }}"
+        - "-Ds3.secret-key={{ .Values.global.s3_secret_key }}"
+        - "-Ds3.endpoint={{ .Values.global.s3_endpoint_url }}"
+        - "-Ds3.path.style.access={{ .Values.global.s3_path_style_access }}"
+        {{- else if eq .Values.checkpoint_store_type "azure" }}
+        - "-Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}"
+        {{- end }}
         - -Dweb.submit.enable=false
         - -Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter
         - -Dmetrics.reporter.prom.host=master-data-processor-taskmanager
@@ -251,11 +266,7 @@ spec:
         - /data/flink/conf/master-data-processor.conf
         command:
         - /opt/flink/bin/taskmanager.sh
-        {{ if .Values.global.azure.images.master_data_processor }}
         image: "{{ .Values.global.azure.images.master_data_processor.registry }}/{{ .Values.global.azure.images.master_data_processor.image }}:{{ .Values.global.azure.images.master_data_processor.digest }}"
-        {{ else }}
-        image: sanketikahub/master-data-processor:release-0.5.0_RC26
-        {{ end }}
         imagePullPolicy: IfNotPresent
         name: master-data-processor-taskmanager
         ports:
@@ -263,9 +274,11 @@ spec:
           name: rpc
         resources:
           limits:
-            cpu: "1"
+            cpu: 500m
+            memory: 1Gi
           requests:
-            cpu: "0.7"
+            cpu: 250m
+            memory: 1Gi
         volumeMounts:
         - mountPath: /opt/flink/conf/flink-conf.yaml
           name: flink-config-volume
@@ -305,6 +318,7 @@ spec:
     matchLabels:
       app: flink
       component: master-data-processor-jobmanager
+      azure-extensions-usage-release-identifier: obsrv-base
   template:
     metadata:
       annotations:
@@ -313,20 +327,21 @@ spec:
       labels:
         app: flink
         component: master-data-processor-jobmanager
+        azure-extensions-usage-release-identifier: obsrv-base
     spec:
       initContainers:
       - name: check-db-ready
       {{ if .Values.global.azure.images.postgres }}
-        image: "{{ .Values.global.azure.images.postgres.registry }}/{{ .Values.global.azure.images.postgres.image }}@{{ .Values.global.azure.images.postgres.digest }}"
+        image: "{{ .Values.global.azure.images.postgres.registry }}/{{ .Values.global.azure.images.postgres.image }}:{{ .Values.global.azure.images.postgres.digest }}"
       {{ else }}
         image: postgres:latest
       {{ end }}
         command: ['sh', '-c',
-          'until pg_isready -h {{ .Release.Name }}-postgresql-hl.postgresql.svc.cluster.local -p 5432;
+          'until pg_isready -h {{ .Release.Name }}-postgresql-hl.postgresql.svc.cluster.local -p 5432 -U obsrv -d obsrv;
           do echo waiting for database; sleep 2; done;']
       - name: wait-for-available-kafka
       {{ if .Values.global.azure.images.kafka }}
-        image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}@{{ .Values.global.azure.images.kafka.digest }}"
+        image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}:{{ .Values.global.azure.images.kafka.digest }}"
       {{ else }}
         image: docker.io/bitnami/kafka:3.5.1-debian-11-r21
       {{ end }}
@@ -342,10 +357,19 @@ spec:
             9092; \
             do echo waiting for kafka; sleep 2; done;
             echo "Kafka is available";
+      imagePullSecrets:
+        - name: {{ .Values.global.image.imagePullSecrets }}
       containers:
       - args:
         - start-foreground
-        - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
+        {{- if eq .Values.checkpoint_store_type "s3" }}
+        - "-Ds3.access-key={{ .Values.global.s3_access_key }}"
+        - "-Ds3.secret-key={{ .Values.global.s3_secret_key }}"
+        - "-Ds3.endpoint={{ .Values.global.s3_endpoint_url }}"
+        - "-Ds3.path.style.access={{ .Values.global.s3_path_style_access }}"
+        {{- else if eq .Values.checkpoint_store_type "azure" }}
+        - "-Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}"
+        {{- end }}
         - --job-classname=org.sunbird.obsrv.pipeline.task.MasterDataProcessorStreamTask
         - -Dweb.submit.enable=false
         - -Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter
@@ -359,11 +383,7 @@ spec:
         - /data/flink/conf/master-data-processor.conf
         command:
         - /opt/flink/bin/standalone-job.sh
-        {{ if .Values.global.azure.images.master_data_processor }}
         image: "{{ .Values.global.azure.images.master_data_processor.registry }}/{{ .Values.global.azure.images.master_data_processor.image }}:{{ .Values.global.azure.images.master_data_processor.digest }}"
-        {{ else }}
-        image: sanketikahub/master-data-processor:release-0.5.0_RC26
-        {{ end }}
         imagePullPolicy: IfNotPresent
         name: master-data-processor-jobmanager
         ports:
@@ -377,24 +397,26 @@ spec:
           name: ui
         resources:
           limits:
-            cpu: "1"
+            cpu: 250m
+            memory: 1Gi
           requests:
-            cpu: "0.7"
+            cpu: 250m
+            memory: 1Gi
         volumeMounts:
         - mountPath: /opt/flink/conf/flink-conf.yaml
           name: flink-config-volume
           subPath: flink-conf.yaml
+        - mountPath: /opt/flink/conf/log4j-console.properties
+          name: flink-config-volume
+          subPath: log4j-console.properties
         - mountPath: /data/flink/conf/baseconfig.conf
           name: flink-config-volume
           subPath: base-config.conf
         - mountPath: /data/flink/conf/master-data-processor.conf
           name: flink-config-volume
           subPath: master-data-processor.conf
-        - mountPath: /opt/flink/conf/log4j-console.properties
-          name: flink-config-volume
-          subPath: log4j-console.properties
         workingDir: /opt/flink
-      # restartPolicy: OnFailure
+    #   restartPolicy: OnFailure
       volumes:
       - configMap:
           items:
@@ -409,4 +431,36 @@ spec:
           name: master-data-processor-config
         name: flink-config-volume
 ---
-
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: master-data-processor-taskmanager
+  namespace: flink
+  labels:
+    app: master-data-processor-taskmanager
+    release: monitoring
+    system.processing: "true"
+spec:
+  selector:
+    matchLabels:
+      component: master-data-processor-taskmanager
+  endpoints:
+  - port: prom
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: master-data-processor-jobmanager
+  namespace: flink
+  labels:
+    app: master-data-processor-jobmanager
+    release: monitoring
+    system.processing: "true"
+spec:
+  selector:
+    matchLabels:
+      component: master-data-processor-jobmanager
+  endpoints:
+  - port: prom
+    interval: 30s

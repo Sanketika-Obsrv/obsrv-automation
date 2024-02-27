@@ -17,13 +17,14 @@ spec:
   template:
     metadata:
       labels:
+        # azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/name: {{ include "kafka-exporter.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       initContainers:
         - name: wait-for-available-kafka
         {{ if .Values.global.azure.images.kafka }}
-          image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}@{{ .Values.global.azure.images.kafka.digest }}"
+          image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}:{{ .Values.global.azure.images.kafka.digest }}"
         {{ else }}
           image: docker.io/bitnami/kafka:3.5.1-debian-11-r21
         {{ end }}
@@ -42,7 +43,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
         {{ if .Values.global.azure.images.kafka_exporter }}
-          image: "{{ .Values.global.azure.images.kafka_exporter.registry }}/{{ .Values.global.azure.images.kafka_exporter.image }}@{{ .Values.global.azure.images.kafka_exporter.digest }}"
+          image: "{{ .Values.global.azure.images.kafka_exporter.registry }}/{{ .Values.global.azure.images.kafka_exporter.image }}:{{ .Values.global.azure.images.kafka_exporter.digest }}"
         {{ else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         {{ end }}

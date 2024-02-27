@@ -35,7 +35,7 @@ spec:
   containers:
     - name: {{ .Release.Name }}-test
       {{- if .Values.global.azure.images.alpine }}
-      image: "{{ .Values.global.azure.images.alpine.registry }}/{{ .Values.global.azure.images.alpine.image }}@{{ .Values.global.azure.images.alpine.digest }}"
+      image: "{{ .Values.global.azure.images.alpine.registry }}/{{ .Values.global.azure.images.alpine.image }}:{{ .Values.global.azure.images.alpine.digest }}"
       {{- else }}
       image: "{{ .Values.testFramework.image}}:{{ .Values.testFramework.tag }}"
       {{- end }}

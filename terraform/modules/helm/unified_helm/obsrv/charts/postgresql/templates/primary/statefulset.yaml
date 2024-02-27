@@ -34,6 +34,7 @@ spec:
     metadata:
       name: {{ include "postgresql.primary.fullname" . }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
+        azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/component: primary
         {{- if .Values.commonLabels }}
         {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
@@ -98,7 +99,7 @@ spec:
         {{- if and .Values.tls.enabled (not .Values.volumePermissions.enabled) }}
         - name: copy-certs
         {{ if .Values.global.azure.images.bitnami_shell }}
-          image: "{{ .Values.global.azure.images.bitnami_shell.registry }}/{{ .Values.global.azure.images.bitnami_shell.image }}@{{ .Values.global.azure.images.bitnami_shell.digest }}"
+          image: "{{ .Values.global.azure.images.bitnami_shell.registry }}/{{ .Values.global.azure.images.bitnami_shell.image }}:{{ .Values.global.azure.images.bitnami_shell.digest }}"
         {{ else }}
           image: {{ include "postgresql.volumePermissions.image" . }}
         {{ end }}
@@ -124,7 +125,7 @@ spec:
         {{- else if and .Values.volumePermissions.enabled (or .Values.primary.persistence.enabled .Values.shmVolume.enabled) }}
         - name: init-chmod-data
         {{ if .Values.global.azure.images.bitnami_shell }}
-          image: "{{ .Values.global.azure.images.bitnami_shell.registry }}/{{ .Values.global.azure.images.bitnami_shell.image }}@{{ .Values.global.azure.images.bitnami_shell.digest }}"
+          image: "{{ .Values.global.azure.images.bitnami_shell.registry }}/{{ .Values.global.azure.images.bitnami_shell.image }}:{{ .Values.global.azure.images.bitnami_shell.digest }}"
         {{ else }}
           image: {{ include "postgresql.volumePermissions.image" . }}
         {{ end }}
@@ -193,8 +194,8 @@ spec:
       {{- end }}
       containers:
         - name: postgresql
-        {{ if .Values.global.azure.images.postgresql }}
-          image: "{{ .Values.global.azure.images.postgresql.registry }}/{{ .Values.global.azure.images.postgresql.image }}@{{ .Values.global.azure.images.postgresql.digest }}"
+        {{ if .Values.global.azure.images.postgres }}
+          image: "{{ .Values.global.azure.images.postgres.registry }}/{{ .Values.global.azure.images.postgres.image }}:{{ .Values.global.azure.images.postgres.digest }}"
         {{ else }}
           image: {{ include "postgresql.image" . }}
         {{ end }}
@@ -494,7 +495,7 @@ spec:
         {{- if .Values.metrics.enabled }}
         - name: metrics
         {{ if .Values.global.azure.images.postgresql_exporter }}
-          image: "{{ .Values.global.azure.images.postgresql.registry }}/{{ .Values.global.azure.images.postgresql.image }}@{{ .Values.global.azure.images.postgresql.digest }}"
+          image: "{{ .Values.global.azure.images.postgresql.registry }}/{{ .Values.global.azure.images.postgresql.image }}:{{ .Values.global.azure.images.postgresql.digest }}"
         {{ else }}
           image: {{ include "postgresql.metrics.image" . }}
         {{ end }}

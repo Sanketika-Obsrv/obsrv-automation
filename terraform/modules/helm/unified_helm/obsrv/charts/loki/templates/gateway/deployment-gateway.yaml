@@ -29,6 +29,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- with .Values.loki.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -50,7 +51,7 @@ spec:
       containers:
         - name: nginx
           {{-  if $.Values.global.azure.images.loki_gateway }}
-          image: "{{ $.Values.global.azure.images.loki_gateway.registry }}/{{ $.Values.global.azure.images.loki_gateway.image }}@{{ $.Values.global.azure.images.loki_gateway.digest }}"
+          image: "{{ $.Values.global.azure.images.loki_gateway.registry }}/{{ $.Values.global.azure.images.loki_gateway.image }}:{{ $.Values.global.azure.images.loki_gateway.digest }}"
           {{- else }}
           image: {{ include "loki.gatewayImage" . }}
           {{- end }}

@@ -25,6 +25,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         app: {{ template "kube-prometheus-stack.name" . }}-operator
 {{ include "kube-prometheus-stack.labels" . | indent 8 }}
 {{- if .Values.prometheusOperator.podLabels }}
@@ -44,7 +45,7 @@ spec:
           {{- $operatorRegistry := .Values.global.imageRegistry | default .Values.prometheusOperator.image.registry -}}
           {{- $thanosRegistry := .Values.global.imageRegistry | default .Values.prometheusOperator.thanosImage.registry -}}
           {{- if .Values.global.azure.images.prometheus_operator }}
-          image: "{{ .Values.global.azure.images.prometheus_operator.registry }}/{{ .Values.global.azure.images.prometheus_operator.image }}@{{ .Values.global.azure.images.prometheus_operator.digest }}"
+          image: "{{ .Values.global.azure.images.prometheus_operator.registry }}/{{ .Values.global.azure.images.prometheus_operator.image }}:{{ .Values.global.azure.images.prometheus_operator.digest }}"
           {{- else if .Values.prometheusOperator.image.sha }}
           image: "{{ $operatorRegistry }}/{{ .Values.prometheusOperator.image.repository }}:{{ .Values.prometheusOperator.image.tag | default .Chart.AppVersion }}@sha256:{{ .Values.prometheusOperator.image.sha }}"
           {{- else }}
@@ -84,7 +85,7 @@ spec:
             - --alertmanager-default-base-image={{ .Values.global.imageRegistry | default .Values.prometheusOperator.alertmanagerDefaultBaseImageRegistry }}/{{ .Values.prometheusOperator.alertmanagerDefaultBaseImage }}
             {{- end }}
             {{- if .Values.global.azure.images.prometheus_config_reloader }}
-            - --prometheus-config-reloader={{ .Values.global.azure.images.prometheus_config_reloader.registry }}/{{ .Values.global.azure.images.prometheus_config_reloader.image }}@{{ .Values.global.azure.images.prometheus_config_reloader.digest }}
+            - --prometheus-config-reloader={{ .Values.global.azure.images.prometheus_config_reloader.registry }}/{{ .Values.global.azure.images.prometheus_config_reloader.image }}:{{ .Values.global.azure.images.prometheus_config_reloader.digest }}
             {{- else if .Values.prometheusOperator.prometheusConfigReloader.image.sha }}
             - --prometheus-config-reloader={{ $configReloaderRegistry }}/{{ .Values.prometheusOperator.prometheusConfigReloader.image.repository }}:{{ .Values.prometheusOperator.prometheusConfigReloader.image.tag | default .Chart.AppVersion }}@sha256:{{ .Values.prometheusOperator.prometheusConfigReloader.image.sha }}
             {{- else }}
@@ -116,7 +117,7 @@ spec:
             - --thanos-default-base-image={{ $thanosRegistry }}/{{ .Values.prometheusOperator.thanosImage.repository }}:{{ .Values.prometheusOperator.thanosImage.tag }}@sha256:{{ .Values.prometheusOperator.thanosImage.sha }}
             {{- else }}
             - --thanos-default-base-image={{ $thanosRegistry }}/{{ .Values.prometheusOperator.thanosImage.repository }}:{{ .Values.prometheusOperator.thanosImage.tag }}
-            {{- end }} 
+            {{- end }}
             {{- if .Values.prometheusOperator.thanosRulerInstanceNamespaces }}
             - --thanos-ruler-instance-namespaces={{ .Values.prometheusOperator.thanosRulerInstanceNamespaces | join "," }}
             {{- end }}

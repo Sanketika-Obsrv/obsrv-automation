@@ -19,6 +19,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         app: {{ template "minio.name" . }}-job
         release: {{ .Release.Name }}
 {{- if .Values.podLabels }}
@@ -68,7 +69,7 @@ spec:
       containers:
       - name: minio-mc
         {{-  if $.Values.global.azure.images.mc_image }}
-        image: "{{ $.Values.global.azure.images.mc_image.registry }}/{{ $.Values.global.azure.images.mc_image.image }}@{{ $.Values.global.azure.images.mc_image.digest }}"
+        image: "{{ $.Values.global.azure.images.mc_image.registry }}/{{ $.Values.global.azure.images.mc_image.image }}:{{ $.Values.global.azure.images.mc_image.digest }}"
         {{- else }}
         image: "{{ .Values.mcImage.repository }}:{{ .Values.mcImage.tag }}"
         {{- end }}

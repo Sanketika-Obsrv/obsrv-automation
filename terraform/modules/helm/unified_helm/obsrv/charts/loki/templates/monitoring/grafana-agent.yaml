@@ -6,6 +6,7 @@ metadata:
   name: {{ include "loki.fullname" $ }}
   namespace: {{ .namespace }}
   labels:
+    azure-extensions-usage-release-identifier: obsrv-base
     {{- include "loki.labels" $ | nindent 4 }}
     {{- with .labels }}
     {{- toYaml . | nindent 4 }}

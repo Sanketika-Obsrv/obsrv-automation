@@ -40,6 +40,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/part-of: memberlist
         {{- include "loki.readSelectorLabels" . | nindent 8 }}
         {{- with .Values.loki.podLabels }}

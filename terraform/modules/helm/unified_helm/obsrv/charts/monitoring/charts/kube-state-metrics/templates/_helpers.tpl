@@ -141,7 +141,7 @@ The image to use for kubeRBACProxy
 */}}
 {{- define "kubeRBACProxy.image" -}}
 {{- if .Values.global.azure.images.busybox }}
-image: "{{ .Values.global.azure.images.busybox.registry }}/{{ .Values.global.azure.images.busybox.image }}@{{ .Values.global.azure.images.busybox.digest }}"
+image: "{{ .Values.global.azure.images.busybox.registry }}/{{ .Values.global.azure.images.busybox.image }}:{{ .Values.global.azure.images.busybox.digest }}"
 {{- else if .Values.kubeRBACProxy.image.sha }}
 {{- if .Values.global.imageRegistry }}
 {{- printf "%s/%s:%s@%s" .Values.global.imageRegistry .Values.kubeRBACProxy.image.repository (default (printf "v%s" .Chart.AppVersion) .Values.kubeRBACProxy.image.tag) .Values.kubeRBACProxy.image.sha }}

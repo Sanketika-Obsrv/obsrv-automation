@@ -28,6 +28,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "grafana.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}

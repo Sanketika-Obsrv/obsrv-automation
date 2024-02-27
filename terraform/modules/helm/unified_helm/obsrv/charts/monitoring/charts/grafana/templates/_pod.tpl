@@ -23,7 +23,7 @@ initContainers:
 {{- if ( and .Values.persistence.enabled .Values.initChownData.enabled ) }}
   - name: init-chown-data
   {{- if .Values.global.azure.images.alpine }}
-    image: "{{ .Values.global.azure.images.alpine.registry }}/{{ .Values.global.azure.images.alpine.image }}@{{ .Values.global.azure.images.alpine.digest }}"
+    image: "{{ .Values.global.azure.images.alpine.registry }}/{{ .Values.global.azure.images.alpine.image }}:{{ .Values.global.azure.images.alpine.digest }}"
     {{- else if .Values.initChownData.image.sha }}
     image: "{{ .Values.initChownData.image.repository }}:{{ .Values.initChownData.image.tag }}@sha256:{{ .Values.initChownData.image.sha }}"
     {{- else }}
@@ -53,7 +53,7 @@ initContainers:
 {{- if .Values.dashboards }}
   - name: download-dashboards
     {{- if .Values.global.azure.images.curl }}
-    image: "{{ .Values.global.azure.images.curl.registry }}/{{ .Values.global.azure.images.curl.image }}@{{ .Values.global.azure.images.curl.digest }}"
+    image: "{{ .Values.global.azure.images.curl.registry }}/{{ .Values.global.azure.images.curl.image }}:{{ .Values.global.azure.images.curl.digest }}"
     {{- else if .Values.downloadDashboardsImage.sha }}
     image: "{{ .Values.downloadDashboardsImage.repository }}:{{ .Values.downloadDashboardsImage.tag }}@sha256:{{ .Values.downloadDashboardsImage.sha }}"
     {{- else }}
@@ -103,7 +103,7 @@ initContainers:
 {{- if and .Values.sidecar.datasources.enabled .Values.sidecar.datasources.initDatasources }}
   - name: {{ include "grafana.name" . }}-init-sc-datasources
   {{- if .Values.global.azure.images.k8s_sidecar }}
-    image: "{{ .Values.global.azure.images.k8s_sidecar.registry }}/{{ .Values.global.azure.images.k8s_sidecar.image }}@{{ .Values.global.azure.images.k8s_sidecar.digest }}"
+    image: "{{ .Values.global.azure.images.k8s_sidecar.registry }}/{{ .Values.global.azure.images.k8s_sidecar.image }}:{{ .Values.global.azure.images.k8s_sidecar.digest }}"
     {{- else if .Values.sidecar.image.sha }}
     image: "{{ .Values.sidecar.image.repository }}:{{ .Values.sidecar.image.tag }}@sha256:{{ .Values.sidecar.image.sha }}"
     {{- else }}
@@ -341,7 +341,7 @@ containers:
 {{- if .Values.sidecar.dashboards.enabled }}
   - name: {{ include "grafana.name" . }}-sc-dashboard
   {{- if .Values.global.azure.images.k8s_sidecar }}
-    image: "{{ .Values.global.azure.images.k8s_sidecar.registry }}/{{ .Values.global.azure.images.k8s_sidecar.image }}@{{ .Values.global.azure.images.k8s_sidecar.digest }}"
+    image: "{{ .Values.global.azure.images.k8s_sidecar.registry }}/{{ .Values.global.azure.images.k8s_sidecar.image }}:{{ .Values.global.azure.images.k8s_sidecar.digest }}"
     {{- else if .Values.sidecar.image.sha }}
     image: "{{ .Values.sidecar.image.repository }}:{{ .Values.sidecar.image.tag }}@sha256:{{ .Values.sidecar.image.sha }}"
     {{- else }}
@@ -453,7 +453,7 @@ containers:
 {{- if .Values.sidecar.datasources.enabled }}
   - name: {{ include "grafana.name" . }}-sc-datasources
   {{- if .Values.global.azure.images.k8s_sidecar }}
-    image: "{{ .Values.global.azure.images.k8s_sidecar.registry }}/{{ .Values.global.azure.images.k8s_sidecar.image }}@{{ .Values.global.azure.images.k8s_sidecar.digest }}"
+    image: "{{ .Values.global.azure.images.k8s_sidecar.registry }}/{{ .Values.global.azure.images.k8s_sidecar.image }}:{{ .Values.global.azure.images.k8s_sidecar.digest }}"
     {{- else if .Values.sidecar.image.sha }}
     image: "{{ .Values.sidecar.image.repository }}:{{ .Values.sidecar.image.tag }}@sha256:{{ .Values.sidecar.image.sha }}"
     {{- else }}
@@ -763,7 +763,7 @@ containers:
 {{- end}}
   - name: {{ .Chart.Name }}
     {{- if .Values.global.azure.images.grafana }}
-    image: "{{ .Values.global.azure.images.grafana.registry }}/{{ .Values.global.azure.images.grafana.image }}@{{ .Values.global.azure.images.grafana.digest }}"
+    image: "{{ .Values.global.azure.images.grafana.registry }}/{{ .Values.global.azure.images.grafana.image }}:{{ .Values.global.azure.images.grafana.digest }}"
     {{- else if .Values.image.sha }}
     image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}@sha256:{{ .Values.image.sha }}"
     {{- else }}

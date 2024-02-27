@@ -38,6 +38,7 @@ spec:
     metadata:
       name: {{ template "minio.fullname" . }}
       labels:
+        # azure-extensions-usage-release-identifier: obsrv-base
         app: {{ template "minio.name" . }}
         release: {{ .Release.Name }}
 {{- if .Values.podLabels }}
@@ -73,7 +74,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
         {{-  if $.Values.global.azure.images.minio }}
-          image: "{{ $.Values.global.azure.images.minio.registry }}/{{ $.Values.global.azure.images.minio.image }}@{{ $.Values.global.azure.images.minio.digest }}"
+          image: "{{ $.Values.global.azure.images.minio.registry }}/{{ $.Values.global.azure.images.minio.image }}:{{ $.Values.global.azure.images.minio.digest }}"
           {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           {{- end }}
@@ -81,7 +82,7 @@ spec:
           command:
             - "/bin/sh"
             - "-ce"
-            - "/usr/bin/docker-entrypoint.sh minio server {{ $bucketRoot }} -S {{ .Values.certsPath }} --address :{{ .Values.minioAPIPort }} --console-address :{{ .Values.minioConsolePort }} {{- template "minio.extraArgs" . }}"
+            - "/opt/bitnami/scripts/minio/entrypoint.sh minio server {{ $bucketRoot }} -S {{ .Values.certsPath }} --address :{{ .Values.minioAPIPort }} --console-address :{{ .Values.minioConsolePort }} {{- template "minio.extraArgs" . }}"
           volumeMounts:
             - name: minio-user
               mountPath: "/tmp/credentials"

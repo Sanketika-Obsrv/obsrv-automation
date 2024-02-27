@@ -22,6 +22,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "enterprise-logs.tokengenSelectorLabels" . | nindent 8 }}
         {{- with .Values.enterprise.tokengen.labels }}
         {{- toYaml . | nindent 8 }}
@@ -43,7 +44,7 @@ spec:
       initContainers:
         - name: loki
           {{-  if $.Values.global.azure.images.loki }}
-          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}@{{ $.Values.global.azure.images.loki.digest }}"
+          image: "{{ $.Values.global.azure.images.loki.registry }}/{{ $.Values.global.azure.images.loki.image }}:{{ $.Values.global.azure.images.loki.digest }}"
           {{- else }}
           image: {{ template "loki.image" . }}
           {{- end }}
@@ -82,7 +83,7 @@ spec:
       containers:
         - name: create-secret
         {{-  if .Values.global.azure.images.kubectl_image }}
-          image: "{{ .Values.global.azure.images.kubectl_image.registry }}/{{ .Values.global.azure.images.kubectl_image.image }}@{{ .Values.global.azure.images.kubectl_image.digest }}"
+          image: "{{ .Values.global.azure.images.kubectl_image.registry }}/{{ .Values.global.azure.images.kubectl_image.image }}:{{ .Values.global.azure.images.kubectl_image.digest }}"
           {{- else }}
           image: {{ include "loki.kubectlImage" . }}
           {{- end }}

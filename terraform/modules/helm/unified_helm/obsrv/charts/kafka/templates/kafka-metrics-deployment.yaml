@@ -25,6 +25,7 @@ spec:
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
+        # azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/component: cluster-metrics
         {{- if .Values.metrics.kafka.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.metrics.kafka.podLabels "context" $) | nindent 8 }}
@@ -71,7 +72,7 @@ spec:
       containers:
         - name: kafka-exporter
         {{ if .Values.global.azure.images.kafka_exporter }}
-          image: "{{ .Values.global.azure.images.kafka_exporter.registry }}/{{ .Values.global.azure.images.kafka_exporter.image }}@{{ .Values.global.azure.images.kafka_exporter.digest }}"
+          image: "{{ .Values.global.azure.images.kafka_exporter.registry }}/{{ .Values.global.azure.images.kafka_exporter.image }}:{{ .Values.global.azure.images.kafka_exporter.digest }}"
         {{ else }}
           image: {{ include "kafka.metrics.kafka.image" . }}
         {{ end }}

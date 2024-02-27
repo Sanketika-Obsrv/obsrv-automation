@@ -25,6 +25,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "kube-state-metrics.labels" . | indent 8 }}
       {{- if .Values.podAnnotations }}
       annotations:
@@ -120,7 +121,7 @@ spec:
         {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if .Values.global.azure.images.kube_state_metrics}}
-        image: "{{ .Values.global.azure.images.kube_state_metrics.registry }}/{{ .Values.global.azure.images.kube_state_metrics.image }}@{{ .Values.global.azure.images.kube_state_metrics.digest }}"
+        image: "{{ .Values.global.azure.images.kube_state_metrics.registry }}/{{ .Values.global.azure.images.kube_state_metrics.image }}:{{ .Values.global.azure.images.kube_state_metrics.digest }}"
         {{ else }}
         image: {{ include "kube-state-metrics.image" . }}
         {{ end }}

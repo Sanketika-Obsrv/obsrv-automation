@@ -21,6 +21,7 @@ spec:
   template:
     metadata:
       labels:
+        # azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/name: {{ include "prometheus-druid-exporter.fullname" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
@@ -53,7 +54,7 @@ spec:
 {{- end }}
 {{- end }}
       {{ if .Values.global.azure.images.druid_exporter }}
-        image: "{{ .Values.global.azure.images.druid_exporter.registry }}/{{ .Values.global.azure.images.druid_exporter.image }}@{{ .Values.global.azure.images.druid_exporter.digest }}"
+        image: "{{ .Values.global.azure.images.druid_exporter.registry }}/{{ .Values.global.azure.images.druid_exporter.image }}:{{ .Values.global.azure.images.druid_exporter.digest }}"
       {{ else }}
         image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
       {{ end }}

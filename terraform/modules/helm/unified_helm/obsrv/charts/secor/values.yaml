@@ -1,6 +1,6 @@
 cloud_store_provider: "s3"
 upload_manager: "com.pinterest.secor.uploader.S3UploadManager"
-cloud_storage_bucket: "obsrv-sb-dev-165052186109"
+cloud_storage_bucket: ""
 namespace: "secor"
 storageClass: "gp2"
 secor_env: "sb-dev"
@@ -9,8 +9,7 @@ region: "us-east-2"
 pullPolicy: "IfNotPresent"
 jvm_memory: 1024m
 image_tag: "0.29.16-java-11-gs"
-message_timezone: "UTC"
-parser_timezone: "Asia/Kolkata"
+timezone: "UTC"
 secor_jobs:
   ingest-backup:
     replicas: 1
@@ -20,66 +19,6 @@ secor_jobs:
     timestamp_key: "syncts"
     fallback_timestamp_key: ""
     topic: "sb-dev.ingest"
-    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
-    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
-    max_file_size: "100000000"
-    max_file_age: "60"
-    partition_prefix_enabled: "false"
-    partition_prefix_key: ""
-    partition_prefix_mapping: "{}"
-    message_channel_identifier: "dataset"
-    output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
-    storage:
-      size: "1Gi"
-    requests:
-      cpu: "128m"
-      memory: "512Mi"
-    limits:
-      cpu: "128m"
-      memory: "512Mi"
-    lag_threshold_warning: 100000
-    threads: "2"
-    lag_threshold_critical: 200000
-
-  extractor-duplicate-backup:
-    replicas: 1
-    consumer_group: "sb-dev_extractor_duplicate"
-    service_name: "extractor_duplicate"
-    base_path: "telemetry-data/extractor-duplicates"
-    timestamp_key: "syncts"
-    fallback_timestamp_key: ""
-    topic: "sb-dev.extractor.duplicate"
-    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
-    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
-    max_file_size: "100000000"
-    max_file_age: "60"
-    partition_prefix_enabled: "false"
-    partition_prefix_key: ""
-    partition_prefix_mapping: "{}"
-    message_channel_identifier: "dataset"
-    output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
-    storage:
-      size: "1Gi"
-    requests:
-      cpu: "128m"
-      memory: "512Mi"
-    limits:
-      cpu: "128m"
-      memory: "512Mi"
-    lag_threshold_warning: 100000
-    threads: "2"
-    lag_threshold_critical: 200000
-
-  extractor-failed-backup:
-    replicas: 1
-    consumer_group: "sb-dev_extractor_failed"
-    service_name: "extractor_failed"
-    base_path: "telemetry-data/extractor-failed"
-    timestamp_key: "syncts"
-    fallback_timestamp_key: ""
-    topic: "sb-dev.extractor.failed"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -162,36 +101,6 @@ secor_jobs:
     threads: "2"
     lag_threshold_critical: 200000
 
-  invalid-backup:
-    replicas: 1
-    consumer_group: "sb-dev_invalid"
-    service_name: "invalid"
-    base_path: "telemetry-data/invalid"
-    timestamp_key: "obsrv_meta.syncts"
-    fallback_timestamp_key: ""
-    topic: "sb-dev.invalid"
-    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
-    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
-    max_file_size: "100000000"
-    max_file_age: "60"
-    partition_prefix_enabled: "false"
-    partition_prefix_key: ""
-    partition_prefix_mapping: "{}"
-    message_channel_identifier: "dataset"
-    output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
-    storage:
-      size: "1Gi"
-    requests:
-      cpu: "128m"
-      memory: "512Mi"
-    limits:
-      cpu: "128m"
-      memory: "512Mi"
-    lag_threshold_warning: 100000
-    threads: "2"
-    lag_threshold_critical: 200000
-
   unique-backup:
     replicas: 1
     consumer_group: "sb-dev_unique"
@@ -200,36 +109,6 @@ secor_jobs:
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
     topic: "sb-dev.unique"
-    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
-    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
-    max_file_size: "100000000"
-    max_file_age: "60"
-    partition_prefix_enabled: "false"
-    partition_prefix_key: ""
-    partition_prefix_mapping: "{}"
-    message_channel_identifier: "dataset"
-    output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
-    storage:
-      size: "1Gi"
-    requests:
-      cpu: "128m"
-      memory: "512Mi"
-    limits:
-      cpu: "128m"
-      memory: "512Mi"
-    lag_threshold_warning: 100000
-    threads: "2"
-    lag_threshold_critical: 200000
-
-  duplicate-backup:
-    replicas: 1
-    consumer_group: "sb-dev_duplicate"
-    service_name: "duplicate"
-    base_path: "telemetry-data/duplicates"
-    timestamp_key: "obsrv_meta.syncts"
-    fallback_timestamp_key: ""
-    topic: "sb-dev.duplicate"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -282,36 +161,6 @@ secor_jobs:
     threads: "2"
     lag_threshold_critical: 200000
 
-  denorm-failed-backup:
-    replicas: 1
-    consumer_group: "sb-dev_denorm_failed"
-    service_name: "denorm_failed"
-    base_path: "telemetry-data/denorm-failed"
-    timestamp_key: "obsrv_meta.syncts"
-    fallback_timestamp_key: ""
-    topic: "sb-dev.denorm.failed"
-    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
-    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
-    max_file_size: "100000000"
-    max_file_age: "60"
-    partition_prefix_enabled: "false"
-    partition_prefix_key: ""
-    partition_prefix_mapping: "{}"
-    message_channel_identifier: "dataset"
-    output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
-    storage:
-      size: "1Gi"
-    requests:
-      cpu: "128m"
-      memory: "512Mi"
-    limits:
-      cpu: "128m"
-      memory: "512Mi"
-    lag_threshold_warning: 100000
-    threads: "2"
-    lag_threshold_critical: 200000
-
   transform-backup:
     replicas: 1
     consumer_group: "sb-dev_transform"
@@ -320,36 +169,6 @@ secor_jobs:
     timestamp_key: "obsrv_meta.syncts"
     fallback_timestamp_key: ""
     topic: "sb-dev.transform"
-    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
-    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
-    max_file_size: "100000000"
-    max_file_age: "60"
-    partition_prefix_enabled: "false"
-    partition_prefix_key: ""
-    partition_prefix_mapping: "{}"
-    message_channel_identifier: "dataset"
-    output_file_pattern: "{partition}-{currentTimestamp}.json"
-    message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
-    storage:
-      size: "1Gi"
-    requests:
-      cpu: "128m"
-      memory: "512Mi"
-    limits:
-      cpu: "128m"
-      memory: "512Mi"
-    lag_threshold_warning: 100000
-    threads: "2"
-    lag_threshold_critical: 200000
-
-  system-stats:
-    replicas: 1
-    consumer_group: "sb-dev_system_stats"
-    service_name: "system-stats"
-    base_path: "telemetry-data/system-stats"
-    timestamp_key: "obsrv_meta.syncts"
-    fallback_timestamp_key: ""
-    topic: "sb-dev.stats"
     kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
     zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
     max_file_size: "100000000"
@@ -401,6 +220,36 @@ secor_jobs:
     lag_threshold_warning: 100000
     threads: "2"
     lag_threshold_critical: 200000
+
+  system-telemetry-events:
+    replicas: 1
+    consumer_group: "sb-dev_system_telemetry_events"
+    service_name: "system-telemetry-events"
+    base_path: "telemetry-data/system-telemetry-events"
+    timestamp_key: "ets"
+    fallback_timestamp_key: ""
+    topic: "sb-dev.system.telemetry.events"
+    kafka_broker_host: "kafka-headless.kafka.svc.cluster.local"
+    zookeeper_quorum: "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
+    max_file_size: "100000000"
+    max_file_age: "60"
+    partition_prefix_enabled: "false"
+    partition_prefix_key: ""
+    partition_prefix_mapping: "{}"
+    message_channel_identifier: ""
+    output_file_pattern: "{partition}-{currentTimestamp}.json"
+    message_parser: "com.pinterest.secor.parser.PatternDateMessageParser" 
+    storage:
+      size: "1Gi"
+    requests:
+      cpu: "128m"
+      memory: "512Mi"
+    limits:
+      cpu: "128m"
+      memory: "512Mi"
+    lag_threshold_warning: 100000
+    threads: "2"
+    lag_threshold_critical: 200000 
 
 alertrules:
   enabled: false

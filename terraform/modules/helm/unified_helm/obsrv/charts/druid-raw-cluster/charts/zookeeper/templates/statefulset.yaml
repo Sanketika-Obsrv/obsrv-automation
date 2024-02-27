@@ -43,6 +43,7 @@ spec:
         checksum/tls-secrets: {{ include (print $.Template.BasePath "/tls-secrets.yaml") . | sha256sum }}
         {{- end }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
+        # azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/component: zookeeper
         {{- if .Values.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
@@ -118,7 +119,7 @@ spec:
         {{- if or .Values.tls.client.enabled .Values.tls.quorum.enabled }}
         - name: init-certs
         {{ if .Values.global.azure.images.zookeeper }}
-          image: "{{ .Values.global.azure.images.zookeeper.registry }}/{{ .Values.global.azure.images.zookeeper.image }}@{{ .Values.global.azure.images.zookeeper.digest }}"
+          image: "{{ .Values.global.azure.images.zookeeper.registry }}/{{ .Values.global.azure.images.zookeeper.image }}:{{ .Values.global.azure.images.zookeeper.digest }}"
         {{ else }}
           image: {{ include "zookeeper.image" . }}
         {{ end }}
@@ -184,7 +185,7 @@ spec:
       containers:
         - name: zookeeper
         {{ if .Values.global.azure.images.zookeeper }}
-          image: "{{ .Values.global.azure.images.zookeeper.registry }}/{{ .Values.global.azure.images.zookeeper.image }}@{{ .Values.global.azure.images.zookeeper.digest }}"
+          image: "{{ .Values.global.azure.images.zookeeper.registry }}/{{ .Values.global.azure.images.zookeeper.image }}:{{ .Values.global.azure.images.zookeeper.digest }}"
         {{ else }}
           image: {{ template "zookeeper.image" . }}
         {{ end }}

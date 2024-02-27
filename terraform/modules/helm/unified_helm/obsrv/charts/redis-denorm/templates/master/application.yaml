@@ -107,7 +107,7 @@ spec:
       containers:
         - name: redis
         {{ if .Values.global.azure.images.redis }}
-          image: "{{ .Values.global.azure.images.redis.registry }}/{{ .Values.global.azure.images.redis.image }}@{{ .Values.global.azure.images.redis.digest }}"
+          image: "{{ .Values.global.azure.images.redis.registry }}/{{ .Values.global.azure.images.redis.image }}:{{ .Values.global.azure.images.redis.digest }}"
         {{ else }}
           image: {{ template "redis.image" . }}
         {{ end }}
@@ -268,7 +268,7 @@ spec:
         {{- if .Values.metrics.enabled }}
         - name: metrics
         {{ if .Values.global.azure.images.redis_exporter }}
-          image: "{{ .Values.global.azure.images.redis_exporter.registry }}/{{ .Values.global.azure.images.redis_exporter.image }}@{{ .Values.global.azure.images.redis_exporter.digest }}"
+          image: "{{ .Values.global.azure.images.redis_exporter.registry }}/{{ .Values.global.azure.images.redis_exporter.image }}:{{ .Values.global.azure.images.redis_exporter.digest }}"
         {{ else }}
           image: {{ include "redis.metrics.image" . }}
         {{ end }}
@@ -378,7 +378,7 @@ spec:
         {{- if $needsVolumePermissions }}
         - name: volume-permissions
         {{ if .Values.global.azure.images.os_shell }}
-          image: "{{ .Values.global.azure.images.os_shell.registry }}/{{ .Values.global.azure.images.os_shell.image }}@{{ .Values.global.azure.images.os_shell.digest }}"
+          image: "{{ .Values.global.azure.images.os_shell.registry }}/{{ .Values.global.azure.images.os_shell.image }}:{{ .Values.global.azure.images.os_shell.digest }}"
         {{ else }}
           image: {{ include "redis.volumePermissions.image" . }}
         {{ end }}
@@ -412,7 +412,7 @@ spec:
         {{- if .Values.sysctl.enabled }}
         - name: init-sysctl
         {{ if .Values.global.azure.images.os_shell }}
-          image: "{{ .Values.global.azure.images.os_shell.registry }}/{{ .Values.global.azure.images.os_shell.image }}@{{ .Values.global.azure.images.os_shell.digest }}"
+          image: "{{ .Values.global.azure.images.os_shell.registry }}/{{ .Values.global.azure.images.os_shell.image }}:{{ .Values.global.azure.images.os_shell.digest }}"
         {{ else }}
           image: {{ include "redis.sysctl.image" . }}
         {{ end }}

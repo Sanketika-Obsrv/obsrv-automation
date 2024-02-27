@@ -19,6 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "loki-canary.selectorLabels" $ | nindent 8 }}
     spec:
       serviceAccountName: {{ include "loki-canary.fullname" $ }}
@@ -32,7 +33,7 @@ spec:
       containers:
         - name: loki-canary
           {{-  if $.Values.global.azure.images.loki_canary }}
-          image: "{{ $.Values.global.azure.images.loki_canary.registry }}/{{ $.Values.global.azure.images.loki_canary.image }}@{{ $.Values.global.azure.images.loki_canary.digest }}"
+          image: "{{ $.Values.global.azure.images.loki_canary.registry }}/{{ $.Values.global.azure.images.loki_canary.image }}:{{ $.Values.global.azure.images.loki_canary.digest }}"
           {{- else }}
           image: {{ include "loki-canary.image" $ }}
           {{- end }}

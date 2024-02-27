@@ -24,6 +24,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         app: secor
         release: {{ $job_name }}
     spec:
@@ -40,7 +41,7 @@ spec:
           mountPath: /mnt/data
       - name: wait-for-available-kafka
       {{ if $.Values.global.azure.images.kafka }}
-        image: "{{ $.Values.global.azure.images.kafka.registry }}/{{ $.Values.global.azure.images.kafka.image }}@{{ $.Values.global.azure.images.kafka.digest }}"
+        image: "{{ $.Values.global.azure.images.kafka.registry }}/{{ $.Values.global.azure.images.kafka.image }}:{{ $.Values.global.azure.images.kafka.digest }}"
       {{ else }}
         image: docker.io/bitnami/kafka:3.5.1-debian-11-r21
       {{ end }}
@@ -59,7 +60,7 @@ spec:
       containers:
         - name: {{ $job_name }}-secor
         {{ if $.Values.global.azure.images.secor }}
-          image: "{{ $.Values.global.azure.images.secor.registry }}/{{ $.Values.global.azure.images.secor.image }}@{{ $.Values.global.azure.images.secor.digest }}"
+          image: "{{ $.Values.global.azure.images.secor.registry }}/{{ $.Values.global.azure.images.secor.image }}:{{ $.Values.global.azure.images.secor.digest }}"
         {{ else }}
           image: {{ $.Values.image_repository }}:{{ $.Values.image_tag }}
         {{ end }}
@@ -71,6 +72,8 @@ spec:
               value: "/opt/secor/config/log4j.docker.properties"
             - name: "JVM_MEMORY"
               value: "{{ $.Values.jvm_memory }}"
+            - name: "TIMEZONE"
+              value: "{{ $.Values.timezone }}"   
           volumeMounts:
            - mountPath: /opt/secor/config
              name: secor-config

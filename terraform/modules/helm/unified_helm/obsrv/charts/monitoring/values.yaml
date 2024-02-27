@@ -980,7 +980,11 @@ grafana:
   ## Passed to grafana subchart and used by servicemonitor below
   ##
   service:
-    portName: http-web
+    enabled: true
+    type: NodePort
+    port: 80
+    targetPort: 3000
+    nodePort: 30504
 
   serviceMonitor:
     # If true, a ServiceMonitor CRD is created for a prometheus operator

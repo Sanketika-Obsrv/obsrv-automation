@@ -4,6 +4,9 @@ metadata:
   labels:
     app: web-console
     system.infra: "true"
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-weight": "-1"
   name: web-console
   namespace: {{ .Values.namespace }}
 spec:
@@ -17,15 +20,12 @@ spec:
         azure-extensions-usage-release-identifier: obsrv-base
         app: web-console
     spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.image.imagePullSecrets }}
       containers:
         - name: web-console
-        {{ if .Values.global.azure.images.web_console }}
           image: "{{ .Values.global.azure.images.web_console.registry }}/{{ .Values.global.azure.images.web_console.image }}:{{ .Values.global.azure.images.web_console.digest }}"
-        {{ else }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        {{ end }}
           imagePullPolicy: Always
-          name: web-console
           resources:
             requests:
               cpu: "{{ .Values.cpu_requests }}"

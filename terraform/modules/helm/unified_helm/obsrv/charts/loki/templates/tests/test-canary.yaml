@@ -20,7 +20,7 @@ spec:
   containers:
     - name: loki-helm-test
 {{-  if $.Values.global.azure.images.loki_test }}
-      image: "{{ $.Values.global.azure.images.loki_test.registry }}/{{ $.Values.global.azure.images.loki_test.image }}@{{ $.Values.global.azure.images.loki_test.digest }}"
+      image: "{{ $.Values.global.azure.images.loki_test.registry }}/{{ $.Values.global.azure.images.loki_test.image }}:{{ $.Values.global.azure.images.loki_test.digest }}"
       {{- else }}
       image: {{ include "loki.helmTestImage" $ }}
       # {{- end }}

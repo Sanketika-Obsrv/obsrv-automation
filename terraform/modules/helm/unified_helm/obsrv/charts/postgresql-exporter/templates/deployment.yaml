@@ -19,6 +19,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         app: {{ template "prometheus-postgres-exporter.name" . }}
         release: monitoring
 {{- if .Values.podLabels }}
@@ -133,7 +134,7 @@ spec:
           {{- end }}
           {{- end }}
         {{ if .Values.global.azure.images.postgresql_exporter }}
-          image: "{{ .Values.global.azure.images.postgresql_exporter.registry }}/{{ .Values.global.azure.images.postgresql_exporter.image }}@{{ .Values.global.azure.images.postgresql_exporter.digest }}"
+          image: "{{ .Values.global.azure.images.postgresql_exporter.registry }}/{{ .Values.global.azure.images.postgresql_exporter.image }}:{{ .Values.global.azure.images.postgresql_exporter.digest }}"
         {{ else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         {{ end }}

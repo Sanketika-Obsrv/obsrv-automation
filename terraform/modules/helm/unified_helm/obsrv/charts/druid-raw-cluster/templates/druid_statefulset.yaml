@@ -14,8 +14,8 @@ spec:
 {{ end }}
   # serviceAccount: "{{ .Values.namespace }}-sa"
   startScript: /druid.sh
-  # podLabels:
-  #   release: alpha
+  podLabels:
+    # azure-extensions-usage-release-identifier: obsrv-base
   # podAnnotations:
   #   dummykey: dummyval
   readinessProbe:
@@ -72,9 +72,11 @@ spec:
     # Deep storage
     druid.storage.type={{ .Values.druid_deepstorage_type }}
     # AWS
-    druid.s3.accessKey = {{ .Values.s3_access_key }}
-    druid.s3.secretKey = {{ .Values.s3_secret_key }}
-    druid.storage.bucket={{ .Values.s3_bucket }}
+    druid.s3.accessKey = {{ .Values.global.s3_access_key }}
+    druid.s3.secretKey = {{ .Values.global.s3_secret_key }}
+    druid.storage.bucket={{ .Values.global.s3_bucket }}
+    druid.s3.endpoint.url={{ .Values.global.s3_endpoint_url }}
+    druid.s3.enablePathStyleAccess={{ .Values.global.s3_path_style_access }}
     druid.storage.baseKey=druid/segments
     # Azure
     druid.azure.account = {{ .Values.global.azure_storage_account_name }}
@@ -95,7 +97,7 @@ spec:
     druid.indexer.logs.disableAcl=true
 
     {{- if eq .Values.druid_deepstorage_type "s3" }}
-    druid.indexer.logs.s3Bucket={{ .Values.s3_bucket }}
+    druid.indexer.logs.s3Bucket={{ .Values.global.s3_bucket }}
     druid.indexer.logs.s3Prefix= {{ .Values.druid_indexer_logs_prefix }}
     {{- end }}
 
@@ -147,7 +149,7 @@ spec:
         druid.service={{ .Values.druid_broker_service }}
         # HTTP server threads
         druid.broker.http.numConnections={{ .Values.druid_broker_http_numConnections }}
-        druid.server.http.numThreads={{ .Values.druid_server_http_numThreads }}
+        druid.server.http.numThreads={{ .Values.druid_broker_http_numThreads }}
         # Processing threads and buffers
         druid.processing.buffer.sizeBytes={{ .Values.druid_broker_processing_buffer_sizeBytes }}
         druid.processing.numThreads={{ .Values.druid_broker_processing_numThreads }}
@@ -258,8 +260,7 @@ spec:
           port: {{ .Values.druid_historical_port }}
       runtime.properties: |
         druid.service={{ .Values.druid_historical_service }}
-        # HTTP server threads
-        druid.server.http.numThreads={{ .Values.druid_server_http_numThreads }}
+        druid.server.http.numThreads={{ .Values.druid_historical_http_numThreads }}
         # Processing threads and buffers
         druid.processing.buffer.sizeBytes={{ .Values.druid_historical_processing_buffer_sizeBytes }}
         druid.processing.numThreads={{ .Values.druid_historical_processing_numThreads }}
@@ -432,12 +433,15 @@ spec:
       replicas: {{ .Values.druid_router_replicas }}
       services:
         - spec:
-            type: ClusterIP
+            type: {{ .Values.router.service.type }}
             ports:
-              - name: druidrouterport
-                port: 8888
-                targetPort: 8888
-                protocol: TCP
+            - name: druid-router-port
+              protocol: TCP
+              port: {{ .Values.router.service.port }}
+              targetPort: {{ .Values.router.service.targetport }}
+              {{- if eq .Values.router.service.type "NodePort" }}
+              nodePort: {{ .Values.router.service.nodePort }}
+              {{- end }}
       # services:
       #   - spec:
       #       type: ClusterIP

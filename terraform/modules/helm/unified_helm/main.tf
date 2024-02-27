@@ -9,8 +9,8 @@ resource "helm_release" "obsrv" {
     force_update     = true
     cleanup_on_fail  = true
     atomic           = true
-    
-    values           = [  
+
+    values           = [
       templatefile("${path.module}/${var.obsrv_custom_values_yaml}",{})
     ]
     set {

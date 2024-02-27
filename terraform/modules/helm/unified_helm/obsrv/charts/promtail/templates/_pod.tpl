@@ -4,6 +4,7 @@ Pod template used in Daemonset and Deployment
 {{- define "promtail.podTemplate" -}}
 metadata:
   labels:
+    azure-extensions-usage-release-identifier: obsrv-base
     {{- include "promtail.selectorLabels" . | nindent 4 }}
     {{- with .Values.podLabels }}
     {{- toYaml . | nindent 4 }}
@@ -34,8 +35,8 @@ spec:
   containers:
     - name: promtail
     {{ if .Values.global.azure.images.promtail }}
-      image: "{{ .Values.global.azure.images.promtail.registry }}/{{ .Values.global.azure.images.promtail.image }}@{{ .Values.global.azure.images.promtail.digest }}"
-    {{ else }}  
+      image: "{{ .Values.global.azure.images.promtail.registry }}/{{ .Values.global.azure.images.promtail.image }}:{{ .Values.global.azure.images.promtail.digest }}"
+    {{ else }}
       image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
     {{ end }}
       imagePullPolicy: {{ .Values.image.pullPolicy }}

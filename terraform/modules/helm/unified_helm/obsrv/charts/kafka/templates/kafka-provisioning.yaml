@@ -20,6 +20,7 @@ spec:
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
+        # azure-extensions-usage-release-identifier: obsrv-base
         app.kubernetes.io/component: kafka-provisioning
         {{- if .Values.provisioning.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.podLabels "context" $) | nindent 8 }}

@@ -24,6 +24,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "prometheus-node-exporter.labels" . | nindent 8 }}
     spec:
       automountServiceAccountToken: {{ ternary true false (or .Values.serviceAccount.automountServiceAccountToken .Values.kubeRBACProxy.enabled) }}
@@ -43,7 +44,7 @@ spec:
         {{- $servicePort := ternary 8100 .Values.service.port .Values.kubeRBACProxy.enabled }}
         - name: node-exporter
           {{- if .Values.global.azure.images.node_exporter}}
-          image: "{{ .Values.global.azure.images.node_exporter.registry }}/{{ .Values.global.azure.images.node_exporter.image }}@{{ .Values.global.azure.images.node_exporter.digest }}" 
+          image: "{{ .Values.global.azure.images.node_exporter.registry }}/{{ .Values.global.azure.images.node_exporter.image }}:{{ .Values.global.azure.images.node_exporter.digest }}"
           {{ else }}
           image: {{ include "prometheus-node-exporter.image" . }}
           {{ end }}

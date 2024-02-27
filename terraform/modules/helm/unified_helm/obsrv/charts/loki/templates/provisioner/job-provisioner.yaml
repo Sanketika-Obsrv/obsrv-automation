@@ -23,6 +23,7 @@ spec:
   template:
     metadata:
       labels:
+        azure-extensions-usage-release-identifier: obsrv-base
         {{- include "enterprise-logs.provisionerSelectorLabels" . | nindent 8 }}
         {{- with .Values.enterprise.provisioner.labels }}
         {{- toYaml . | nindent 8 }}
@@ -92,7 +93,7 @@ spec:
       containers:
         - name: create-secret
         {{-  if $.Values.global.azure.images.kubectl_image }}
-          image: "{{ $.Values.global.azure.images.kubectl_image.registry }}/{{ $.Values.global.azure.images.kubectl_image.image }}@{{ $.Values.global.azure.images.kubectl_image.digest }}"
+          image: "{{ $.Values.global.azure.images.kubectl_image.registry }}/{{ $.Values.global.azure.images.kubectl_image.image }}:{{ $.Values.global.azure.images.kubectl_image.digest }}"
           {{- else }}
           image: {{ include "loki.kubectlImage" . }}
           {{- end }}
@@ -104,8 +105,8 @@ spec:
               # In case, the admin resources have already been created, the provisioner job
               # does not write the token files to the bootstrap mount.
               # Therefore, secrets are only created if the respective token files exist.
-              # Note: the following bash commands should always return a success status code. 
-              # Therefore, in case the token file does not exist, the first clause of the 
+              # Note: the following bash commands should always return a success status code.
+              # Therefore, in case the token file does not exist, the first clause of the
               # or-operation is successful.
               {{- range .Values.enterprise.provisioner.additionalTenants }}
               ! test -s /bootstrap/token-write-{{ .name }} || \

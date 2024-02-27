@@ -12,21 +12,25 @@ spec:
   template:
     metadata:
       labels:
+        # azure-extensions-usage-release-identifier: obsrv-base
         app: {{ .Chart.Name }}
     spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.image.imagePullSecrets }}
+      # serviceAccountName: {{ .Chart.Name }}-sa
       initContainers:
       - name: check-db-ready
       {{ if .Values.global.azure.images.postgres }}
-        image: "{{ .Values.global.azure.images.postgres.registry }}/{{ .Values.global.azure.images.postgres.image }}@{{ .Values.global.azure.images.postgres.digest }}"
+        image: "{{ .Values.global.azure.images.postgres.registry }}/{{ .Values.global.azure.images.postgres.image }}:{{ .Values.global.azure.images.postgres.digest }}"
       {{ else }}
         image: postgres:latest
       {{ end }}
-        command: ['sh', '-c', 
-          'until pg_isready -h {{ .Release.Name }}-postgresql-hl.postgresql.svc.cluster.local -p 5432; 
+        command: ['sh', '-c',
+          'until pg_isready -h {{ .Release.Name }}-postgresql-hl.postgresql.svc.cluster.local -p 5432 -U obsrv -d obsrv;
           do echo waiting for database; sleep 2; done;']
       - name: wait-for-available-kafka
       {{ if .Values.global.azure.images.kafka }}
-        image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}@{{ .Values.global.azure.images.kafka.digest }}"
+        image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}:{{ .Values.global.azure.images.kafka.digest }}"
       {{ else }}
         image: docker.io/bitnami/kafka:3.5.1-debian-11-r21
       {{ end }}
@@ -44,16 +48,11 @@ spec:
             echo "Kafka is available";
       containers:
         - name: {{ .Chart.Name }}
-        {{ if .Values.global.azure.images.dataset_api }}
           image: "{{ .Values.global.azure.images.dataset_api.registry }}/{{ .Values.global.azure.images.dataset_api.image }}:{{ .Values.global.azure.images.dataset_api.digest }}"
-        {{ else }}
-          image: "{{ .Values.dockerhub }}/{{ .Values.repository }}:{{ .Values.image_tag }}"
-        {{ end }}
           imagePullPolicy: Always
           envFrom:
            - configMapRef:
               name: {{ .Chart.Name }}-config
-
           ports:
             - containerPort: 3000
 
@@ -70,6 +69,10 @@ spec:
   ports:
     - name: http-{{ .Chart.Name }}
       protocol: TCP
-      port: {{ .Values.network.targetport }}
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetport }}
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
   selector:
     app: {{ .Chart.Name }}
