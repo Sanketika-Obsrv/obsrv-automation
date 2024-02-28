@@ -114,16 +114,12 @@ resource "aws_eks_cluster" "eks_master" {
   depends_on = [
   aws_iam_role_policy_attachment.eks_master_policy_attachment,
   aws_cloudwatch_log_group.eks_cw_log_group.0
- ]
-  
+  ]
 }
 resource "aws_cloudwatch_log_group" "eks_cw_log_group" {
   count   = var.cluster_logs_enabled ? 1 : 0
   name    = "/aws/eks/${var.building_block}-${var.env}-eks/cluster"
   retention_in_days = var.eks_cluster_logs_retention
-
-
-
 }
 
 resource "aws_eks_node_group" "eks_nodes" {
