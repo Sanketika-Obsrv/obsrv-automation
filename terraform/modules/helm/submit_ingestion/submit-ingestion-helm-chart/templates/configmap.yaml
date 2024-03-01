@@ -34,6 +34,14 @@ data:
               },
               {
                 "type": "string",
+                "name": "ctx_source_connector"
+              },
+              {
+                "type": "string",
+                "name": "ctx_source_connector_instance"
+              },
+              {
+                "type": "string",
                 "name": "error_pdata_id"
               },
               {
@@ -203,6 +211,16 @@ data:
                   "type": "path",
                   "name": "ctx_dataset_type",
                   "expr": "$.ctx.dataset_type"
+                },
+                {
+                  "type": "path",
+                  "name": "ctx_source_connector",
+                  "expr": "$.ctx.source.connector"
+                },
+                {
+                  "type": "path",
+                  "name": "ctx_source_connector_instance",
+                  "expr": "$.ctx.source.connectorInstance"
                 },
                 {
                   "type": "path",
