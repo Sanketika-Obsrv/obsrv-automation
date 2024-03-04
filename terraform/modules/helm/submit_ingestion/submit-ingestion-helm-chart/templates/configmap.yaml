@@ -38,7 +38,7 @@ data:
               },
               {
                 "type": "string",
-                "name": "ctx_source_connector_instance"
+                "name": "ctx_source_id"
               },
               {
                 "type": "string",
@@ -219,7 +219,7 @@ data:
                 },
                 {
                   "type": "path",
-                  "name": "ctx_source_connector_instance",
+                  "name": "ctx_source_id",
                   "expr": "$.ctx.source.connectorInstance"
                 },
                 {
