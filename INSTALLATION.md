@@ -39,7 +39,7 @@ Prerequisites:
     export AWS_TERRAFORM_BACKEND_BUCKET_NAME=mybucket
     export AWS_TERRAFORM_BACKEND_BUCKET_REGION=myregion
     ```
-- You will need `velero cli` to create the cluster backups. Learnn how to install velero cli at ([Velero cli](https://velero.io/docs/v1.3.0/velero-install/))
+- You will need `velero cli` to create the cluster backups. Learn how to install velero cli at ([Velero cli](https://velero.io/docs/v1.3.0/velero-install/))
 
 #### Steps:
 * Execute the below steps in the same terminal session:
