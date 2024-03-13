@@ -3,7 +3,7 @@
 
 ## Configuration
 
-Define the necessary configurations in the `setup.conf` file:
+Define the necessary configurations in the `obsrv.conf` file:
 
 ### setup.conf
 
@@ -34,20 +34,12 @@ Ensure the installation of the following tools:
 
 ## Setup Process
 
-Before executing the `setup` shell script, ensure that the `curl` and `unzip` utilities are present on your system. If they are not installed, you can use the following commands to install them. Execute the provided `setup.sh`` script as a root user to avoid potential permission issues:
-
-**Prerequisites**
-```bash
-sudo apt-get update
-sudo apt-get install -y curl
-sudo apt-get install -y unzip
-```
-
-Once the `curl` and `unzip` utility is successfully installed, proceed with the setup by running the following command:
-
-```bash
-sh setup.sh ./setup.conf
-```
-
-This command utilizes the configurations specified in the `setup.conf` file to initiate the setup process.
+1. Run Installation Script: Execute the following command to start the installation process:
+    - Before installing please provide executable permission to installation script
+    `chmod +x ./obsrv.sh`
+    ```bash
+    ./obsrv.sh install --config ./obsrv.conf --install_dependencies false
+    ```
+    - Note: Setting install_dependencies=true will automatically download and install all required dependencies. If preferred, you can manually download the dependencies instead.
+2. Monitor Installation Progress: The script will begin installing Obsrv within the AWS cluster. Monitor the progress and follow any on-screen prompts or instructions.
 
