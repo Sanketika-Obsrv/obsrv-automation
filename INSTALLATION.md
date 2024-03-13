@@ -65,7 +65,7 @@ terragrunt apply -target=module.eks -auto-approve && terragrunt apply -target=mo
 ### Prerequisites:
 * Log into your cloud environment in your terminal. Please see [Sign in with Azure CLI](https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli) for reference.
     ```
-    az login
+    az login --allow-no-subscriptions
     ```        
 * Create a storage account and export the below variables in your terminal. Please see [Create a storage container](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?toc=/azure/storage/blobs/toc.json) for reference. Export the below variables in your terminal session
     ```
@@ -75,12 +75,35 @@ terragrunt apply -target=module.eks -auto-approve && terragrunt apply -target=mo
     ```
 ### Steps:
 * Execute the below commands in the same terminal session: 
-    ```
+    ```bash
     cd terraform/azure
     terragrunt init
-    terragrunt plan
-    terragrunt apply
+    terragrunt apply -target module.aks -auto-approve
     ```
+* Pass the following variables when prompted:
+    ```bash
+    env: dev
+    building_block: obsrv
+    location: East US 2
+    ```
+- Note:  All the above variable values are given for example
+* Export the below variables:
+    ``` bash
+    export KUBE_CONFIG_PATH=<path_to_kubeconfig>( default to current directory)
+    export KUBECONFIG=<path_to_kubeconfig>( default to current directory)
+    ```
+* Execute the below commands in the same terminal session:
+    ``` bash
+    terragrunt apply -auto-approve
+    ```
+* Pass the following variables when prompted:
+    ```bash
+    env: dev
+    building_block: obsrv
+    location: East US 2
+    ```
+- Note:  All the above variable values are given for example
+
 **GCP**
 ### Prerequisites:
 * Setup the gcoud CLI. Please see [Installing Google Cloud SDK](https://cloud.google.com/sdk/docs/install) for reference.
