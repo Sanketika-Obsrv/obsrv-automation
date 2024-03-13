@@ -39,6 +39,7 @@ Prerequisites:
     export AWS_TERRAFORM_BACKEND_BUCKET_NAME=mybucket
     export AWS_TERRAFORM_BACKEND_BUCKET_REGION=myregion
     ```
+- You will need `velero cli` to create the cluster backups. Learnn how to install velero cli at ([Velero cli](https://velero.io/docs/v1.3.0/velero-install/))
 
 #### Steps:
 * Execute the below steps in the same terminal session:
@@ -51,9 +52,24 @@ Prerequisites:
     terragrunt apply -target=module.get_kubeconfig -auto-approve
     terragrunt apply
     ```
-The installer will ask for user inputs twice:
- - Before creating the EKS cluster
- - Before creating rest of the components
+    The installer will ask for user inputs twice:
+    - Before creating the EKS cluster
+    - Before creating rest of the components
+
+* Create a velero backup:
+    - After the cluster is created velero backup needs to be triggered manually
+    - We need to create a backup and schedule manually
+    - Run the below commands to create a backup and schedule
+        ```bash
+        velero backup create <backup_name>
+        velero backup schedule <backup_schedule_name>
+        ```
+    - Below example Creates a backup and schedule it for every 24h and retain the backup for 50h
+        ```bash
+        velero backup create obsrv-dev-full-cluster-backup
+        velero backup schedule obsrv-dev-full-cluster-daily-backup --schedule="@every 24h" --ttl 50h0m0s
+        ```
+
 
 #### Tip:
 Add `-auto-approve` to the above `terragrunt` command to install without providing user inputs as shown below
@@ -64,7 +80,7 @@ terragrunt apply -target=module.eks -auto-approve && terragrunt apply -target=mo
 **Azure**
 ### Prerequisites:
 * Log into your cloud environment in your terminal. Please see [Sign in with Azure CLI](https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli) for reference.
-    ```
+    ``` bash
     az login --allow-no-subscriptions
     ```        
 * Create a storage account and export the below variables in your terminal. Please see [Create a storage container](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?toc=/azure/storage/blobs/toc.json) for reference. Export the below variables in your terminal session
