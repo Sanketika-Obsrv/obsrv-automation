@@ -95,7 +95,7 @@ variable "redis_namespace" {
 variable "redis_release_name" {
   type        = string
   description = "Release name for Redis installation."
-  default     = "obsrv-redis"
+  default     = "obsrv-dedup-redis"
 }
 
 variable "postgresql_service_name" {
