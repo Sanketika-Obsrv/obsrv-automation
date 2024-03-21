@@ -522,7 +522,7 @@ postgresql:
             id TEXT PRIMARY KEY,
             datasource text NOT NULL,
             dataset_id TEXT NOT NULL REFERENCES datasets (id),
-            ingestion_spec json NOT NULL,
+            ingestion_spec json,
             lakehouse_spec json,
             datasource_ref text NOT NULL,
             retention_period json,
