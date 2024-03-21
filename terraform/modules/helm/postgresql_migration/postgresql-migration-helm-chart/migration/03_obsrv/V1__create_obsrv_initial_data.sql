@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS datasources (
   datasource text NOT NULL,
   dataset_id TEXT NOT NULL REFERENCES datasets (id),
   ingestion_spec json NOT NULL,
+  lakehouse_spec json,
   datasource_ref text NOT NULL,
   retention_period json,
   archival_policy json,
