@@ -223,8 +223,8 @@ shareProcessNamespace:
   worker: false
 
 service:
-  type: ClusterIP
-  port: 8080
+  type: ${trino_service.type}
+  port: ${trino_service.port}
 
 auth: {}
   # Set username and password

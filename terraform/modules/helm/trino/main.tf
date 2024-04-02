@@ -13,6 +13,7 @@ resource "helm_release" "trino" {
         trino_namespace     = var.trino_namespace
         trino_image         = var.trino_image
         trino_workers_count = var.trino_workers_count
+        trino_service       = var.trino_service
         trino_catalogs      = jsonencode(var.trino_catalogs)
       }
     )
