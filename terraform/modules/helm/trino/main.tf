@@ -14,7 +14,7 @@ resource "helm_release" "trino" {
         trino_image         = var.trino_image
         trino_workers_count = var.trino_workers_count
         trino_service       = var.trino_service
-        trino_catalogs      = jsonencode(var.trino_catalogs)
+        trino_catalogs      = jsonencode({ for key, value in local.catalogs : key => join("\n", [for k, v in value : "${k}=${v}"]) })
       }
     )
   ]

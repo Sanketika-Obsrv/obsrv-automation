@@ -2,8 +2,8 @@ variable "hms_image" {
   type        = object({ name = string, tag = string, registry = string, pullPolicy = string })
   description = "Trino image metadata"
   default = {
-    name       = "maheshkg/hive-metastore"
-    tag        = "latest"
+    name       = "hive-metastore-app"
+    tag        = "1.0.0"
     pullPolicy = "IfNotPresent"
     registry   = ""
   }
@@ -63,29 +63,6 @@ variable "hms_replica_count" {
   default     = 1
 }
 
-variable "hms_db_metadata" {
-  type        = map(string)
-  description = "HMS database connection details"
-  default = {
-    "DATABASE_HOST"     = "192.168.1.17"
-    "DATABASE_DB"       = "postgres"
-    "DATABASE_USER"     = "postgres"
-    "DATABASE_PASSWORD" = "postgres"
-  }
-}
-
-variable "hms_object_store_metadata" {
-  type        = map(string)
-  description = "HMS object store connection metadata"
-  default = {
-    "AWS_ACCESS_KEY_ID"     = "test"
-    "AWS_SECRET_ACCESS_KEY" = "testSecret"
-    "S3_ENDPOINT_URL"       = "http://192.168.1.17:4566"
-    "S3_BUCKET"             = "obsrv"
-    "S3_PREFIX"             = ""
-  }
-}
-
 variable "hms_service" {
   type        = object({ type = string, port = number })
   description = "HMS service metadata"
@@ -93,7 +70,24 @@ variable "hms_service" {
 }
 
 locals {
-  env_vars = merge(var.hms_db_metadata, var.hms_object_store_metadata)
+  default_hms_db_metadata = {}
+  default_hadoop_metadata = {
+    "fs.s3a.impl"                   = "org.apache.hadoop.fs.s3a.S3AFileSystem"
+    "fs.s3a.connection.ssl.enabled" = "false"
+  }
 }
 
+variable "hms_db_metadata" {
+  type        = map(string)
+  description = "HMS database connection details"
+}
 
+variable "hadoop_metadata" {
+  type        = map(string)
+  description = "Hadoop core site configuration"
+}
+
+locals {
+  env_vars             = merge(local.default_hms_db_metadata, var.hms_db_metadata)
+  hadoop_configuration = merge(local.default_hadoop_metadata, var.hadoop_metadata)
+}

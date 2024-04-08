@@ -35,6 +35,8 @@ spec:
           mountPath: /flyway/migrations/02_druid_raw
         - name: obsrv-sql-files
           mountPath: /flyway/migrations/03_obsrv
+        - name: hms-sql-files
+          mountPath: /flyway/migrations/04_hms
       volumes:
         - name: flyway-migrate-script
           configMap:
@@ -49,3 +51,6 @@ spec:
         - name: obsrv-sql-files
           configMap:
              name: obsrv-sql-files
+        - name: hms-sql-files
+          configMap:
+             name: hms-sql-files

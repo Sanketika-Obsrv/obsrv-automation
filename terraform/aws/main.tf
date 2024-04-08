@@ -308,4 +308,33 @@ module "postgresql_migration" {
   postgresql_druid_raw_user_password    = module.postgresql.postgresql_druid_raw_user_password
   postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
   data_encryption_key                   = resource.random_string.data_encryption_key.result
+  postgresql_hms_user_password          = module.postgresql.postgresql_hms_user_password
+}
+
+module "trino" {
+  source          = "../modules/helm/trino"
+  count           = var.create_hudi ? 1 : 0
+  trino_namespace = var.hudi_namespace
+  trino_lakehouse_metadata = {
+    "hive.s3.aws-access-key" = module.iam.s3_access_key
+    "hive.s3.aws-secret-key" = module.iam.s3_secret_key
+  }
+}
+
+module "hms" {
+  source        = "../modules/helm/hive_meta_store"
+  count         = var.create_hudi ? 1 : 0
+  hms_namespace = var.hudi_namespace
+  hms_db_metadata = {
+    "DATABASE_HOST"     = "postgresql-hl.postgresql.svc"
+    "DATABASE_DB"       = module.postgresql.postgresql_obsrv_database
+    "DATABASE_USER"     = module.postgresql.postgresql_hms_username
+    "DATABASE_PASSWORD" = module.postgresql.postgresql_hms_user_password
+    "WAREHOUSE_DIR"     = "s3a://${module.s3.s3_bucket}/${var.hudi_prefix_path}/"
+    "THRIFT_PORT"       = "9083"
+  }
+  hadoop_metadata = {
+    "fs.s3a.access.key" = module.iam.s3_access_key
+    "fs.s3a.secret.key" = module.iam.s3_secret_key
+  }
 }

@@ -91,17 +91,19 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+- name: hadoop-config-volume
+  configMap:
+    name: hadoop-config
+    items:
+      - key: core-site.xml
+        path: core-site.xml
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+- name: hadoop-config-volume
+  mountPath: /opt/hadoop/etc/hadoop/core-site.xml
+  subPath: core-site.xml
 
 nodeSelector: {}
 
@@ -110,3 +112,4 @@ tolerations: []
 affinity: {}
 
 envVars: ${hms_env_vars}
+hadoop_core_site: ${hadoop_conf}

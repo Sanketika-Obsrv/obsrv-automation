@@ -13,6 +13,7 @@ resource "helm_release" "hms" {
         hms_image         = var.hms_image
         hms_replica_count = var.hms_replica_count
         hms_service       = var.hms_service
+        hadoop_conf       = jsonencode(local.hadoop_configuration)
         hms_env_vars      = jsonencode(local.env_vars)
       }
     )

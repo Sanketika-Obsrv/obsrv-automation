@@ -54,19 +54,29 @@ variable "trino_chart_path" {
   description = "Trino helm chart path."
   default     = "trino-helm-chart"
 }
-
-variable "trino_catalogs" {
-  type        = map(string)
-  description = "Trino catalogs metadata"
-}
 variable "trino_chart_depends_on" {
   type        = any
   description = "List of helm release names that this chart depends on."
   default     = ""
 }
-
 variable "trino_service" {
   type        = object({ type = string, port = number })
   description = "Trino service metadata"
   default     = { type = "ClusterIP", port = 8080 }
+}
+variable "trino_lakehouse_metadata" {
+  type        = map(string)
+  description = "Trino lakehouse config"
+}
+locals {
+  default_lakehouse_metadata = {
+    "connector.name"      = "hudi"
+    "hive.metastore.uri"  = "thrift://hms-metastore-app.hudi.svc:9083"
+    "hive.s3.ssl.enabled" = "false"
+  }
+}
+locals {
+  catalogs = {
+    lakehouse = merge(var.trino_lakehouse_metadata, local.default_lakehouse_metadata)
+  }
 }

@@ -170,3 +170,20 @@ variable "secor_image_tag" {
   type        = string
   description = "secor image version"
 }
+
+variable "hudi_namespace" {
+  type        = string
+  default     = "hudi"
+  description = "Apache Hudi namespace"
+}
+
+variable "hudi_prefix_path" {
+  type        = string
+  description = "Hudi prefix path"
+  default     = "hudi"
+}
+
+variable "create_hudi" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+}
