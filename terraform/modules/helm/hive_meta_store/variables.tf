@@ -2,10 +2,10 @@ variable "hms_image" {
   type        = object({ name = string, tag = string, registry = string, pullPolicy = string })
   description = "Trino image metadata"
   default = {
-    name       = "hive-metastore-app"
+    name       = "hms"
     tag        = "1.0.0"
     pullPolicy = "IfNotPresent"
-    registry   = ""
+    registry   = "sanketikahub"
   }
 }
 
