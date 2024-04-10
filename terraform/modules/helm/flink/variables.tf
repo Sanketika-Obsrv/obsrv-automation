@@ -191,3 +191,40 @@ variable "merged_pipeline_enabled" {
   description = "Toggle to enable merged pipeline"
   type = bool
 }
+
+locals {
+  default_hadoop_metadata = {
+    "fs.s3a.impl"                   = "org.apache.hadoop.fs.s3a.S3AFileSystem"
+    "fs.s3a.connection.ssl.enabled" = "false"
+  }
+}
+
+variable "hadoop_metadata" {
+  type        = map(string)
+  description = "Hadoop core site configuration"
+}
+
+locals {
+  hadoop_configuration = merge(local.default_hadoop_metadata, var.hadoop_metadata)
+}
+
+variable "create_hudi" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+}
+variable "postgresql_hms_username" {
+  type        = string
+  description = "Postgresql hms username"
+}
+variable "postgresql_hms_user_password" {
+  type        = string
+  description = "Postgresql hms user password."
+}
+variable "hudi_bucket" {
+  type = string
+  description = "Apache hudi bucket name"
+}
+variable "hudi_prefix_path" {
+  type = string
+  description = "Apache hudi bucket prefix path name"
+}

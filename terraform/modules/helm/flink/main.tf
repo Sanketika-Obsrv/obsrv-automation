@@ -53,6 +53,12 @@ resource "helm_release" "flink" {
           denorm_redis_release_name      = var.denorm_redis_release_name
           dedup_redis_namespace          = var.dedup_redis_namespace
           dedup_redis_release_name       = var.dedup_redis_release_name
+          hadoop_configuration           = local.hadoop_configuration
+          create_hudi                    = var.create_hudi
+          postgresql_hms_username        = var.postgresql_hms_username
+          postgresql_hms_user_password   = var.postgresql_hms_user_password
+          hudi_bucket                    = var.hudi_bucket
+          hudi_prefix_path               = var.hudi_prefix_path
       })
     ]
 }

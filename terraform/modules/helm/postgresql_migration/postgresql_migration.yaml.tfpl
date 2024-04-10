@@ -12,3 +12,4 @@ postgresql_obsrv_user_password: "${postgresql_obsrv_user_password}"
 postgresql_hms_user_password: "${postgresql_hms_user_password}"
 system_settings:
   encryption_key: "${data_encryption_key}"
+create_hudi: ${create_hudi}

@@ -87,3 +87,7 @@ variable "postgresql_hms_user_password" {
   type        = string
   description = "Postgresql hms user password."
 }
+variable "create_hudi" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+}

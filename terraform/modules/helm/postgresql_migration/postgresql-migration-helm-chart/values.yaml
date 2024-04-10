@@ -15,7 +15,7 @@ postgresql_superset_user_password: ""
 postgresql_druid_raw_user_password: ""
 postgresql_obsrv_user_password: ""
 postgresql_hms_user_password: ""
-
+create_hudi: false
 system_settings:
   encryption_key: "strong_encryption_key_to_encrypt"
   default_dataset_id: "ALL"

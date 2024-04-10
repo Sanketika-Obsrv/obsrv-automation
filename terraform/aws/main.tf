@@ -156,6 +156,15 @@ module "flink" {
   flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
   flink_namespace                     = module.eks.flink_namespace
   postgresql_service_name             = module.postgresql.postgresql_service_name
+  create_hudi                         = var.create_hudi
+  postgresql_hms_username             = module.postgresql.postgresql_hms_username
+  postgresql_hms_user_password        = module.postgresql.postgresql_hms_user_password
+  hudi_bucket                         = module.s3.s3_bucket
+  hudi_prefix_path                    = var.hudi_prefix_path
+  hadoop_metadata                     = {
+    "fs.s3a.access.key" = module.iam.s3_access_key
+    "fs.s3a.secret.key" = module.iam.s3_secret_key
+  }
 }
 
 module "druid_raw_cluster" {
@@ -309,6 +318,7 @@ module "postgresql_migration" {
   postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
   data_encryption_key                   = resource.random_string.data_encryption_key.result
   postgresql_hms_user_password          = module.postgresql.postgresql_hms_user_password
+  create_hudi                           = var.create_hudi
 }
 
 module "trino" {
