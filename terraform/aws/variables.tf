@@ -183,7 +183,7 @@ variable "hudi_prefix_path" {
   default     = "hudi"
 }
 
-variable "create_hudi" {
+variable "enable_hudi" {
   type        = bool
   description = "Toggle to install hudi components (hms, trino and flink job)"
 }

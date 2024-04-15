@@ -208,7 +208,7 @@ locals {
   hadoop_configuration = merge(local.default_hadoop_metadata, var.hadoop_metadata)
 }
 
-variable "create_hudi" {
+variable "enable_hudi" {
   type        = bool
   description = "Toggle to install hudi components (hms, trino and flink job)"
 }

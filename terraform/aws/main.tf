@@ -156,7 +156,7 @@ module "flink" {
   flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
   flink_namespace                     = module.eks.flink_namespace
   postgresql_service_name             = module.postgresql.postgresql_service_name
-  create_hudi                         = var.create_hudi
+  enable_hudi                         = var.enable_hudi
   postgresql_hms_username             = module.postgresql.postgresql_hms_username
   postgresql_hms_user_password        = module.postgresql.postgresql_hms_user_password
   hudi_bucket                         = module.s3.s3_bucket
@@ -318,12 +318,12 @@ module "postgresql_migration" {
   postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
   data_encryption_key                   = resource.random_string.data_encryption_key.result
   postgresql_hms_user_password          = module.postgresql.postgresql_hms_user_password
-  create_hudi                           = var.create_hudi
+  enable_hudi                           = var.enable_hudi
 }
 
 module "trino" {
   source          = "../modules/helm/trino"
-  count           = var.create_hudi ? 1 : 0
+  count           = var.enable_hudi ? 1 : 0
   trino_namespace = var.hudi_namespace
   trino_lakehouse_metadata = {
     "hive.s3.aws-access-key" = module.iam.s3_access_key
@@ -333,7 +333,7 @@ module "trino" {
 
 module "hms" {
   source        = "../modules/helm/hive_meta_store"
-  count         = var.create_hudi ? 1 : 0
+  count         = var.enable_hudi ? 1 : 0
   hms_namespace = var.hudi_namespace
   hms_db_metadata = {
     "DATABASE_HOST"     = "postgresql-hl.postgresql.svc"

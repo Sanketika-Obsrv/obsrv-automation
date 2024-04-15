@@ -35,7 +35,7 @@ spec:
           mountPath: /flyway/migrations/02_druid_raw
         - name: obsrv-sql-files
           mountPath: /flyway/migrations/03_obsrv
-        {{- if .Values.create_hudi }}
+        {{- if .Values.enable_hudi }}
         - name: hms-sql-files
           mountPath: /flyway/migrations/04_hms
         {{- end }}
@@ -53,7 +53,7 @@ spec:
         - name: obsrv-sql-files
           configMap:
              name: obsrv-sql-files
-        {{- if .Values.create_hudi }}
+        {{- if .Values.enable_hudi }}
         - name: hms-sql-files
           configMap:
              name: hms-sql-files

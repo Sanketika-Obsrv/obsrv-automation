@@ -65,7 +65,7 @@ base_config: |
     port = "9042"
   }
 
-create_hudi: ${create_hudi}
+enable_hudi: ${enable_hudi}
 
 hudi-connector:
   hudi-connector: |+

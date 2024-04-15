@@ -104,7 +104,7 @@ spec:
             path: {{ .Release.Name }}.conf
           - key: log4j_console_properties
             path: log4j-console.properties
-            {{- if .Values.create_hudi }}
+            {{- if .Values.enable_hudi }}
           - key: core-site.xml
             path: core-site.xml
             {{- end }}
@@ -115,7 +115,7 @@ spec:
       - name: {{ .Release.Name }}-jobmanager
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: IfNotPresent
-        {{- if .Values.create_hudi }}
+        {{- if .Values.enable_hudi }}
         env:
         - name: HADOOP_CONF_DIR
           value: "/opt/hadoop/etc/hadoop"
@@ -177,7 +177,7 @@ spec:
         - name: flink-config-volume
           mountPath: /opt/flink/conf/log4j-console.properties
           subPath: log4j-console.properties
-          {{- if .Values.create_hudi }}
+          {{- if .Values.enable_hudi }}
         - name: flink-config-volume
           mountPath: /opt/hadoop/etc/hadoop/core-site.xml
           subPath: core-site.xml
@@ -214,7 +214,7 @@ spec:
             path: base-config.conf
           - key: {{ .Release.Name }}
             path: {{ .Release.Name }}.conf
-            {{- if .Values.create_hudi }}
+            {{- if .Values.enable_hudi }}
           - key: core-site.xml
             path: core-site.xml
             {{- end }}
@@ -225,7 +225,7 @@ spec:
       - name: {{ .Release.Name }}-taskmanager
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: IfNotPresent
-        {{- if .Values.create_hudi }}
+        {{- if .Values.enable_hudi }}
         env:
         - name: HADOOP_CONF_DIR
           value: "/opt/hadoop/etc/hadoop"
@@ -281,7 +281,7 @@ spec:
         - name: flink-config-volume
           mountPath: /data/flink/conf/{{ .Release.Name }}.conf
           subPath: {{ .Release.Name }}.conf
-          {{- if .Values.create_hudi }}
+          {{- if .Values.enable_hudi }}
         - name: flink-config-volume
           mountPath: /opt/hadoop/etc/hadoop/core-site.xml
           subPath: core-site.xml

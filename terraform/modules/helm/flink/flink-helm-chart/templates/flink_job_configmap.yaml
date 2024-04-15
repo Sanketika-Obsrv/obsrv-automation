@@ -13,7 +13,7 @@ data:
 {{ index .Values $name | toYaml | indent 2 }}
   log4j_console_properties: |+
 {{ .Values.log4j_console_properties | indent 4 }}
-{{- if .Values.create_hudi }}
+{{- if .Values.enable_hudi }}
   core-site.xml: |
     <configuration>
     {{- range $key, $value := .Values.hadoop_core_site }}
