@@ -287,8 +287,8 @@ global:
 
   gcs_bucket: &gcs-bucket ""
 
-  druid_deepstorage_type: &global-druid-deep-store-type ""
-  kubernetes_storage_class: &global-k9s-storage-class ""
+  druid_deepstorage_type: &global-druid-deep-store-type "s3"
+  kubernetes_storage_class: &global-k9s-storage-class "standard"
 
   sys-events-kafka-topic: &sys-events-kafka-topic "dev.system.events"
   sys-telemetry-events-kafka-topic: &sys-telemetry-events-kafka-topic "dev.system.telemetry.events"
@@ -319,8 +319,8 @@ dataset-api:
     REDIS_PORT: 6379
   exhaust_service:
     # LABEL_CONTAINER: *azure-container
-    CLOUD_STORAGE_PROVIDER: &global-cloud-storage-provider ""
-    CLOUD_STORAGE_REGION: &global-cloud-storage-region ""
+    CLOUD_STORAGE_PROVIDER: aws
+    CLOUD_STORAGE_REGION: *global-cloud-storage-region
     # CONTAINER: *azure-container
     CONTAINER_PREFIX: "telemetry-data"
   # service_account_annotations:
@@ -579,6 +579,17 @@ postgresql:
           CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config(dataset_id);
 
           CREATE INDEX IF NOT EXISTS dataset_source_config_status ON dataset_source_config(status);
+
+          CREATE TABLE IF NOT EXISTS system_settings (
+            "key" text NOT NULL,
+            "value" text NOT NULL,
+            "category" text NOT NULL DEFAULT 'SYSTEM'::text,
+            "type" text NOT NULL,
+            "created_date" timestamp NOT NULL DEFAULT now(),
+            "updated_date" timestamp,
+            "label" text,
+            PRIMARY KEY ("key")
+          );
 
           GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
 
@@ -861,13 +872,13 @@ secor:
   # azure_account: *azure-account-name
   # azure_secret: *azure-account-key
   cloud_store_provider: *global-cloud-storage-provider
-  {{- if eq .Values.cloud_store_provider "azure" }}
-  upload_manager: "com.pinterest.secor.uploader.AzureUploadManager"
-  {{- else if eq .Values.cloud_store_provider "s3" }}
+  # {{- if eq .Values.cloud_store_provider "azure" }}
+  # upload_manager: "com.pinterest.secor.uploader.AzureUploadManager"
+  # {{- else if eq .Values.cloud_store_provider "s3" }}
   upload_manager: "com.pinterest.secor.uploader.S3UploadManager"
-  {{- else if eq .Values.cloud_store_provider "gcs" }}
-  upload_manager: "com.pinterest.secor.uploader.GcsUploadManager"
-  {{- end }}
+  # {{- else if eq .Values.cloud_store_provider "gcs" }}
+  # upload_manager: "com.pinterest.secor.uploader.GcsUploadManager"
+  # {{- end }}
   storageClass: *global-k9s-storage-class
   secor_env: *global-env
   region: *global-region
