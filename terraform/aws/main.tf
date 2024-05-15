@@ -348,3 +348,34 @@ module "hms" {
     "fs.s3a.secret.key" = module.iam.s3_secret_key
   }
 }
+
+module "lakehouse-connector" {
+  source                              = "../modules/helm/lakehouse-connector"
+  count                               = var.enable_hudi ? 1 : 0
+  env                                 = var.env
+  building_block                      = var.building_block
+  flink_container_registry            = var.flink_container_registry
+  flink_image_tag                     = var.flink_image_tag
+  flink_checkpoint_store_type         = var.flink_checkpoint_store_type
+  flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis_dedup, module.redis_denorm]
+  postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
+  checkpoint_base_url                 = "s3://${module.s3.checkpoint_storage_bucket}"
+  denorm_redis_namespace              = module.redis_denorm.redis_namespace
+  denorm_redis_release_name           = module.redis_denorm.redis_release_name
+  dedup_redis_namespace               = module.redis_dedup.redis_namespace
+  dedup_redis_release_name            = module.redis_dedup.redis_release_name
+  flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
+  flink_namespace                     = module.eks.flink_namespace
+  postgresql_service_name             = module.postgresql.postgresql_service_name
+  enable_hudi                         = var.enable_hudi
+  postgresql_hms_username             = module.postgresql.postgresql_hms_username
+  postgresql_hms_user_password        = module.postgresql.postgresql_hms_user_password
+  hudi_bucket                         = module.s3.s3_bucket
+  hudi_prefix_path                    = var.hudi_prefix_path
+  hadoop_metadata                     = {
+    "fs.s3a.access.key" = module.iam.s3_access_key
+    "fs.s3a.secret.key" = module.iam.s3_secret_key
+  }
+}

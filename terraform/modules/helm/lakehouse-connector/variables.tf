@@ -8,27 +8,16 @@ variable "building_block" {
   description = "Building block name. All resources will be prefixed with this value."
 }
 
-variable "flink_sa_release_name" {
-  type        = string
-  description = "Flink helm release name."
-  default     = "flink"
-}
-
 variable "flink_namespace" {
   type        = string
   description = "Flink namespace."
 }
 
-variable "flink_chart_path_sa" {
-  type        = string
-  description = "Flink chart path."
-  default     = "flink-helm-chart-sa"
-}
 
 variable "flink_chart_path" {
   type        = string
   description = "Flink chart path."
-  default     = "flink-helm-chart"
+  default     = "lakehouse-flink-helm-chart"
 }
 
 # *** changed this to release map.
@@ -61,12 +50,6 @@ variable "flink_custom_values_yaml" {
   type        = string
   description = "Flink chart values.yaml path."
   default     = "flink.yaml.tfpl"
-}
-
-variable "flink_custom_values_yaml_sa" {
-  type        = string
-  description = "Flink chart values.yaml path."
-  default     = "flink.yaml.tfpl-sa"
 }
 
 variable "flink_kubernetes_service_name" {
@@ -177,20 +160,6 @@ variable "flink_sa_annotations" {
   description = "Service account annotations for flink service account."
   default     = "serviceAccountName: default"
 }
-variable "flink_release_names" {
-  description = "Create release names"
-  type        = map(string)
-}
-
-variable "flink_merged_pipeline_release_names" {
-  description = "Create release names"
-  type        = map(string)
-}
-
-variable "merged_pipeline_enabled" {
-  description = "Toggle to enable merged pipeline"
-  type = bool
-}
 
 locals {
   default_hadoop_metadata = {
@@ -206,4 +175,25 @@ variable "hadoop_metadata" {
 
 locals {
   hadoop_configuration = merge(local.default_hadoop_metadata, var.hadoop_metadata)
+}
+
+variable "enable_hudi" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+}
+variable "postgresql_hms_username" {
+  type        = string
+  description = "Postgresql hms username"
+}
+variable "postgresql_hms_user_password" {
+  type        = string
+  description = "Postgresql hms user password."
+}
+variable "hudi_bucket" {
+  type = string
+  description = "Apache hudi bucket name"
+}
+variable "hudi_prefix_path" {
+  type = string
+  description = "Apache hudi bucket prefix path name"
 }

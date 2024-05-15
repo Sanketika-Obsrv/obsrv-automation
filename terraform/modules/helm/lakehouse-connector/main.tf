@@ -1,27 +1,5 @@
-resource "helm_release" "flink_sa" {
-  name             = "${var.flink_sa_release_name}-sa"
-  chart            = "${path.module}/${var.flink_chart_path_sa}"
-  namespace        = var.flink_namespace
-  create_namespace = var.flink_create_namespace
-  wait_for_jobs    = var.flink_wait_for_jobs
-  timeout          = var.flink_chart_install_timeout
-  force_update     = true
-  cleanup_on_fail  = true
-  atomic           = true
-  values = [
-    templatefile("${path.module}/${var.flink_custom_values_yaml_sa}",
-      {
-        flink_namespace            = var.flink_namespace
-        flink_sa_annotations       = var.flink_sa_annotations
-        flink_service_account_name = "${var.flink_namespace}-sa"
-      }
-    )
-  ]
-}
-
-resource "helm_release" "flink" {
-    for_each         = contains([var.merged_pipeline_enabled], true ) ? var.flink_merged_pipeline_release_names : var.flink_release_names
-    name             = each.key
+resource "helm_release" "lakehouse-connector" {
+    name             = lakehouse-connector
     chart            = "${path.module}/${var.flink_chart_path}"
     namespace        = var.flink_namespace
     create_namespace = var.flink_create_namespace
@@ -53,6 +31,12 @@ resource "helm_release" "flink" {
           denorm_redis_release_name      = var.denorm_redis_release_name
           dedup_redis_namespace          = var.dedup_redis_namespace
           dedup_redis_release_name       = var.dedup_redis_release_name
+          hadoop_configuration           = local.hadoop_configuration
+          enable_hudi                    = var.enable_hudi
+          postgresql_hms_username        = var.postgresql_hms_username
+          postgresql_hms_user_password   = var.postgresql_hms_user_password
+          hudi_bucket                    = var.hudi_bucket
+          hudi_prefix_path               = var.hudi_prefix_path
       })
     ]
 }

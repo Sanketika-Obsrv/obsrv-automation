@@ -13,3 +13,12 @@ data:
 {{ index .Values $name | toYaml | indent 2 }}
   log4j_console_properties: |+
 {{ .Values.log4j_console_properties | indent 4 }}
+  core-site.xml: |
+    <configuration>
+    {{- range $key, $value := .Values.hadoop_core_site }}
+      <property>
+        <name>{{ $key }}</name>
+        <value>{{ $value }}</value>
+      </property>
+    {{- end }}
+    </configuration>
