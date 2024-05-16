@@ -325,7 +325,12 @@ dataset-api:
     CONTAINER_PREFIX: "telemetry-data"
   # service_account_annotations:
   #   meta.helm.sh/release-namespace: dataset-api
-
+  lakehouse_service:
+    LAKEHOUSE_HOST: http://obsrv-trino
+    LAKEHOUSE_PORT: "8080"
+    LAKEHOUSE_CATALOG: "lakehouse"
+    LAKEHOUSE_SCHEMA: "hms"
+    LAKEHOUSE_DEFAULT_USER: "admin"
 command-api:
   enabled: true
   namespace: command-api
