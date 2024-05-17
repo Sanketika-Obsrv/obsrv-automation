@@ -35,3 +35,10 @@ data:
   storage_url_expiry: "{{ .Values.exhaust_service.STORAGE_URL_EXPIRY }}"
   cloud_storage_config: '{"identity":"{{ .Values.global.azure_storage_account_name }}","credential":"{{ .Values.global.azure_storage_account_key }}"}'
   exhaust_query_range: "{{ .Values.exhaust_service.EXHAUST_QUERY_RANGE }}"
+  {{ if .Values.lakehouse_service }}
+  lakehouse_host: "{{ .Values.lakehouse_service.LAKEHOUSE_HOST }}"
+  lakehouse_port: "{{ .Values.lakehouse_service.LAKEHOUSE_PORT }}"
+  lakehouse_catalog: "{{ .Values.lakehouse_service.LAKEHOUSE_CATALOG }}"
+  lakehouse_schema: "{{ .Values.lakehouse_service.LAKEHOUSE_SCHEMA }}"
+  lakehouse_default_user: "{{ .Values.lakehouse_service.LAKEHOUSE_DEFAULT_USER }}"
+  {{- end}}

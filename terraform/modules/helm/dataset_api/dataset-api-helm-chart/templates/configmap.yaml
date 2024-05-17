@@ -50,6 +50,3 @@ data:
   lakehouse_schema: "{{ .Values.lakehouse_service.LAKEHOUSE_SCHEMA }}"
   lakehouse_default_user: "{{ .Values.lakehouse_service.LAKEHOUSE_DEFAULT_USER }}"
   {{- end}}
-
-
-

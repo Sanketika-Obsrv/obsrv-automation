@@ -90,7 +90,7 @@ log4j_console_properties: |
 base_config: |
   job {
     env = "dev"
-    enable.distributed.checkpointing = true
+    enable.distributed.checkpointing = false
     statebackend {
       base.url = "wasbs://checkpoint-obsrv-test-dev-725876873105@blob.storage.account/flink-jobs"
     }
