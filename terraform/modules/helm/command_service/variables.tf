@@ -85,4 +85,7 @@ variable "flink_namespace" {
   default     = "flink"
 }
 
- 
+variable "enable_hudi" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+} 

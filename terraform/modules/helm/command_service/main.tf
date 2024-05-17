@@ -19,6 +19,7 @@ resource "helm_release" "command_service" {
           postgresql_obsrv_user_password              = var.postgresql_obsrv_user_password
           postgresql_obsrv_database                   = var.postgresql_obsrv_database
           flink_namespace                             = var.flink_namespace
+          enable_hudi                                 = var.enable_hudi
       })
     ]
 }

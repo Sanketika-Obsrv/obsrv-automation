@@ -107,7 +107,7 @@ spec:
           name: {{ .Release.Name }}-config
         name: flink-config-volume
       containers:
-      - name: {{ .Release.Name }}-jobmanager
+      - name: {{ .Release.Name }}-jobmanager # Main container to start job-manager
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         # image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
@@ -160,6 +160,35 @@ spec:
             metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
             metrics.reporter.prom.host: {{ .Release.Name }}-jobmanager
             metrics.reporter.prom.port: 9250
+      - name: {{ .Release.Name }}-job-submit # side car to submit the hudi connector 
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        command:
+          - /opt/flink/bin/flink
+          - run
+          - -m
+          - {{ .Release.Name }}-jobmanager.flink.svc.cluster.local:8081
+          - /opt/flink/custom-lib/{{ .Release.Name }}-1.0.0.jar
+          - --config.file.path
+          - /data/flink/conf/{{ .Release.Name }}.conf
+        volumeMounts:
+        - mountPath: /data/flink/conf/baseconfig.conf
+          name: flink-config-volume
+          subPath: base-config.conf
+        - mountPath: /data/flink/conf/{{ .Release.Name }}.conf
+          name: flink-config-volume
+          subPath: {{ .Release.Name }}.conf
+        workingDir: /opt/flink
+        restartPolicy: Never
+        volumes:
+        - configMap:
+            items:
+            - key: base-config
+              path: base-config.conf
+            - key: {{ .Release.Name }}
+              path: {{ .Release.Name }}.conf
+            name: {{ .Release.Name }}-config
+          name: flink-config-volume
 
 ---
 apiVersion: apps/v1
