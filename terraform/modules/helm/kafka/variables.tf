@@ -68,9 +68,14 @@ variable "kafka_input_masterdata_topic" {
   default     = "masterdata.ingest"
 }
 
-
 variable "kafka_install_timeout" {
   type        = number
   description = "Kafka chart install timeout."
   default     = 1200
+}
+
+variable "kafka_input_hudi_topic" {
+  type        = string
+  description = "Kafka hudi output topic"
+  default     = "hudi.connector.in"
 }

@@ -8,6 +8,10 @@ provisioning:
     partitions: 1
     replicationFactor: 1
     # https://kafka.apache.org/documentation/#topicconfigs
+  - name: "${input_hudi_topic}"
+    partitions: 1
+    replicationFactor: 1
+    # https://kafka.apache.org/documentation/#topicconfigs
 
 persistence:
   size: 50Gi
