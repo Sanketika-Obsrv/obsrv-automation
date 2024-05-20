@@ -1,0 +1,1 @@
+ALTER TABLE datasources ADD COLUMN type TEXT not NULL DEFAULT 'druid';
