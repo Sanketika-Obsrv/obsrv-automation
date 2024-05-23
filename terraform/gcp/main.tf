@@ -389,9 +389,8 @@ module "flink" {
   env                                 = var.env
   building_block                      = var.building_block
   flink_container_registry            = var.flink_container_registry
-  flink_image_tag                     = var.flink_image_tag
-  flink_merged_pipeline_release_names = var.flink_merged_pipeline_release_names
-  flink_release_names                 = var.flink_release_names
+  flink_merged_pipeline_release_version_map = var.flink_merged_pipeline_release_version_map
+  flink_release_version_map           = var.flink_release_version_map
   merged_pipeline_enabled             = var.merged_pipeline_enabled
   flink_checkpoint_store_type         = var.flink_checkpoint_store_type
   flink_chart_depends_on              = [ module.kafka, module.postgresql_migration, module.redis_dedup, module.redis_denorm ]

@@ -177,13 +177,13 @@ variable "flink_sa_annotations" {
   description = "Service account annotations for flink service account."
   default     = "serviceAccountName: default"
 }
-variable "flink_release_names" {
-  description = "Create release names"
+variable "flink_release_version_map" {
+  description = "Create release names and tags"
   type        = map(string)
 }
 
-variable "flink_merged_pipeline_release_names" {
-  description = "Create release names"
+variable "flink_merged_pipeline_release_version_map" {
+  description = "Create release names and tags"
   type        = map(string)
 }
 

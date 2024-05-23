@@ -29,6 +29,20 @@ eks_node_disk_size            = 30
 command_service_image_tag         = "1.0.0-GA"
 web_console_image_tag             = "1.0.0-GA"
 dataset_api_image_tag             = "1.0.2-GA"
-flink_image_tag                   = "1.0.1-GA"
 secor_image_tag                   = "1.0.0-GA"
 superset_image_tag                = "3.0.2"
+
+# Image tag for each flink job
+flink_release_version_map = {
+  extractor             = "1.0.5-GA"
+  preprocessor          = "1.0.5-GA"
+  denormalizer          = "1.0.5-GA"
+  transformer           = "1.0.5-GA"
+  druid-router          = "1.0.5-GA"
+  master-data-processor = "1.0.5-GA"
+}
+
+flink_merged_pipeline_release_version_map = {
+    merged-pipeline       = "1.0.5-GA"
+    master-data-processor = "1.0.5-GA"
+}

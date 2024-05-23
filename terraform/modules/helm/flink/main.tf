@@ -20,7 +20,7 @@ resource "helm_release" "flink_sa" {
 }
 
 resource "helm_release" "flink" {
-    for_each         = contains([var.merged_pipeline_enabled], true ) ? var.flink_merged_pipeline_release_names : var.flink_release_names
+    for_each         = contains([var.merged_pipeline_enabled], true ) ? var.flink_merged_pipeline_release_version_map : var.flink_release_version_map
     name             = each.key
     chart            = "${path.module}/${var.flink_chart_path}"
     namespace        = var.flink_namespace
@@ -37,8 +37,8 @@ resource "helm_release" "flink" {
           env                            = var.env
           flink_namespace                = var.flink_namespace
           flink_container_registry       = "${var.flink_container_registry}"
-          flink_image_tag                = var.flink_image_tag
-          flink_image_name               = each.value
+          flink_image_tag                = each.value
+          flink_image_name               = each.key
           checkpoint_store_type          = var.flink_checkpoint_store_type
           s3_access_key                  = var.s3_access_key
           s3_secret_key                  = var.s3_secret_key

@@ -97,11 +97,6 @@ variable "flink_container_registry" {
   default     = "sanketikahub"
 }
 
-variable "flink_image_tag" {
-   type        = string
-   description = "Flink kubernetes service name."
-}
-
 variable "web_console_configs" {
   type = map
   description = "Web console config variables. See below commented code for values that need to be passed"
@@ -128,25 +123,25 @@ variable "web_console_image_repository" {
   default     = "sanketikahub"
 }
 
-variable "flink_release_names" {
-  description = "Create release names"
+variable "flink_release_version_map" {
+  description = "Create release names and tags"
   type        = map(string)
   default = {
-    extractor       = "extractor"
-    preprocessor    = "preprocessor"
-    denormalizer    = "denormalizer"
-    transformer     = "transformer"
-    druid-router    = "druid-router"
-    master-data-processor = "master-data-processor"
+    extractor             = "1.0.5-GA"
+    preprocessor          = "1.0.5-GA"
+    denormalizer          = "1.0.5-GA"
+    transformer           = "1.0.5-GA"
+    druid-router          = "1.0.5-GA"
+    master-data-processor = "1.0.5-GA"
   }
 }
 
-variable "flink_merged_pipeline_release_names" {
-  description = "Create release names"
+variable "flink_merged_pipeline_release_version_map" {
+  description = "Create release names and tags"
   type        = map(string)
   default = {
-    merged-pipeline = "merged-pipeline"
-    master-data-processor = "master-data-processor"
+    merged-pipeline       = "1.0.5-GA"
+    master-data-processor = "1.0.5-GA"
   }
 }
 
