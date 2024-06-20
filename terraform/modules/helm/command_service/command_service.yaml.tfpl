@@ -9,9 +9,9 @@ service_config: |
     namespace: ${flink_namespace}
     reinstall_sleep_time: 3
     jobs:
-      - name: "PipelineMergedJob"
-        release_name: merged-pipeline
-        job_manager_url: "merged-pipeline-jobmanager.flink.svc.cluster.local:8081"
+      - name: "UnifiedPipelineJob"
+        release_name: unified-pipeline
+        job_manager_url: "unified-pipeline-jobmanager.flink.svc.cluster.local:8081"
       - name: "MasterDataProcessor"
         release_name: master-data-processor
         job_manager_url: "master-data-processor-jobmanager.flink.svc.cluster.local:8081"

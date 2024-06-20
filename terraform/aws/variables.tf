@@ -142,18 +142,18 @@ variable "flink_release_names" {
   }
 }
 
-variable "flink_merged_pipeline_release_names" {
+variable "flink_unified_pipeline_release_names" {
   description = "Create release names"
   type        = map(string)
   default = {
-    merged-pipeline = "merged-pipeline"
+    unified-pipeline = "unified-pipeline"
     master-data-processor = "master-data-processor"
     # kafka-connector = "kafka-connector"
   }
 }
 
-variable "merged_pipeline_enabled" {
-  description = "Toggle to deploy merged pipeline"
+variable "unified_pipeline_enabled" {
+  description = "Toggle to deploy unified pipeline"
   type = bool
   default = true
 }

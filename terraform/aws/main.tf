@@ -140,9 +140,9 @@ module "flink" {
   building_block                      = var.building_block
   flink_container_registry            = var.flink_container_registry
   flink_image_tag                     = var.flink_image_tag
-  flink_merged_pipeline_release_names = var.flink_merged_pipeline_release_names
+  flink_unified_pipeline_release_names = var.flink_unified_pipeline_release_names
   flink_release_names                 = var.flink_release_names
-  merged_pipeline_enabled             = var.merged_pipeline_enabled
+  unified_pipeline_enabled             = var.unified_pipeline_enabled
   flink_checkpoint_store_type         = var.flink_checkpoint_store_type
   flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis_dedup, module.redis_denorm]
   postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username

@@ -40,11 +40,11 @@ global:
       #   digest: sha256:77bdba3135998baadc20015e00a9742eebac52167b90c3e46d0c339a2d668b12
       #   image: os-shell
       #   registry: docker.io/bitnami
-      merged_pipeline:
+      unified_pipeline:
         # tag: release-0.5.0_RC27
         # digest: sha256:211bc5b9e335fe0f8c5b8470db45ab2fec40cb0d7f64ad256a8d37a3749842d3
         digest: release-0.5.0_RC27
-        image: merged-pipeline
+        image: unified-pipeline
         registry: docker.io/sunbird
       master_data_processor:
         # tag: release-0.5.0_RC27
@@ -383,9 +383,9 @@ druid-raw-cluster:
       eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-obsrv-test-druid-raw-sa-iam-role
     name: druid-raw-sa
 
-merged-pipeline:
+unified-pipeline:
   enabled: true
-  name: merged-pipeline
+  name: unified-pipeline
   namespace: flink
   env: *global-env
   checkpoint_store_type: azure

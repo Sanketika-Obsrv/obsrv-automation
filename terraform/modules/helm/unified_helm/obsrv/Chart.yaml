@@ -40,9 +40,9 @@ dependencies:
   - name: master-data-processor
     version: 0.1.2
     condition: master-data-processor.enabled
-  - name: merged-pipeline
+  - name: unified-pipeline
     version: 0.1.2
-    condition: merged-pipeline.enabled
+    condition: unified-pipeline.enabled
   - name: postgresql
     version: 12.2.7
     condition: postgresql.enabled
