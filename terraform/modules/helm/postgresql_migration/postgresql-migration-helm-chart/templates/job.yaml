@@ -35,6 +35,10 @@ spec:
           mountPath: /flyway/migrations/02_druid_raw
         - name: obsrv-sql-files
           mountPath: /flyway/migrations/03_obsrv
+        {{- if .Values.enable_lakehouse }}
+        - name: hms-sql-files
+          mountPath: /flyway/migrations/05_hms
+        {{- end }}
       volumes:
         - name: flyway-migrate-script
           configMap:
@@ -49,3 +53,8 @@ spec:
         - name: obsrv-sql-files
           configMap:
              name: obsrv-sql-files
+        {{- if .Values.enable_lakehouse }}
+        - name: hms-sql-files
+          configMap:
+             name: hms-sql-files
+        {{- end }}

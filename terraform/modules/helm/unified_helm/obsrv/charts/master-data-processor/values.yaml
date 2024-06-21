@@ -157,6 +157,7 @@ master-data-processor:
       output.unique.topic = ${job.env}".masterdata.unique"
       output.duplicate.topic = ${job.env}".masterdata.duplicate"
       output.transform.topic = ${job.env}".masterdata.transform"
+      output.transform.failed.topic = ${job.env}".masterdata.failed"
       stats.topic = ${job.env}".masterdata.stats"
       groupId = ${job.env}"-masterdata-pipeline-group"
 

@@ -83,3 +83,12 @@ variable "data_encryption_key" {
   type        = string
   description = "Data encryption key. This is used to encrypt data in pipeline. This is a 32 character string."
 }
+
+variable "postgresql_hms_user_password" {
+  type        = string
+  description = "Postgresql hms user password."
+}
+variable "enable_lakehouse" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+}

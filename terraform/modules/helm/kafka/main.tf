@@ -14,6 +14,8 @@ resource "helm_release" "kafka" {
         {
           input_topic                  = "${var.env}.${var.kafka_input_topic}"
           input_masterdata_topic       = "${var.env}.${var.kafka_input_masterdata_topic}"
+          input_hudi_topic             = "${var.env}.${var.kafka_input_hudi_topic}"
+
         }
       )
     ]

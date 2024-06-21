@@ -12,3 +12,6 @@ postgresql_obsrv_user_password: "${postgresql_obsrv_user_password}"
 
 system_settings:
   encryption_key: "${data_encryption_key}"
+
+postgresql_hms_user_password: "${postgresql_hms_user_password}"
+enable_lakehouse: ${enable_lakehouse}

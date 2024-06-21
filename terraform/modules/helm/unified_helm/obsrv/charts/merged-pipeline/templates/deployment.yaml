@@ -1,5 +1,5 @@
 ---
-# Source: obsrv-chart/charts/merged-pipeline/templates/flink_job_configmap.yaml
+# Source: obsrv-chart/charts/unified-pipeline/templates/flink_job_configmap.yaml
 apiVersion: v1
 data:
   base-config: |+
@@ -71,7 +71,7 @@ data:
     taskmanager.memory.process.size: 1700m
     jobmanager.memory.process.size: 1600m
     state.savepoints.dir: file:///tmp
-  job_classname: org.sunbird.obsrv.pipeline.task.MergedPipelineStreamTask
+  job_classname: org.sunbird.obsrv.pipeline.task.UnifiedPipelineStreamTask
   log4j_console_properties: |
     # This affects logging for both user code and Flink
     rootLogger.level = INFO
@@ -102,7 +102,7 @@ data:
     # Suppress the irrelevant (wrong) warnings from the Netty channel handler
     logger.netty.name = org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline
     logger.netty.level = OFF
-  merged-pipeline: |
+  unified-pipeline: |
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".ingest"
@@ -117,6 +117,7 @@ data:
       output.denorm.topic = ${job.env}".denorm"
       output.denorm.failed.topic = ${job.env}".denorm.failed"
       output.transform.topic = ${job.env}".transform"
+      output.transform.failed.topic = ${job.env}".failed"
       stats.topic = ${job.env}".stats"
       groupId = ${job.env}"-single-pipeline-group"
       producer {
@@ -142,18 +143,18 @@ kind: ConfigMap
 metadata:
   labels:
     app: flink
-  name: merged-pipeline-config
+  name: unified-pipeline-config
   namespace: flink
 
 ---
-# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+# Source: obsrv-chart/charts/unified-pipeline/templates/deployment.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     app: flink
-    component: merged-pipeline-jobmanager
-  name: merged-pipeline-jobmanager
+    component: unified-pipeline-jobmanager
+  name: unified-pipeline-jobmanager
   namespace: flink
 spec:
   ports:
@@ -169,14 +170,14 @@ spec:
     port: 9250
   selector:
     app: flink
-    component: merged-pipeline-jobmanager
+    component: unified-pipeline-jobmanager
   type: ClusterIP
 ---
-# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+# Source: obsrv-chart/charts/unified-pipeline/templates/deployment.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: merged-pipeline-jobmanager-webui
+  name: unified-pipeline-jobmanager-webui
   namespace: flink
 spec:
   ports:
@@ -186,17 +187,17 @@ spec:
     targetPort: 8081
   selector:
     app: flink
-    component: merged-pipeline-jobmanager
+    component: unified-pipeline-jobmanager
   type: ClusterIP
 ---
-# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+# Source: obsrv-chart/charts/unified-pipeline/templates/deployment.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     app: flink
-    component: merged-pipeline-taskmanager
-  name: merged-pipeline-taskmanager
+    component: unified-pipeline-taskmanager
+  name: unified-pipeline-taskmanager
   namespace: flink
 spec:
   ports:
@@ -204,29 +205,29 @@ spec:
     port: 9251
   selector:
     app: flink
-    component: merged-pipeline-taskmanager
+    component: unified-pipeline-taskmanager
   type: ClusterIP
 ---
 
 ---
-# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+# Source: obsrv-chart/charts/unified-pipeline/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: merged-pipeline-taskmanager
+  name: unified-pipeline-taskmanager
   namespace: flink
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: flink
-      component: merged-pipeline-taskmanager
+      component: unified-pipeline-taskmanager
   template:
     metadata:
       labels:
         azure-extensions-usage-release-identifier: obsrv-base
         app: flink
-        component: merged-pipeline-taskmanager
+        component: unified-pipeline-taskmanager
         system.processing: "true"
     spec:
       containers:
@@ -235,21 +236,21 @@ spec:
         - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
         - -Dweb.submit.enable=false
         - -Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter
-        - -Dmetrics.reporter.prom.host=merged-pipeline-taskmanager
+        - -Dmetrics.reporter.prom.host=unified-pipeline-taskmanager
         - -Dmetrics.reporter.prom.port=9251-9260
-        - -Djobmanager.rpc.address=merged-pipeline-jobmanager
+        - -Djobmanager.rpc.address=unified-pipeline-jobmanager
         - -Dtaskmanager.rpc.port=6122
         - --config.file.path
-        - /data/flink/conf/merged-pipeline.conf
+        - /data/flink/conf/unified-pipeline.conf
         command:
         - /opt/flink/bin/taskmanager.sh
-        {{ if .Values.global.azure.images.merged_pipeline }}
-        image: "{{ .Values.global.azure.images.merged_pipeline.registry }}/{{ .Values.global.azure.images.merged_pipeline.image }}:{{ .Values.global.azure.images.merged_pipeline.digest }}"
+        {{ if .Values.global.azure.images.unified_pipeline }}
+        image: "{{ .Values.global.azure.images.unified_pipeline.registry }}/{{ .Values.global.azure.images.unified_pipeline.image }}:{{ .Values.global.azure.images.unified_pipeline.digest }}"
         {{ else }}
-        image: sanketikahub/merged-pipeline:release-0.5.0_RC26
+        image: sanketikahub/unified-pipeline:release-0.5.0_RC26
         {{ end }}
         imagePullPolicy: IfNotPresent
-        name: merged-pipeline-taskmanager
+        name: unified-pipeline-taskmanager
         ports:
         - containerPort: 6122
           name: rpc
@@ -268,9 +269,9 @@ spec:
         - mountPath: /data/flink/conf/baseconfig.conf
           name: flink-config-volume
           subPath: base-config.conf
-        - mountPath: /data/flink/conf/merged-pipeline.conf
+        - mountPath: /data/flink/conf/unified-pipeline.conf
           name: flink-config-volume
-          subPath: merged-pipeline.conf
+          subPath: unified-pipeline.conf
         workingDir:
       volumes:
       - configMap:
@@ -281,22 +282,22 @@ spec:
             path: log4j-console.properties
           - key: base-config
             path: base-config.conf
-          - key: merged-pipeline
-            path: merged-pipeline.conf
-          name: merged-pipeline-config
+          - key: unified-pipeline
+            path: unified-pipeline.conf
+          name: unified-pipeline-config
         name: flink-config-volume
 ---
-# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+# Source: obsrv-chart/charts/unified-pipeline/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: merged-pipeline-jobmanager
+  name: unified-pipeline-jobmanager
   namespace: flink
 spec:
   selector:
     matchLabels:
       app: flink
-      component: merged-pipeline-jobmanager
+      component: unified-pipeline-jobmanager
       azure-extensions-usage-release-identifier: obsrv-base
   template:
     metadata:
@@ -305,7 +306,7 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         app: flink
-        component: merged-pipeline-jobmanager
+        component: unified-pipeline-jobmanager
         azure-extensions-usage-release-identifier: obsrv-base
     spec:
       initContainers:
@@ -340,26 +341,26 @@ spec:
       - args:
         - start-foreground
         - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
-        - --job-classname=org.sunbird.obsrv.pipeline.task.MergedPipelineStreamTask
+        - --job-classname=org.sunbird.obsrv.pipeline.task.UnifiedPipelineStreamTask
         - -Dweb.submit.enable=false
         - -Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter
         - -Dmetrics.reporter.prom.port=9250
-        - -Djobmanager.rpc.address=merged-pipeline-jobmanager
+        - -Djobmanager.rpc.address=unified-pipeline-jobmanager
         - -Djobmanager.rpc.port=6123
         - -Dparallelism.default=1
         - -Dblob.server.port=6124
         - -Dqueryable-state.server.ports=6125
         - --config.file.path
-        - /data/flink/conf/merged-pipeline.conf
+        - /data/flink/conf/unified-pipeline.conf
         command:
         - /opt/flink/bin/standalone-job.sh
-        {{ if .Values.global.azure.images.merged_pipeline }}
-        image: "{{ .Values.global.azure.images.merged_pipeline.registry }}/{{ .Values.global.azure.images.merged_pipeline.image }}:{{ .Values.global.azure.images.merged_pipeline.digest }}"
+        {{ if .Values.global.azure.images.unified_pipeline }}
+        image: "{{ .Values.global.azure.images.unified_pipeline.registry }}/{{ .Values.global.azure.images.unified_pipeline.image }}:{{ .Values.global.azure.images.unified_pipeline.digest }}"
         {{ else }}
-        image: sanketikahub/merged-pipeline:release-0.5.0_RC26
+        image: sanketikahub/unified-pipeline:release-0.5.0_RC26
         {{ end }}
         imagePullPolicy: IfNotPresent
-        name: merged-pipeline-jobmanager
+        name: unified-pipeline-jobmanager
         ports:
         - containerPort: 6123
           name: rpc
@@ -381,9 +382,9 @@ spec:
         - mountPath: /data/flink/conf/baseconfig.conf
           name: flink-config-volume
           subPath: base-config.conf
-        - mountPath: /data/flink/conf/merged-pipeline.conf
+        - mountPath: /data/flink/conf/unified-pipeline.conf
           name: flink-config-volume
-          subPath: merged-pipeline.conf
+          subPath: unified-pipeline.conf
         - mountPath: /opt/flink/conf/log4j-console.properties
           name: flink-config-volume
           subPath: log4j-console.properties
@@ -396,10 +397,10 @@ spec:
             path: flink-conf.yaml
           - key: base-config
             path: base-config.conf
-          - key: merged-pipeline
-            path: merged-pipeline.conf
+          - key: unified-pipeline
+            path: unified-pipeline.conf
           - key: log4j_console_properties
             path: log4j-console.properties
-          name: merged-pipeline-config
+          name: unified-pipeline-config
         name: flink-config-volume
 ---

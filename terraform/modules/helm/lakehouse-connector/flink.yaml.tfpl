@@ -1,0 +1,129 @@
+namespace: ${flink_namespace}
+checkpoint_store_type: ${checkpoint_store_type}
+s3_access_key: ${s3_access_key}
+s3_secret_key: ${s3_secret_key}
+azure_account: ${azure_account}
+azure_secret: ${azure_secret}
+image:
+  registry: ${flink_container_registry}
+  repository: ${flink_image_name}
+  tag: ${flink_lakehouse_image_tag}
+  imagePullSecrets: ""
+base_config: |
+  job {
+    env = "${env}"
+    enable.distributed.checkpointing = true
+    statebackend {
+      base.url = "${checkpoint_base_url}"
+    }
+  }
+  kafka {
+    broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
+    producer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
+    consumer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
+    zookeeper = "kafka-zookeeper-headless.svc.cluster.local:2181"
+    producer {
+      max-request-size = 1572864
+      batch.size = 98304
+      linger.ms = 10
+      compression = "snappy"
+    }
+    output.system.event.topic = $${job.env}".system.events"
+    output.failed.topic = $${job.env}".failed"
+  }
+  task {
+    parallelism = 1
+    consumer.parallelism = 1
+    checkpointing.interval = 10000
+    checkpointing.pause.between.seconds = 10000
+    restart-strategy.attempts = 3
+    restart-strategy.delay = 30000 # in milli-seconds
+  }
+
+  redis.connection.timeout = 100
+  redis {
+    host = ${dedup_redis_release_name}-master.${dedup_redis_namespace}.svc.cluster.local
+    port = 6379
+  }
+
+  redis-meta {
+    host = ${denorm_redis_release_name}-master.${denorm_redis_namespace}.svc.cluster.local
+    port = 6379
+  }
+
+  postgres {
+    host = ${postgresql_service_name}.svc.cluster.local
+    port = 5432
+    maxConnections = 2
+    user = ${postgresql_obsrv_username}
+    password = ${postgresql_obsrv_user_password}
+    database = ${postgresql_obsrv_database}
+  }
+
+  lms-cassandra {
+    host = "localhost"
+    port = "9042"
+  }
+
+enable_lakehouse: ${enable_lakehouse}
+
+lakehouse-connector:
+  lakehouse-connector: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = $${job.env}".hudi.connector.in"
+      output.topic = $${job.env}".hudi.connector.out"
+      output.invalid.topic = $${job.env}".failed"
+      event.max.size = "1048576" # Max is only 1MB
+      groupId = $${job.env}"-hudi-writer-group"
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
+      checkpointing.compressed = true
+      checkpointing.interval = 30000
+      checkpointing.pause.between.seconds = 30000
+      restart-strategy.attempts = 3
+      restart-strategy.delay = 30000 # in milli-seconds
+      parallelism = 1
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+    hudi {
+      hms {
+        enabled = true
+        uri = "thrift://hms-metastore-app.hudi.svc:9083"
+        database {
+          name = "hms"
+          username = "${postgresql_hms_username}"
+          password = "${postgresql_hms_user_password}"
+        }
+      }
+      table {
+        type = "MERGE_ON_READ"
+        base.path = "s3a://${hudi_bucket}/${hudi_prefix_path}"
+      }
+      compaction.enabled = true
+      write.tasks = 1
+    }
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+    jobmanager.rpc.address: lakehouse-connector-jobmanager
+    blob.server.port: 6124
+    jobmanager.rpc.port: 6123
+    taskmanager.rpc.port: 6122
+  job_classname: org.sunbird.obsrv.streaming.HudiConnectorStreamTask
+
+hadoop_core_site: ${hadoop_configuration}

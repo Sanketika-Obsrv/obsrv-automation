@@ -35,7 +35,7 @@ variable "flink_chart_path" {
 # variable "flink_release_name" {
 #   type        = string
 #   description = "Flink helm release name."
-#   default     = "merged-pipeline"
+#   default     = "unified-pipeline"
 # }
 # *** changed this to release map.
 
@@ -182,12 +182,12 @@ variable "flink_release_names" {
   type        = map(string)
 }
 
-variable "flink_merged_pipeline_release_names" {
+variable "flink_unified_pipeline_release_names" {
   description = "Create release names"
   type        = map(string)
 }
 
-variable "merged_pipeline_enabled" {
-  description = "Toggle to enable merged pipeline"
+variable "unified_pipeline_enabled" {
+  description = "Toggle to enable unified pipeline"
   type = bool
 }

@@ -121,3 +121,15 @@ variable "postgresql_druid_raw_user_password" {
   description = "Postgresql druid user password."
   default   = "druidraw123"
 }
+
+
+variable "postgresql_hms_username" {
+  type        = string
+  description = "Postgresql hms username"
+  default   = "hms"
+}
+variable "postgresql_hms_user_password" {
+  type        = string
+  description = "Postgresql hms user password."
+  default   = "hms123"
+}

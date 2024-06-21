@@ -19,6 +19,9 @@ resource "helm_release" "postgresql_migration" {
           postgresql_druid_raw_user_password = var.postgresql_druid_raw_user_password
           postgresql_obsrv_user_password     = var.postgresql_obsrv_user_password
           data_encryption_key                = var.data_encryption_key
+          postgresql_hms_user_password       = var.postgresql_hms_user_password
+          enable_lakehouse                   = var.enable_lakehouse
+        
         })
     ]
 }

@@ -2,7 +2,7 @@ namespace: "flink"
 imagepullsecrets: ""
 image:
   registry: sanketikahub
-  repository: merged-pipeline
+  repository: unified-pipeline
   tag: 1.0.0-GA
 serviceMonitor:
   enabled: false
@@ -161,8 +161,8 @@ base_config: |
     port = "9042"
   }
 
-merged-pipeline:
-  merged-pipeline: |+
+unified-pipeline:
+  unified-pipeline: |+
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
       input.topic = ${job.env}".ingest"
@@ -176,6 +176,7 @@ merged-pipeline:
       output.denorm.topic = ${job.env}".denorm"
       output.denorm.failed.topic = ${job.env}".failed"
       output.transform.topic = ${job.env}".transform"
+      output.transform.failed.topic = ${job.env}".failed"
       stats.topic = ${job.env}".stats"
       groupId = ${job.env}"-single-pipeline-group"
       producer {
@@ -211,7 +212,7 @@ merged-pipeline:
     taskmanager.memory.process.size: 1700m
     jobmanager.memory.process.size: 1600m
     state.savepoints.dir: file:///tmp
-  job_classname: org.sunbird.obsrv.pipeline.task.MergedPipelineStreamTask
+  job_classname: org.sunbird.obsrv.pipeline.task.UnifiedPipelineStreamTask
 
 extractor:
   extractor: |+
@@ -332,6 +333,7 @@ transformer:
     kafka {
       input.topic = ${job.env}".denorm"
       output.transform.topic = ${job.env}".transform"
+      output.transform.failed.topic = ${job.env}".failed"
       groupId = ${job.env}"-transformer-group"
       producer {
         max-request-size = 10000024
@@ -436,6 +438,7 @@ master-data-processor:
       output.duplicate.topic = ${job.env}".masterdata.failed"
       output.denorm.topic = ${job.env}".masterdata.denorm"
       output.transform.topic = ${job.env}".masterdata.transform"
+      output.transform.failed.topic = ${job.env}".masterdata.failed"
       stats.topic = ${job.env}".masterdata.stats"
       groupId = ${job.env}"-masterdata-pipeline-group"
 

@@ -32,3 +32,18 @@ metadata:
     app: flyway-postgresql
 data:
   {{- (tpl (.Files.Glob "migration/03_obsrv/*.sql").AsConfig .) | nindent 2 }}
+
+
+---
+{{- if .Values.enable_lakehouse }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: hms-sql-files
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: hms-sql-files
+    app: flyway-postgresql
+data:
+  {{- (tpl (.Files.Glob "migration/05_hms/*.sql").AsConfig .) | nindent 2 }}
+{{- end }}

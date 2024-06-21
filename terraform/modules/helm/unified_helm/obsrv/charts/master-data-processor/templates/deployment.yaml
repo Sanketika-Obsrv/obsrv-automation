@@ -128,7 +128,7 @@ data:
       output.duplicate.topic = ${job.env}".masterdata.failed"
       output.denorm.topic = ${job.env}".masterdata.denorm"
       output.transform.topic = ${job.env}".masterdata.transform"
-      output.transform.failed.topic = ${job.env}".masterdata.transform.failed"
+      output.transform.failed.topic = ${job.env}".masterdata.failed"
       stats.topic = ${job.env}".masterdata.stats"
       groupId = ${job.env}"-masterdata-pipeline-group"
 

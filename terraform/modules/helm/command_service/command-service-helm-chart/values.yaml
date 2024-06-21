@@ -8,21 +8,14 @@ cpu_requests: 0.1
 cpu_limits: 0.1
 memory_requests: 512Mi
 memory_limits: 512Mi
+enable_lakehouse: false
+
+hudi_jobs:
+    - name: "LakehouseConnectorJob"
+      release_name: lakehouse-connector
+      job_manager_url: "lakehouse-connector-jobmanager.flink.svc.cluster.local:8081"
 
 service_config: |
-  flink:
-    namespace: flink
-    reinstall_sleep_time: 3
-    jobs:
-      - name: "PipelineMergedJob"
-        release_name: merged-pipeline
-        job_manager_url: "merged-pipeline-jobmanager.flink.svc.cluster.local:8081"
-      - name: "MasterDataProcessorJob"
-        release_name: master-data-processor
-        job_manager_url: "master-data-processor-jobmanager.flink.svc.cluster.local:8081"
-      - name: "KafkaConnectorJob"
-        release_name: kafka-connector
-        job_manager_url: "kafka-connector-jobmanager.flink.svc.cluster.local:8081"
 
   commands:
     RESTART_PIPELINE:
@@ -37,6 +30,21 @@ service_config: |
     database: obsrv
 
   helm_charts_base_dir: /app/helm-charts
+  
+  flink:
+    namespace: flink
+    reinstall_sleep_time: 3
+    jobs:
+      - name: "UnifiedPipelineJob"
+        release_name: unified-pipeline
+        job_manager_url: "unified-pipeline-jobmanager.flink.svc.cluster.local:8081"
+      - name: "MasterDataProcessorJob"
+        release_name: master-data-processor
+        job_manager_url: "master-data-processor-jobmanager.flink.svc.cluster.local:8081"
+      - name: "KafkaConnectorJob"
+        release_name: kafka-connector
+        job_manager_url: "kafka-connector-jobmanager.flink.svc.cluster.local:8081"
+
 
 rbac:
   # kubernetes.rest-service.exposed.type: NodePort requires

@@ -31,3 +31,10 @@ service_account_annotations:
   ${dataset_api_sa_annotations}
 service:
   type: ${service_type}
+enable_lakehouse: ${enable_lakehouse}
+lakehouse_service:
+    LAKEHOUSE_HOST: ${lakehouse_host}
+    LAKEHOUSE_PORT: ${lakehouse_port}
+    LAKEHOUSE_CATALOG: ${lakehouse_catalog}
+    LAKEHOUSE_SCHEMA: ${lakehouse_schema}
+    LAKEHOUSE_DEFAULT_USER: ${lakehouse_default_user}

@@ -86,3 +86,7 @@ variable "flink_namespace" {
 }
 
  
+variable "enable_lakehouse" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+} 

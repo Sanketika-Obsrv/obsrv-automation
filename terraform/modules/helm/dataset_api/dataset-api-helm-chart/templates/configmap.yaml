@@ -44,5 +44,11 @@ data:
   grafana_token: "{{ .Values.grafana_service.GRAFANA_TOKEN }}"
   {{- end }}
 
-
+  {{- if .Values.enable_lakehouse }}
+  lakehouse_host: "{{ .Values.lakehouse_service.LAKEHOUSE_HOST }}"
+  lakehouse_port: "{{ .Values.lakehouse_service.LAKEHOUSE_PORT }}"
+  lakehouse_catalog: "{{ .Values.lakehouse_service.LAKEHOUSE_CATALOG }}"
+  lakehouse_schema: "{{ .Values.lakehouse_service.LAKEHOUSE_SCHEMA }}"
+  lakehouse_default_user: "{{ .Values.lakehouse_service.LAKEHOUSE_DEFAULT_USER }}"
+  {{- end}}
 

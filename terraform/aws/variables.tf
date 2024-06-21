@@ -141,17 +141,17 @@ variable "flink_release_names" {
   }
 }
 
-variable "flink_merged_pipeline_release_names" {
+variable "flink_unified_pipeline_release_names" {
   description = "Create release names"
   type        = map(string)
   default = {
-    merged-pipeline = "merged-pipeline"
+    unified-pipeline = "unified-pipeline"
     master-data-processor = "master-data-processor"
   }
 }
 
-variable "merged_pipeline_enabled" {
-  description = "Toggle to deploy merged pipeline"
+variable "unified_pipeline_enabled" {
+  description = "Toggle to deploy unified pipeline"
   type = bool
   default = true
 }
@@ -169,4 +169,65 @@ variable "superset_image_tag" {
 variable "secor_image_tag" {
   type        = string
   description = "secor image version"
+}
+
+
+variable "hudi_namespace" {
+  type        = string
+  default     = "hudi"
+  description = "Apache Hudi namespace"
+}
+
+variable "hudi_prefix_path" {
+  type        = string
+  description = "Hudi prefix path"
+  default     = "hudi"
+}
+
+variable "enable_lakehouse" {
+  type        = bool
+  description = "Toggle to install hudi components (hms, trino and flink job)"
+}
+
+variable "lakehouse_host" {
+  type        = string
+  description = "Lakehouse Host"
+  default     = "http://trino.hudi.svc.cluster.local"
+}
+
+variable "lakehouse_port" {
+  type        = string
+  description = "Trino port"
+  default     = "8080"
+}
+
+variable "lakehouse_catalog" {
+  type        = string
+  description = "Lakehouse Catalog name"
+  default     = "lakehouse"
+}
+
+variable "lakehouse_schema" {
+  type        = string
+  description = "Lakehouse Schema name"
+  default     = "hms"
+}
+
+variable "lakehouse_default_user" {
+  type        = string
+  description = "Lakehouse default user"
+  default     = "admin"
+}
+
+
+variable "flink_image_name" {
+  type        = string
+  description = "Flink image name."
+  default = "lakehouse-connector"
+}
+
+variable "flink_lakehouse_image_tag" {
+  type        = string
+  description = "Flink lakehouse image tag."
+  default = "1.0.0"
 }

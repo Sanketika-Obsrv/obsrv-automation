@@ -140,9 +140,9 @@ module "flink" {
   building_block                      = var.building_block
   flink_container_registry            = var.flink_container_registry
   flink_image_tag                     = var.flink_image_tag
-  flink_merged_pipeline_release_names = var.flink_merged_pipeline_release_names
+  flink_unified_pipeline_release_names = var.flink_unified_pipeline_release_names
   flink_release_names                 = var.flink_release_names
-  merged_pipeline_enabled             = var.merged_pipeline_enabled
+  unified_pipeline_enabled             = var.unified_pipeline_enabled
   flink_checkpoint_store_type         = var.flink_checkpoint_store_type
   flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis_dedup, module.redis_denorm]
   postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
@@ -226,6 +226,12 @@ module "dataset_api" {
   dataset_api_namespace              = module.eks.dataset_api_namespace
   s3_bucket                          = module.s3.s3_bucket
   service_type                       = var.service_type
+  enable_lakehouse                   = var.enable_lakehouse
+  lakehouse_host                     = var.lakehouse_host
+  lakehouse_port                     = var.lakehouse_port
+  lakehouse_catalog                  = var.lakehouse_catalog
+  lakehouse_schema                   = var.lakehouse_schema
+  lakehouse_default_user             = var.lakehouse_default_user 
 }
 
 module "secor" {
@@ -294,6 +300,7 @@ module "command_service" {
   postgresql_obsrv_user_password   = module.postgresql.postgresql_obsrv_user_password
   postgresql_obsrv_database        = module.postgresql.postgresql_obsrv_database
   flink_namespace                  = module.flink.flink_namespace
+  enable_lakehouse                 = var.enable_lakehouse
 }
 
 module "postgresql_migration" {
@@ -308,4 +315,66 @@ module "postgresql_migration" {
   postgresql_druid_raw_user_password    = module.postgresql.postgresql_druid_raw_user_password
   postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
   data_encryption_key                   = resource.random_string.data_encryption_key.result
+  postgresql_hms_user_password          = module.postgresql.postgresql_hms_user_password
+  enable_lakehouse                      = var.enable_lakehouse
+}
+
+module "trino" {
+  source          = "../modules/helm/trino"
+  count           = var.enable_lakehouse ? 1 : 0
+  trino_namespace = var.hudi_namespace
+  trino_lakehouse_metadata = {
+    "hive.s3.aws-access-key" = var.create_velero_user ? module.iam[0].s3_access_key : var.velero_aws_access_key_id
+    "hive.s3.aws-secret-key" = var.create_velero_user ? module.iam[0].s3_secret_key : var.velero_aws_secret_access_key
+  }
+}
+
+module "hms" {
+  source        = "../modules/helm/hive_meta_store"
+  count         = var.enable_lakehouse ? 1 : 0
+  hms_namespace = var.hudi_namespace
+  hms_db_metadata = {
+    "DATABASE_HOST"     = "postgresql-hl.postgresql.svc"
+    "DATABASE_DB"       = module.postgresql.postgresql_hms_database
+    "DATABASE_USER"     = module.postgresql.postgresql_hms_username
+    "DATABASE_PASSWORD" = module.postgresql.postgresql_hms_user_password
+    "WAREHOUSE_DIR"     = "s3a://${module.s3[0].s3_bucket}/${var.hudi_prefix_path}/"
+    "THRIFT_PORT"       = "9083"
+  }
+  hadoop_metadata = {
+    "fs.s3a.access.key" = var.create_velero_user ? module.iam[0].s3_access_key : var.velero_aws_access_key_id
+    "fs.s3a.secret.key" = var.create_velero_user ? module.iam[0].s3_secret_key : var.velero_aws_secret_access_key
+  }
+}
+
+module "lakehouse-connector" {
+  source                              = "../modules/helm/lakehouse-connector"
+  count                               = var.enable_lakehouse ? 1 : 0
+  env                                 = var.env
+  building_block                      = var.building_block
+  flink_container_registry            = var.flink_container_registry
+  flink_lakehouse_image_tag           = var.flink_lakehouse_image_tag
+  flink_image_name                    = var.flink_image_name
+  flink_checkpoint_store_type         = var.flink_checkpoint_store_type
+  flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis_dedup, module.redis_denorm]
+  postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
+  checkpoint_base_url                 = "s3://${module.s3[0].checkpoint_storage_bucket}"
+  denorm_redis_namespace              = module.redis_denorm.redis_namespace
+  denorm_redis_release_name           = module.redis_denorm.redis_release_name
+  dedup_redis_namespace               = module.redis_dedup.redis_namespace
+  dedup_redis_release_name            = module.redis_dedup.redis_release_name
+  flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
+  flink_namespace                     = module.eks.flink_namespace
+  postgresql_service_name             = module.postgresql.postgresql_service_name
+  enable_lakehouse                    = var.enable_lakehouse
+  postgresql_hms_username             = module.postgresql.postgresql_hms_username
+  postgresql_hms_user_password        = module.postgresql.postgresql_hms_user_password
+  hudi_bucket                         = module.s3[0].s3_bucket
+  hudi_prefix_path                    = var.hudi_prefix_path
+  hadoop_metadata                     = {
+    "fs.s3a.access.key" = var.create_velero_user ? module.iam[0].s3_access_key : var.velero_aws_access_key_id
+    "fs.s3a.secret.key" = var.create_velero_user ? module.iam[0].s3_secret_key : var.velero_aws_secret_access_key
+  }
 }

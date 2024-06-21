@@ -20,3 +20,6 @@ system_settings:
   default_dataset_id: "ALL"
   max_event_size: 1048576
   dedup_period: 604800 # In seconds (7 days)
+
+postgresql_hms_user_password: ""
+enable_lakehouse: false

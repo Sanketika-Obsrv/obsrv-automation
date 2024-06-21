@@ -41,10 +41,10 @@ global:
       #   digest: sha256:77bdba3135998baadc20015e00a9742eebac52167b90c3e46d0c339a2d668b12
       #   image: os-shell
       #   registry: docker.io/bitnami
-      merged_pipeline:
+      unified_pipeline:
         # tag: 1.0.2-GA
         digest: 1.0.3-GA
-        image: merged-pipeline
+        image: unified-pipeline
         registry: *sanketika_docker_registry
       master_data_processor:
         # tag: 1.0.2-GA
@@ -377,9 +377,9 @@ druid-raw-cluster:
       eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-obsrv-test-druid-raw-sa-iam-role
     name: druid-raw-sa
 
-merged-pipeline:
+unified-pipeline:
   enabled: true
-  name: merged-pipeline
+  name: unified-pipeline
   namespace: flink
   env: *global-env
   checkpoint_store_type: *global-cloud-storage-provider

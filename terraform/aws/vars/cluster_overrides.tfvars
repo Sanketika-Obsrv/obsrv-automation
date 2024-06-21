@@ -32,3 +32,6 @@ dataset_api_image_tag             = "1.0.2-GA"
 flink_image_tag                   = "1.0.1-GA"
 secor_image_tag                   = "1.0.0-GA"
 superset_image_tag                = "3.0.2"
+
+enable_lakehouse                = false
+flink_lakehouse_image_tag       = "1.0.1"

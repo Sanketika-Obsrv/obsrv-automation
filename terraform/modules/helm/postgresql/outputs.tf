@@ -45,3 +45,13 @@ output "postgresql_obsrv_database" {
 output "postgresql_service_name" {
   value = contains([var.postgresql_release_name], "postgresql") ? "${var.postgresql_release_name}.${var.postgresql_namespace}" : "${var.postgresql_release_name}-postgresql.${var.postgresql_namespace}"
 }
+
+output "postgresql_hms_user_password" {
+  value     = var.postgresql_hms_user_password
+  sensitive = true
+}
+
+output "postgresql_hms_username" {
+   value     = var.postgresql_hms_username
+  sensitive = true
+}

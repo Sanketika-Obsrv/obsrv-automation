@@ -52,3 +52,11 @@ service_account_annotations:
   eks.amazonaws.com/role-arn: ""
 service:
   type: LoadBalancer
+
+enable_lakehouse: false
+lakehouse_service:
+    LAKEHOUSE_HOST: http://obsrv-trino
+    LAKEHOUSE_PORT: "8080"
+    LAKEHOUSE_CATALOG: "lakehouse"
+    LAKEHOUSE_SCHEMA: "hms"
+    LAKEHOUSE_DEFAULT_USER: "admin"

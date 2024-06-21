@@ -9,3 +9,6 @@ metadata:
 data:
   service_config: |
 {{ .Values.service_config | indent 4 }}
+  {{ if .Values.enable_lakehouse }}
+{{ toYaml .Values.hudi_jobs | indent 8 }}
+  {{ end }}

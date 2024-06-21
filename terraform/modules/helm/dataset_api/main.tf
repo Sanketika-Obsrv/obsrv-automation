@@ -27,6 +27,13 @@ resource "helm_release" "dataset_api" {
           dedup_redis_release_name           = var.dedup_redis_release_name
           s3_bucket                          = var.s3_bucket
           service_type                       = var.service_type
+          enable_lakehouse                   = var.enable_lakehouse
+          lakehouse_host                     = var.lakehouse_host
+          lakehouse_port                     = var.lakehouse_port
+          lakehouse_catalog                  = var.lakehouse_catalog
+          lakehouse_schema                   = var.lakehouse_schema
+          lakehouse_default_user             = var.lakehouse_default_user     
+        
         }
       )
     ]
