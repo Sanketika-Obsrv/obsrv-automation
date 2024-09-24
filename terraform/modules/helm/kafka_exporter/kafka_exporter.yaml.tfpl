@@ -1,8 +1,0 @@
-prometheus:
-  serviceMonitor:
-    enabled: true
-    namespace: ${kafka_exporter_namespace}
-    interval: "30s"
-    additionalLabels:
-      app: kafka-exporter
-      release: monitoring

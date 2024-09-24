@@ -1,5 +1,0 @@
-namespace: "${flink_namespace}"
-serviceAccount:
-  annotations:
-    ${flink_sa_annotations}
-  name: ${flink_service_account_name}

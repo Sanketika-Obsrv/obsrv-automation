@@ -1,5 +1,0 @@
-apiVersion: v2
-name: flink-sa
-version: 0.1.1
-appVersion: 1.16.0
-description: This chart is used to create the flink service account common for all flink job

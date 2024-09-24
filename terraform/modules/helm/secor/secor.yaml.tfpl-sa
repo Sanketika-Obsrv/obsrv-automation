@@ -1,5 +1,0 @@
-namespace: "${secor_namespace}"
-serviceAccount:
-  annotations:
-    ${secor_sa_annotations}
-  name: ${secor_service_account_name}
