@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: monitoring
+    system.ingestion: "true"
+    system.querying: "true"
+    system.api: "true"
+spec:
+  jobLabel: jobLabel
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  endpoints:
+  - port: http-{{ .Chart.Name }}
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 5s

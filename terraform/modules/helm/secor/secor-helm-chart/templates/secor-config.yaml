@@ -1,0 +1,25 @@
+{{- range $job_name, $job_config :=  .Values.secor_jobs }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-config
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app: {{ $.Release.Name }}-config
+    chart: {{ $.Chart.Name }}-{{ $.Chart.Version }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+data:
+  secor.properties: |+
+{{- (tpl ($.Files.Get "config/secor.properties") $) | nindent 4 }}
+  secor.common.properties: |+
+{{- (tpl ($.Files.Get "config/secor.common.properties") $) | nindent 4 }}
+  secor.s3.properties: |+
+{{- (tpl ($.Files.Get "config/secor.s3.properties") $) | nindent 4 }}
+  secor.gs.properties: |+
+{{- (tpl ($.Files.Get "config/secor.gs.properties") $) | nindent 4 }}
+  secor.partition.properties: |+
+{{- (tpl ($.Files.Get "config/secor.partition.properties") $) | nindent 4 }}
+  log4j.properties: |+
+{{ ($.Files.Glob "config/log4j*.properties").AsConfig | nindent 4 }}
+{{- end }}

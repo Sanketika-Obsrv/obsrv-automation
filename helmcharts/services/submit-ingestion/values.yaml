@@ -1,0 +1,158 @@
+nameOverride: "submit-ingestion"
+fullnameOverride: "submit-ingestion"
+
+namespace: submit-ingestion
+
+replicaCount: 1
+
+global:
+  image:
+    registry: ""
+
+registry: "docker.io"
+repository: "alpine/curl"
+tag: ""
+digest: ""
+
+imagePullPolicy: IfNotPresent
+imagePullSecrets: []
+
+commonLabels: {}
+
+commonAnnotations: {}
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # runAsNonRoot: true
+  # runAsUser: 1001
+  # fsGroup: 1001
+
+securityContext: {}
+  # readOnlyRootFilesystem: false
+  # capabilities:
+  #   drop:
+  #   - ALL
+
+# This block is an interface for k8s service spec.
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - paths:
+      - /
+      # host: chart-example.local
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+livenessProbe: {}
+  # httpGet:
+  #   path: "/healthz"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+readinessProbe: {}
+  # httpGet:
+  #   path: "/ready"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+configmap:
+  enabled: true
+  mountPath: /config
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+serviceMonitor:
+  enabled: false
+  selectorLabels:
+    release: monitoring
+  endpoints: []
+  # - port: http # the name of the port in your service, assuming the primary service port is named 'http' in this example.
+  #   path: /metrics
+  #   interval: 30s
+  #   scrapeTimeout: 10s
+  #   honorLabels: true
+
+# Example values.yaml structure
+initContainers: {}
+  # - name: init-myservice
+  #   image: busybox:1.28
+  #   command: ['sh', '-c', "until nslookup kubernetes.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
+
+sidecars: {}
+  # - name: log-reader # Sidecar container
+  #   image: busybox # Use another busybox image
+  #   command: ["/bin/sh"] # Override the default command
+  #   args: ["-c", "tail -f /var/log/app.log"] # Run a shell script that tails the log file
+
+druid_router_host: "druid-raw-routers.druid-raw.svc.cluster.local:8888"
+supervisor_path: "druid/indexer/v1/supervisor"
+bootstrap_servers: "kafka-headless.kafka.svc.cluster.local:9092"
+datasource:
+  system_events:
+    topic: "dev.system.events"
+    name: "system-events"
+    segment_granularity: "hour"
+    query_granularity: "hour"
+    task_duration: "PT1H"
+    task_completion: "PT1H"
+    task_count: 1
+    replicas: 1
+    enable: true
+
+  system_telemetry_events:
+    topic: "dev.system.telemetry.events"
+    name: "system-telemetry-events"
+    segment_granularity: "hour"
+    query_granularity: "hour"
+    task_duration: "PT1H"
+    task_completion: "PT1H"
+    task_count: 1
+    replicas: 1
+    enable: true
+
+startupCommand:
+  - sh
+  - -c
+  - |
+    if [ "{{ .Values.datasource.system_events.enable }}" = "true" ]; then
+      curl -XPOST -H 'Content-Type: application/json' -d @/config/system-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }};
+    fi
+    if [ "{{ .Values.datasource.system_telemetry_events.enable }}" = "true" ]; then
+      curl -XPOST -H 'Content-Type: application/json' -d @/config/system-telemetry-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }};
+    fi
+restartPolicy: "OnFailure"

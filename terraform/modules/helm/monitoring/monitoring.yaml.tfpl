@@ -1,0 +1,165 @@
+commonLabels:
+  system.monitoring: 'true'
+alertmanager:
+  alertmanagerSpec:
+    podLabels: 
+      system.monitoring: 'true'
+    resources:
+      limits:
+        cpu: "0.1"
+        memory: 256Mi
+      requests:
+        cpu: "0.1"
+        memory: 128Mi
+prometheusOperator:
+  resources:
+    limits:
+      cpu: "0.1"
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi
+    prometheusConfigReloader:
+      resources:
+        limits:
+          cpu: "0.1"
+          memory: 256Mi
+        requests:
+          cpu: "0.1"
+          memory: 128Mi
+prometheus-node-exporter:
+  podLabels:
+    system.monitoring: 'true'
+  resources:
+    limits:
+      cpu: "0.1"
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi
+prometheus:
+  commonMetaLabels:
+    system.monitoring: 'true'
+  server:
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 512Mi
+      requests:
+        cpu: 0.5
+        memory: 512Mi
+  prometheusSpec:
+    retention: ${prometheus_metrics_retention}
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: ${prometheus_persistent_volume_size}
+    additionalScrapeConfigs:
+      - job_name: s3-common-backups
+        metrics_path: /probe
+        scrape_interval: 1m
+        scrape_timeout: 30s
+        static_configs:
+          - targets:
+            - bucket=${velero_storage_bucket};
+            - bucket=${checkpoint_storage_bucket};
+            - bucket=${s3_bucket};
+        relabel_configs:
+          - source_labels: [__address__]
+            regex: "^bucket=(.*);$"
+            replacement: "$${1}"
+            target_label: "__param_bucket"
+          - target_label: __address__
+            replacement: s3-exporter.s3-exporter.svc.cluster.local:9340
+
+      - job_name: s3-db-backups
+        metrics_path: /probe
+        scrape_interval: 1m
+        scrape_timeout: 30s
+        static_configs:
+          - targets:
+%{ for s in backup_folder_prefixes ~}
+            - bucket=${s3_backups_bucket};prefix=${s};
+%{ endfor ~}
+        relabel_configs:
+          - source_labels: [__address__]
+            regex: "^bucket=(.*);prefix=(.*);$"
+            replacement: "$${1}"
+            target_label: "__param_bucket"
+          - source_labels: [__address__]
+            regex: "^bucket=(.*);prefix=(.*);$"
+            replacement: "$${2}"
+            target_label: "__param_prefix"
+          - target_label: __address__
+            replacement: s3-exporter.s3-exporter.svc.cluster.local:9340
+
+grafana:
+  service:
+    enabled: true
+    type: ${service_type}
+  extraLabels: 
+    system.monitoring: 'true'
+  podLabels: 
+      system.monitoring: 'true'
+  resources:
+    limits:
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi
+  env:
+    GF_AUTH_GENERIC_OAUTH_ENABLED: ${gf_auth_generic_oauth_enabled}
+    GF_AUTH_GENERIC_OAUTH_NAME: ${gf_auth_generic_oauth_name}
+    GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: ${gf_auth_generic_oauth_allow_sign_up}
+    GF_AUTH_GENERIC_OAUTH_CLIENT_ID: ${gf_auth_generic_oauth_client_id}
+    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: ${gf_auth_generic_oauth_client_secret}
+    GF_AUTH_GENERIC_OAUTH_SCOPES: ${gf_auth_generic_oauth_scopes}
+    GF_AUTH_GENERIC_OAUTH_AUTH_URL: ${gf_auth_generic_oauth_auth_url}
+    GF_AUTH_GENERIC_OAUTH_TOKEN_URL: ${gf_auth_generic_oauth_token_url}
+    GF_AUTH_GENERIC_OAUTH_API_URL: ${gf_auth_generic_oauth_api_url}
+    GF_AUTH_GENERIC_OAUTH_AUTH_HTTP_METHOD: ${gf_auth_generic_oauth_auth_http_method}
+    GF_AUTH_GENERIC_OAUTH_USERNAME_FIELD: ${gf_auth_generic_oauth_username_field}
+    GF_SECURITY_ALLOW_EMBEDDING: ${gf_security_allow_embedding}
+    GF_SERVER_ROOT_URL: https://${kong_ingress_domain}${grafana_ingress_path}
+    GF_SERVER_DOMAIN: ${kong_ingress_domain}
+    GF_SERVER_SERVE_FROM_SUBPATH: true
+  persistence:
+    enabled: true
+    size: ${grafana_persistent_volume_size}
+
+  grafana.ini:
+    smtp:
+      enabled: ${smtp_enabled}
+      host: ${smtp_config["host"]}
+      user: ${smtp_config["user"]}
+      password: ${smtp_config["password"]}
+      from_address: ${smtp_config["from_address"]}
+      cert_file: ${smtp_config["cert_file"]}
+      key_file:  ${smtp_config["key_file"]}
+      ehlo_identity: ${smtp_config["ehlo_identity"]}
+      startTLS_policy: ${smtp_config["startTLS_policy"]}
+      skip_verify: ${smtp_config["skip_verify"]}
+      from_name: ${smtp_config["from_name"]}   
+      
+kube-state-metrics:
+  customLabels: 
+    system.monitoring: 'true'
+  metricLabelsAllowlist:
+    - pods=[*]
+    - deployments=[*]
+    - statefulsets=[*]
+    - persistentvolumeclaims=[*]
+    - persistentvolumes=[*]
+  resources:
+    limits:
+      cpu: "0.1"
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi
+
+       

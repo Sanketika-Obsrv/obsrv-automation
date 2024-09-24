@@ -1,0 +1,54 @@
+namespace: "web-console"
+replicaCount: 1
+cpu_requests: 0.5
+cpu_limits: 0.5
+memory_requests: 512Mi
+memory_limits: 1024Mi
+image:
+  repository: sanketikahub/obsrv-web-console
+  tag: 1.0.0-GA
+  pullPolicy: "IfNotPresent"
+  imagePullSecrets: ""
+ENV: "" # dev
+PORT: "" # 3000
+APP_NAME: "" # obsrv-web-console
+PROMETHEUS_URL: ""
+CONFIG_API_URL: ""
+OBS_API_URL: ""
+SYSTEM_API_URL: ""
+ALERT_MANAGER_URL: ""
+GRAFANA_URL: ""
+SUPERSET_URL: ""
+REACT_APP_GRAFANA_URL: ""
+REACT_APP_SUPERSET_URL: ""
+SESSION_SECRET: ""
+POSTGRES_CONNECTION_STRING: ""
+OAUTH_WEB_CONSOLE_URL: ""
+AUTH_KEYCLOAK_REALM: ""
+AUTH_KEYCLOAK_PUBLIC_CLIENT: # true/false
+AUTH_KEYCLOAK_SSL_REQUIRED: ""
+AUTH_KEYCLOAK_CLIENT_ID: ""
+AUTH_KEYCLOAK_CLIENT_SECRET: ""
+AUTH_KEYCLOAK_SERVER_URL: ""
+AUTH_GOOGLE_CLIENT_ID: ""
+AUTH_GOOGLE_CLIENT_SECRET: ""
+HTTPS: ""
+REACT_APP_VERSION: ""
+GENERATE_SOURCEMAP: ""
+AUTH_AD_URL: ""
+AUTH_AD_BASE_DN: ""
+AUTH_AD_USER_NAME: ""
+AUTH_AD_PASSWORD: ""
+REACT_APP_AUTHENTICATION_ALLOWED_TYPES: ""
+AUTH_OIDC_ISSUER: ""
+AUTH_OIDC_AUTHRIZATION_URL: ""
+AUTH_OIDC_TOKEN_URL: ""
+AUTH_OIDC_USER_INFO_URL: ""
+AUTH_OIDC_CLIENT_ID: ""
+AUTH_OIDC_CLIENT_SECRET: ""
+serviceAccount:
+  name: webconsole-sa
+grafana_secret_allowed_namespaces: "dataset-api,web-console"
+grafana_secret_name: "grafana-secret"
+service:
+  type: LoadBalancer

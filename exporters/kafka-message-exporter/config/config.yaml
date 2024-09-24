@@ -1,0 +1,9 @@
+kafka:
+  spark:
+    host: "localhost:9092"
+    topic: "spark.stats"
+    schema: "telemetry"
+  obsrv:
+    host: "localhost:9092"
+    topic: "dev.stats"
+    schema: "obsrv_meta"

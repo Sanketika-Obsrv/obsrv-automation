@@ -1,0 +1,31 @@
+{{- $currentScope := .}}
+{{- range $jobName, $jobData := .Values.flink_jobs }}
+{{- range $key, $smData := $jobData.serviceMonitor }}
+{{- if $jobData.enabled}}
+{{- if $smData.enabled}}
+{{- with $currentScope }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ printf "%s-%s" $jobName $key }}
+  namespace: {{ include "base.namespace" . }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  jobLabel: {{ $smData.jobLabel }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 6 }}
+  endpoints:
+  - port: {{ $smData.port }} # the name of the port in your service, assuming the primary service port is named 'http' in this example.
+    interval: {{ $smData.interval }}
+    scrapeTimeout: {{ $smData.scrapeTimeout }}
+    honorLabels: {{ $smData.honorLabels }}
+{{- end}}
+{{- end}}
+{{- end}}
+{{- end}}
+{{- end}}

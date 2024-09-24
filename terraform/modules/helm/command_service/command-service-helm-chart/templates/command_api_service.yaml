@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-service"
+  namespace: {{ .Release.namespace }}
+  labels:
+    run: "{{ .Release.Name }}-service"
+    system.ingestion: "true"
+    release: monitoring
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: {{ .Values.http_port }}
+  selector:
+    release: monitoring

@@ -1,0 +1,33 @@
+resources:
+  requests:
+    cpu: 0.05
+    memory: 100Mi
+  limits:
+    cpu: 0.05
+    memory: 100Mi
+global:
+  commonLabels:
+    system.api: "true"
+installCRDs: true
+prometheus:
+  enabled: true
+  servicemonitor:
+    enabled: true
+    labels:
+      release: monitoring
+webhook:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 100Mi
+    limits:
+      cpu: 0.05
+      memory: 100Mi
+cainjector:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 100Mi
+    limits:
+      cpu: 0.05
+      memory: 100Mi

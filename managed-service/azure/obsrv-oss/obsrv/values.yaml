@@ -1,0 +1,1278 @@
+global:
+  azure:
+    images:
+      command_api:
+        # tag: 1.0.2
+        digest: sha256:88c1a2b627ff9238c906935531117cd387e622eeee37176c1ef2d3ef36a698e3
+        image: flink-command-service
+        # tag: 2.0.2
+        # digest: sha256:d7b7a53765ace3e906f6e4a2a5c1f203429f49a1c77e323804dd6eae59200cf6
+        # image: obsrv-command-service
+        registry: docker.io/sanketikahub
+      dataset_api:
+        # tag:1.0.2
+        digest: sha256:02e7455eee1194a4fd93cbb8f23e5dc6459a7a001393079358e0a5436f68997d
+        image: obsrv-api-service
+        registry: docker.io/sanketikahub
+      druid_exporter:
+        # tag: v0.11
+        digest: sha256:fd3ce79c4505b078bd9d382bc3b7c49326f9a13814e6ef30d755a78bf3dc613d
+        image: druid-exporter
+        registry: docker.io/sanketikahub
+      druid_operator:
+        digest: sha256:2991a809adf4905468faeeca7f1d4d822c22957ea1c17b8c50799b40a4c81023
+        image: druid-operator
+        registry: docker.io/druidio
+      druid_raw_cluster:
+        digest: sha256:193d2cf2072a43b89b27220ae216f07a0a68040fb9a08d0ce6ad8955a8245c65
+        image: druid
+        registry: docker.io/apache
+      zookeeper:
+        digest: sha256:37f17d102c85227c3cc888a63edac865e8842b43b6af73be508a464055a347f8
+        image: zookeeper
+        registry: docker.io/bitnami
+      # os_shell:
+      #   # tag: 11-debian-11-r37
+      #   digest: sha256:77bdba3135998baadc20015e00a9742eebac52167b90c3e46d0c339a2d668b12
+      #   image: os-shell
+      #   registry: docker.io/bitnami
+      unified_pipeline:
+        # tag: release-0.5.0_RC27
+        digest: sha256:211bc5b9e335fe0f8c5b8470db45ab2fec40cb0d7f64ad256a8d37a3749842d3
+        image: unified-pipeline
+        registry: docker.io/sanketikahub
+      master_data_processor:
+        # tag: release-0.5.0_RC27
+        digest: sha256:1a48c84305875b7b806a7042a07e7e70f1c383e1b99094df7d5fc18484f7ea6c
+        image: master-data-processor
+        registry: docker.io/sanketikahub
+      kafka:
+        # tag: 3.5.1-debian-11-r21
+        digest: sha256:779a5701bedba294ba2677c8744f347399e01b52b39a37cf23cdf30529c90dae
+        image: kafka
+        registry: docker.io/bitnami
+      autodiscovery:
+        # tag: 1.25.12-debian-11-r26
+        digest: sha256:9774c3452853d3ba9c4744d0acfa36d63f9d87ba7e43fd292caf7dae9115fac4
+        image: kubectl
+        registry: docker.io/bitnami
+      kafka_exporter:
+        # tag: 1.7.0-debian-11-r81
+        digest: sha256:d3d6303e662baa448f9eb996847562d3e895d9a0b7e5a7ffac709bd086db9ebc
+        image: kafka-exporter
+        registry: docker.io/bitnami
+      jmx_exporter:
+        # tag: 0.19.0-debian-11-r45
+        digest: sha256:7fad9d8cd6e402d1caed64275f4e5b742eaa493b9149732292d32b2b1f18c117
+        image: jmx-exporter
+        registry: docker.io/bitnami
+      # bitnami_shell:
+      #   # tag: 11-debian-11-r136
+      #   digest: sha256:77bdba3135998baadc20015e00a9742eebac52167b90c3e46d0c339a2d668b12
+      #   image: os-shell
+      #   registry: docker.io/bitnami
+      postgresql:
+        # tag: 14.9.0-debian-11-r2
+        digest: sha256:f349e5f081c5894c80321fbb22981c00e22f802055d2ac34a3b9260e0be6df44
+        image: postgresql
+        registry: docker.io/bitnami
+      postgres:
+        # tag: 15.4-alpine
+        digest: sha256:f36c528a2dc8747ea40b4cb8578da69fa75c5063fd6a71dcea3e3b2a6404ff7b
+        image: postgres
+        registry: docker.io
+      postgresql_exporter:
+        digest: sha256:cd26ed87c71fd287c310eb55bc200dd8df03ca674d01e0a348826606a6d67c05
+        image: postgres-exporter
+        registry: docker.io/bitnami
+      redis:
+        digest: sha256:017aaf627b7e115f6fb036c6e3360a0de4d83f1d62b315db31e89a0c09a4698e
+        image: redis
+        registry: docker.io/bitnami
+      redis_sentinel:
+        digest: sha256:a0317520a0275f1937a280fec73748b7a7995c17e137dab58b38e4b1fb4dfc15
+        image: redis-sentinel
+        registry: docker.io/bitnami
+      redis_exporter:
+        digest: sha256:c595d096a8bdf45b4cbc53f7ccb901a32f32a86ef14c0c7d7e87216e28065052
+        image: redis-exporter
+        registry: docker.io/bitnami
+      secor:
+        # tag: 0.30-jdk-11
+        digest: sha256:1583ef7ba2c03e8adba54376a28fe72980d1d06048c47f4ead609dcda978fabd
+        image: secor
+        registry: docker.io/sanketikahub
+      ubuntu:
+        digest: sha256:33a5cc25d22c45900796a1aca487ad7a7cb09f09ea00b779e3b2026b4fc2faba
+        image: ubuntu
+        registry: docker.io/library
+      k8s_sidecar:
+        digest: sha256:415d07ee1027c3ff7af9e26e05e03ffd0ec0ccf9f619ac00ab24366efe4343bd
+        image: k8s-sidecar
+        registry: quay.io/kiwigrid
+      grafana_image_renderer:
+        # tag: 3.10.0
+        digest: sha256:f4fa0092e46820f9386911d34e4ec4fe63341ebd67cbca5234c75e7662fa1603
+        image: grafana-image-renderer
+        registry: docker.io/sanketikahub
+      curl:
+        digest: sha256:bb0843a1307b1aa73f65f24379d11dde881c16db62ba50810de0c64d48e740ed
+        image: curl
+        registry: docker.io/curlimages
+      busybox:
+        digest: sha256:95cf004f559831017cdf4628aaf1bb30133677be8702a8c5f2994629f637a209
+        image: busybox
+        registry: docker.io/library
+      grafana:
+        digest: sha256:f6ed7046c77aeedd02e83f635ba7e053c8bcff0a3a2fed3ae4ada088d71ba7ea
+        image: grafana
+        registry: docker.io/grafana
+      kube_rbac_proxy:
+        digest: sha256:23959f17f0c06988423b2aa899e9d387b9bfabd4fd005e6aa2444aa66de50793
+        image: kube-rbac-proxy
+        registry: quay.io/brancz
+      node_exporter:
+        digest: sha256:81f94e50ea37a88dfee849d0f4acad25b96b397061f59e5095905f6bc5829637
+        image: node-exporter
+        registry: quay.io/prometheus
+      alertmanager:
+        # main
+        digest: sha256:cdd2386e0c73e1741f92ee4dce66dd714732603d2a5a110bf50ed57c11605945
+        image: alertmanager
+        registry: quay.io/prometheus
+      prometheus_operator:
+        digest: sha256:9c55b6970e37fb734c153e6c6acace285be98d095e8b221f93e38a6b179e1222
+        image: prometheus-operator
+        registry: quay.io/prometheus-operator
+      prometheus_config_reloader:
+        digest: sha256:65dde6b23d0fe81778c2b1027785f2244a71d1702b67f08700b2308c381e5400
+        image: prometheus-config-reloader
+        registry: quay.io/prometheus-operator
+      thanos:
+        digest: sha256:e7d337d6ac2aea3f0f9314ec9830291789e16e2b480b9d353be02d05ce7f2a7e
+        image: thanos
+        registry: quay.io/thanos
+      prometheus:
+        digest: sha256:d6ead9daf2355b9923479e24d7e93f246253ee6a5eb18a61b0f607219f341a80
+        image: prometheus
+        registry: quay.io/prometheus
+      kube_state_metrics:
+        digest: sha256:ec5732e28f151de3847df60f48c5a570aacdb692ff1ce949d97105ae5e5a6722
+        image: kube-state-metrics
+        registry: registry.k8s.io/kube-state-metrics
+      alpine:
+        digest: sha256:aa8e02bf2b4c206e18dda2de2dcd93fa127ce9b8ee26efa56368e61e41bf8293
+        image: alpine
+        registry: docker.io/sanketikahub
+      kube_webhook_certgen:
+        digest: sha256:543c40fd093964bc9ab509d3e791f9989963021f1e9e4c9c7b6700b02bfb227b
+        image: kube-webhook-certgen
+        registry: registry.k8s.io/ingress-nginx
+      grafana_agent_operator:
+        digest: sha256:5236a784ef1192d6af31a0c34fc8a1d7dd98944545b19fc61ae83a17450988f2
+        image: agent-operator
+        registry: docker.io/grafana
+      minio:
+        digest: sha256:ab4e5eb38d0692c55e10e0413a9d8e38311520abbf18454f6648f83928469cb1
+        image: minio
+        registry: quay.io/minio
+      kubectl_image:
+        digest: sha256:9774c3452853d3ba9c4744d0acfa36d63f9d87ba7e43fd292caf7dae9115fac4
+        image: kubectl
+        registry: docker.io/bitnami
+      mc_image:
+        # RELEASE.2023-09-13T23-08-58Z
+        digest: sha256:e9cefbed4949abe99eab6a9ba15dae9dbd1bbec269ac60cedbd393dd4e8d29e9
+        image: mc
+        registry: quay.io/minio
+      # enterprise_logs:
+      #   digest: sha256:469d8fdb73288d7a3e243c74856f155f8c498c9710102c338758ba431b235ef9
+      #   image: enterprise-logs
+      #   registry: docker.io/grafana
+      # enterprise_logs_provisioner:
+      #   digest: sha256:1e1e6da087fadee34fe7c1224da80bd6011e7841927bc73fde974bffba50fc54
+      #   image: enterprise-logs-provisioner
+      #   registry: docker.io/grafana
+      loki_test:
+        # latest
+        digest: sha256:4eca92e66d9367ba6f0920c6998d9955bb979346d69db315e32e77d6f1b47fe8
+        image: loki-helm-test
+        registry: docker.io/grafana
+      loki_canary:
+        # tag: main-769979c
+        digest: sha256:2dbbd50bb734526224a889c3779e0ec28fa0cf0880d52e5d13d2c857643ab9c9
+        image: loki-canary
+        registry: docker.io/grafana
+      loki:
+        # tag: main-769979c
+        digest: sha256:19bc3cec575645d1b27a3550a1866fd058f04a0128da88aca19c296382ae6da4
+        image: loki
+        registry: docker.io/grafana
+      loki_gateway:
+        # tag: 1.25-alpine
+        digest: sha256:b7e3ed3f269c3cc87e04349a53183b4694fef3fa38666abe17a750432e846eb9
+        image: nginx-unprivileged
+        registry: docker.io/nginxinc
+      promtail:
+        digest: sha256:dd248a3ccba5907b2081cca4861242c5c064a6b11289538326346c210d9cbb87
+        image: promtail
+        registry: docker.io/keshavprasad
+      # superset:
+      #   # tag: 2.0.0
+      #   digest: sha256:ca32ff641daca7447edfe78345e1abbc3b278895b1d4a245e69e28020e3310b7
+      #   image: superset
+      #   registry: docker.io/apache
+
+  env: &global-env "dev"
+  building_block: &global-bb "obsrv"
+  # redis_host: &global-redis-host "obsrv-redis-master.redis.svc.cluster.local"
+  # postgresql_host: &global-psql-host "obsrv-postgresql-hl.postgresql.svc.cluster.local"
+  # postgresql_druid_url: &global-psql-druid-conn "jdbc:postgresql://obsrv-postgresql-hl.postgresql.svc.cluster.local:5432/druid_raw"
+  druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
+  druid_URL: &global-druid-URL "http://druid-raw-routers.druid-raw.svc:8888"
+
+  postgresql_obsrv_username: &psql-obsrv-user "obsrv"
+  postgresql_obsrv_database: &psql-obsrv-db "obsrv"
+  postgresql_obsrv_user_password: &psql-obsrv-pwd "obsrv123"
+  postgresql_druid_user_password: &psql-druid-pwd "druidraw123"
+
+  s3_bucket: &s3-bucket ""
+  s3_access_key: &s3-key ""
+  s3_secret_key: &s3-secret ""
+  region: &global-region ""
+
+  azure_storage_account_name: ""
+  azure_storage_account_key: ""
+  azure_storage_container: ""
+
+  gcs_bucket: &gcs-bucket ""
+
+  druid_deepstorage_type: &global-druid-deep-store-type "azure"
+  kubernetes_storage_class: &global-k9s-storage-class "managed-premium"
+
+  system_stats_topic: &ss-kafka-topic "dev.stats"
+  masterdata_system_stats_topic: &masterdata-ss-kafka-topic "dev.masterdata.stats"
+
+alert-rules:
+  enabled: true
+  namespace: monitoring
+
+dataset-api:
+  enabled: true
+  namespace: dataset-api
+  SYSTEM_ENV: *global-env
+  druid_service:
+    DRUID_HOST: *global-druid-host
+    DRUID_PORT: 8888
+  postgres_service:
+    POSTGRES_PORT: 5432
+    POSTGRES_DATABASE: *psql-obsrv-db
+    POSTGRES_USERNAME: *psql-obsrv-user
+    POSTGRES_PASSWORD: *psql-obsrv-pwd
+  dockerhub: sanketikahub
+  repository: obsrv-api-service
+  image_tag: 1.0.1
+  imagePullSecrets: ""
+  redis_service:
+    REDIS_PORT: 6379
+  exhaust_service:
+    # LABEL_CONTAINER: *azure-container
+    # CLOUD_STORAGE_PROVIDER: "aws"
+    # CLOUD_STORAGE_REGION: "us-east-2"
+    CLOUD_STORAGE_PROVIDER: "aws"
+    # CONTAINER: *azure-container
+    CONTAINER_PREFIX: "telemetry-data"
+  # service_account_annotations:
+  #   meta.helm.sh/release-namespace: dataset-api
+
+command-api:
+  enabled: true
+  namespace: command-api
+
+druid-exporter:
+  enabled: true
+  namespace: druid-raw
+  druidURL: *global-druid-URL
+  serviceMonitor:
+    enabled: true
+    namespace: druid-raw
+    interval: 30s
+    scrapeTimeout: 10s
+
+druid-operator:
+  enabled: true
+  namespace: druid-raw
+
+druid-raw-cluster:
+  enabled: true
+  namespace: druid-raw
+  # druid_namespace: druid-raw
+  druid_metadata_storage_connector_user: druid_raw
+  druid_metadata_storage_connector_password: *psql-druid-pwd
+  # druid_metadata_storage_connector_connectURI: *global-psql-druid-conn
+  druid_worker_capacity: 2
+  druid_env: *global-env
+  storageClass: *global-k9s-storage-class
+  druid_deepstorage_type: *global-druid-deep-store-type
+  druid_indexer_logs_type: *global-druid-deep-store-type
+  # druid_indexer_logs_container: *azure-container
+  s3_bucket: *s3-bucket
+  s3_access_key: *s3-key
+  s3_secret_key: *s3-secret
+  # azure_storage_account_name: *azure-account-name
+  # azure_storage_account_key: *azure-account-key
+  # azure_storage_container: *azure-container
+  gcs_bucket: *gcs-bucket
+  zookeeper:
+    namespace: druid-raw
+  serviceAccount:
+    create: false
+    annotations:
+      meta.helm.sh/release-namespace: druid-raw
+      eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-obsrv-test-druid-raw-sa-iam-role
+    name: druid-raw-sa
+
+unified-pipeline:
+  enabled: true
+  name: unified-pipeline
+  namespace: flink
+  env: *global-env
+  checkpoint_store_type: azure
+
+master-data-processor:
+  enabled: true
+  name: master-data-processor
+  namespace: flink
+  env: *global-env
+  checkpoint_store_type: azure
+
+flink-sa:
+  enabled: false
+  namespace: flink
+  serviceAccount:
+    annotations:
+      meta.helm.sh/release-namespace: flink
+      eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-obsrv-test-flink-sa-iam-role
+    name: flink-sa
+
+grafana-configs:
+  enabled: true
+  namespace: monitoring
+
+kafka:
+  enabled: true
+  namespace: kafka
+  provisioning:
+    enabled: true
+    topics:
+      - name: "dev.ingest"
+        partitions: 1
+        replicationFactor: 1
+        # https://kafka.apache.org/documentation/#topicconfigs
+      - name: "dev.masterdata.ingest"
+        partitions: 1
+        replicationFactor: 1
+        # https://kafka.apache.org/documentation/#topicconfigs
+  persistence:
+    size: 50Gi
+  zookeeper:
+    persistence:
+      size: 8Gi
+    namespace: kafka
+    fullnameOverride: kafka-zookeeper
+  metrics:
+    kafka:
+      enabled: false
+    jmx:
+      enabled: false
+
+kafka-exporter:
+  enabled: true
+  namespace: kafka
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      namespace: kafka
+      interval: "30s"
+      additionalLabels:
+        app: kafka-exporter
+        release: monitoring
+
+postgresql:
+  enabled: true
+  namespace: postgresql
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 14.9.0-debian-11-r2
+  auth:
+    enablePostgresUser: true
+    postgresPassword: postgres
+  primary:
+    extendedConfiguration: |
+      password_encryption = md5
+    resources:
+      limits: {}
+      requests:
+        memory: 256Mi
+        cpu: 250m
+    persistence:
+      size: 1Gi
+      enabled: true
+      mountPath: /bitnami/postgresql
+
+    initdb:
+      user: postgres
+      password: postgres
+      scriptsConfigMap: ""
+      scripts:
+        00_create_superset_db.sql: |
+          CREATE DATABASE superset;
+        01_create_superset_user.sql: |
+          CREATE USER superset WITH ENCRYPTED PASSWORD 'superset123';
+          GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
+        02_create_druid_raw_db.sql: |
+          CREATE DATABASE druid_raw;
+        03_create_druid_raw_user.sql: |
+          CREATE USER druid_raw WITH ENCRYPTED PASSWORD 'druidraw123';
+          GRANT ALL PRIVILEGES ON DATABASE druid_raw TO druid_raw;
+        04_create_obsrv_db.sql: |
+          CREATE DATABASE obsrv;
+        05_create_obsrv_user.sql: |
+          CREATE USER obsrv WITH ENCRYPTED PASSWORD 'obsrv123';
+          ALTER DATABASE obsrv OWNER TO obsrv;
+          GRANT ALL PRIVILEGES ON DATABASE obsrv TO obsrv};
+        06_create_tables.sql: |
+          \c obsrv
+
+          CREATE TABLE IF NOT EXISTS datasets (
+              id TEXT PRIMARY KEY,
+              dataset_id TEXT,
+              type TEXT NOT NULL,
+              name TEXT,
+              validation_config JSON,
+              extraction_config JSON,
+              dedup_config JSON,
+              data_schema JSON,
+              denorm_config JSON,
+              router_config JSON,
+              dataset_config JSON,
+              status TEXT,
+              tags TEXT[],
+              data_version INT,
+              created_by TEXT,
+              updated_by TEXT,
+              created_date TIMESTAMP NOT NULL DEFAULT now(),
+              updated_date TIMESTAMP NOT NULL,
+              published_date TIMESTAMP NOT NULL
+          );
+
+          CREATE INDEX IF NOT EXISTS datasets_status ON datasets(status);
+
+          CREATE TABLE IF NOT EXISTS datasources (
+            id TEXT PRIMARY KEY,
+            datasource text NOT NULL,
+            dataset_id TEXT NOT NULL REFERENCES datasets (id),
+            ingestion_spec json NOT NULL,
+            datasource_ref text NOT NULL,
+            retention_period json,
+            archival_policy json,
+            purge_policy json,
+            backup_config json NOT NULL,
+            status text NOT NULL,
+            created_by text NOT NULL,
+            updated_by text NOT NULL,
+            created_date TIMESTAMP NOT NULL DEFAULT now(),
+            updated_date TIMESTAMP NOT NULL,
+            published_date TIMESTAMP NOT NULL,
+            UNIQUE (dataset_id, datasource)
+          );
+
+          CREATE INDEX IF NOT EXISTS datasources_dataset ON datasources(dataset_id);
+
+          CREATE INDEX IF NOT EXISTS datasources_status ON datasources(status);
+
+          CREATE TABLE IF NOT EXISTS dataset_transformations (
+            id TEXT PRIMARY KEY,
+            dataset_id TEXT NOT NULL REFERENCES datasets (id),
+            field_key TEXT NOT NULL,
+            transformation_function JSON,
+            status TEXT NOT NULL,
+            created_by TEXT NOT NULL,
+            updated_by TEXT NOT NULL,
+            created_date TIMESTAMP NOT NULL DEFAULT now(),
+            updated_date TIMESTAMP NOT NULL,
+            published_date TIMESTAMP NOT NULL,
+            UNIQUE (dataset_id, field_key)
+          );
+
+          CREATE INDEX IF NOT EXISTS dataset_transformations_dataset ON dataset_transformations (dataset_id);
+
+          CREATE INDEX IF NOT EXISTS dataset_transformations_status ON dataset_transformations (status);
+
+          CREATE TABLE IF NOT EXISTS dataset_source_config (
+            id TEXT PRIMARY KEY,
+            dataset_id TEXT NOT NULL REFERENCES datasets (id),
+            connector_type text NOT NULL,
+            connector_config json NOT NULL,
+            status text NOT NULL,
+            connector_stats json,
+            created_by text NOT NULL,
+            updated_by text NOT NULL,
+            created_date TIMESTAMP NOT NULL DEFAULT now(),
+            updated_date TIMESTAMP NOT NULL,
+            published_date TIMESTAMP NOT NULL,
+            UNIQUE (dataset_id)
+          );
+          CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config(dataset_id);
+
+          CREATE INDEX IF NOT EXISTS dataset_source_config_status ON dataset_source_config(status);
+
+          GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
+
+          GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
+
+postgresql-exporter:
+  enabled: true
+  namespace: postgresql
+  serviceMonitor:
+    enabled: true
+    namespace: postgresql
+    interval: 30s
+    labels:
+      release: monitoring
+
+redis:
+  enabled: true
+  namespace: redis
+  image:
+    registry: docker.io
+    repository: bitnami/redis
+    tag: 7.0.5-debian-11-r15
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets:
+      - ""
+
+  commonConfiguration: |-
+    # Enable RDB persistence
+    save 300 100
+
+  auth:
+    enabled: false
+
+  master:
+    count: 1
+    ## @param master.configuration Configuration for Redis&reg; master nodes
+    ## ref: https://redis.io/topics/config
+    ##
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    ## @param master.extraFlags Array with additional command line flags for Redis&reg; master
+    ## e.g:
+    extraFlags:
+      - "--maxmemory 1024mb"
+      - "--maxmemory-policy volatile-ttl"
+    containerPorts:
+      redis: 6379
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 1
+        memory: 1Gi
+    persistence:
+      enabled: true
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+    # sidecars:
+    #   - name: redis-backup
+    #     image: sanketikahub/redis-backup:0.5
+    #     imagePullPolicy: IfNotPresent
+    #     volumeMounts:
+    #       - mountPath: /data
+    #         name: redis-data
+    #     env:
+    #       - name: REDIS_BACKUP_CRON_SCHEDULE
+    #         value: "00 00 * * *"
+    #       - name: CLOUD_SERVICE
+    #         value: azure
+    #       - name: AZURE_BACKUP_BUCKET
+    #         value: ""
+    #       - name: S3_BACKUP_BUCKET
+    #         value: ""
+    #       - name: GCS_BACKUP_BUCKET
+    #         value: ""
+    #       - name: REDIS_RDB_FILE_PATH
+    #         value: /data
+    #       - name: REDIS_REPLICATION_MODE
+    #         value: master
+    #     resources:
+    #       limits:
+    #         cpu: 0.2
+    #         memory: 100Mi
+    serviceAccount:
+      create: false
+    #   name: ${redis_backup_service_account_name}
+    #   annotations:
+    #     ${redis_backup_sa_annotations}
+
+  replica:
+    replicaCount: 1
+    ## @param replica.configuration Configuration for Redis&reg; replicas nodes
+    ## ref: https://redis.io/topics/config
+    ##
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
+    ## e.g:
+    extraFlags:
+      - "--maxmemory 1024mb"
+      - "--maxmemory-policy volatile-ttl"
+    ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
+    ##
+    containerPorts:
+      redis: 6379
+    persistence:
+      enabled: true
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+    serviceAccount:
+      create: false
+
+secor:
+  enabled: true
+  namespace: secor
+
+  # common variables used across all jobs
+  extractor_timestamp_key: &extractor-timestamp-key "syncts"
+  default_timestamp_key: &default-timestamp-key "obsrv_meta.syncts"
+  fallback_timestamp_key: &fallback-timestamp-key "ets"
+  # kafka_broker_host: &kafka-broker-host "obsrv-kafka-headless.kafka.svc.cluster.local"
+  # zookeeper_quorum: &zookeeper-quorum "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
+  file_size: &file-size "100000000"
+  file_age: &file-age "100"
+  backup_pv_size: &backup-pv-size "1Gi"
+  request_cpu: &request-cpu "128m"
+  request_memory: &request-memory "512Mi"
+  secor_cpu_limit: &secor-cpu-limit "128m"
+  secor_memory_limit: &secor-memory-limit "512Mi"
+  threads: &threads 2
+
+  cloud_store_provider: "azure"
+  # cloud_storage_bucket: *azure-container
+  # azure_account: *azure-account-name
+  # azure_secret: *azure-account-key
+  upload_manager: "com.pinterest.secor.uploader.AzureUploadManager"
+  storageClass: *global-k9s-storage-class
+  secor_env: *global-env
+  region: *global-region
+  image_repository: "sanketikahub/secor"
+  pullPolicy: "IfNotPresent"
+  image_tag: "0.30"
+  jvm_memory: "1024m"
+  message_timezone: "UTC"
+  parser_timezone: "Asia/Kolkata"
+  secor_jobs:
+    ingest-backup:
+      replicas: 1
+      consumer_group: "dev_ingest"
+      service_name: "ingest-backup"
+      base_path: "telemetry-data/ingest"
+      timestamp_key: *extractor-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.ingest"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    extractor-duplicate-backup:
+      replicas: 1
+      consumer_group: dev_extractor_duplicate"
+      service_name: "extractor_duplicate"
+      base_path: "telemetry-data/extractor-duplicates"
+      timestamp_key: *extractor-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.extractor.duplicate"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    extractor-failed-backup:
+      replicas: 1
+      consumer_group: "dev_extractor_failed"
+      service_name: "extractor_failed"
+      base_path: "telemetry-data/extractor-failed"
+      timestamp_key: *extractor-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.extractor.failed"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    raw-backup:
+      replicas: 1
+      consumer_group: "dev_raw"
+      service_name: "raw"
+      base_path: "telemetry-data/raw"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.raw"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    failed-backup:
+      replicas: 1
+      consumer_group: "dev_failed"
+      service_name: "failed"
+      base_path: "telemetry-data/failed"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.failed"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    invalid-backup:
+      replicas: 1
+      consumer_group: "dev_invalid"
+      service_name: "invalid"
+      base_path: "telemetry-data/invalid"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.invalid"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    unique-backup:
+      replicas: 1
+      consumer_group: "dev_unique"
+      service_name: "unique"
+      base_path: "telemetry-data/unique"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.unique"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    duplicate-backup:
+      replicas: 1
+      consumer_group: "dev_duplicate"
+      service_name: "duplicate"
+      base_path: "telemetry-data/duplicates"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.duplicate"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    denorm-backup:
+      replicas: 1
+      consumer_group: "dev_denorm"
+      service_name: "denorm"
+      base_path: "telemetry-data/denorm"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.denorm"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    denorm-failed-backup:
+      replicas: 1
+      consumer_group: "dev_denorm_failed"
+      service_name: "denorm_failed"
+      base_path: "telemetry-data/denorm-failed"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.denorm.failed"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    transform-backup:
+      replicas: 1
+      consumer_group: "dev_transform"
+      service_name: "transform"
+      base_path: "telemetry-data/transformed"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.transform"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    system-stats:
+      replicas: 1
+      consumer_group: "dev_system_stats"
+      service_name: "system-stats"
+      base_path: "telemetry-data/system-stats"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.stats"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    system-events:
+      replicas: 1
+      consumer_group: "dev_system_events"
+      service_name: "system-events"
+      base_path: "telemetry-data/system-events"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.system.events"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "data.dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+  alertrules:
+    enabled: false
+
+  describedobject:
+    name: "data-path"
+
+submit-ingestion:
+  enabled: true
+  namespace: submit-ingestion
+  druid_router_host: "druid-raw-routers.druid-raw.svc.cluster.local"
+  druid_router_port: 8888
+  ingestion_spec:
+    system_stats:
+      topic: *ss-kafka-topic
+      name: "system-stats"
+    masterdata_system_stats:
+      topic: *masterdata-ss-kafka-topic
+      name: "masterdata-system-stats"
+
+monitoring:
+  enabled: true
+  namespace: monitoring
+  namespaceOverride: monitoring
+  alertmanager:
+    alertmanagerSpec:
+      resources:
+        limits:
+          cpu: 128m
+          memory: 256Mi
+        requests:
+          cpu: 128m
+          memory: 256Mi
+  prometheusOperator:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    prometheusConfigReloader:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 50Mi
+        requests:
+          cpu: 200m
+          memory: 50Mi
+  kube-state-metrics:
+    namespaceOverride: monitoring
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 32Mi
+  grafana:
+    namespaceOverride: monitoring
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  prometheus:
+    server:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    prometheusSpec:
+      retention: 90d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+  prometheus-node-exporter:
+    namespaceOverride: monitoring
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 100m
+        memory: 32Mi
+
+loki:
+  enabled: true
+  namespace: loki
+  nameOverride: loki
+  fullnameOverride: loki
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  limits_config:
+    enforce_metric_name: false
+    reject_old_samples: true
+    reject_old_samples_max_age: "168h"
+    max_cache_freshness_per_query: "10m"
+    split_queries_by_interval: "15m"
+    retention_period: "48h"
+  storage:
+    type: azure
+  compactor:
+    retention_enabled: true
+    working_directory: /var/loki/compactor/retention
+  test:
+    enabled: false
+  minio:
+    enabled: true
+    namespace: loki
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 256Mi
+    metrics:
+      serviceMonitor:
+        enabled: true
+        namespace: loki
+        includeNode: true
+        additionalLabels:
+          release: monitoring
+  grafana-agent-operator:
+    namespace: loki
+  monitoring:
+    nameOverride: loki
+    fullnameOverride: loki
+    selfMonitoring:
+      enabled: false
+    dashboards:
+      namespace: monitoring
+    lokiCanary:
+      enabled: false
+      namespace: monitoring
+      resources:
+        limits:
+          cpu: 0.1
+          memory: 256Mi
+        requests:
+          cpu: 0.1
+          memory: 128Mi
+    serviceMonitor:
+      labels:
+        release: monitoring
+        system.monitoring: "true"
+  gateway:
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+  read:
+    #    affinity: {}
+    replicas: 1
+    resources:
+      limits:
+        cpu: 512m
+        memory: 1024Mi
+      requests:
+        cpu: 256m
+        memory: 512Mi
+  write:
+    #    affinity: {}
+    replicas: 1
+    resources:
+      limits:
+        cpu: 512m
+        memory: 1024Mi
+      requests:
+        cpu: 256m
+        memory: 512Mi
+
+promtail:
+  enabled: true
+  namespace: loki
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: monitoring

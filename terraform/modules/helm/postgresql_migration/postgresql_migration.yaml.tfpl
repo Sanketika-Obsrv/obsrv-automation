@@ -1,0 +1,25 @@
+namespace: ${postgresql_namespace}
+config:
+  db:
+    url: jdbc:postgresql://${postgresql_url}:5432/
+    username: ${postgresql_admin_username}
+    password: ${postgresql_admin_password}
+    driver_class_name: org.postgresql.Driver
+
+postgresql_superset_user_password: "${postgresql_superset_user_password}"
+postgresql_druid_raw_user_password: "${postgresql_druid_raw_user_password}"
+postgresql_obsrv_user_password: "${postgresql_obsrv_user_password}"
+postgresql_keycloak_user_password: "${postgresql_keycloak_user_password}"
+superset_oauth_clientid: "${superset_oauth_clientid}"
+superset_oauth_client_secret: "${superset_oauth_client_secret}"
+kong_ingress_domain: "${kong_ingress_domain}"
+gf_auth_generic_oauth_client_id: "${gf_auth_generic_oauth_client_id}"
+gf_auth_generic_oauth_client_secret: "${gf_auth_generic_oauth_client_secret}"
+web_console_password: "${web_console_password}"
+web_console_login: "${web_console_login}"
+
+system_settings:
+  encryption_key: "${data_encryption_key}"
+
+postgresql_hms_user_password: "${postgresql_hms_user_password}"
+enable_lakehouse: ${enable_lakehouse}

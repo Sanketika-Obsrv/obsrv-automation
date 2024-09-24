@@ -1,0 +1,56 @@
+domain: "${kong_ingress_domain}"
+ingress_class_name: "kong"
+cert_secret_name: "kong-ingress-ssl-cert"
+
+# List of routes
+webconsole:
+  name: webconsole
+  namespace: web-console
+  path_type: "ImplementationSpecific"
+  service_name: "web-console"
+  service_port: 3000
+  paths:
+  - path: "/console"
+
+grafana:
+  name: grafana
+  namespace: monitoring
+  path_type: "ImplementationSpecific"
+  service_name: "monitoring-grafana"
+  service_port: 80
+  paths:
+  - path: "/grafana"
+
+superset:
+  name: superset
+  namespace: superset
+  path_type: "ImplementationSpecific"
+  service_name: "superset"
+  service_port: 8088
+  paths:
+  - path: "/"
+
+datasetapi:
+  enabled: true
+  name: datasetapi
+  namespace: dataset-api
+  path_type: "ImplementationSpecific"
+  service_name: "dataset-api-service"
+  service_port: 3000
+  paths:
+  - path: "/data/v1/in"
+  - path: "/data/v1/query"
+  - path: "/data/v1/sql-query"
+  rate_limiting:
+    enabled: false
+    minute: 10
+  jwt_enabled: false
+
+keycloak:
+  name: keycloak
+  namespace: keycloak
+  path_type: "ImplementationSpecific"
+  service_name: "keycloak"
+  service_port: 80
+  paths:
+  - path: "/"

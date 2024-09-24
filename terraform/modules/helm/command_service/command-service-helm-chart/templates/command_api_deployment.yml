@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.namespace }}
+  labels:
+    system.ingestion: "true"
+    system.dataset-management: "true"
+    release: monitoring
+    run: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      run: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        run: {{ .Release.Name }}
+        system.ingestion: "true"
+        system.dataset-management: "true"
+        release: monitoring
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      volumes:
+      - name: commandapi-config-volume
+        configMap:
+          name: "{{ .Release.Name }}-config"
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecrets }}
+      containers:
+      - name: {{ .Release.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            cpu: "{{ .Values.cpu_requests }}"
+            memory: "{{ .Values.memory_requests }}"
+          limits:
+            cpu: "{{ .Values.cpu_limits }}"
+            memory: "{{ .Values.memory_limits }}"
+        ports:
+        - containerPort: {{ .Values.http_port }}
+          name: http
+        volumeMounts:
+        - name: commandapi-config-volume
+          mountPath: /app/src/config/service_config.yml
+          subPath: service_config
+        env:
+        - name: system_env
+          value: "{{ .Values.system_env }}"

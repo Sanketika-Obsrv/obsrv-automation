@@ -1,0 +1,34 @@
+{{- if .Values.datasetapi.enabled }}
+{{- if .Values.datasetapi.rate_limiting.enabled }}
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: datasetapi-rate-limiting
+  annotations:
+    kubernetes.io/ingress.class: kong
+  namespace: {{ .Values.datasetapi.namespace }}
+plugin: rate-limiting
+config:
+  minute: {{ .Values.datasetapi.rate_limiting.minute }}
+  policy: local
+{{- end }}
+{{- if .Values.datasetapi.jwt_enabled }}
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: obsrv-jwt
+  namespace: {{ .Values.datasetapi.namespace }}
+plugin: jwt
+
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: obsrv-api-consumer
+  annotations:
+    kubernetes.io/ingress.class: kong
+  namespace: {{ .Values.datasetapi.namespace }}
+username: obsrv-api-consumer
+{{- end }}
+{{- end }}

@@ -1,0 +1,236 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-jobmanager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: flink
+    component: {{ .Release.Name }}-jobmanager
+    system.processing: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: rpc
+      port: {{ .Values.jobmanager.rpc_port }}
+    - name: blob
+      port: {{ .Values.jobmanager.blob_port }}
+    - name: query
+      port: {{ .Values.jobmanager.query_port }}
+    - name: ui
+      port: {{ .Values.jobmanager.ui_port }}
+    - name: prom
+      port: {{ .Values.jobmanager.prom_port }}
+    - name: python
+      port: 5000
+  selector:
+    app: flink
+    component: {{ .Release.Name }}-jobmanager
+    system.processing: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-jobmanager-webui
+  namespace: {{ .Release.Namespace }}
+spec:
+  {{- if eq .Values.service.type "ClusterIP" }}
+  type: ClusterIP
+  {{- end }}
+  {{- if eq .Values.service.type "LoadBalancer" }}
+  type: LoadBalancer
+  {{- end }}
+  ports:
+    - name: rest
+      port: {{ .Values.rest_port }}
+      protocol: TCP
+      targetPort: {{ .Values.resttcp_port }}
+  selector:
+    app: flink
+    component: {{ .Release.Name }}-jobmanager
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-taskmanager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: flink
+    component: {{ .Release.Name }}-taskmanager
+    system.processing: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom
+      port: {{ .Values.taskmanager.prom_port }}
+  selector:
+    app: flink
+    component: {{ .Release.Name }}-taskmanager
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-pyjobmanager
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: rest
+      port: {{ .Values.pyjobmanager.port }}
+  selector:
+    app: flink
+    component: {{ .Release.Name }}-pyjobmanager
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-jobmanager
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: flink
+      component: {{ .Release.Name }}-jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: {{ .Release.Name }}-jobmanager
+        system.processing: "true"
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: "{{ .Values.jobmanager.prom_port }}"
+    spec:
+      # imagePullSecrets:
+      # - name: {{ .Values.image.imagePullSecrets }}
+      # serviceAccount: {{ .Release.Namespace }}-sa
+      volumes:
+      - name: flink-config-volume
+        configMap:
+          name: {{ .Release.Name }}-config
+          items:
+          - key: log4j_console_properties
+            path: log4j-console.properties
+      containers:
+      - name: {{ .Release.Name }}-jobmanager
+        # image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        resources:
+          requests:
+              cpu: "{{ .Values.jobmanager.cpu_requests }}"
+              memory: "{{ .Values.jobmanager.memory_requests }}"
+          limits:
+            cpu: "{{ .Values.jobmanager.cpu_limits }}"
+            memory: "{{ .Values.jobmanager.memory_limits }}"
+        volumeMounts:
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/log4j-console.properties
+            subPath: log4j-console.properties
+        args: ["jobmanager"]
+        env:
+        - name: FLINK_PROPERTIES
+          value: |+
+            jobmanager.rpc.address: {{ .Release.Name }}-jobmanager
+            metrics.reporters: prom
+            metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+            metrics.reporter.prom.host: {{ .Release.Name }}-jobmanager
+            metrics.reporter.prom.port: 9250
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-taskmanager
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.taskmanager.replicas }}
+  selector:
+    matchLabels:
+      app: flink
+      component: {{ .Release.Name }}-taskmanager
+  template:
+    metadata:
+      labels:
+        system.processing: "true"
+        app: flink
+        component: {{ .Release.Name }}-taskmanager
+    spec:
+      # imagePullSecrets:
+      # - name: {{ .Values.image.imagePullSecrets }}
+      # serviceAccount: {{ .Release.Namespace }}-sa
+      volumes:
+      - name: flink-config-volume
+        configMap:
+          name: {{ .Release.Name }}-config
+          items:
+          - key: log4j_console_properties
+            path: log4j-console.properties
+      containers:
+      - name: {{ .Release.Name }}-taskmanager
+        # image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        resources:
+          requests:
+              cpu: "{{ .Values.taskmanager.cpu_requests }}"
+              memory: "{{ .Values.taskmanager.memory_requests }}"
+          limits:
+            cpu: "{{ .Values.taskmanager.cpu_limits }}"
+            memory: "{{ .Values.taskmanager.memory_limits }}"
+        volumeMounts:
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/log4j-console.properties
+            subPath: log4j-console.properties
+        # command: ["/opt/flink/bin/taskmanager.sh"]
+        args: ["taskmanager"]
+        env:
+        - name: FLINK_PROPERTIES
+          value: |+
+            jobmanager.rpc.address: {{ .Release.Name }}-jobmanager
+            taskmanager.numberOfTaskSlots: 2
+            metrics.reporters: prom
+            metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+            metrics.reporter.prom.host: {{ .Release.Name }}-taskmanager
+            metrics.reporter.prom.port: 9251
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-pyjobmanager
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.taskmanager.replicas }}
+  selector:
+    matchLabels:
+      app: flink
+      component: {{ .Release.Name }}-pyjobmanager
+  template:
+    metadata:
+      labels:
+        system.processing: "true"
+        app: flink
+        component: {{ .Release.Name }}-pyjobmanager
+    spec:
+      # imagePullSecrets:
+      # - name: {{ .Values.image.imagePullSecrets }}
+      # serviceAccount: {{ .Release.Namespace }}-sa
+      containers:
+      - name: {{ .Release.Name }}-pyjobmanager
+        # image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        resources:
+          requests:
+              cpu: "{{ .Values.pyjobmanager.cpu_requests }}"
+              memory: "{{ .Values.pyjobmanager.memory_requests }}"
+          limits:
+            cpu: "{{ .Values.pyjobmanager.cpu_limits }}"
+            memory: "{{ .Values.pyjobmanager.memory_limits }}"
+        command: ["python3"]
+        args: ["/opt/flink/python-files/wrapper-api.py"]

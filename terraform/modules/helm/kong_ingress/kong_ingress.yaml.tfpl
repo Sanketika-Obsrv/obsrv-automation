@@ -1,0 +1,28 @@
+resources:
+  limits:
+    cpu: 100m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+extraLabels:
+  system.api: 'true'
+podLabels:
+  system.api: 'true'
+proxy:
+  labels:
+    system.api: 'true'
+  annotations:
+%{ if kong_ingress_aws_eip_ids != "" }
+    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: ${kong_ingress_aws_eip_ids}
+%{ endif }
+%{ if kong_ingress_aws_subnet_ids != "" }
+    service.beta.kubernetes.io/aws-load-balancer-subnets: ${kong_ingress_aws_subnet_ids}
+%{ endif }
+    ${indent(4, kong_loadbalancer_annotations)}
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  labels:
+    release: monitoring
+    system.api: 'true'

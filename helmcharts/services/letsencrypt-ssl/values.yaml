@@ -1,0 +1,13 @@
+commonLabels:
+  system.api: "true"
+namespace: "web-console"
+cert_issuer_name: "letsencrypt-prod"
+letsencrypt_server_url: "https://acme-staging-v02.api.letsencrypt.org/directory"
+ingress_class_name: "kong"
+cert_name: "kong-ingress-ssl-cert"
+cert_issuer_type: "ClusterIssuer"
+reflection_namespaces: "superset,monitoring,nlq"
+domain_admin_email: "user@example.com"
+domain: ""
+global:
+  domain: "kong.local"

@@ -1,0 +1,18 @@
+image:
+  repository: ${postgresql_backup_image_repository}
+  pullPolicy: IfNotPresent
+  imagePullSecrets: ${docker_registry_secret_name}
+  tag: ${postgresql_backup_image_tag}
+
+serviceAccount:
+  annotations:
+    ${postgresql_backup_sa_annotations}
+  name: ${postgresql_backup_service_account_name}
+
+CRON_SCHEDULE: '"${postgresql_backup_cron_schedule}"'
+PG_USER: ${postgresql_backup_postgres_user}
+PG_HOST: ${postgresql_backup_postgres_host}
+PGPASSWORD: ${postgresql_backup_postgres_password}
+CLOUD_SERVICE: ${postgresql_backup_cloud_service}
+S3_BACKUP_BUCKET: ${postgresql_backup_s3_bucket}
+GS_BACKUP_BUCKET: ${postgresql_backup_gcs_bucket}

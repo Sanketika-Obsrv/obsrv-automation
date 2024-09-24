@@ -1,0 +1,90 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: grafana-sa-script
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": pre-install, pre-upgrade
+    "helm.sh/hook-weight": "-1"
+data:
+  create_service_account.sh: |
+    #!/bin/sh
+    set -euo pipefail
+    apk update
+    apk add curl jq
+
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod +x kubectl
+    mv kubectl /usr/local/bin/
+
+    response=$(curl -Ss -X POST "http://monitoring-grafana.monitoring.svc.cluster.local/api/serviceaccounts" \
+    -H 'Accept: application/json' \
+    -H 'Content-type: application/json' \
+    -H 'Authorization: Basic {{ .Values.AUTH_TOKEN }}' \
+    -d '{
+    "name": "grafana-sa",
+    "role": "Admin",
+    "isDisabled": false
+    }')
+
+    echo $response
+    message=$(echo "$response" | jq -r '.message')
+    id=$(echo "$response" | jq -r '.id')
+
+    if [ "$message" == "service account already exists" ]
+    then
+      echo "Service account already exist, will not re-create."
+      echo "Will try the first 25 ids for getting the service acount id."
+      status_code="404"
+      for i in `seq 1 25`
+      do
+        status_code=$(curl -o /dev/null -I -w %{http_code} -Ssq "http://monitoring-grafana.monitoring.svc.cluster.local/api/serviceaccounts/$i" \
+        -H 'Accept: application/json' \
+        -H 'Content-type: application/json' \
+        -H 'Authorization: Basic {{ .Values.AUTH_TOKEN }}')
+        if [ "$status_code" == "200" ]
+        then
+          id=$i
+          break
+        else
+          status_code="404"
+        fi
+      done
+      if [ "$status_code" != "200" ]
+        then
+          echo "Unable to get the service account id."
+          exit 1
+      fi
+    fi
+
+    response=$(curl -Ss "http://monitoring-grafana.monitoring.svc.cluster.local/api/serviceaccounts/$id/tokens" \
+    -H 'Accept: application/json' \
+    -H 'Content-type: application/json' \
+    -H 'Authorization: Basic {{ .Values.AUTH_TOKEN }}' \
+    -d '{
+    "name": "grafana-sa"
+    }')
+
+    echo $response
+    message=$(echo "$response" | jq -r '.message')
+    key=$(echo "$response" | jq -r '.key')
+    echo $key
+
+    if [ "$message" == "service account token with given name already exists in the organization" ]
+    then
+      echo "Service account token with given name already exists in the organization. Do nothing."
+      exit 0
+    else
+      if [ $key == "null" ]
+      then
+        echo "Unable to find the key for the service account. Please manually delete the service account and rerun this job."
+        exit 1
+      else
+        kubectl create secret generic grafana-secret --from-literal=bearer_token="Bearer $key" -n web-console --dry-run=client -o yaml | kubectl apply -f -
+        kubectl patch configmap dataset-api-config -n dataset-api --type merge -p "{\"data\": {\"grafana_token\": \"Bearer $key\"}}"
+        kubectl delete pods -l app=dataset-api -n dataset-api
+
+
+
+      fi
+    fi

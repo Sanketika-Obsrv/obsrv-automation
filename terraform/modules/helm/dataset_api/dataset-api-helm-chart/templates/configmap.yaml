@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+    system.querying: "true"
+data:
+  system_env: "{{ .Values.SYSTEM_ENV }}"
+  telemetry_kafka_compression: "{{.Values.TELEMETRY_KAFKA_COMPRESSION}}"
+  druid_host: "{{ .Values.druid_service.DRUID_HOST }}"
+  druid_port: "{{ .Values.druid_service.DRUID_PORT }}"
+  kafka_host: "{{ .Values.kafka_service.KAFKA_HOST }}"
+  kafka_port: "{{ .Values.kafka_service.KAFKA_PORT }}"
+  client_id: "{{ .Values.kafka_service.CLIENT_ID }}"
+  kafka_initial_retry_time: "{{ .Values.kafka_service.KAFKA_INITIAL_RETRY_TIME }}"
+  kafka_retries: "{{ .Values.kafka_service.KAFKA_RETRIES }}"
+  kafka_connection_timeout: "{{ .Values.kafka_service.KAFKA_CONNECTION_TIMEOUT }}"
+  postgres_host: "{{ .Values.postgres_service.POSTGRES_HOST }}"
+  postgres_port: "{{ .Values.postgres_service.POSTGRES_PORT }}"
+  postgres_database: "{{ .Values.postgres_service.POSTGRES_DATABASE }}"
+  postgres_username: "{{ .Values.postgres_service.POSTGRES_USERNAME }}"
+  postgres_password: "{{ .Values.postgres_service.POSTGRES_PASSWORD }}"
+  denorm_redis_host: "{{ .Values.denorm_redis_service.REDIS_HOST }}"
+  denorm_redis_port: "{{ .Values.denorm_redis_service.REDIS_PORT }}"
+  dedup_redis_host: "{{ .Values.dedup_redis_service.REDIS_HOST }}"
+  dedup_redis_port: "{{ .Values.dedup_redis_service.REDIS_PORT }}"
+  cloud_storage_provider: "{{ .Values.exhaust_service.CLOUD_STORAGE_PROVIDER }}"
+  cloud_storage_region: "{{ .Values.exhaust_service.CLOUD_STORAGE_REGION }}"
+  container: "{{ .Values.exhaust_service.CONTAINER }}"
+  container_prefix: "{{ .Values.exhaust_service.CONTAINER_PREFIX }}"
+  storage_url_expiry: "{{ .Values.exhaust_service.STORAGE_URL_EXPIRY }}"
+  exhaust_query_range: "{{ .Values.exhaust_service.EXHAUST_QUERY_RANGE }}"
+  max_query_threshold: "{{ .Values.MAX_QUERY_THRESHOLD }}"
+  max_query_limit: "{{ .Values.MAX_QUERY_LIMIT }}"
+  max_date_range: "{{ .Values.MAX_DATE_RANGE }}"
+  exclude_datasource_validation: "{{ .Values.EXCLUDE_DATASOURCE_VALIDATION }}"
+  object_key: "{{ .Values.encryption_config.object_key }}"
+  encryption_key: "{{ .Values.encryption_config.encryption_key }}"
+  command_service_host: "{{ .Values.command_service_config.host }}"
+  command_service_port: "{{ .Values.command_service_config.port }}"
+  {{- if .Values.grafana_service }}
+  grafana_url: "{{ .Values.grafana_service.GRAFANA_URL }}"
+  grafana_token: "{{ .Values.grafana_service.GRAFANA_TOKEN }}"
+  {{- end }}
+
+  {{- if .Values.enable_lakehouse }}
+  lakehouse_host: "{{ .Values.lakehouse_service.LAKEHOUSE_HOST }}"
+  lakehouse_port: "{{ .Values.lakehouse_service.LAKEHOUSE_PORT }}"
+  lakehouse_catalog: "{{ .Values.lakehouse_service.LAKEHOUSE_CATALOG }}"
+  lakehouse_schema: "{{ .Values.lakehouse_service.LAKEHOUSE_SCHEMA }}"
+  lakehouse_default_user: "{{ .Values.lakehouse_service.LAKEHOUSE_DEFAULT_USER }}"
+  {{- end}}
+

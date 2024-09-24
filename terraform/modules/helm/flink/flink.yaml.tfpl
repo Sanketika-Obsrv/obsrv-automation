@@ -1,0 +1,213 @@
+namespace: ${flink_namespace}
+checkpoint_store_type: ${checkpoint_store_type}
+s3_access_key: ${s3_access_key}
+s3_secret_key: ${s3_secret_key}
+azure_account: ${azure_account}
+azure_secret: ${azure_secret}
+image:
+  registry: ${flink_container_registry}
+  repository: ${flink_image_name}
+  tag: ${flink_image_tag}
+  imagePullSecrets: ${docker_registry_secret_name}
+base_config: |
+  job {
+    env = "${env}"
+    enable.distributed.checkpointing = true
+    statebackend {
+      base.url = "${checkpoint_base_url}"
+    }
+  }
+  kafka {
+    broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
+    producer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
+    consumer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
+    zookeeper = "kafka-zookeeper-headless.svc.cluster.local:2181"
+    producer {
+      max-request-size = 1572864
+      batch.size = 98304
+      linger.ms = 10
+      compression = "snappy"
+    }
+    output.system.event.topic = $${job.env}".system.events"
+    output.failed.topic = $${job.env}".failed"
+  }
+  task {
+    parallelism = 1
+    consumer.parallelism = 1
+    checkpointing.interval = 10000
+    checkpointing.pause.between.seconds = 10000
+    restart-strategy.attempts = 3
+    restart-strategy.delay = 30000 # in milli-seconds
+  }
+
+  redis.connection.timeout = 100
+  redis {
+    host = ${dedup_redis_release_name}-master.${dedup_redis_namespace}.svc.cluster.local
+    port = 6379
+  }
+
+  redis-meta {
+    host = ${denorm_redis_release_name}-master.${denorm_redis_namespace}.svc.cluster.local
+    port = 6379
+  }
+
+  postgres {
+    host = ${postgresql_service_name}.svc.cluster.local
+    port = 5432
+    maxConnections = 2
+    user = ${postgresql_obsrv_username}
+    password = ${postgresql_obsrv_user_password}
+    database = ${postgresql_obsrv_database}
+  }
+
+  lms-cassandra {
+    host = "localhost"
+    port = "9042"
+  }
+
+unified-pipeline:
+  unified-pipeline: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = $${job.env}".ingest"
+      output.raw.topic = $${job.env}".raw"
+      output.extractor.duplicate.topic = $${job.env}".failed"
+      output.batch.failed.topic = $${job.env}".failed"
+      event.max.size = "1048576" # Max is only 1MB
+      output.invalid.topic = $${job.env}".failed"
+      output.unique.topic = $${job.env}".unique"
+      output.duplicate.topic = $${job.env}".failed"
+      output.denorm.topic = $${job.env}".denorm"
+      output.denorm.failed.topic = $${job.env}".failed"
+      output.transform.topic = $${job.env}".transform"
+      output.transform.failed.topic = $${job.env}".failed"
+      stats.topic = $${job.env}".stats"
+      groupId = $${job.env}"-unified-pipeline-group"
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
+      window.time.in.seconds = 5
+      window.count = 30
+      window.shards = 1400
+      consumer.parallelism = 2
+      downstream.operators.parallelism = 2
+    }
+
+    redis {
+      database {
+        extractor.duplication.store.id = 1
+        preprocessor.duplication.store.id = 2
+        key.expiry.seconds = 3600
+      }
+    }
+
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 2
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+
+  job_classname: in.sanketika.obsrv.pipeline.task.UnifiedPipelineStreamTask
+
+transformer-ext:
+  transformer-ext: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = $${job.env}".denorm"
+      output.transform.topic = $${job.env}".transform"
+      output.transform.failed.topic = $${job.env}".failed"
+      groupId = $${job.env}"-transformer-group"
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+
+
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 2
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+
+  job_classname: in.sanketika.obsrv.transformer.task.TransformerStreamTask
+
+
+master-data-processor-ext:
+  master-data-processor-ext: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = $${job.env}".masterdata.ingest"
+      output.raw.topic = $${job.env}".masterdata.raw"
+      output.extractor.duplicate.topic = $${job.env}".masterdata.failed"
+      output.failed.topic = $${job.env}".masterdata.failed"
+      output.batch.failed.topic = $${job.env}".masterdata.failed"
+      event.max.size = "1048576" # Max is only 1MB
+      output.invalid.topic = $${job.env}".masterdata.failed"
+      output.unique.topic = $${job.env}".masterdata.unique"
+      output.duplicate.topic = $${job.env}".masterdata.failed"
+      output.denorm.topic = $${job.env}".masterdata.denorm"
+      output.transform.topic = $${job.env}".masterdata.transform"
+      output.transform.failed.topic = $${job.env}".masterdata.failed"
+      stats.topic = $${job.env}".masterdata.stats"
+      groupId = $${job.env}"-masterdata-pipeline-group"
+
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
+      window.time.in.seconds = 5
+      window.count = 30
+      window.shards = 1400
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+    redis {
+      database {
+        extractor.duplication.store.id = 1
+        preprocessor.duplication.store.id = 2
+        key.expiry.seconds = 3600
+      }
+    }
+
+    dataset.type = "master-dataset"
+
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+
+  job_classname: in.sanketika.obsrv.pipeline.task.MasterDataProcessorStreamTask

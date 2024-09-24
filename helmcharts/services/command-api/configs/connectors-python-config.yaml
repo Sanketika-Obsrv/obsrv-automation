@@ -1,0 +1,27 @@
+postgres:
+  dbname: "{{ .Values.postgresqlDatabase | default .Values.global.postgresql.obsrv.name }}"
+  user: "{{ .Values.postgresqlUser | default .Values.global.postgresql.obsrv.user }}"
+  password: "{{ .Values.postgresqlPassword | default .Values.global.postgresql.obsrv.password }}"
+  host: "{{ .Values.global.postgresql.host }}"
+  port: "{{ .Values.global.postgresql.port }}"
+
+kafka:
+  broker-servers:  "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
+  connector-metrics-topic: "{{ .Values.global.kafka.connectorsMetricTopic }}"
+  failed-topic: "{{ .Values.global.kafka.connectorsFailedTopic}}"
+  producer:
+    compression: snappy
+    max-request-size: 1000000 # 1MB {1M: 1000000, 10M: 10000000, 5M: 5000000}
+
+obsrv_encryption_key: "{{ .Values.global.encryption_key }}"
+
+building-block: "{{ .Values.global.building_block }}"
+env: "{{ .Values.global.env }}"
+
+dataset_api:
+  host: "{{ .Values.global.dataset_api.host}}"
+  pre_signed_url: "v2/files/generate-url"
+
+connectors:
+  extraction_path: "/tmp/obsrv-connectors-extracted"
+  storage_path: "/data/connectors"

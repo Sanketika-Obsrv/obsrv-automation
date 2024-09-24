@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-config"
+  namespace: {{ .Release.namespace }}
+  labels:
+    app: command-api
+    system.ingestion: "true"
+    system.dataset-management: "true"
+data:
+  service_config: |
+{{ .Values.service_config | indent 4 }}
+  {{ if .Values.enable_lakehouse }}
+{{ toYaml .Values.hudi_jobs | indent 8 }}
+  {{ end }}

@@ -1,0 +1,24 @@
+namespace: ${submit_ingestion_namespace}
+druid_router_host: "${druid_cluster_release_name}-routers.${druid_cluster_namespace}.svc.cluster.local:8888"
+datasource:
+  system_events:
+    topic: "${env}.system.events"
+    name: "system-events"
+    segment_granularity: "DAY"
+    query_granularity: "MINUTE"
+    task_duration: "PT1H"
+    task_completion: "PT1H"
+    task_count: 1
+    replicas: 1
+    enable: true
+
+  system_telemetry_events:
+    topic: "${env}.system.telemetry.events"
+    name: "system-telemetry-events"
+    segment_granularity: "DAY"
+    query_granularity: "MINUTE"
+    task_duration: "PT1H"
+    task_completion: "PT1H"
+    task_count: 1
+    replicas: 1
+    enable: true  

@@ -1,0 +1,26 @@
+namespace: "submit-ingestion"
+druid_router_host: "druid-raw-routers.druid-raw.svc.cluster.local:8888"
+supervisor_path: "druid/indexer/v1/supervisor"
+bootstrap_servers: "kafka-headless.kafka.svc.cluster.local:9092"
+datasource:
+  system_events:
+    topic: "sb-dev.system.events"
+    name: "system-events"
+    segment_granularity: "hour"
+    query_granularity: "hour"
+    task_duration: "PT1H"
+    task_completion: "PT1H"
+    task_count: 1
+    replicas: 1
+    enable: true
+
+  system_telemetry_events:
+    topic: "sb-dev.system.telemetry.events"
+    name: "system-telemetry-events"
+    segment_granularity: "hour"
+    query_granularity: "hour"
+    task_duration: "PT1H"
+    task_completion: "PT1H"   
+    task_count: 1
+    replicas: 1 
+    enable: true

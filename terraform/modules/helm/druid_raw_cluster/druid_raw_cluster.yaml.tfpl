@@ -1,0 +1,22 @@
+druid_namespace: ${druid_namespace}
+druid_metadata_storage_connector_user: ${druid_raw_user}
+druid_metadata_storage_connector_password: ${druid_raw_user_password}
+druid_metadata_storage_connector_connectURI: "jdbc:postgresql://postgresql-hl.postgresql.svc.cluster.local:5432/${druid_raw_database}"
+druid_worker_capacity: ${druid_worker_capacity}
+druid_env: ${env}
+storageClass: ${kubernetes_storage_class}
+druid_deepstorage_type: ${druid_deepstorage_type}
+druid_indexer_logs_type: ${druid_deepstorage_type}
+s3_bucket: ${s3_bucket}
+s3_access_key: ${s3_access_key}
+s3_secret_key: ${s3_secret_key}
+azure_storage_account_name: ${azure_storage_account_name}
+azure_storage_account_key: ${azure_storage_account_key}
+azure_storage_container: ${azure_storage_container}
+gcs_bucket: ${gcs_bucket}
+druid_router_service_type: ${service_type}
+
+serviceAccount:
+  annotations:
+    ${druid_raw_sa_annotations}
+  name: ${druid_raw_service_account_name}

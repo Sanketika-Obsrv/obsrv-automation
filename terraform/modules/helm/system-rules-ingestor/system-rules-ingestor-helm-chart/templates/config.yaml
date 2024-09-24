@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-config"
+  namespace: "{{ .Values.namespace }}"
+  labels:
+    app: "{{ .Chart.Name }}"
+data:
+  datasetServiceUrl: "{{ .Values.api_url }}"
+  delay: "{{ .Values.delay }}"
+  folder: "{{ .Values.folder }}"
+  rules: |
+{{ .Values.rules | indent 4 }}

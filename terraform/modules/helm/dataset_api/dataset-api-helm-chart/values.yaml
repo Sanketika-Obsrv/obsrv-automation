@@ -1,0 +1,68 @@
+namespace: "dataset-api"
+replicaCount: 1
+image:
+  registry: "sanketikahub"
+  repository: "obsrv-api-service"
+  image_tag: 1.0.0-GA
+  imagePullSecrets: ""
+cpu_requests: 0.5
+cpu_limits: 0.5
+memory_requests: 512Mi
+memory_limits: 1024Mi
+network:
+  port: '3000'
+  targetport: '3000'
+SYSTEM_ENV: "dev"
+TELEMETRY_KAFKA_COMPRESSION: snappy
+druid_service:
+  DRUID_HOST: http://druid-raw-routers.druid-raw.svc
+  DRUID_PORT: '8888'
+kafka_service:
+  KAFKA_HOST: "kafka-headless.kafka.svc"
+  KAFKA_PORT: '9092'
+  KAFKA_INITIAL_RETRY_TIME: '3000'
+  KAFKA_RETRIES: 5
+  KAFKA_CONNECTION_TIMEOUT: '5000'
+  CLIENT_ID: "obsrv-apis"
+postgres_service:
+  POSTGRES_HOST: postgresql-hl.postgresql.svc
+  POSTGRES_PORT: '5432'
+  POSTGRES_DATABASE: "obsrv"
+  POSTGRES_USERNAME: "obsrv"
+  POSTGRES_PASSWORD: "obsrv123"
+dedup_redis_service:
+  REDIS_HOST: obsrv-dedup-redis-headless.redis.svc.cluster.local
+  REDIS_PORT: 6379
+denorm_redis_service:
+  REDIS_HOST: obsrv-denorm-redis-headless.redis.svc.cluster.local
+  REDIS_PORT: 6379
+exhaust_service:
+  CLOUD_STORAGE_PROVIDER: "aws"
+  CLOUD_STORAGE_REGION: "us-east-2"
+  CONTAINER: "" # Bucket name.
+  CONTAINER_PREFIX: "telemetry-data"
+  STORAGE_URL_EXPIRY: 3600
+  EXHAUST_QUERY_RANGE: 31 # In Days
+encryption_config:
+  object_key: authenticationMechanism
+  encryption_key: encryptionKey
+command_service_config:
+  host: http://command-api-service.command-api.svc
+  port: 8000
+  path: "/system/v1/dataset/command"
+MAX_QUERY_THRESHOLD: "5000"
+MAX_QUERY_LIMIT: "5000"
+MAX_DATE_RANGE: "30"
+EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-system-stats,system-events"
+enable_lakehouse: false
+lakehouse_service:
+    LAKEHOUSE_HOST: http://obsrv-trino
+    LAKEHOUSE_PORT: "8080"
+    LAKEHOUSE_CATALOG: "lakehouse"
+    LAKEHOUSE_SCHEMA: "hms"
+    LAKEHOUSE_DEFAULT_USER: "admin"
+service_account_annotations:
+  eks.amazonaws.com/role-arn: ""
+
+service:
+  type: LoadBalancer

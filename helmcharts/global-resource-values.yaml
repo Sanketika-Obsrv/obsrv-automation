@@ -1,0 +1,615 @@
+#coredb
+kafka:
+  resources:
+    limits:
+      cpu: 1
+      memory: 2048Mi
+    requests:
+      cpu: 750m
+      memory: 1024Mi
+  zookeeper:
+    resources:
+      limits:
+        cpu: 256m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+  metrics:
+    kafka:
+      resources:
+      limits:
+        cpu: 100m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    jmx:
+      resources:
+      limits:
+        cpu: 100m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  
+
+postgresql:
+  primary:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 10Gi
+      mountPath: /bitnami/postgresql
+      labels:
+        system.storage: "true"
+        system.ingestion: "true"
+        system.querying: "true"
+        system.api: "true"
+    
+  readReplicas:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+      mountPath: /bitnami/postgresql
+      labels:
+        system.storage: "true"
+        system.ingestion: "true"
+        system.querying: "true"
+        system.api: "true"
+
+redis-denorm:
+  master:
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 2Gi
+      requests:
+        cpu: 0.5
+        memory: 1Gi
+    # sidecars:
+    #   resources:
+    #     limits:
+    #       cpu: 0.2
+    #       memory: 100Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+  replica:
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+
+redis-dedup:
+  master:
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 512Mi
+      requests:
+        cpu: 0.5
+        memory: 512Mi
+    # sidecars:
+    #   resources:
+    #     limits:
+    #       cpu: 0.2
+    #       memory: 100Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+  replica:
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+      
+kong:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+druid-operator:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+#migrations
+postgresql-migration:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 712Mi
+    requests:
+      cpu: 100m
+      memory: 711Mi
+      #issue running helm templete
+
+cert-manager:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 100Mi
+    limits:
+      cpu: 0.05
+      memory: 100Mi
+  webhook:
+    resources:
+      requests:
+        cpu: 0.05
+        memory: 100Mi
+      limits:
+        cpu: 0.05
+        memory: 100Mi
+  cainjector:
+    resources:
+      requests:
+        cpu: 0.05
+        memory: 100Mi
+      limits:
+        cpu: 0.05
+        memory: 100Mi
+
+#coreinfra
+promtail:
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  sidecar:
+    configReloader:
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+
+loki:
+  singleBinary:
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 1024Mi
+      requests:
+        cpu: 0.5
+        memory: 128Mi
+    persistence:
+      enableStatefulSetAutoDeletePVC: true
+      size: 10Gi
+      storageClass: null
+      selector: null
+  minio:
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+    persistence:
+      size: 5Gi
+  monitoring:
+    lokiCanary:
+      resources:
+        limits:
+          cpu: 0.1
+          memory: 256Mi
+        requests:
+          cpu: 0.1
+          memory: 128Mi
+  gateway:
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+  read:
+    replicas: 1
+    resources:
+      limits:
+        cpu: 512m
+        memory: 1024Mi
+      requests:
+        cpu: 256m
+        memory: 512Mi
+    persistence:
+      # -- Enable StatefulSetAutoDeletePVC feature
+      enableStatefulSetAutoDeletePVC: true
+      # -- Size of persistent disk
+      size: 10Gi
+      storageClass: null
+      selector: null
+  write:
+    replicas: 1
+    resources:
+      limits:
+        cpu: 512m
+        memory: 1024Mi
+      requests:
+        cpu: 256m
+        memory: 512Mi
+      persistence:
+        # -- Enable volume claims in pod spec
+        volumeClaimsEnabled: true
+        # -- Parameters used for the `data` volume when volumeClaimEnabled if false
+        dataVolumeParameters:
+          emptyDir: {}
+        # -- Enable StatefulSetAutoDeletePVC feature
+        enableStatefulSetAutoDeletePVC: false
+        # -- Size of persistent disk
+        size: 10Gi
+        storageClass: null
+        selector: null
+  backend:
+    persistence:
+      volumeClaimsEnabled: true
+      dataVolumeParameters:
+        emptyDir: {}
+      enableStatefulSetAutoDeletePVC: false
+      size: 10Gi
+      storageClass: null
+      selector: null
+
+
+grafana:
+  resources:
+    limits:
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
+  persistence:
+    type: pvc
+    # storageClassName: default
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+    # annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
+
+#druid-raw-cluster need changes in yaml files
+druid-raw-cluster:
+  druid_brokers_pod:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 750Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+      
+  druid_coordinator_pod:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 500Mi
+
+  druid_overlord_pod:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+  druid_historical_pod:
+    resources:
+      limits:
+        cpu: 1
+        memory: 3700Mi
+      requests:
+        cpu: 800m
+        memory: 3000Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 50Gi
+
+  druid_middlemanager_pod:
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+
+  druid_indexer_pod:
+    resources:
+      limits:
+        cpu: 1
+        memory: 11Gi
+      requests:
+        cpu: 1
+        memory: 10Gi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 20Gi
+
+  druid_router_pod:
+    resources:
+      limits:
+        cpu: 512m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+  zookeeper:
+    resources:
+      limits:
+        cpu: 256m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+        
+flink:
+  flink_jobs:
+    merget-pipeline:
+      resources:
+        limits:
+          cpu: 0.25
+          memory: 1024Mi
+        requests:
+          cpu: 0.25
+          memory: 1024Mi
+    master-data-processor:
+      resources:
+        limits:
+          cpu: 0.5
+          memory: 1024Mi
+        requests:
+          cpu: 0.5
+          memory: 1024Mi
+
+kafka-message-exporter:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+kube-prometheus-stack:
+  alertmanager:
+    alertmanagerSpec:
+      resources:
+        limits:
+          cpu: "0.1"
+          memory: 256Mi
+        requests:
+          cpu: "0.1"
+          memory: 128Mi
+  prometheusOperator:
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+    prometheusConfigReloader:
+      resources:
+        limits:
+          cpu: 0.1
+          memory: 256Mi
+        requests:
+          cpu: 0.1
+          memory: 128Mi
+  prometheus:
+    server:
+      resources:
+        limits:
+          cpu: 0.5
+          memory: 512Mi
+        requests:
+          cpu: 0.5
+          memory: 512Mi
+          #issue getting resources
+
+kube-state-metrics:
+  resources:
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
+
+kubernetes-reflector:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+postgresql-exporter:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+prometheus-node-exporter:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 100m
+      memory: 32Mi
+
+secor:
+  resources:
+    limits:
+      cpu: 128m
+      memory: 512Mi
+    requests:
+      cpu: 128m
+      memory: 512Mi
+      #issue running helm templete
+  
+spark:
+  master:
+    resources:
+      limits:
+        cpu: 1
+        memory: 4G
+      requests:
+        cpu: 1
+        memory: 2Gi
+
+  worker:
+    resources:
+      limits:
+        cpu: 1
+        memory: 4G
+      requests:
+        cpu: 1
+        memory: 2Gi
+
+  persistence:
+    enabled: true
+    masterTmp:
+      name: spark-master-tmp
+      # storageClassName: gp2
+      storage:
+        size: 2Gi
+    workerTmp:
+      name: spark-worker-tmp
+      # storageClassName: gp2
+      storage:
+        size: 2Gi
+    masterMetadata:
+      name: spark-master-metadata
+      # storageClassName: gp2
+      storage:
+        size: 2Gi
+    workerMetadata:
+      name: spark-worker-metadata
+      # storageClassName: gp2
+      storage:
+        size: 2Gi
+
+superset:
+  resources:
+    limits:
+      cpu: 512m
+      memory: 1024Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+#obsrvtools
+command-api:
+  resources:
+    limits:
+      cpu: 0.1
+      memory: 128Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
+      
+dataset-api:
+  resources:
+    limits:
+      cpu: 0.5
+      memory: 1024Mi
+    requests:
+      cpu: 0.5
+      memory: 512Mi
+
+web-console:
+  resources:
+    limits:
+      cpu: 0.5
+      memory: 1024Mi
+    requests:
+      cpu: 0.5
+      memory: 512Mi
+
+#additional
+druid-exporter:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+velero:
+  resources:
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+    requests:
+      cpu: 0.1
+      memory: 128Mi
+  nodeAgent:
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1024Mi
+
+volume-autoscaler:
+  resources:
+    limits:
+      cpu: 0.05
+      memory: 100Mi
+    requests:
+      cpu: 0.05
+      memory: 100Mi

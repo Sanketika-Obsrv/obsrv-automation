@@ -1,0 +1,540 @@
+global:
+  image:
+    registry: &global_registry "sanketikahub"
+    dockerRegistrySecretName: &dockerSecretName ""
+    dockerConfigJson: |-
+      {"auths":{"DOCKER_REGISTRY_SERVER":{"username":"DOCKER_USER","password":"DOCKER_PASSWORD","email":"DOCKER_EMAIL","auth":"BASE64_ENCODED_USER_PASS"}}}
+
+
+imagePullSecrets: &imagePullSecrets
+  - name: *dockerSecretName
+
+# service:
+#   image: "service name"
+#   registry: "" # takes precedence over global registry
+#   digest: "" # takes precedence over tag if specified
+#   tag: "1.0.0-GA"
+
+images: &images
+  ## Obsrv Images
+  command-api: &command-api # registry: ""
+    repository: obsrv-command-service
+    tag: "1.1-RC"
+    digest: ""
+
+  # dataset-api: #open source
+  #   # registry: ""
+  #   repository: obsrv-api-service
+  #   tag: "1.0.5-GA"
+  #   digest: ""
+
+  dataset-api: &dataset-api # registry: ""
+    repository: obsrv-api-service
+    tag: "1.1-RC"
+    digest: ""
+
+  web-console: &web-console # registry: ""
+    repository: "sb-obsrv-web-console"
+    tag: "1.1-RC"
+    digest: ""
+
+  ## PIPELINE ENTERPRISE
+  unified-pipeline: &unified-pipeline # registry: ""
+    repository: unified-pipeline
+    tag: "1.1-RC"
+    digest: ""
+  
+  cache-indexer: &cache-indexer # registry: ""
+    repository: cache-indexer
+    tag: "1.1-RC"
+    digest: ""
+
+  ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
+  ## TODO: Add every component here
+  transformer-ext: &transforer-ext # registry: ""
+    repository: transformer-ext
+    tag: "1.0.6-GA"
+    digest: ""
+
+  master-data-processor: &master-data-processor # registry: ""
+    repository: master-data-processor
+    tag: "1.0.6-GA"
+    digest: ""
+
+  postgresql-backup: &postgresql-backup # registry: ""
+    repository: postgresql-backup
+    tag: "1.0.5-GA"
+    digest: ""
+
+  postgresql: &postgresql
+    registry: "docker.io"
+    repository: "bitnami/postgresql"
+    tag: "16.1.0-debian-11-r19"
+    digest: ""
+
+  postgresql-exporter: &postgresql-exporter
+    registry: "quay.io"
+    repository: "prometheuscommunity/postgres-exporter"
+    tag: "v0.11.1"
+    digest: ""
+
+  postgresql-migration: &postgresql-migration
+    registry: "docker.io"
+    repository: "flyway/flyway"
+    # tag: "10.1"
+    tag: "10.12.0" # updated tag - yet to be tested
+    digest: ""
+
+  volume-autoscaler: &volume-autoscaler
+    registry: "docker.io"
+    repository: devopsnirvana/kubernetes-volume-autoscaler
+    tag: 1.0.5
+    digest: ""
+
+  s3-exporter: &s3-exporter
+    registry: "docker.io"
+    repository: "ribbybibby/s3-exporter"
+    tag: "latest"
+    digest: ""
+
+  promtail: &promtail
+    registry: "docker.io"
+    repository: "grafana/promtail"
+    tag: "2.7.4"
+    digest: ""
+
+  redis: &redis
+    registry: "docker.io"
+    repository: "bitnami/redis"
+    tag: "7.0.11-debian-11-r15"
+    digest: ""
+    pullSecrets: 
+      - *dockerSecretName
+
+  # submit-ingestion: &submit-ingestion
+  #   registry: "docker.io"
+  #   repository: "ubuntu"
+  #   tag: "20.04"
+  #   digest: ""
+
+  system-rules-ingestor: &system-rules-ingestor # registry: ""
+    repository: "system-rules-ingestor"
+    tag: "1.0.3-GA"
+    digest: ""
+
+  loki: &loki
+    registry: "docker.io"
+    repository: "grafana/loki"
+    tag: "2.9.3"
+    digest: ""
+
+  loki-gateway: &loki-gateway
+    registry: "docker.io"
+    repository: "nginxinc/nginx-unprivileged"
+    tag: "1.24-alpine"
+    digest: ""
+
+  kubernetes-reflector: &kubernetes-reflector
+    registry: "docker.io"
+    repository: "emberstack/kubernetes-reflector"
+    tag: "7.1.262"
+    digest: ""
+
+  alertmanager: &alertmanager
+    registry: quay.io
+    repository: prometheus/alertmanager
+    tag: v0.25.0
+    digest: ""
+
+  prometheus-operator-webhook: &prometheus-operator-webhook
+    registry: registry.k8s.io
+    repository: ingress-nginx/kube-webhook-certgen
+    tag: v20221220-controller-v1.5.1-58-g787ea74b6
+    digest: ""
+
+  prometheus-operator: &prometheus-operator
+    registry: quay.io
+    repository: prometheus-operator/prometheus-operator
+    tag: "v0.65.1"
+    digest: ""
+
+  prometheus-config-reloader: &prometheus-config-reloader
+    registry: "quay.io"
+    repository: prometheus-operator/prometheus-config-reloader
+    # if not set appVersion field from Chart.yaml is used
+    tag: "v0.65.1"
+    digest: ""
+
+  prometheus: &prometheus
+    registry: "quay.io"
+    repository: prometheus/prometheus
+    tag: v2.44.0
+    digest: ""
+
+  grafana: &grafana
+    registry: docker.io
+    repository: grafana/grafana
+    tag: "9.5.2"
+    digest: ""
+
+  grafana-test-framework: &grafana-test-framework
+    registry: "docker.io"
+    repository: bats/bats
+    tag: "v1.4.1"
+    digest: ""
+
+  grafana-download-dashboards: &grafana-download-dashboards
+    registry: docker.io
+    repository: bats/bats
+    tag: "v1.4.1"
+    digest: ""
+
+  grafana-init-chown-data: &grafana-init-chown-data
+    registry: docker.io
+    repository: library/busybox
+    tag: "1.31.1"
+    digest: ""
+
+  grafana-side-car: &grafana-side-car
+    registry: quay.io
+    repository: kiwigrid/k8s-sidecar
+    tag: 1.24.3
+    digest: ""
+
+  kube-state-metrics: &kube-state-metrics
+    registry: "registry.k8s.io"
+    repository: "kube-state-metrics/kube-state-metrics"
+    tag: "v2.8.2"
+    digest: ""
+
+  prometheus-node-exporter: &prometheus-node-exporter
+    registry: quay.io
+    repository: prometheus/node-exporter
+    tag: "v1.5.0"
+    digest: ""
+
+  velero: &velero
+    registry: "docker.io"
+    repository: "velero/velero"
+    tag: "v1.10.2"
+  #  digest: "" If uncommented, this will take precendence as per velero chart design
+
+  superset: &superset # registry: ""
+    repository: "sanketikahub/superset"
+    tag: "3.0.2"
+    digest: ""
+
+  secor: &secor # registry: ""
+    repository: "secor"
+    tag: "1.0.1"
+    digest: ""
+
+  spark: &spark # registry: ""
+    repository: "sanketikahub/spark"
+    tag: "3.5.1-debian-12-r6"
+    digest: ""
+
+  cert_manager_cainjector: &cert_manager_cainjector
+    registry: quay.io/jetstack
+    repository: jetstack/cert-manager-cainjector
+    tag: v1
+    digest: ""
+
+  cert_manager_webhook: &cert_manager_webhook # registry: ""
+    repository: cert-manager-webhook
+    tag: v1.12.2
+    digest: ""
+
+  cert_manager_controller: &cert_manager_controller
+    registry: quay.io/jetstack
+    repository: cert-manager-controller
+    tag: v1
+    digest: ""
+
+  cert_manager_ctl: &cert_manager_ctl
+    registry: quay.io/jetstac
+    repository: cert-manager-ctl
+    tag: v1
+    digest: ""
+
+  kong: &kong # registry: ""
+    repository: kong
+    tag: 3.3
+    digest: ""
+
+  kafka: &kafka
+    # registry: ""
+    # repository: bitnami/kafka
+    tag: 3.6.0
+    digest: ""
+
+  # kafka-connector: &kafka-connector
+  #   # registry: ""
+  #   # repository: kafka-connector
+  #   tag: 1.0.5-GA
+  #   digest: ""
+
+  # kafka-exporter: &kafka-exporter
+  #   registry: "docker.io"
+  #   repository: danielqsj/kafka-exporter
+  #   tag: latest
+  #   digest: ""
+
+  kafka-message-exporter: &kafka-message-exporter # registry: ""
+    repository: kafka-message-exporter
+    tag: 1.0.3-GA
+    digest: ""
+
+  druid_operator: &druid_operator
+    registry: "docker.io/druidio"
+    repository: druidio/druid-operator
+    tag: "latest"
+    digest: ""
+
+  druid-raw-cluster: &druid-raw-cluster
+    registry: "docker.io/druidio"
+    repository: docker.io/apache
+    tag: "latest"
+    digest: ""
+
+  druid_exporter: &druid_exporter
+    registry: "quay.io"
+    repository: opstree/druid-exporter
+    tag: "v0.11"
+    digest: ""
+
+  keycloak: &keycloak
+    registry: "registry-1.docker.io"
+    repository: bitnami/keycloak
+    tag: "23.0.6-debian-11-r18"
+    digest: ""
+
+  hms: &hms
+    # registry: ""
+    repository: hms
+    tag: "1.0.5"
+    digest: ""
+
+  trino: &trino
+    registry: "registry-1.docker.io"
+    repository: trinodb/trino
+    tag: "432"
+    digest: ""
+
+  promitor-agent-scraper: &promitor-agent-scraper 
+    repository: containers.promitor.io/tomkerkhove/promitor-agent-scraper
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  
+  lakehouse-connector: &lakehouse-connector
+    repository: lakehouse-connector
+    tag: 1.0.8
+  
+  nlq-api: &nlq-api
+    repository: text2sql
+    tag: 0.1.0
+
+# Public charts like bitnami etc
+# Modyfying these charts involves many changes
+# Hence we are keeping their original desgin
+# It enables easy upgrade in future
+
+internal: &internal
+  command-api:
+    <<: *command-api
+    imagePullSecrets: *imagePullSecrets
+
+  web-console:
+    <<: *web-console
+    imagePullSecrets: *imagePullSecrets
+
+  dataset-api:
+    <<: *dataset-api
+    imagePullSecrets: *imagePullSecrets
+  
+  nlq-api:
+    <<: *nlq-api
+    imagePullSecrets: *imagePullSecrets
+
+  postgresql:
+    image:
+      <<: *postgresql
+
+  hms:
+    image:
+      <<: *hms
+
+  trino:
+    image:
+      <<: *trino
+
+  postgresql-backup:
+    <<: *postgresql-backup
+    imagePullSecrets: *imagePullSecrets
+
+  s3-exporter:
+    <<: *s3-exporter
+
+  velero:
+    image:
+      <<: *velero
+
+  redis-dedup:
+    image:
+      <<: *redis
+
+  redis-denorm:
+    image:
+      <<: *redis
+
+  loki:
+    singleBinary:
+      image:
+        <<: *loki
+    gateway:
+      image:
+        <<: *loki-gateway
+
+  kubernetes-reflector:
+    image:
+      <<: *kubernetes-reflector
+
+  kube-state-metrics:
+    image:
+      <<: *kube-state-metrics
+
+  kube-prometheus-stack:
+    prometheus:
+      prometheusSpec:
+        image:
+          <<: *prometheus
+    alertmanager:
+      alertmanagerSpec:
+        image:
+          <<: *alertmanager
+    prometheusOperator:
+      admissionWebhooks:
+        patch:
+          image:
+            <<: *prometheus-operator-webhook
+      image:
+        <<: *prometheus-operator
+      prometheusConfigReloader:
+        image:
+          <<: *prometheus-config-reloader
+
+  grafana:
+    image:
+      <<: *grafana
+    testFramework:
+      <<: *grafana-test-framework
+    downloadDashboardsImage:
+      <<: *grafana-download-dashboards
+    initChownData:
+      image:
+        <<: *grafana-init-chown-data
+    sidecar:
+      image:
+        <<: *grafana-side-car
+
+  prometheus-node-exporter:
+    image:
+      <<: *prometheus-node-exporter
+
+  keycloak:
+    image:
+      <<: *keycloak
+
+  druid_exporter:
+    image:
+      <<: *druid_exporter
+
+  druid-raw-cluster:
+    image:
+      <<: *druid-raw-cluster
+
+  druid_operator:
+    image:
+      <<: *druid_operator
+
+  kafka-message-exporter:
+    imagePullSecrets: *imagePullSecrets
+    <<: *kafka-message-exporter
+
+  # kafka-exporter:
+  #   image:
+  #     <<: *kafka-exporter
+
+  # kafka-connector:
+  #   image:
+  #     <<: *kafka-connector
+
+  kafka:
+    image:
+      <<: *kafka
+
+  kong:
+    image:
+      <<: *kong
+
+  cert_manager_ctl:
+    image:
+      <<: *cert_manager_ctl
+
+  cert_manager_controller:
+    image:
+      <<: *cert_manager_controller
+
+  cert_manager_webhook:
+    image:
+      <<: *cert_manager_webhook
+
+  cert_manager_cainjector:
+    image:
+      <<: *cert_manager_cainjector
+
+  spark:
+    image:
+      <<: *spark
+
+  secor:
+    <<: *secor
+
+  superset:
+    <<: *superset
+
+  flink:
+    imagePullSecrets: *imagePullSecrets
+    flink_jobs:
+      master-data-processor:
+        enabled: false
+        <<: *master-data-processor
+      unified-pipeline:
+        enabled: true
+        <<: *unified-pipeline
+      cache-indexer:
+        enabled: true
+        <<: *cache-indexer
+
+  cert-manager:
+    imagePullSecrets: *imagePullSecrets
+
+  system-rules-ingestor:
+    <<: *system-rules-ingestor
+    imagePullSecrets: *imagePullSecrets
+
+  volume-autoscaler:
+    <<: *volume-autoscaler
+  
+  promitor-agent-scraper: 
+    image:
+      <<: *promitor-agent-scraper
+    
+  lakehouse-connector:
+    image: 
+      <<: *lakehouse-connector
+      
+
+## Sourcing internal as root element,
+## should need arise
+<<: *internal

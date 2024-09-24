@@ -1,0 +1,39 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.cert_issuer_name }}
+  labels:
+{{ include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) | nindent 4 }}
+spec:
+  acme:
+    email: {{ .Values.domain_admin_email }}
+    server: {{.Values.letsencrypt_server_url }}
+    privateKeySecretRef:
+      name: {{ .Values.cert_issuer_name }}
+    solvers:
+    - http01:
+        ingress:
+          ingressClassName: {{ .Values.ingress_class_name }}
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $.Values.cert_name }}
+  namespace: {{ include "base.namespace" . }}
+  labels:
+{{ include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) | nindent 4 }}
+spec:
+  secretName: {{ $.Values.cert_name }}
+  commonName: {{ default $.Values.global.domain $.Values.domain }}
+  dnsNames:
+    - {{ default $.Values.global.domain $.Values.domain }}
+  issuerRef:
+    name: {{ $.Values.cert_issuer_name }}
+    kind: {{ $.Values.cert_issuer_type }}
+  secretTemplate:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "{{ .Values.reflection_namespaces }}"
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"

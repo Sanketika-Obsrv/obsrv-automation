@@ -1,0 +1,130 @@
+nameOverride: "s3-exporter"
+fullnameOverride: "s3-exporter"
+
+namespace: s3-exporter
+
+replicaCount: 1
+
+global:
+  image:
+    registry: ""
+
+registry: "docker.io"
+repository: "ribbybibby/s3-exporter"
+tag: "latest"
+digest: ""
+
+s3_region: "us-east-2"
+
+imagePullPolicy: IfNotPresent
+imagePullSecrets: []
+
+commonLabels:
+  system.monitoring: "true"
+
+commonAnnotations: {}
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # runAsNonRoot: true
+  # runAsUser: 1001
+  # fsGroup: 1001
+
+securityContext: {}
+  # readOnlyRootFilesystem: false
+  # capabilities:
+  #   drop:
+  #   - ALL
+
+# This block is an interface for k8s service spec.
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 9340
+      targetPort: 9340
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - paths:
+      - /
+      # host: chart-example.local
+
+resources:
+  limits:
+    cpu: 50m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+livenessProbe: {}
+  # httpGet:
+  #   path: "/healthz"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+readinessProbe: {}
+  # httpGet:
+  #   path: "/ready"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+configmap:
+  enabled: false
+  mountPath: /config
+
+serviceAccount:
+  name: ""
+  create: true
+  annotations: {}
+
+serviceMonitor:
+  enabled: false
+  selectorLabels:
+    release: monitoring
+  endpoints: []
+  # - port: http # the name of the port in your service, assuming the primary service port is named 'http' in this example.
+  #   path: /metrics
+  #   interval: 30s
+  #   scrapeTimeout: 10s
+  #   honorLabels: true
+
+# Example values.yaml structure
+initContainers: {}
+  # - name: init-myservice
+  #   image: busybox:1.28
+  #   command: ['sh', '-c', "until nslookup kubernetes.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
+
+sidecars: {}
+  # - name: log-reader # Sidecar container
+  #   image: busybox # Use another busybox image
+  #   command: ["/bin/sh"] # Override the default command
+  #   args: ["-c", "tail -f /var/log/app.log"] # Run a shell script that tails the log file

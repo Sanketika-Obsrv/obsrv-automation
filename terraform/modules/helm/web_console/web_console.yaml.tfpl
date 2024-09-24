@@ -1,0 +1,47 @@
+namespace: ${web_console_namespace}
+image: 
+  repository: ${web_console_image_repository}
+  tag: ${web_console_image_tag}
+  imagePullSecrets: ${docker_registry_secret_name}
+ENV: ${env}
+PORT: ${port}
+APP_NAME: ${app_name}
+PROMETHEUS_URL: ${prometheus_url}
+CONFIG_API_URL: ${config_api_url}
+OBS_API_URL: ${obs_api_url}
+SYSTEM_API_URL: ${system_api_url}
+ALERT_MANAGER_URL: ${alert_manager_url}
+GRAFANA_URL: ${grafana_url}
+SUPERSET_URL: ${superset_url}
+REACT_APP_GRAFANA_URL: ${react_app_grafana_url}
+REACT_APP_SUPERSET_URL: ${react_app_superset_url}
+SESSION_SECRET: ${session_secret}
+POSTGRES_CONNECTION_STRING: ${postgres_connection_string}
+OAUTH_WEB_CONSOLE_URL: ${oauth_web_console_url}
+AUTH_KEYCLOAK_REALM: ${auth_keycloak_realm}
+AUTH_KEYCLOAK_PUBLIC_CLIENT: ${auth_keycloak_public_client}
+AUTH_KEYCLOAK_SSL_REQUIRED: ${auth_keycloak_ssl_required}
+AUTH_KEYCLOAK_CLIENT_ID: ${auth_keycloak_client_id}
+AUTH_KEYCLOAK_CLIENT_SECRET: ${auth_keycloak_client_secret}
+AUTH_KEYCLOAK_SERVER_URL: ${auth_keycloak_server_url}
+AUTH_GOOGLE_CLIENT_ID: ${auth_google_client_id}
+AUTH_GOOGLE_CLIENT_SECRET: ${auth_google_client_secret}
+HTTPS: ${https}
+REACT_APP_VERSION: ${react_app_version}
+GENERATE_SOURCEMAP: ${generate_sourcemap}
+AUTH_AD_URL: ${auth_ad_url}
+AUTH_AD_BASE_DN: ${auth_ad_base_dn}
+AUTH_AD_USER_NAME: ${auth_ad_user_name}
+AUTH_AD_PASSWORD: ${auth_ad_password}
+REACT_APP_AUTHENTICATION_ALLOWED_TYPES: ${react_app_authentication_allowed_types}
+AUTH_OIDC_ISSUER: ${auth_oidc_issuer}
+AUTH_OIDC_AUTHRIZATION_URL: ${auth_oidc_authrization_url}
+AUTH_OIDC_TOKEN_URL: ${auth_oidc_token_url}
+AUTH_OIDC_USER_INFO_URL: ${auth_oidc_user_info_url}
+AUTH_OIDC_CLIENT_ID: ${auth_oidc_client_id}
+AUTH_OIDC_CLIENT_SECRET: ${auth_oidc_client_secret}
+AUTH_TOKEN: ${auth_token}
+serviceAccount:
+  name: ${service_account_name}
+grafana_secret_allowed_namespaces: ${grafana_secret_allowed_namespaces}
+grafana_secret_name: ${grafana_secret_name}

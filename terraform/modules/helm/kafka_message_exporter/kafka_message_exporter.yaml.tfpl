@@ -1,0 +1,20 @@
+image:
+  repository: ${kafka_message_exporter_image_repository}
+  pullPolicy: IfNotPresent
+  imagePullSecrets: ${docker_registry_secret_name}
+  tag: ${kafka_message_exporter_image_tag}
+
+
+config:
+  kafka:
+    spark:
+      host: ${kafka_host}
+      topic: ${env}.${spark_metrics_topic}
+      schema: "telemetry"
+    obsrv:
+      host: ${kafka_host}
+      topic: ${env}.stats
+      schema: "obsrv_meta"
+
+serviceMonitorLabels:
+  release: monitoring

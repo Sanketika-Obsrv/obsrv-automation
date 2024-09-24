@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+  namespace: {{ .Release.namespace }}
+  labels:
+    app: flink
+    system.processing: "true"
+data:
+  base-config: |+
+{{ .Values.base_config | indent 4 }}
+{{- $name := .Release.Name }}
+{{ index .Values $name | toYaml | indent 2 }}
+  log4j_console_properties: |+
+{{ .Values.log4j_console_properties | indent 4 }}
+  core-site.xml: |+
+    <configuration>
+    {{- range $key, $value := .Values.hadoop_core_site }}
+      <property>
+        <name>{{ $key }}</name>
+        <value>{{ $value }}</value>
+      </property>
+    {{- end }}
+    </configuration>

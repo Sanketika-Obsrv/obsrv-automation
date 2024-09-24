@@ -1,0 +1,166 @@
+# Azure Container Details
+azure_account: "{{.Values.global.azure_storage_account_name}}"
+azure_secret: "{{ .Values.global.azure_storage_account_key }}"
+azure_container_name: "{{ .Values.global.container }}"
+
+
+s3_access_key: ""
+s3_secret_id: ""
+s3_region: ""
+s3_endpoint: ""
+s3_path_style_access: false
+s3_bucket_name: "telemetry-data-store"
+timezone: "UTC"
+jvm_memory: "1024m"
+
+gcp_bucket_name: "telemetry-data-store"
+
+serviceAccount:
+  create: true
+  name: secor-sa
+  annotations: {}
+
+storage_type: "s3"
+storageClass: ""
+
+kafka: &kafka
+  host: "{{ .Values.global.kafka.host }}"
+  port: "{{.Values.global.kafka.port}}"
+
+zookeeper: &zookeeper
+  host: "{{.Values.global.zookeeper.host}}"
+  port: "{{.Values.global.zookeeper.port}}"
+
+global:
+  kafka: *kafka
+  zookeeper: *zookeeper
+  env: "dev"
+
+base_path: "telemetry-data"
+
+base_config: &base_config
+  enabled: true
+  replicas: 1
+  threads: 2
+  timestamp_key: "obsrv_meta.syncts"
+  fallback_timestamp_key: "ets"
+  kafka_broker_host: "{{.Values.global.kafka.host}}"
+  zookeeper_quorum: "{{.Values.global.zookeeper.host}}:{{.Values.global.zookeeper.port}}"
+  max_file_size: "100000000"
+  max_file_age: "900"
+  partition_prefix_enabled: "false"
+  partition_prefix_key: ""
+  partition_prefix_mapping: "{}"
+  message_channel_identifier: "dataset"
+  output_file_pattern: "{partition}-{currentTimestamp}.json"
+  message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+  storage:
+    size: 1Gi
+  requests:
+    cpu: 128m
+    memory: 512Mi
+  limits:
+    cpu: 128m
+    memory: 512Mi
+  lag_threshold_warning: 50000
+  lag_threshold_critical: 100000
+
+secor_jobs:
+  ingest-backup:
+    <<: *base_config
+    topic: "{{.Values.global.env}}.ingest"
+    service_name: "ingest-backup"
+    consumer_group: "{{.Values.global.env}}.ingest"
+    base_path: "{{ .Values.base_path }}/ingest"
+    timestamp_key: "syncts"
+  raw-backup:
+    <<: *base_config
+    enabled: false
+    topic: "{{.Values.global.env}}.raw"
+    service_name: "raw-backup"
+    consumer_group: "{{.Values.global.env}}.raw"
+    base_path: "{{ .Values.base_path }}/raw"
+    timestamp_key: "obsrv_meta.syncts"
+  unique-backup:
+    <<: *base_config
+    enabled: false
+    topic: "{{.Values.global.env}}.unique"
+    service_name: "unique-backup"
+    consumer_group: "{{.Values.global.env}}.unique"
+    base_path: "{{ .Values.base_path }}/unique"
+    timestamp_key: "obsrv_meta.syncts"
+  denorm-backup:
+    <<: *base_config
+    enabled: false
+    topic: "{{.Values.global.env}}.denorm"
+    service_name: "denorm-backup"
+    consumer_group: "{{.Values.global.env}}.denorm"
+    base_path: "{{ .Values.base_path }}/denorm"
+    timestamp_key: "obsrv_meta.syncts"
+  transform-backup:
+    <<: *base_config
+    enabled: false
+    topic: "{{.Values.global.env}}.transform"
+    service_name: "transform-backup"
+    consumer_group: "{{.Values.global.env}}.transform"
+    base_path: "{{ .Values.base_path }}/transform"
+    timestamp_key: "obsrv_meta.syncts"
+  failed-backup:
+    <<: *base_config
+    topic: "{{.Values.global.env}}.failed"
+    service_name: "failed-backup"
+    consumer_group: "{{.Values.global.env}}.failed"
+    base_path: "{{ .Values.base_path }}/failed"
+    timestamp_key: "obsrv_meta.syncts"
+  system-events-backup:
+    <<: *base_config
+    topic: "{{.Values.global.env}}.system.events"
+    service_name: "system-events-backup"
+    consumer_group: "{{.Values.global.env}}.system-events"
+    base_path: "{{ .Values.base_path }}/system-events"
+    timestamp_key: "obsrv_meta.syncts"
+  system-telemetry-backup:
+    <<: *base_config
+    topic: "{{.Values.global.env}}.system-telemetry"
+    service_name: "system-telemetry-backup"
+    consumer_group: "{{.Values.global.env}}.system-telemetry-events"
+    base_path: "{{ .Values.base_path }}/system-telemetry"
+    timestamp_key: "ets"
+  masterdata-ingest-backup:
+    <<: *base_config
+    topic: "{{.Values.global.env}}.masterdata.ingest"
+    service_name: "masterdata-ingest-backup"
+    consumer_group: "{{.Values.global.env}}.masterdata-ingest"
+    base_path: "{{ .Values.base_path }}/masterdata-ingest"
+    timestamp_key: "syncts"
+
+namespace: "secor"
+
+repository: secor
+tag: 1.0.0-GA
+imagePullPolicy: IfNotPresent
+imagePullSecrets: []
+
+exporter:
+  image:
+    repository: prom/statsd-exporter
+    tag: latest
+    pullPolicy: IfNotPresent
+
+prometheus_rule_selector_app: prometheus-operator
+prometheus_rule_selector_release: prometheus-operator
+
+# If you enable this, secor lag alert rules will be created in the flink cluster.
+# In our case the consumer group lag metrics available in core prometheus.
+# So we need to create the secor lag alert rule in core prometheus.
+# By adding this condition we are avoiding creating the secor lag alert rule in flink cluster.
+alertrules:
+  enabled: false
+
+# This condition is whether to create the secor lag alert rule or not.
+secor_alertrule:
+  enabled: false
+
+
+commonAnnotations:
+    "helm.sh/hook-weight": "-5"

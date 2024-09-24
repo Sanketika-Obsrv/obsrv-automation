@@ -1,0 +1,11 @@
+image:
+  repository: ${s3_exporter_image_repository}
+  pullPolicy: IfNotPresent
+  tag: ${s3_exporter_image_tag}
+
+serviceAccount:
+  annotations:
+    ${s3_exporter_sa_annotations}
+  name: ${s3_exporter_service_account_name}
+
+s3_region: ${s3_region}

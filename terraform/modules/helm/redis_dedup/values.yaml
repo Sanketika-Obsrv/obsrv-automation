@@ -1,0 +1,122 @@
+commonLabels:
+  system: storage
+  system.processing: 'true'
+image:
+  registry: docker.io
+  repository: bitnami/redis
+  tag: 7.0.5-debian-11-r15
+  digest: ""
+  pullPolicy: IfNotPresent
+
+commonConfiguration: |-
+  # Enable RDB persistence
+  save 300 100
+auth:
+  enabled: false
+
+master:
+  count: 1
+  podLabels:
+      system: storage
+  ## @param master.configuration Configuration for Redis&reg; master nodes
+  ## ref: https://redis.io/topics/config
+  ##
+  configuration: ""
+  disableCommands:
+    - FLUSHALL
+  ## @param master.extraFlags Array with additional command line flags for Redis&reg; master
+  ## e.g:
+  extraFlags:
+   - "--maxmemory 512mb"
+   - "--maxmemory-policy volatile-ttl"
+  containerPorts:
+    redis: 6379
+  resources:
+    limits:
+      cpu: 0.5
+      memory: 512Mi
+    requests:
+      cpu: 0.5
+      memory: 512Mi
+  persistence:
+    enabled: true
+    labels:
+      system: storage
+    path: /data
+    subPath: ""
+    subPathExpr: ""
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+  serviceAccount:
+    create: true
+    name: redis
+    annotations:
+      serviceAccountName: default
+
+replica:
+  replicaCount: 1
+  podLabels:
+      system: storage
+  ## @param replica.configuration Configuration for Redis&reg; replicas nodes
+  ## ref: https://redis.io/topics/config
+  ##
+  configuration: ""
+  disableCommands:
+    - FLUSHALL
+  ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
+  ## e.g:
+  extraFlags:
+   - "--maxmemory 512Mi"
+   - "--maxmemory-policy volatile-ttl"
+  ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
+  ##
+  containerPorts:
+    redis: 6379
+  persistence:
+    enabled: true
+    labels:
+      system: storage
+    path: /data
+    subPath: ""
+    subPathExpr: ""
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+
+  sidecars:
+    - name: redis-backup
+      image: sanketikahub/redis-backup:1.0.4-GA
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      env:
+        - name: REDIS_BACKUP_CRON_SCHEDULE
+          value: "00 00 * * *"
+        - name: CLOUD_SERVICE
+          value: s3
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          value: ""
+        - name: AZURE_STORAGE_ACCOUNT_KEY
+          value: ""
+        - name: AZURE_BACKUP_BUCKET
+          value: ""
+        - name: S3_BACKUP_BUCKET
+          value: "" # Update the name of S3 the bucket
+        - name: GCS_BACKUP_BUCKET
+          value: "" # Update the name of GCS bucket
+        - name: REDIS_RDB_FILE_PATH
+          value: /data
+        - name: REDIS_REPLICATION_MODE
+          value: master
+        - name: BACKUP_PREFIX
+          value: dedup-redis
+      resources:
+        limits:
+          cpu: 0.2
+          memory: 100Mi
+  serviceAccount:
+    create: true

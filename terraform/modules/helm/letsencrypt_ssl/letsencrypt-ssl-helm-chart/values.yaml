@@ -1,0 +1,15 @@
+cert_issuer_name: "letsencrypt-prod"
+letsencrypt_server_url: "https://acme-v02.api.letsencrypt.org/directory"
+ingress_class_name: "kong"
+cert_name: "kong-ingress-ssl-cert"
+cert_issuer_type: "ClusterIssuer"
+default_namespace: "superset"
+cert_namespaces:
+ - "web-console"
+ - "monitoring"
+ - "dataset-api"
+domain: "kong.example"
+domain_admin_email: "user@example.com"
+keycloak:
+  enabled: true
+  namespace: keycloak

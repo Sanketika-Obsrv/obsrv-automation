@@ -1,0 +1,475 @@
+postgres:
+  adminUser: ${pg_admin_username}
+  adminPassword: ${pg_admin_password}
+  db_host: ${postgresql_service_name}
+  db_port: '5432'
+  superset:
+    db_name: superset
+    db_username: superset
+    db_password: '${pg_superset_user_password}'
+
+image:
+  repository: sanketikahub/superset
+  tag: ${superset_image_tag}
+  pullPolicy: IfNotPresent
+
+redis_url: 'redis://${redis_release_name}-master.${redis_namespace}.svc.cluster.local:6379/3'
+
+web_console_base_url: '${web_console_base_url}'
+superset_base_url: '${superset_base_url}'
+keycloak_base_url: '${keycloak_base_url}'
+redirection_auth: '${redirection_auth_path}'
+
+extraSecrets:
+  custom_sso_security_manager.py: |
+    import logging
+    import json
+    from superset.security import SupersetSecurityManager
+
+    class CustomSsoSecurityManager(SupersetSecurityManager):
+
+      def oauth_user_info(self, provider, response=None):
+        print("Oauth2 provider:", provider)
+        if provider == 'obsrv':
+          # As example, this line request a GET to base_url + '/' + userDetails with Bearer  Authentication,
+          # and expects that authorization server checks the token, and response with user details
+          response = self.appbuilder.sm.oauth_remotes[provider].get('console/api/oauth/v1/userinfo').__dict__
+          content = response['_content'].decode('utf-8')
+          data = json.loads(content)
+          print("Oauth2 User Data:", data)
+          id = data['id']
+          name = data['name']
+          email = data['email']
+          return { 'name' :name, 'email' : email, 'id' : id, 'username' : name, 'first_name':'', 'last_name':''}
+        if provider == 'keycloak':
+          # Get the user info using the access token
+          res = self.appbuilder.sm.oauth_remotes[provider].get('realms/master/protocol/openid-connect/userinfo')
+          user = json.loads(res._content)
+          return {
+            'username' : user['preferred_username'],
+            'name' : user['name'] if 'name' in user else user['preferred_username'],
+            'email' : user['email'],
+            'first_name': user['given_name'] if 'given_name' in user else user['preferred_username'],
+            'last_name': user['family_name'] if 'family_name' in user else user['preferred_username'],
+            'is_active': True,
+          }
+
+extraConfigs:
+  import_datasources.yaml: |
+    databases:
+    - allow_csv_upload: true
+      allow_ctas: true
+      allow_cvas: true
+      database_name: obsrv
+      sqlalchemy_uri: druid://dataset-api-service.${dataset_api_namespace}.svc.cluster.local:3000/v1/sql
+      uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
+      version: 1.0.0
+      tables:
+      - table_name: system-events
+        main_dttm_col: __time
+        description: null
+        default_endpoint: null
+        offset: 0
+        cache_timeout: null
+        schema: druid
+        sql: null
+        params: null
+        template_params: null
+        filter_select_enabled: false
+        fetch_values_predicate: null
+        extra: null
+        uuid: 62edf6c5-87c8-4b03-8a0a-f67613d3e24d
+        metrics:
+        - metric_name: total_processing_time
+          verbose_name: Total Processing Time
+          metric_type: double
+          expression: SUM(total_processing_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: latency_time
+          verbose_name: Latency Time
+          metric_type: double
+          expression: SUM(latency_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: processing_time
+          verbose_name: Processing Time
+          metric_type: double
+          expression: SUM(processing_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: extractor_time
+          verbose_name: Extractor Time
+          metric_type: double
+          expression: SUM(extractor_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: validator_time
+          verbose_name: Validator Time
+          metric_type: double
+          expression: SUM(validator_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: dedup_time
+          verbose_name: Deduplication Time
+          metric_type: double
+          expression: SUM(dedup_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: denorm_time
+          verbose_name: Denormalization Time
+          metric_type: double
+          expression: SUM(denorm_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: transformer_time
+          verbose_name: Transformer Time
+          metric_type: double
+          expression: SUM(transformer_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: error_count
+          verbose_name: Error Count
+          metric_type: long
+          expression: SUM(error_count)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: count
+          verbose_name: COUNT(*)
+          metric_type: count
+          expression: COUNT(*)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: count
+          verbose_name: COUNT(*)
+          metric_type: count
+          expression: COUNT(*)
+          description: Count
+          d3format: null
+          warning_text: null
+        columns:
+        - column_name: __time
+          verbose_name: Event Time
+          is_dttm: true
+          is_active: true
+          type: LONG
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Event Time
+          python_date_format: null
+          extra: null
+        - column_name: event_type
+          verbose_name: Event Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Event Type
+          python_date_format: null
+          extra: null
+        - column_name: ctx_module
+          verbose_name: Context Module
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Module
+          python_date_format: null
+          extra: null
+        - column_name: ctx_pdata_id
+          verbose_name: Context Pdata Id
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Pdata Id
+          python_date_format: null
+          extra: null
+        - column_name: ctx_pdata_type
+          verbose_name: Context Pdata Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Pdata Type
+          python_date_format: null
+          extra: null
+        - column_name: ctx_pdata_pid
+          verbose_name: Context Pdata Pid
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Pdata Pid
+          python_date_format: null
+          extra: null
+        - column_name: error_pdata_id
+          verbose_name: Error Pdata Id
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Pdata Id
+          python_date_format: null
+          extra: null
+        - column_name: error_pdata_status
+          verbose_name: Error Pdata Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Pdata Status
+          python_date_format: null
+          extra: null
+        - column_name: error_type
+          verbose_name: Error Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Type
+          python_date_format: null
+          extra: null
+        - column_name: error_code
+          verbose_name: Error Code
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Code
+          python_date_format: null
+          extra: null
+        - column_name: error_message
+          verbose_name: Error Message
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Message
+          python_date_format: null
+          extra: null
+        - column_name: error_level
+          verbose_name: Error Level
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Level
+          python_date_format: null
+          extra: null
+        - column_name: ctx_dataset
+          verbose_name: Context Dataset
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Dataset
+          python_date_format: null
+          extra: null
+        - column_name: ctx_dataset_type
+          verbose_name: Context Dataset Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Dataset Type
+          python_date_format: null
+          extra: null
+        - column_name: extractor_status
+          verbose_name: Extractor Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Extractor Status
+          python_date_format: null
+          extra: null
+        - column_name: validator_status
+          verbose_name: Validator Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Validator Status
+          python_date_format: null
+          extra: null
+        - column_name: dedup_status
+          verbose_name: Deduplication Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Deduplication Status
+          python_date_format: null
+          extra: null
+        - column_name: denorm_status
+          verbose_name: Denormalization Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Denormalization Status
+          python_date_format: null
+          extra: null
+        - column_name: transformer_status
+          verbose_name: Transformer Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Transformer Status
+          python_date_format: null
+          extra: null
+        version: 1.0.0
+        database_uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
+
+# dashboardConfig: "dashboard_export_20240102T092557.zip"
+
+configOverrides:
+  enable_feature_flags: |
+    FEATURE_FLAGS = {
+      "DASHBOARD_NATIVE_FILTERS": True,
+      "DASHBOARD_CROSS_FILTERS": True,
+      "DASHBOARD_NATIVE_FILTERS_SET": True,
+      "ENABLE_TEMPLATE_PROCESSING": True,
+    }
+
+  data_cache_config: |
+    DATA_CACHE_CONFIG = {
+      'CACHE_TYPE': 'redis',
+      'CACHE_DEFAULT_TIMEOUT': 600,
+      'CACHE_KEY_PREFIX': 'superset_',
+      'CACHE_REDIS_URL': '{{ tpl .Values.redis_url . }}'
+    }
+
+  sql_alchemy_config: |
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{{ tpl .Values.postgres.superset.db_username . }}:{{ tpl .Values.postgres.superset.db_password . }}@{{ tpl .Values.postgres.db_host . }}/{{ tpl .Values.postgres.superset.db_name . }}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SECRET_KEY = '4/SLqE9vfrZsrF4YTVFVfmZDiW4Q0DKh0dHBoqHWC3Lhpgktph/jfkUI'
+
+  enable_oauth: |
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+
+    # Set the authentication type to OAuth
+    AUTH_TYPE = AUTH_OAUTH
+
+    OAUTH_PROVIDERS = [
+      {
+        'name':'obsrv',
+        'token_key':'access_token', # Name of the token in the response of access_token_url
+        'icon':'fa-address-card',   # Icon for the provider
+        'remote_app': {
+            'client_id':'${superset_oauth_clientid}',  # Client Id (Identify Superset application)
+            'client_secret':'${superset_oauth_client_secret}', # Secret for this Client Id (Identify Superset application)
+            'client_kwargs':{
+                'scope': 'read'               # Scope for the Authorization
+            },
+            'access_token_method':'POST',    # HTTP Method to call access_token_url
+            'access_token_params':{        # Additional parameters for calls to access_token_url
+                'client_id':'${superset_oauth_clientid}',
+                'client_secret':'${superset_oauth_client_secret}'
+            },
+            'access_token_headers':{    # Additional headers for calls to access_token_url
+                'Authorization': 'Basic ${superset_oauth_token}'
+            },
+            'api_base_url':'{{ tpl .Values.web_console_base_url . }}',
+            'access_token_url':'{{ tpl .Values.web_console_base_url . }}/console/api/oauth/v1/token',
+            'authorize_url':'{{ tpl .Values.web_console_base_url . }}/console/api/oauth/v1/authorize'
+        }
+      },
+      {  
+        'name':'keycloak',
+        'token_key':'access_token', # Name of the token in the response of access_token_url
+        'icon':'fa-address-card',   # Icon for the provider
+        'remote_app': {
+            'api_base_url': '{{ tpl .Values.keycloak_base_url . }}/auth',
+            'client_id': 'obsrv',  # Client Id (Identify Superset application)
+            'client_secret':'${keycloak_oauth_client_secret}', # Secret for this Client Id (Identify Superset application)
+            'client_kwargs':{
+                'scope': 'profile openid'               # Scope for the Authorization
+            },
+            'jwks_uri': '{{ tpl .Values.keycloak_base_url . }}/realms/master/protocol/openid-connect/certs',
+            # 'request_token_url':None,
+            'access_token_url':  '{{ tpl .Values.keycloak_base_url . }}/realms/master/protocol/openid-connect/token',
+            'authorize_url':  '{{ tpl .Values.keycloak_base_url . }}/realms/master/protocol/openid-connect/auth',
+        }
+      }
+    ]
+    # Will allow user self registration, allowing to create Flask users from Authorized User
+    AUTH_USER_REGISTRATION = True
+    AUTH_OAUTH_REDIRECT_URI='{{ tpl .Values.superset_base_url . }}/oauth-authorized/{{ tpl .Values.redirection_auth . }}'
+    # The default user self registration role
+    AUTH_USER_REGISTRATION_ROLE = "Admin"
+    ENABLE_PROXY_FIX = True
+
+    from custom_sso_security_manager import CustomSsoSecurityManager
+    CUSTOM_SECURITY_MANAGER = CustomSsoSecurityManager
+
+service:
+  type: ${service_type}

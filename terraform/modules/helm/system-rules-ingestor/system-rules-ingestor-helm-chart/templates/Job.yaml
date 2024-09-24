@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ttlSecondsAfterFinished: 1000 # in seconds
+  template:
+    spec:
+      containers:
+      - image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.image_tag }}"
+        name: {{ .Chart.Name }}
+        imagePullPolicy: Always
+        env:
+        - name: DATASET_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Chart.Name }}-config
+              key: datasetServiceUrl
+        - name: DELAY
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Chart.Name }}-config
+              key: delay
+        - name: FOLDER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Chart.Name }}-config
+              key: folder      
+        envFrom:
+        - configMapRef:
+            name: {{ .Chart.Name }}-config
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/app/alerting/rules.yaml
+          subPath: rules
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Chart.Name }}-config
+        resources: {}
+      restartPolicy: Never

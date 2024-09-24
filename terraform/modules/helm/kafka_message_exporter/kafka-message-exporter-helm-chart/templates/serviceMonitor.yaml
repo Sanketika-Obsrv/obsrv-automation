@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+{{ include "kafka-message-exporter.labels" . | indent 2 }}
+{{- if .Values.serviceMonitorLabels }}
+  labels:
+    {{ toYaml .Values.serviceMonitorLabels | indent 4 }}
+  {{- end }}
+  system.monitoring: "true"
+  name: {{ include "kafka-message-exporter.fullname" . }}
+spec:
+  endpoints:
+  - port: http
+    honorLabels: true
+    relabelings:
+    - action: labeldrop
+      regex: ^pod$
+  selector:
+    matchLabels:
+      {{- include "kafka-message-exporter.labels" . | nindent 6 }}

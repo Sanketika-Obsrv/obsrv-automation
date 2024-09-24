@@ -1,0 +1,9 @@
+serviceMonitor:
+  enabled: true
+  namespace: ${postgresql_exporter_namespace}
+  interval: 30s
+  labels:
+    release: monitoring
+    system.monitoring: 'true'
+podLabels:
+  system.monitoring: 'true'    

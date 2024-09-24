@@ -1,0 +1,4 @@
+namespace: ""
+dockerconfigjson: ""
+allowed_namespaces: ""
+docker_registry_secret_name: ""

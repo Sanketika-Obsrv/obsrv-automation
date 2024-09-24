@@ -1,0 +1,5 @@
+backoff
+dataclasses-json
+psycopg2-binary
+requests
+pyyaml

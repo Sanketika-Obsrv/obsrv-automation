@@ -1,0 +1,17 @@
+apiVersion: v2
+name: secor
+version: 0.1.0
+appVersion: 0.29.0
+description: Secor is a service implementing Kafka log persistence
+keywords:
+- kafka
+- secor
+maintainers:
+- name: secor-maintainers
+sources:
+- https://github.com/pinterest/secor
+home: https://github.com/pinterest/secor
+
+# dependencies:
+#   - name: alertrules
+#     condition: alertrules.enabled

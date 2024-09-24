@@ -1,0 +1,281 @@
+global:
+  cloud_storage_provider: &cloud_storage_provider "aws"
+  cloud_store_provider: &cloud_store_provider "s3"
+  cloud_storage_region: &cloud_storage_region "ap-south-1"
+  dataset_api_container: ""
+  postgresql_backup_cloud_bucket: &backups_bucket "backups-obsrv-test-905418313089"
+  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-test-905418313089"
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-test-905418313089"
+  cloud_storage_bucket: &cloud_storage_bucket "obsrv-test-905418313089"
+
+  spark_cloud_bucket: ""
+  storage_class_name: &storage_class_name "gp2"
+  spark_service_account_arn: ""
+  secor_backup_bucket: &secor_backup_bucket "telemetry_data_store"
+  checkpoint_bucket: &checkpoint_bucket "s3://checkpoint-obsrv-test-905418313089"
+  deep_store_type: &deep_store_type "s3"
+  s3_access_key: &s3-access-key ""
+  s3_secret_key: &s3-secret-access-key ""
+kong_annotations: &kong_annotations 
+  service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+  service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "eipalloc-0aa23e2d7c6e7d1f0"
+  service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-07f8d7579cb8fe885"
+
+service_accounts:
+  enabled: &create_sa true
+  secor: &secor_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-secor-sa-iam-role"
+  dataset_api: &dataset_api_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-dataset-api-sa-iam-role"
+  druid_raw: &druid_raw_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-druid-raw-sa-iam-role"
+  flink: &flink_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-flink-sa-iam-role"
+  postgresql_backup: &postgresql_backup_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-postgresql-backup-sa-iam-role"
+  redis_backup: &redis_backup_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-redis-backup-sa-iam-role"
+  s3_exporter: &s3_exporter_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-s3-exporter-sa-iam-role"
+  spark: &spark_sa_annotation
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-spark-sa-iam-role"
+
+redis-service-account: &redis-service-account
+  serviceAccount:
+    create: *create_sa
+    name: redis-backup-sa
+    annotations:
+      <<: *redis_backup_sa_annotation
+
+redis_dedup_backup_sidecar: &redis_dedup_backup_sidecar
+  master:
+    sidecars:
+      - name: redis-backup
+        image: sanketikahub/redis-backup:1.0.6-GA
+        volumeMounts:
+          - mountPath: "/data"
+            name: redis-data
+        env:
+          - name: REDIS_BACKUP_CRON_SCHEDULE
+            value: "00 00 * * *"
+          - name: CLOUD_SERVICE
+            value: *cloud_store_provider
+          - name: S3_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
+          - name: GCS_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
+          - name: REDIS_RDB_FILE_PATH
+            value: "/data"
+          - name: REDIS_REPLICATION_MODE
+            value: master
+          - name: AZURE_STORAGE_ACCOUNT_NAME
+            value: "name"
+          - name: AZURE_STORAGE_ACCOUNT_KEY
+            value: "key"
+          - name: AZURE_BACKUP_BUCKET
+            value: "backup"
+          - name: BACKUP_PREFIX
+            value: dedup-redis
+        resources:
+          limits:
+            cpu: 0.2
+            memory: 100Mi
+    <<: *redis-service-account
+
+redis_denorm_backup_sidecar: &redis_denorm_backup_sidecar
+  master:
+    sidecars:
+      - name: redis-backup
+        image: sanketikahub/redis-backup:1.0.6-GA
+        volumeMounts:
+          - mountPath: "/data"
+            name: redis-data
+        env:
+          - name: REDIS_BACKUP_CRON_SCHEDULE
+            value: "00 00 * * *"
+          - name: CLOUD_SERVICE
+            value: *cloud_store_provider
+          - name: S3_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
+          - name: GCS_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
+          - name: REDIS_RDB_FILE_PATH
+            value: "/data"
+          - name: REDIS_REPLICATION_MODE
+            value: master
+          - name: AZURE_STORAGE_ACCOUNT_NAME
+            value: "name"
+          - name: AZURE_STORAGE_ACCOUNT_KEY
+            value: "key"
+          - name: AZURE_BACKUP_BUCKET
+            value: "backup"
+          - name: BACKUP_PREFIX
+            value: denorm-redis
+        resources:
+          limits:
+            cpu: 0.2
+            memory: 100Mi
+    <<: *redis-service-account
+
+s3-exporter-service-account: &s3-exporter-service-account
+  s3_region: *cloud_storage_region
+  serviceAccount:
+    create: *create_sa
+    name: s3-exporter-sa
+    annotations:
+      <<: *s3_exporter_sa_annotation
+
+velero-backup: &velero-backup
+  credentials:
+    useSecret: true
+    secretContents:
+      cloud: |
+        [default]
+        aws_access_key_id=""
+        aws_secret_access_key=""
+  configuration:
+    provider: *cloud_storage_provider
+    backupStorageLocation:
+      bucket: *velero_backup_cloud_bucket
+      config:
+        region: *cloud_storage_region
+    volumeSnapshotLocation:
+      name: default
+      config:
+        region: *cloud_storage_region
+  initContainers:
+    - name: velero-plugin-for-aws
+      image: velero/velero-plugin-for-aws
+      volumeMounts:
+        - name: plugins
+          mountPath: /target
+
+spark:
+  persistence:
+    masterTmp:
+      storageClassName: *storage_class_name
+    workerTmp:
+      storageClassName: *storage_class_name
+    masterMetadata:
+      storageClassName: *storage_class_name
+    workerMetadata:
+      storageClassName: *storage_class_name
+  cloud_provider: *cloud_storage_provider
+
+dataset-api-service-account: &dataset-api-service-account
+  serviceAccount:
+    create: *create_sa
+    annotations: {}
+
+redis-denorm:
+  << : *redis_denorm_backup_sidecar
+
+redis-dedup:
+  << : *redis_dedup_backup_sidecar
+
+velero:
+  <<: *velero-backup
+
+s3-exporter:
+  <<: *s3-exporter-service-account
+
+dataset-api:
+  <<: *dataset-api-service-account
+
+secor-service-account: &secor-service-account 
+  serviceAccount: 
+    create: *create_sa
+    name: secor-sa
+    annotations:
+      <<: *secor_sa_annotation
+
+secor:
+  cloud_store_provider: *cloud_store_provider
+  s3_bucket_name: *backups_bucket
+  s3_region: *cloud_storage_region
+  storageClass: *storage_class_name
+  <<: *secor-service-account 
+      
+kong:
+  proxy:
+    annotations:
+      <<: *kong_annotations
+
+flink-service-account: &flink-service-account
+  serviceAccount:
+    create: *create_sa
+    name: flink-sa
+    annotations:
+      <<: *flink_sa_annotation
+
+flink:
+  <<: *flink-service-account
+  checkpoint_store_type: *cloud_store_provider
+  checkpointing:
+    enabled: true
+    statebackend: *checkpoint_bucket
+
+postgres-backup-service-account: &postgres-backup-service-account
+  serviceAccount:
+    create: *create_sa
+    name: postgresql-backup-sa
+    annotations:
+      <<: *postgresql_backup_sa_annotation
+
+postgresql-backup:
+  <<: *postgres-backup-service-account
+
+druid-raw-service-account: &druid-raw-service-account
+  serviceAccount:
+    create: *create_sa
+    name: druid-raw-sa
+    annotations:
+      <<: *druid_raw_sa_annotation
+
+druid-raw-cluster:
+  druid_deepstorage_type: *deep_store_type
+  druid_indexer_logs_type: *deep_store_type
+  storageClass: *storage_class_name
+  s3_bucket: *cloud_storage_bucket
+  s3_access_key: ""
+  s3_secret_key: ""
+  <<: *druid-raw-service-account
+
+loki:
+  storage:
+    type: *storage_class_name
+  compactor:
+    retention_enabled: true
+    working_directory: /var/loki/compactor/retention
+
+lakehouse-connector:
+  hadoop_core_site: 
+      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem 
+      fs.s3a.access.key: *s3-access-key
+      fs.s3a.secret.key: *s3-secret-access-key
+  serviceAccount: 
+    create: *create_sa
+    name: flink-sa
+    annotations:
+      <<: *flink_sa_annotation
+    
+trino:
+  additionalCatalogs: 
+    lakehouse: |-
+      connector.name=hudi
+      hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
+      hive.s3.aws-access-key="access-key"
+      hive.s3.aws-secret-key="access-secret"
+      hive.s3.ssl.enabled=false 
+
+hms:
+  envVars:
+    WAREHOUSE_DIR: s3a://lakehouse-benchmarking/hudi/
+
+  hadoop_core_site:
+    fs.s3a.access.key:  *s3-access-key
+    fs.s3a.secret.key:  *s3-secret-access-key
+    # fs.s3a.endpoint: *s3-endpoint-url 
+    # fs.s3a.path.style.access: false
+    # fs.s3a.connection.ssl.enabled: true

@@ -1,0 +1,15 @@
+{{- if .Values.dashboardConfig }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "superset.fullname" . }}-dashboards
+  labels:
+    app: {{ template "superset.name" . }}
+    chart: {{ template "superset.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    system.querying: "true"
+binaryData:
+  dashboards.zip: {{ .Files.Get .Values.dashboardConfig | b64enc }}
+immutable: true
+{{- end -}}

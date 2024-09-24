@@ -1,0 +1,55 @@
+domain: "kong.example"
+ingress_class_name: "kong"
+cert_secret_name: "kong-ingress-ssl-cert"
+namespace: kong-ingress-routes
+global:
+  ingress_annotations:
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: "https"
+    konghq.com/https-redirect-status-code: "301"
+
+ingress:
+  webconsole:
+    enabled: true
+    name: webconsole
+    namespace: web-console
+    path_type: "ImplementationSpecific"
+    service_name: "web-console"
+    domains: []
+    annotations: {}
+    service_port: 3000
+    paths:
+      - path: "/console"
+  superset:
+    enabled: true
+    name: superset
+    namespace: superset
+    path_type: "ImplementationSpecific"
+    service_name: "superset"
+    domains: []
+    annotations: {}
+    service_port: 8088
+    paths:
+      - path: "/"
+  grafana:
+    enabled: true
+    name: grafana
+    namespace: monitoring
+    path_type: "ImplementationSpecific"
+    service_name: "grafana"
+    domains: []
+    annotations: {}
+    service_port: 80
+    paths:
+      - path: "/grafana"
+  nlq-service:
+    enabled: true
+    name: nlq-api
+    namespace: nlq
+    path_type: "ImplementationSpecific"
+    service_name: "nlq-api"
+    domains: []
+    annotations: {}
+    service_port: 8501
+    paths:
+      - path: "/nlq"

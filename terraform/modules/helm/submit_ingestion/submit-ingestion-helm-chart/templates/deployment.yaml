@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: submit-ingestion
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: druid
+          image: "ubuntu:20.04"
+          command:
+            - sh
+            - -c
+            - |
+              apt-get update && apt-get install -y curl &&
+              if [ "{{ .Values.datasource.system_events.enable }}" = "true" ]; then
+                curl -XPOST -H 'Content-Type: application/json' -d @/etc/ingestion-spec/system-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }};
+              fi
+              if [ "{{ .Values.datasource.system_telemetry_events.enable }}" = "true" ]; then
+                curl -XPOST -H 'Content-Type: application/json' -d @/etc/ingestion-spec/system-telemetry-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }};
+              fi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/ingestion-spec
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ingestion-spec-config

@@ -1,0 +1,4 @@
+image:
+  registry: ${system_rules_ingestor_container_registry}
+  repository: ${system_rules_ingestor_image_name}
+  image_tag: ${system_rules_ingestor_image_tag}

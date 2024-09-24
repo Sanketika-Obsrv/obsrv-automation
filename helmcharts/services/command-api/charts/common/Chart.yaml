@@ -1,0 +1,12 @@
+apiVersion: v2
+description: Library chart for Sunbird
+keywords:
+- common
+- helper
+- template
+- function
+maintainers:
+- name: NimbusHub.in
+name: common
+type: library
+version: 0.1.0

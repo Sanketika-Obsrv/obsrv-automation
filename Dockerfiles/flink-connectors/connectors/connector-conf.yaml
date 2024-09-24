@@ -1,0 +1,27 @@
+postgres:
+  dbname: obsrv
+  user: postgres
+  password: postgres
+  host: postgresql-hl.postgresql.svc.cluster.local
+  port: 5432
+
+kafka:
+  broker-servers: kafka-headless.kafka.svc.cluster.local:9092
+  telemetry-topic: obsrv-connectors-telemetry
+  connector-metrics-topic: obsrv-connectors-metrics
+  producer:
+    compression: snappy
+    max-request-size: 1000000 # 1MB {1M: 1000000, 10M: 10000000, 5M: 5000000}
+
+obsrv_encryption_key: strong_encryption_key_to_encrypt
+
+building-block: obsrv-connectors
+env: local
+
+dataset_api:
+  host: "http://dataset-api.dataset-api.svc.cluster.local:3000"
+  pre_signed_url: "v2/files/generate-url"
+
+connectors:
+  extraction_path: "/tmp/obsrv-connectors-extracted"
+  storage_path: "/flink/connectors"

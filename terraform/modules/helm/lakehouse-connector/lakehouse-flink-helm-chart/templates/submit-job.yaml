@@ -1,0 +1,55 @@
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: {{ .Release.Name }}-job-submit
+#   namespace: {{ .Release.Namespace }}
+# spec:
+#   template:
+#     spec:
+#       initContainers:
+#       - name: init
+#         image: "docker.io/library/ubuntu@sha256:33a5cc25d22c45900796a1aca487ad7a7cb09f09ea00b779e3b2026b4fc2faba"
+#         command:
+#         - sh
+#         - -c
+#         - |
+#           apt-get update && apt-get install -y curl
+#           while true; do
+#             if curl -sSf -o /dev/null http://{{ .Release.Name }}-jobmanager.flink.svc.cluster.local:8081; then
+#               break
+#             else
+#               echo "Waiting for Job Manager..."
+#               sleep 2
+#             fi
+#           done
+#       containers:
+#       - name: {{ .Release.Name }}-job-submit
+#         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+#         imagePullPolicy: Always
+#         command:
+#           - /opt/flink/bin/flink
+#           - run
+#           - -m
+#           - {{ .Release.Name }}-jobmanager.flink.svc.cluster.local:8081
+#           - /opt/flink/custom-lib/{{ .Release.Name }}-1.0.0.jar
+#           - --config.file.path
+#           - /data/flink/conf/{{ .Release.Name }}.conf
+#         volumeMounts:
+#         - mountPath: /data/flink/conf/baseconfig.conf
+#           name: flink-config-volume
+#           subPath: base-config.conf
+#         - mountPath: /data/flink/conf/{{ .Release.Name }}.conf
+#           name: flink-config-volume
+#           subPath: {{ .Release.Name }}.conf
+#         workingDir: /opt/flink
+#       restartPolicy: Never
+#       volumes:
+#       - configMap:
+#           items:
+#           - key: base-config
+#             path: base-config.conf
+#           - key: {{ .Release.Name }}
+#             path: {{ .Release.Name }}.conf
+#           name: {{ .Release.Name }}-config
+#         name: flink-config-volume
+#   backoffLimit: 3

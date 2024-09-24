@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: "{{ .Release.Name }}-service"
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: "{{ .Release.Name }}-service"
+    release: monitoring
+    system.ingestion: "true"
+    system.querying: "true"
+    system.api: "true"
+spec:
+  jobLabel: jobLabel
+  selector:
+    matchLabels:
+      release: monitoring
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 5s

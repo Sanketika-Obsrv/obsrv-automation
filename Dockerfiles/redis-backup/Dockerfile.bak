@@ -1,0 +1,6 @@
+FROM bitnami/redis:7.0.5-debian-11-r15
+USER root
+RUN apt-get update && apt-get install -y curl unzip bzip2 systemctl cron  && mkdir /.aws && chown -R 1001:1001 /.aws
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install && rm -rf awscliv2.zip aws
+COPY setup-cron.sh load-cron.cron redis-backup.sh /
+ENTRYPOINT ["/bin/bash", "-c", "systemctl start cron && /setup-cron.sh > /dev/stdout && /opt/bitnami/scripts/redis/entrypoint.sh /opt/bitnami/scripts/redis/run.sh"]

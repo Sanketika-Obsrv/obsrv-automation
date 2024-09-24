@@ -1,0 +1,4 @@
+cert_issuer_name: ${letsencrypt_ssl_issuer_name}
+letsencrypt_server_url: ${letsencrypt_server_url}
+domain: ${kong_ingress_domain}
+domain_admin_email: ${letsencrypt_ssl_admin_email}

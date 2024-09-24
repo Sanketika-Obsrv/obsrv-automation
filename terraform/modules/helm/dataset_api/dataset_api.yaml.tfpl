@@ -1,0 +1,51 @@
+namespace: ${dataset_api_namespace}
+SYSTEM_ENV: ${env}
+cpu_requests: 0.8
+cpu_limits: 1
+memory_requests: 512Mi
+memory_limits: 1024Mi
+druid_service:
+  DRUID_HOST: http://${druid_cluster_release_name}-routers.${druid_cluster_namespace}.svc.cluster.local
+  DRUID_PORT: 8888
+postgres_service:
+  POSTGRES_HOST: postgresql-hl.postgresql.svc
+  POSTGRES_PORT: 5432
+  POSTGRES_DATABASE: ${postgresql_obsrv_database}
+  POSTGRES_USERNAME: ${postgresql_obsrv_username}
+  POSTGRES_PASSWORD: ${postgresql_obsrv_user_password}
+image:
+  registry: ${dataset_api_container_registry}
+  repository: ${dataset_api_image_name}
+  image_tag: ${dataset_api_image_tag}
+  imagePullSecrets: ${docker_registry_secret_name}
+dedup_redis_service:
+  REDIS_HOST: ${dedup_redis_release_name}-master.${dedup_redis_namespace}.svc.cluster.local
+  REDIS_PORT: 6379
+denorm_redis_service:
+  REDIS_HOST: ${denorm_redis_release_name}-master.${denorm_redis_namespace}.svc.cluster.local
+  REDIS_PORT: 6379
+exhaust_service:
+  CONTAINER: ${s3_bucket}
+  CLOUD_STORAGE_PROVIDER: ${storage_provider}
+  CLOUD_STORAGE_REGION: ${s3_region}
+service_account_annotations:
+  ${dataset_api_sa_annotations}
+grafana_service:
+  GRAFANA_URL: ${grafana_url}
+encryption_config:
+  object_key: authenticationMechanism
+  encryption_key: "${encryption_key}"
+command_service_config:
+  host: http://${command_service_release_name}-service.${command_service_namespace}.svc.cluster.local
+  port: 8000
+  path: "/system/v1/dataset/command"
+
+service:
+  type: ${service_type}
+enable_lakehouse: ${enable_lakehouse}
+lakehouse_service:
+    LAKEHOUSE_HOST: ${lakehouse_host}
+    LAKEHOUSE_PORT: ${lakehouse_port}
+    LAKEHOUSE_CATALOG: ${lakehouse_catalog}
+    LAKEHOUSE_SCHEMA: ${lakehouse_schema}
+    LAKEHOUSE_DEFAULT_USER: ${lakehouse_default_user}

@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "postgresql-backup.fullname" . }}
+  labels:
+    {{- include "postgresql-backup.labels" . | nindent 4 }}
+    system.storage: "true"
+spec:
+  schedule: {{ .Values.CRON_SCHEDULE }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          labels:
+            {{- include "postgresql-backup.selectorLabels" . | nindent 12 }}
+          {{- with .Values.imagePullSecrets }}
+            system.storage: "true"
+          imagePullSecrets:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+        spec:
+          serviceAccountName: {{ include "postgresql-backup.serviceAccountName" . }}
+          restartPolicy: {{ .Values.restartPolicy }}
+          imagePullSecrets:
+            - name: {{ .Values.image.imagePullSecrets }}
+          containers:
+            - name: {{ .Chart.Name }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: PG_USER
+                  value: {{ .Values.PG_USER }}
+                - name: PG_HOST
+                  value: {{ .Values.PG_HOST }}
+                - name: PGPASSWORD
+                  value: {{ .Values.PGPASSWORD }}
+                - name: CLOUD_SERVICE
+                  value: {{ .Values.CLOUD_SERVICE }}
+                - name: S3_BACKUP_BUCKET
+                  value: {{ .Values.S3_BACKUP_BUCKET }}
+                - name: GS_BACKUP_BUCKET
+                  value: {{ .Values.GS_BACKUP_BUCKET }}

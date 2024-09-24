@@ -1,0 +1,274 @@
+global:
+  storageClass: &storage_class "standard"
+  redis-namespace: &redis-namespace "redis"
+  project_id: &project_id "obsrv-installation"
+  cloud_storage_config: &cloud_storage_config |+
+    '{ "identity": "AWS_ACCESS_KEY_ID", "credential": "AWS_SECRET_ACCESS_KEY_ID", "region": "us-east-2" }'
+  dataset_api_container: "test-connector"
+  cloud_storage_provider: "aws"
+  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-dev-31381366265"
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-dev-31381366265"
+  storage_provider: &storage_provider "aws"
+  cloud_storage_region: "us-east-2"
+
+  s3_bucket: &s3-bucket "obsrv-data"
+  s3_access_key: &s3-access-key "7xSgQhiRnJg3pUzvIiBV"
+  s3_secret_key: &s3-secret-access-key "4R4n5Hz8vcJLjWvtWAuQSR1tQzwCFMIBFpT26Au3"
+  region: &region "ap-south-1"
+  s3_endpoint_url: &s3-endpoint-url "http://192.168.1.2:9000"
+  s3_path_style_access: &s3-path-style-access "true"
+  s3_protocol: &s3-protocol "http"
+  s3_signing_region: &s3-signing-region "ap-south-1"
+  backup_bucket: &backup_bucket ""
+  checkpoint_bucket: &checkpoint_bucket ""
+
+  cloud_store_provider: &cloud_store_provider "s3"
+  postgresql_backup_cloud_bucket: &postgresql_backup_cloud_bucket "obsrv-data"
+
+  storage_type: &storage-type "s3"
+  enable_lakehouse: &enable_lakehouse "true"
+
+service-account-disable: &service-account-disable
+  serviceAccount:
+    enabled: false
+    create: false
+
+loki:
+  storage:
+    type: *storage_class
+  compactor:
+    retention_enabled: true
+    working_directory: /var/loki/compactor/retention
+
+druid-raw-cluster:
+  <<: *service-account-disable
+  storageClass: *storage_class
+  storage_type: *storage-type
+  druid_indexer_logs_type: *storage-type
+  s3_bucket: *s3-bucket
+  s3_access_key: *s3-access-key
+  s3_secret_key: *s3-secret-access-key
+  druid_s3_endpoint_url: *s3-endpoint-url
+  druid_s3_endpoint_signingRegion: *s3-path-style-access
+
+kafka:
+  persistence:
+    size: 5Gi
+
+redis_dedup_backup_sidecar: &redis_dedup_backup_sidecar
+  master:
+    <<: *service-account-disable
+    sidecars:
+      - name: redis-backup
+        image: sanketikahub/redis-backup:1.0.4-GA
+        volumeMounts:
+          - mountPath: "/data"
+            name: redis-data
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 256Mi
+          limits:
+            cpu: 0.5
+            memory: 512Mi
+        env:
+          - name: REDIS_BACKUP_CRON_SCHEDULE
+            value: "00 * * * *"
+          - name: CLOUD_SERVICE
+            value: *storage-type
+          - name: BACKUP_BUCKET
+            value: *s3-bucket
+          - name: REDIS_RDB_FILE_PATH
+            value: "/data"
+          - name: REDIS_REPLICATION_MODE
+            value: master
+          - name: BACKUP_PREFIX
+            value: dedup-redis
+          - name: AWS_ACCESS_KEY_ID
+            value: *s3-access-key
+          - name: AWS_SECRET_ACCESS_KEY
+            value: *s3-secret-access-key
+          - name: AWS_ENDPOINT_URL
+            value: *s3-endpoint-url
+          - name: AWS_DATA_PATH
+            value: *s3-path-style-access
+          - name: AWS_DEFAULT_REGION
+            value: *s3-signing-region
+
+redis_denorm_backup_sidecar: &redis_denorm_backup_sidecar
+  master:
+    <<: *service-account-disable
+    sidecars:
+      - name: redis-backup
+        image: sanketikahub/redis-backup:1.0.4-GA
+        volumeMounts:
+          - mountPath: "/data"
+            name: redis-data
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 256Mi
+          limits:
+            cpu: 0.5
+            memory: 512Mi
+        env:
+          - name: REDIS_BACKUP_CRON_SCHEDULE
+            value: "00 * * * *"
+          - name: CLOUD_SERVICE
+            value: *storage-type
+          - name: BACKUP_BUCKET
+            value: *backup_bucket
+          - name: REDIS_RDB_FILE_PATH
+            value: "/data"
+          - name: REDIS_REPLICATION_MODE
+            value: master
+          - name: BACKUP_PREFIX
+            value: denorm-redis
+          - name: AWS_ACCESS_KEY_ID
+            value: *s3-access-key
+          - name: AWS_SECRET_ACCESS_KEY
+            value: *s3-secret-access-key
+          - name: AWS_ENDPOINT_URL
+            value: *s3-endpoint-url
+          - name: AWS_DATA_PATH
+            value: *s3-path-style-access
+          - name: AWS_DEFAULT_REGION
+            value: *s3-signing-region
+
+velero-backup: &velero-backup
+  <<: *service-account-disable
+  credentials:
+    useSecret: true
+    secretContents:
+      cloud: |
+        [default]
+        aws_access_key_id="7xSgQhiRnJg3pUzvIiBV"
+        aws_secret_access_key="4R4n5Hz8vcJLjWvtWAuQSR1tQzwCFMIBFpT26Au3"
+  configuration:
+    provider: *storage_provider
+    backupStorageLocation:
+      provider: *storage_provider
+      bucket: *s3-bucket
+      config:
+        region: *region
+        s3ForcePathStyle: true
+        s3Url: "http://192.168.1.2:9000"
+    volumeSnapshotLocation:
+      name: default
+      namespace: velero
+      config:
+        region: *region
+  initContainers:
+    - name: velero-plugin-for-aws
+      image: velero/velero-plugin-for-aws
+      volumeMounts:
+        - name: plugins
+          mountPath: /target
+  schedules:
+    obsrv-daily-backup:
+      disabled: false
+          
+spark:
+  storage_type: *storage_class
+  connectors:
+    enabled: true
+
+postgresql-backup:
+  <<: *service-account-disable
+
+system-rules-ingestor:
+  <<: *service-account-disable
+
+flink:
+  serviceMonitor:
+    enabled: true
+  checkpoint_store_type: *storage_class
+  checkpointing:
+    enabled: false
+    statebackend: file:///tmp/
+  
+command-api:
+  imagePullPolicy: Always
+
+web-console:
+  imagePullPolicy: Always
+
+dataset-api:
+  <<: *service-account-disable
+  exhaust_service:
+    CLOUD_STORAGE_PROVIDER: *storage-type
+    CONTAINER_PREFIX: "telemetry-data"
+  imagePullPolicy: Always
+
+secor:
+  <<: *service-account-disable
+  storage_type: *storage-type
+  bucket_name: *s3-bucket
+  s3_bucket_name: *s3-bucket
+  s3_access_key: *s3-access-key
+  s3_secret_id: *s3-secret-access-key
+  s3_region: *region
+  s3_endpoint: *s3-endpoint-url
+  s3_path_style_access: *s3-path-style-access
+
+letsencrypt-ssl:
+  enabled: false
+
+postgresql-exporter:
+  config:
+    datasource:
+      user: postgres
+      password: postgres
+
+velero:
+  <<: *velero-backup
+
+redis-denorm:
+  namespaceOverride: *redis-namespace
+  host: redis-denorm-master.redis.svc.cluster.local
+  port: 6379
+  << : *redis_denorm_backup_sidecar
+
+redis-dedup:
+  namespace: *redis-namespace
+  host: redis-dedup-master.redis.svc.cluster.local
+  port: 6379
+  << : *redis_dedup_backup_sidecar
+
+lakehouse-connector:
+  enable_lakehouse: *enable_lakehouse
+  namespace: flink
+  image:
+    registry: sanketikahub
+    repository: lakehouse-connector
+    tag: 1.0.3
+  
+  hadoop_core_site: 
+      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem 
+      fs.s3a.access.key: *s3-access-key
+      fs.s3a.secret.key: *s3-secret-access-key
+    
+trino:
+  enabled: *enable_lakehouse
+  namespace: trino
+  additionalCatalogs: 
+    lakehouse: |-
+      connector.name=hudi
+      hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
+      hive.s3.aws-access-key=7xSgQhiRnJg3pUzvIiBV
+      hive.s3.aws-secret-key=4R4n5Hz8vcJLjWvtWAuQSR1tQzwCFMIBFpT26Au3
+      hive.s3.ssl.enabled=false 
+
+hms:
+  enabled: *enable_lakehouse
+  namespace: hms
+  envVars:
+    DATABASE_HOST: postgresql-hl.postgresql.svc.cluster.local
+    WAREHOUSE_DIR: s3a://lakehouse-benchmarking/hudi/
+    THRIFT_PORT: "9083"
+  hadoop_core_site:
+    fs.s3a.access.key:  *s3-access-key
+    fs.s3a.secret.key:  *s3-secret-access-key
+    # fs.s3a.endpoint: *s3-endpoint-url 
+    # fs.s3a.path.style.access: false
+    # fs.s3a.connection.ssl.enabled: true

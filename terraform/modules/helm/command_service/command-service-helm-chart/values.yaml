@@ -1,0 +1,157 @@
+http_port: 8000
+system_env: dev
+image:
+  repository: sanketikahub/obsrv-command-service
+  tag: 1.0.0-GA
+  pullPolicy: "IfNotPresent"
+  imagePullSecrets: ""
+cpu_requests: 0.1
+cpu_limits: 0.1
+memory_requests: 128Mi
+memory_limits: 128Mi
+
+enable_lakehouse: false
+
+hudi_jobs:
+    - name: "LakehouseConnectorJob"
+      release_name: lakehouse-connector
+      job_manager_url: "lakehouse-connector-jobmanager.flink.svc.cluster.local:8081"
+
+service_config: |
+
+  commands:
+    PUBLISH_DATASET:
+      workflow:
+        - MAKE_DATASET_LIVE
+        - SUBMIT_INGESTION_TASKS
+        - START_PIPELINE_JOBS
+        - DEPLOY_CONNECTORS
+        - CREATE_ALERT_METRIC
+        - CREATE_AUDIT_EVENT
+    RESTART_PIPELINE:
+      workflow:
+        - START_PIPELINE_JOBS
+
+  alert_manager:
+    metrics:
+      - flink:
+        - metric: "flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_failed_event_count"
+          alias: "Number of Failed Extraction Events"
+          description: "This alert tracks how many events failed the extraction stage"
+          frequency: 5m
+          interval: 5m
+          operator: "gt"
+          threshold: 100
+        - metric: "flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_duplicate_extraction_count"
+          alias: "Number of Duplicate Extraction Events"
+          description: "This alert tracks how many duplicate events were found during extraction stage"
+          frequency: 5m
+          interval: 5m
+          operator: "gt"
+          threshold: 100
+        - metric: "flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_failed_event_count"
+          alias: "Number of Failed Preprocessing Events"
+          description: "This alert tracks how many events failed the preprocessing stage"
+          frequency: 5m
+          interval: 5m
+          operator: "gt"
+          threshold: 100
+        - metric: "flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_duplicate_event_count"
+          alias: "Number of Duplicate Preprocessing Events"
+          description: "This alert tracks how many duplicate events were found during preprocessing stage"
+          frequency: 5m
+          interval: 5m
+          operator: "gt"
+          threshold: 100
+        - metric: "flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_validation_failed_event_count"
+          alias: "Number of Failed Validation Events"
+          description: "This alert tracks how many events failed the validation stage"
+          frequency: 5m
+          interval: 5m
+          operator: "gt"
+          threshold: 100
+    object_connector_metrics:
+      - metric: "sum_over_time(ObjectDiscoveryJob_cloud_authentication_failure{datasetId='dataset_id'}[1h])"
+        alias: "Cloud Authentication Failure"
+        description: "This alert tracks whether the cloud authentication failed for the dataset"
+        frequency: 1h
+        interval: 1h
+        operator: "gt"
+        threshold: 1
+      - metric: "sum_over_time(ObjectProcessorJob_object_tag_update_failure{datasetId='dataset_id'}[1h])"
+        alias: "Update Tag Failure"
+        description: "This alert tracks whether the tag update failed for the dataset"
+        frequency: 1h
+        interval: 1h
+        operator: "gt"
+        threshold: 1
+      - metric: "sum_over_time(ObjectDiscoveryJob_num_new_objects{datasetId='dataset_id'}[1d])"
+        alias: "Number Of New Objects"
+        description: "This alert tracks whether any new objects are processed. If not, then this alert is fired"
+        frequency: 1d
+        interval: 1h
+        operator: "eq"
+        threshold: 0
+    jdbc_connector_metrics:
+      - metric: "sum_over_time(JDBCConnectorJob_failure_count{datasetId='dataset_id'}[1d])"
+        alias: "Number of Failed Records"
+        description: "This alert tracks whether any records failed to be ingested into the database"
+        frequency: 1d
+        interval: 1h
+        operator: "gt"
+        threshold: 10
+    masterdata_metrics:
+      - metric: "MasterDataProcessorIndexerJob_failure_dataset_count{datasetId='dataset_id'}"
+        alias: "Master Dataset failed to index"
+        description: "This alert tracks whether the given master dataset failed to index data"
+        frequency: 240m
+        interval: 5m
+        operator: "gt"
+        threshold: 0
+
+  postgres:
+    db_host: postgresql-hl.postgresql.svc.cluster.local
+    db_port: 5432
+    db_user: postgres
+    db_password: postgres
+    database: obsrv
+
+  config_service:
+    host: dataset-api-service.dataset-api.svc.cluster.local
+    port: 3000
+
+  druid:
+    router_host: "druid-raw-dev-routers.druid-raw.svc.cluster.local"
+    router_port: 8888
+    supervisor_endpoint: indexer/v1/supervisor
+  
+  kafka:
+    brokers: kafka-headless.kafka.svc.cluster.local:9092
+    telemetry:
+      topic: system.telemetry.events
+
+  helm_charts_base_dir: /app/helm-charts
+  
+  flink:
+    namespace: flink
+    reinstall_sleep_time: 3
+    jobs:
+      - name: "PipelineMergedJob"
+        release_name: merged-pipeline
+        job_manager_url: "merged-pipeline-jobmanager.flink.svc.cluster.local:8081"
+      - name: "MasterDataProcessorJob"
+        release_name: master-data-processor-ext
+        job_manager_url: "master-data-processor-ext-jobmanager.flink.svc.cluster.local:8081"
+      - name: "KafkaConnectorJob"
+        release_name: kafka-connector
+        job_manager_url: "kafka-connector-jobmanager.flink.svc.cluster.local:8081"
+
+rbac:
+  # kubernetes.rest-service.exposed.type: NodePort requires
+  # list permission for nodes at the cluster scope.
+  # Set create to true if you are using NodePort type.
+  nodesRule:
+    create: true
+
+serviceAccount:
+  name: command-api-serviceaccount

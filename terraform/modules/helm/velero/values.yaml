@@ -1,0 +1,35 @@
+# create a user with s3 full access and update the keys below
+credentials:
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=""
+      aws_secret_access_key=""
+configuration:
+  provider: "aws"
+  backupStorageLocation:
+    bucket: "" # Bucket name
+    config:
+      region: ""
+  volumeSnapshotLocation:
+    name: default
+    config:
+      region: "" # Region name Ex: "us-east-2"
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws
+    volumeMounts:
+      - name: plugins
+        mountPath: /target
+metrics:
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: monitoring
+resources:
+  requests:
+    cpu: 0.2
+    memory: 256Mi
+  limits:
+    cpu: 0.1
+    memory: 128Mi

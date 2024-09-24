@@ -1,0 +1,43 @@
+version: "3.1"
+services:
+  jobmanager:
+    image: sanketikahub/flink-python:1.0.2
+    ports:
+      - "8081:8081"
+      - "9250:9250"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        metrics.reporters: prom
+        metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+        metrics.reporter.prom.host: jobmanager
+        metrics.reporter.prom.port: 9250
+
+  taskmanager:
+    image: sanketikahub/flink-python:1.0.2
+    depends_on:
+      - jobmanager
+    command:
+      - taskmanager
+    scale: 1
+    ports:
+    - "9251:9251"
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        metrics.reporters: prom
+        metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+        metrics.reporter.prom.host: taskmanager
+        metrics.reporter.prom.port: 9251
+  pyjobmanager:
+    image: sanketikahub/flink-python:1.0.2
+    command:
+      - python3
+      - /opt/flink/python-files/wrapper-api.py
+    scale: 1
+    ports:
+    - "5000:5000"

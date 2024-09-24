@@ -1,0 +1,122 @@
+image:
+  repository: ${spark_image_repository}
+  tag: ${spark_image_tag}
+  pullPolicy: Always
+  imagePullSecrets: ${docker_registry_secret_name}
+
+serviceAccount:
+  create: ${create_service_account}
+  enabled: true
+  name: ${spark_namespace}-sa
+  annotations:
+    ${spark_sa_annotations}
+  automountServiceAccountToken: true
+
+persistence:
+  enabled: true
+  masterTmp:
+    name: spark-master-tmp
+    storageClassName: ${kubernetes_storage_class}
+    storage:
+      size: 2Gi
+  workerTmp:
+    name: spark-worker-tmp
+    storageClassName: ${kubernetes_storage_class}
+    storage:
+      size: 2Gi
+  masterMetadata:
+    name: spark-master-metadata
+    storageClassName: ${kubernetes_storage_class}
+    storage:
+      size: 2Gi
+  workerMetadata:
+    name: spark-worker-metadata
+    storageClassName: ${kubernetes_storage_class}
+    storage:
+      size: 2Gi
+cloud_provider: ${cloud_provider}
+appdata:
+  baseconfig:
+    conf: |+
+      env = ${env}
+      kafka {
+        bootstrap.servers = "kafka-headless.kafka.svc.cluster.local:9092"
+      }
+      cipher.secret = "${encryption_key}"
+      postgres {
+        host = postgresql-hl.postgresql.svc
+        port = 5432
+        user = ${postgresql_obsrv_username}
+        password = ${postgresql_obsrv_password}
+        database = ${postgresql_obsrv_database}
+        maxConnections = 2
+      }
+  masterdata-indexer:
+    conf: |+
+      include file("/opt/bitnami/spark/conf/baseconfig.conf")
+      redis.host = ${redis_release_name}-master.${redis_namespace}.svc.cluster.local
+      redis.port = 6379
+      redis.scan.count = 1000
+      redis.max.pipeline.size = 1000
+      cloud.storage.container = "://${s3_bucket}/"
+      cloud.storage.provider = ${cloud_provider}
+      cloud.storage.accountName = ""
+      druid.indexer.url = "http://${druid_cluster_release_name}-routers.${druid_cluster_namespace}.svc.cluster.local:8888/druid/indexer/v1/task"
+      druid.datasource.delete.url = "http://${druid_cluster_release_name}-routers.${druid_cluster_namespace}.svc.cluster.local:8888/druid/coordinator/v1/datasources"
+      metrics {
+        topicName = $${env}".${spark_metrics_topic}"
+      }
+      #inputSourceSpec
+      source.spec="{\"spec\":{\"ioConfig\":{\"type\":\"index_parallel\",\"inputSource\":{\"type\":\"${cloud_storage_prefix}\",\"objectGlob\":\"**.json.gz\",\"prefixes\":[\"FILE_PATH\"]}}}}"
+      #deltaIngestionSpec
+      delta.ingestion.spec= "{\"type\":\"index_parallel\",\"spec\":{\"dataSchema\":{\"dataSource\":\"DATASOURCE_REF\"},\"ioConfig\":{\"type\":\"index_parallel\"},\"tuningConfig\":{\"type\":\"index_parallel\",\"maxRowsInMemory\":500000,\"forceExtendableShardSpecs\":false,\"logParseExceptions\":true}}}"
+  object-discovery:
+    conf: |+
+      include file("/opt/bitnami/spark/conf/baseconfig.conf")
+      obsrvTag = "${building_block}-${env}"
+      metrics {
+        version = ${spark_metrics_version}
+        topicName = $${env}".${spark_metrics_topic}"
+      }
+      connector.version = "1.0.0"
+  object-processor:
+    conf: |+
+      include file("/opt/bitnami/spark/conf/baseconfig.conf")
+      batchSize = 10
+      obsrvTag = "${building_block}-${env}"
+      metrics {
+        version = ${spark_metrics_version}
+        topicName = $${env}".${spark_metrics_topic}"
+      }
+      connector.version = "1.0.0"
+  jdbc-connector:
+    conf: |+
+      include file("/opt/bitnami/spark/conf/baseconfig.conf")
+      connector.version = "1.0.0"
+      drivers {
+        mysql = "com.mysql.cj.jdbc.Driver"
+        postgresql = "org.postgresql.Driver"
+      }
+      jdbc {
+        connection{
+          retry = 5
+          retryDelay = 1000
+        }
+      }
+      metrics {
+        version = ${spark_metrics_version}
+        topicName = $${env}".${spark_metrics_topic}"
+      }
+  spark-defaults:
+    conf: |+
+      spark.master spark://spark-master-svc:7077
+      spark.ui.prometheus.enabled true
+      spark.executor.processTreeMetrics.enabled true
+      spark.history.fs.logDirectory /opt/bitnami/spark/spark-metadata/spark-events
+      spark.eventLog.enabled true
+      spark.eventLog.dir /opt/bitnami/spark/spark-metadata/spark-events
+      spark.hadoop.fs.s3a.endpoint s3.${s3_region}.amazonaws.com
+      spark.hadoop.fs.s3a.impl org.apache.hadoop.fs.s3a.S3AFileSystem
+      spark.hadoop.fs.s3a.assumed.role.arn ${spark_sa_role}
+      spark.hadoop.fs.s3a.aws.credentials.provider org.apache.hadoop.fs.s3a.auth.AssumedRoleCredentialProvider
+      spark.hadoop.fs.s3a.assumed.role.credentials.provider com.amazonaws.auth.InstanceProfileCredentialsProvider

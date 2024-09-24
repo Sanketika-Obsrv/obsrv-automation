@@ -1,0 +1,674 @@
+namespace: "system-rules-ingestor"
+
+image:
+  registry: "sanketikahub"
+  repository: "system-rules-ingestor"
+  image_tag: "1.0.0-GA"
+api_url: "http://dataset-api-service.dataset-api.svc:3000"
+delay: "5000" # in milli seconds
+folder: "/opt/app/alerting"
+
+rules: |
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Ingestion"
+    query: max without(label_system_ingestion, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
+    operator: gt
+    threshold: [80]
+    category: Ingestion
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on ingestion
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Ingestion"
+    query: max without(label_system_ingestion, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Ingestion
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on ingestion
+    annotations: {}
+    severity: warning 
+
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Processing"
+    query: max without(label_system_processing, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
+    operator: gt
+    threshold: [80]
+    category: Processing
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on processing
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Processing"
+    query: max without(label_system_processing, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Processing
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on processing
+    annotations: {}
+    severity: warning  
+
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Querying"
+    query: max without(label_system_querying, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
+    operator: gt
+    threshold: [80]
+    category: Querying
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on querying
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Querying"
+    query: max without(label_system_querying, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Querying
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on querying
+    annotations: {}
+    severity: warning
+  
+
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Monitoring"
+    query: max without(label_system_monitoring, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
+    operator: gt
+    threshold: [80]
+    category: Monitoring
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on monitoring
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Monitoring"
+    query: max without(label_system_monitoring, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Monitoring
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on monitoring
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Reporting"
+    query: max without(label_system_reporting, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
+    operator: gt
+    threshold: [80]
+    category: Reporting
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on reporting
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Reporting"
+    query: max without(label_system_reporting, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Reporting
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on reporting
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Storage"
+    query: max without(label_system_storage, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
+    operator: gt
+    threshold: [80]
+    category: Storage
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on storage
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Storage"
+    query: max without(label_system_storage, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Storage
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on storage
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Dataset Management"
+    query: max without(label_system_dataset_management, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
+    operator: gt
+    threshold: [80]
+    category: Dataset Management
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on dataset management
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Dataset Management"
+    query: max without(label_system_dataset_management, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Dataset Management
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on dataset management
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Excessive CPU Utilization Detected in Infra"
+    query: max without(label_system_infra, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
+    operator: gt
+    threshold: [80]
+    category: Infra
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is critical on Infra
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive CPU Utilization Detected in Infra"
+    query: max without(label_system_infra, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Infra
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Cpu usage is high on Infra
+    annotations: {}
+    severity: warning
+
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Ingestion"
+    query: max without(label_system_ingestion, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
+    operator: gt
+    threshold: [80]
+    category: Ingestion
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical on ingestion.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Ingestion"
+    query: max without(label_system_ingestion, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Ingestion
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on ingestion.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Processing"
+    query: max without(label_system_processing, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
+    operator: gt
+    threshold: [80]
+    category: Processing
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical on processing.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Processing"
+    query: max without(label_system_processing, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Processing
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on processing.
+    annotations: {}
+    severity: warning 
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Querying"
+    query: max without(label_system_querying, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
+    operator: gt
+    threshold: [80]
+    category: Querying
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical on querying.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Querying"
+    query: max without(label_system_querying, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Querying
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on querying.
+    annotations: {}
+    severity: warning 
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Monitoring"
+    query: max without(label_system_monitoring, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
+    operator: gt
+    threshold: [80]
+    category: Monitoring
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical on monitoring.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Monitoring"
+    query: max without(label_system_monitoring, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Monitoring
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on monitoring.
+    annotations: {}
+    severity: warning 
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Reporting"
+    query: max without(label_system_reporting, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
+    operator: gt
+    threshold: [80]
+    category: Reporting
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical on reporting.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Reporting"
+    query: max without(label_system_reporting, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Reporting
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on reporting.
+    annotations: {}
+    severity: warning  
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Storage"
+    query: max without(label_system_storage, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
+    operator: gt
+    threshold: [80]
+    category: Storage
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical  on storage.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Storage"
+    query: max without(label_system_storage, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Storage
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on storage.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Dataset Management"
+    query: max without(label_system_dataset_management, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
+    operator: gt
+    threshold: [80]
+    category: Dataset Management
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical on dataset management.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Dataset Management"
+    query: max without(label_system_dataset_management, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Dataset Management
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on dataset management.
+    annotations: {}
+    severity: warning   
+
+  - name: "Critical Alert: Excessive Memory Utilization Detected in Infra"
+    query: max without(label_system_infra, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
+    operator: gt
+    threshold: [80]
+    category: Infra
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is critical on infra.
+    annotations: {}
+    severity: critical
+
+  - name: "Warning Alert: Excessive Memory Utilization Detected in Infra"
+    query: max without(label_system_infra, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
+    operator: within_range
+    threshold: [60,80]
+    category: Infra
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: Memory usage is high on infra.
+    annotations: {}
+    severity: warning 
+
+
+  - name: Reporting System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_infra='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Infra
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Obsrv System has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Obsrv System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_infra='true'}))
+    operator: gt
+    threshold: [3]
+    category: Infra
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Obsrv System has experienced repeated restarts. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+  
+  - name: Ingestion System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_ingestion='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Ingestion
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Ingestion System has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Ingestion System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_ingestion='true'}))
+    operator: gt
+    threshold: [3]
+    category: Ingestion
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Ingestion System has experienced repeated restarts. The data ingestion will be paused. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: Querying System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_querying='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Querying
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Query system has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Querying System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_querying='true'}))
+    operator: gt
+    threshold: [3]
+    category: Querying
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Querying system has experienced repeated restarts. The data Querying will be paused. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: Storage System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_storage='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Storage
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Storage system has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Storage System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_storage='true'}))
+    operator: gt
+    threshold: [3]
+    category: Storage
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Storage system has experienced repeated restarts. The data Backup will be paused. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+
+  - name: Processing System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_processing='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Processing
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Processing system has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Processing System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_processing='true'}))
+    operator: gt
+    threshold: [3]
+    category: Processing
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Processing system has experienced repeated restarts. The data processing will be paused. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: Dataset Management System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_dataset_management='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Dataset Management
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Dataset Management system has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Dataset Management System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_dataset_management='true'}))
+    operator: gt
+    threshold: [3]
+    category: Dataset Management
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Dataset Management system has experienced repeated restarts. The Dataset Managment will not be functional. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: Monitoring System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_monitoring='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Monitoring
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Infra Monitoring system has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Monitoring System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_monitoring='true'}))
+    operator: gt
+    threshold: [3]
+    category: Monitoring
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Infra Monitoring system has experienced repeated restarts. The Infra Monitoring will not be functional. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: Reporting System Recovery Update
+    query:  (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_reporting='true'}))
+    operator: within_range
+    threshold: [1,3]
+    category: Reporting
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Infra Reporting system has undergone a restart and is actively working towards regaining a healthy state.
+    annotations: {}
+    severity: warning
+
+  - name: "Critical Alert: Reporting System Restart Notifications"
+    query:  (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_reporting='true'}))
+    operator: gt
+    threshold: [3]
+    category: Reporting
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The Infra Reporting system has experienced repeated restarts. The Infra Reporting will not be functional. Please examine the logs or immediately contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: "Critical Alert: PostgreSQL Database Backup Failure"
+    query: (time() - s3_last_modified_object_date{job="s3-db-backups", prefix=~"postgresql"})
+    operator: gt
+    threshold: [86400]
+    category: DB Backup
+    frequency: 1h
+    interval: 1h
+    labels: {}
+    description: The PostgreSQL database backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: "Critical Alert: Dedup Redis Database Backup Failure"
+    query: (time() - s3_last_modified_object_date{job="s3-db-backups", prefix=~"dedup-redis"})
+    operator: gt
+    threshold: [86400]
+    category: DB Backup
+    frequency: 1h
+    interval: 1h
+    labels: {}
+    description: The Dedup Redis database backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: "Critical Alert: Denorm Redis Database Backup Failure"
+    query: (time() - s3_last_modified_object_date{job="s3-db-backups", prefix=~"denorm-redis"})
+    operator: gt
+    threshold: [86400]
+    category: DB Backup
+    frequency: 1h
+    interval: 1h
+    labels: {}
+    description: The Denorm Redis database backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: "Critical Alert: Velero (Kubernetes Cluster) Backup Failure"
+    query: (time() - s3_last_modified_object_date{job="s3-common-backups", bucket=~"velero.*"})
+    operator: gt
+    threshold: [86400]
+    category: DB Backup
+    frequency: 1h
+    interval: 1h
+    labels: {}
+    description: The Kubernetes cluster backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: "Critical Alert: Kubernetes Node Storage Capacity Exceeded"
+    query: min by (instance) (max by (instance, mountpoint) (max_over_time(node_filesystem_avail_bytes{mountpoint!~".*/tmp.*"}[$__range]) > 0) / on (instance, mountpoint) max by (instance, mountpoint) (node_filesystem_size_bytes{mountpoint!~".*/tmp.*"}) * 100)
+    operator: lt
+    threshold: [20]
+    category: Disk Space
+    frequency: 2m
+    interval: 1m
+    labels: {}
+    description: The disk space on the Kubernetes node(s) has exceeded 80% of the total capacity. Please investigate immediately or contact administrative support for assistance.
+    annotations: {}
+    severity: critical
+
+  - name: "Critical Alert: Master Data Processor Indexer Job Failure Detected"
+    query: increase(MasterDataProcessorIndexerJob_failure_dataset_count[1d]) > 0
+    operator: gt
+    threshold: [0]
+    category: Batch Job
+    frequency: 1d
+    interval: 1m
+    labels: {}
+    description: The Master Data Processor Indexer Job has failed in the last 24 hours. Please investigate immediately or contact administrative support for assistance.
+    annotations: {}
+    severity: critical  
+
+  - name: "Critical Alert: Druid Unhealthy Supervisor Task"
+    query: max by(supervisor_name, namespace, pod,container,endpoint) (druid_supervisors{state!="RUNNING"})
+    operator: gt
+    threshold: [0]
+    category: Querying
+    frequency: 1m
+    interval: 1m
+    labels: {} 
+    description: Druid supervisors are in a Unhealthy state. Please Investigate immediately or contact administrative support for assistance. 
+    annotations: {}
+    severity: critical  

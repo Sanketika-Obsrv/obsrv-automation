@@ -1,0 +1,1 @@
+REDIS_BACKUP_CRON_SCHEDULE . /etc/profile.d/envs.sh; /redis-backup.sh >> /var/log/cron.log 2>&1

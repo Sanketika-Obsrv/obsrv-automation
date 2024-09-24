@@ -1,0 +1,162 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: "https"
+    konghq.com/https-redirect-status-code: "301"
+  name: {{ .Values.webconsole.name }}
+  namespace: {{ .Values.webconsole.namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress_class_name }}
+  tls:
+  - secretName: {{ .Values.cert_secret_name }}
+    hosts:
+    - {{ .Values.domain }}
+  rules:
+  - host: {{ .Values.domain }}
+    http:
+      paths:
+      {{- range .Values.webconsole.paths }}
+      - path: {{ .path }}
+        pathType: {{ $.Values.webconsole.path_type }}
+        backend:
+          service:
+            name: {{ $.Values.webconsole.service_name }}
+            port:
+              number: {{ $.Values.webconsole.service_port }}
+      {{- end }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/strip-path: "true"
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: "https"
+    konghq.com/https-redirect-status-code: "301"
+  name: {{ .Values.grafana.name }}
+  namespace: {{ .Values.grafana.namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress_class_name }}
+  tls:
+  - secretName: {{ .Values.cert_secret_name }}
+    hosts:
+    - {{ .Values.domain }}
+  rules:
+  - host: {{ .Values.domain }}
+    http:
+      paths:
+      {{- range .Values.grafana.paths }}
+      - path: {{ .path }}
+        pathType: {{ $.Values.grafana.path_type }}
+        backend:
+          service:
+            name: {{ $.Values.grafana.service_name }}
+            port:
+              number: {{ $.Values.grafana.service_port }}
+      {{- end }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: "https"
+    konghq.com/https-redirect-status-code: "301"
+  name: {{ .Values.superset.name }}
+  namespace: {{ .Values.superset.namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress_class_name }}
+  tls:
+  - secretName: {{ .Values.cert_secret_name }}
+    hosts:
+    - {{ .Values.domain }}
+  rules:
+  - host: {{ .Values.domain }}
+    http:
+      paths:
+      {{- range .Values.superset.paths }}
+      - path: {{ .path }}
+        pathType: {{ $.Values.superset.path_type }}
+        backend:
+          service:
+            name: {{ $.Values.superset.service_name }}
+            port:
+              number: {{ $.Values.superset.service_port }}
+      {{- end }}      
+{{- if .Values.datasetapi.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: "https"
+    konghq.com/https-redirect-status-code: "301"
+{{- if and .Values.datasetapi.rate_limiting.enabled .Values.datasetapi.jwt_enabled }}
+    konghq.com/plugins: datasetapi-rate-limiting,obsrv-jwt
+{{- else  if .Values.datasetapi.rate_limiting.enabled }}
+    konghq.com/plugins: datasetapi-rate-limiting
+{{- end }}
+  name: {{ .Values.datasetapi.name }}
+  namespace: {{ .Values.datasetapi.namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress_class_name }}
+  tls:
+  - secretName: {{ .Values.cert_secret_name }}
+{{-  if (lookup "v1" "ConfigMap" "kong-ingress" "domain-name")}}
+    hosts:
+    - {{ (lookup "v1" "ConfigMap" "kong-ingress" "domain-name").data.domain }}
+  rules:
+  - host: {{ (lookup "v1" "ConfigMap" "kong-ingress" "domain-name").data.domain }}
+{{- else }}
+    hosts:
+    - {{ .Values.domain }}
+  rules:
+  - host: {{ .Values.domain }}
+{{- end }}
+    http:
+      paths:
+      {{- range .Values.datasetapi.paths }}
+      - path: {{ .path }}
+        pathType: {{ $.Values.datasetapi.path_type }}
+        backend:
+          service:
+            name: {{ $.Values.datasetapi.service_name }}
+            port:
+              number: {{ $.Values.datasetapi.service_port }}
+      {{- end }}
+{{- end }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: "https"
+    konghq.com/https-redirect-status-code: "301"
+  name: {{ .Values.keycloak.name }}
+  namespace: {{ .Values.keycloak.namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress_class_name }}
+  tls:
+  - secretName: {{ .Values.cert_secret_name }}
+    hosts:
+    - "auth.{{ .Values.domain }}"
+  rules:
+  - host: "auth.{{ .Values.domain }}"
+    http:
+      paths:
+      {{- range .Values.keycloak.paths }}
+      - path: {{ .path }}
+        pathType: {{ $.Values.keycloak.path_type }}
+        backend:
+          service:
+            name: {{ $.Values.keycloak.service_name }}
+            port:
+              number: {{ $.Values.keycloak.service_port }}
+      {{- end }}

@@ -1,0 +1,73 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prometheus-druid-exporter.fullname" . }}
+  namespace: {{ include "base.namespace" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "prometheus-druid-exporter.fullname" . }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+  annotations:
+    {{- toYaml .Values.annotations | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "prometheus-druid-exporter.fullname" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "prometheus-druid-exporter.fullname" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        system.monitoring: "true"
+    spec:
+      containers:
+      - env:
+        - name: DRUID_URL
+          value: {{ .Values.druidURL }}
+        - name: PORT
+          value: {{ .Values.exporterPort | quote}}
+        - name: LOG_LEVEL
+          value: {{ .Values.logLevel }}
+        - name: LOG_FORMAT
+          value: {{ .Values.logFormat }}
+        - name: NO_HISTOGRAM
+          value: {{ .Values.noHistogram | quote}}
+{{- if .Values.extraEnv }}
+{{ toYaml .Values.extraEnv | indent 8 }}
+{{- end }}
+{{- if .Values.security.enabled }}
+        - name: DRUID_USER
+          value: {{ .Values.security.druidUser }}
+        - name: DRUID_PASSWORD
+{{- if not .Values.security.druidPassword.secretKeyRef.enabled }}
+          value: {{ .Values.security.druidPassword.value }}
+{{- else }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.security.druidPassword.secretKeyRef.secretName }}
+              key: {{ .Values.security.druidPassword.secretKeyRef.secretKey }}
+{{- end }}
+{{- end }}
+        image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: {{ include "prometheus-druid-exporter.fullname" . }}
+        ports:
+        - containerPort: {{ .Values.exporterPort }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+{{- if .Values.serviceAccount.create }}
+      serviceAccount: {{ include "prometheus-druid-exporter.fullname" . }}
+      serviceAccountName: {{ include "prometheus-druid-exporter.fullname" . }}
+{{- end }}
+{{- if .Values.affinity }}
+      affinity: {{- toYaml .Values.affinity | nindent 8 }}
+{{- end }}
+{{- if .Values.tolerations }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+{{- end }}

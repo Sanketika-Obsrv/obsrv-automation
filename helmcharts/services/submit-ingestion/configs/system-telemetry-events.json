@@ -1,0 +1,242 @@
+{
+  "type": "kafka",
+  "spec": {
+    "dataSchema": {
+      "dataSource": "{{ .Values.datasource.system_telemetry_events.name }}",
+      "dimensionsSpec": {
+        "dimensions": [
+          {
+            "type": "string",
+            "name": "eid"
+          },
+          {
+            "type": "string",
+            "name": "ver"
+          },
+          {
+            "type": "string",
+            "name": "mid"
+          },
+          {
+            "type": "string",
+            "name": "actor_id"
+          },
+          {
+            "type": "string",
+            "name": "actor_type"
+          },
+          {
+            "type": "string",
+            "name": "context_env"
+          },
+          {
+            "type": "string",
+            "name": "context_sid"
+          },
+          {
+            "type": "string",
+            "name": "context_pdata_id"
+          },
+          {
+            "type": "string",
+            "name": "context_pdata_ver"
+          },
+          {
+            "type": "string",
+            "name": "object_id"
+          },
+          {
+            "type": "string",
+            "name": "object_type"
+          },
+          {
+            "type": "string",
+            "name": "object_rollup_l1"
+          },
+          {
+            "type": "string",
+            "name": "object_rollup_l2"
+          },
+          {
+            "type": "string",
+            "name": "object_rollup_l3"
+          },
+          {
+            "type": "string",
+            "name": "object_rollup_l4"
+          },
+          {
+            "type": "string",
+            "name": "edata_action"
+          },
+          {
+            "type": "json",
+            "name": "edata_props"
+          },
+          {
+            "type": "string",
+            "name": "edata_transition_timeUnit"
+          },
+          {
+            "type": "long",
+            "name": "edata_transition_duration"
+          },
+          {
+            "type": "string",
+            "name": "edata_transition_toState"
+          },
+          {
+            "type": "string",
+            "name": "edata_transition_fromState"
+          }
+        ]
+      },
+      "timestampSpec": {
+        "column": "ets",
+        "format": "auto"
+      },
+      "metricsSpec": [],
+      "granularitySpec": {
+        "type": "uniform",
+        "segmentGranularity": "{{ .Values.datasource.system_telemetry_events.segment_granularity }}",
+        "queryGranularity": "{{ .Values.datasource.system_telemetry_events.query_granularity }}",
+        "rollup": false
+      }
+    },
+    "tuningConfig": {
+     "type": "kafka",
+     "maxRowsPerSegment": 5000000,
+      "logParseExceptions": true
+    },
+    "ioConfig": {
+      "type": "kafka",
+      "topic": "{{ .Values.datasource.system_telemetry_events.topic }}",
+      "consumerProperties": {
+        "bootstrap.servers": "{{ .Values.bootstrap_servers }}"
+      },
+      "taskCount": "{{ .Values.datasource.system_telemetry_events.task_count }}",
+      "replicas": "{{ .Values.datasource.system_telemetry_events.replicas }}",
+      "taskDuration": "{{ .Values.datasource.system_telemetry_events.task_duration }}",
+      "completionTimeout": "{{ .Values.datasource.system_telemetry_events.task_completion }}",
+      "inputFormat": {
+        "type": "json",
+        "flattenSpec": {
+          "useFieldDiscovery": true,
+          "fields": [
+            {
+              "type": "path",
+              "expr": "$.eid",
+              "name": "eid"
+            },
+            {
+              "type": "path",
+              "expr": "$.ets",
+              "name": "ets"
+            },
+            {
+              "type": "path",
+              "expr": "$.ver",
+              "name": "ver"
+            },
+            {
+              "type": "path",
+              "expr": "$.mid",
+              "name": "mid"
+            },
+            {
+              "type": "path",
+              "expr": "$.actor.id",
+              "name": "actor_id"
+            },
+            {
+              "type": "path",
+              "expr": "$.actor.type",
+              "name": "actor_type"
+            },
+            {
+              "type": "path",
+              "expr": "$.context.env",
+              "name": "context_env"
+            },
+            {
+              "type": "path",
+              "expr": "$.context.sid",
+              "name": "context_sid"
+            },
+            {
+              "type": "path",
+              "expr": "$.context.pdata.id",
+              "name": "context_pdata_id"
+            },
+            {
+              "type": "path",
+              "expr": "$.context.pdata.ver",
+              "name": "context_pdata_ver"
+            },
+            {
+              "type": "path",
+              "expr": "$.object.id",
+              "name": "object_id"
+            },
+            {
+              "type": "path",
+              "expr": "$.object.type",
+              "name": "object_type"
+            },
+            {
+              "type": "path",
+              "expr": "$.object.rollup.l1",
+              "name": "object_rollup_l1"
+            },
+            {
+              "type": "path",
+              "expr": "$.object.rollup.l2",
+              "name": "object_rollup_l2"
+            },
+            {
+              "type": "path",
+              "expr": "$.object.rollup.l3",
+              "name": "object_rollup_l3"
+            },
+            {
+              "type": "path",
+              "expr": "$.object.rollup.l4",
+              "name": "object_rollup_l4"
+            },
+            {
+              "type": "path",
+              "expr": "$.edata.action",
+              "name": "edata_action"
+            },
+            {
+              "type": "path",
+              "expr": "$.edata.props[*]",
+              "name": "edata_props"
+            },
+            {
+              "type": "path",
+              "expr": "$.edata.transition.timeUnit",
+              "name": "edata_transition_timeUnit"
+            },
+            {
+              "type": "path",
+              "expr": "$.edata.transition.duration",
+              "name": "edata_transition_duration"
+            },
+            {
+              "type": "path",
+              "expr": "$.edata.transition.toState",
+              "name": "edata_transition_toState"
+            },
+            {
+              "type": "path",
+              "expr": "$.edata.transition.fromState",
+              "name": "edata_transition_fromState"
+            }
+          ]
+        }
+      },
+      "appendToExisting": false
+    }
+  }
+}

@@ -1,0 +1,3 @@
+prometheus_url: ${prometheus_url}
+serviceMonitorLabels:
+  release: monitoring

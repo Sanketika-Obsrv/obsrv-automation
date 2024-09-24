@@ -1,0 +1,281 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-jobmanager
+  namespace: flink
+  labels:
+    app: flink
+    component: {{ .Chart.Name }}-jobmanager
+    system.processing: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: rpc
+      port: {{ .Values.jobmanager.rpc_port }}
+    - name: blob
+      port: {{ .Values.jobmanager.blob_port }}
+    - name: query
+      port: {{ .Values.jobmanager.query_port }}
+    - name: ui
+      port: {{ .Values.jobmanager.ui_port }}
+    - name: prom
+      port: {{ .Values.jobmanager.prom_port }}
+  selector:
+    app: flink
+    component: {{ .Chart.Name }}-jobmanager
+    system.processing: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-jobmanager-webui
+  namespace: flink
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: rest
+      port: {{ .Values.rest_port }}
+      protocol: TCP
+      targetPort: {{ .Values.resttcp_port }}
+  selector:
+    app: flink
+    component: {{ .Chart.Name }}-jobmanager
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-taskmanager
+  namespace: flink
+  labels:
+    app: flink
+    component: {{ .Chart.Name }}-taskmanager
+    system.processing: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom
+      port: {{ .Values.taskmanager.prom_port }}
+  selector:
+    app: flink
+    component: {{ .Chart.Name }}-taskmanager
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-jobmanager
+  namespace: flink
+spec:
+  selector:
+    matchLabels:
+      app: flink
+      component: {{ .Chart.Name }}-jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: {{ .Chart.Name }}-jobmanager
+        system.processing: "true"
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: "{{ .Values.jobmanager.prom_port }}"
+    spec:
+      # imagePullSecrets:
+      # - name: {{ .Values.image.imagePullSecrets }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "base.serviceaccountname" . }}
+      {{- end }}
+      volumes:
+      - configMap:
+          items:
+          - key: flink-conf
+            path: flink-conf.yaml
+          - key: base-config
+            path: base-config.conf
+          - key: {{ .Chart.Name }}
+            path: {{ .Chart.Name }}.conf
+          - key: log4j_console_properties
+            path: log4j-console.properties
+          - key: core-site.xml
+            path: core-site.xml
+          name: {{ .Chart.Name }}-config
+        name: flink-config-volume
+      containers:
+      - name: {{ .Chart.Name }}-jobmanager # Main container to start job-manager
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        # image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6123
+          name: rpc
+        - containerPort: 6124
+          name: blob
+        - containerPort: 6125
+          name: query
+        - containerPort: 8081
+          name: ui
+        resources:
+          requests:
+              cpu: "{{ .Values.jobmanager.cpu_requests }}"
+              memory: "{{ .Values.jobmanager.memory_requests }}"
+          limits:
+            cpu: "{{ .Values.jobmanager.cpu_limits }}"
+            memory: "{{ .Values.jobmanager.memory_limits }}"
+        volumeMounts:
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/log4j-console.properties
+            subPath: log4j-console.properties
+        volumeMounts:
+        - mountPath: /opt/flink/conf/flink-conf.yaml
+          name: flink-config-volume
+          subPath: flink-conf.yaml
+        - mountPath: /data/flink/conf/baseconfig.conf
+          name: flink-config-volume
+          subPath: base-config.conf
+        - mountPath: /data/flink/conf/{{ .Chart.Name }}.conf
+          name: flink-config-volume
+          subPath: {{ .Chart.Name }}.conf
+        - mountPath: /opt/flink/conf/log4j-console.properties
+          name: flink-config-volume
+          subPath: log4j-console.properties
+        - name: flink-config-volume
+          mountPath: /opt/hadoop/etc/hadoop/core-site.xml
+          subPath: core-site.xml
+        workingDir: /opt/flink
+        args: ["jobmanager"]
+        env:
+        - name: HADOOP_CONF_DIR
+          value: "/opt/hadoop/etc/hadoop"
+        - name: FLINK_PROPERTIES
+          value: |+
+            jobmanager.rpc.address: {{ .Chart.Name }}-jobmanager
+            jobmanager.rpc.port=6123
+            metrics.reporters: prom
+            metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+            metrics.reporter.prom.host: {{ .Chart.Name }}-jobmanager
+            metrics.reporter.prom.port: 9250
+      - name: {{ .Chart.Name }}-job-submit # side car to submit the hudi connector 
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+
+        command:
+          - /opt/flink/bin/flink
+          - run
+          - -m
+          - {{ .Chart.Name }}-jobmanager.flink.svc.cluster.local:8081
+          - /opt/flink/custom-lib/hudi-connector-1.0.0.jar
+          - --config.file.path
+          - /data/flink/conf/{{ .Chart.Name }}.conf
+          {{- if eq .Values.global.cloud_storage_provider "azure" }}
+          - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
+          {{- end }}
+          {{- if eq .Values.global.cloud_storage_provider "aws" }}
+          - -Dfs.s3a.access.key={{ .Values.global.s3_access_key }}
+          - -Dfs.s3a.secret.key={{ .Values.global.s3_secret_key }}
+          {{- end }}
+        volumeMounts:
+        - mountPath: /data/flink/conf/baseconfig.conf
+          name: flink-config-volume
+          subPath: base-config.conf
+        - mountPath: /data/flink/conf/{{ .Chart.Name }}.conf
+          name: flink-config-volume
+          subPath: {{ .Chart.Name }}.conf
+        workingDir: /opt/flink
+        volumes:
+        - configMap:
+            items:
+            - key: base-config
+              path: base-config.conf
+            - key: {{ .Chart.Name }}
+              path: {{ .Chart.Name }}.conf
+            name: {{ .Chart.Name }}-config
+          name: flink-config-volume
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-taskmanager
+  namespace: flink
+spec:
+  replicas: {{ .Values.taskmanager.replicas }}
+  selector:
+    matchLabels:
+      app: flink
+      component: {{ .Chart.Name }}-taskmanager
+  template:
+    metadata:
+      labels:
+        system.processing: "true"
+        app: flink
+        component: {{ .Chart.Name }}-taskmanager
+    spec:
+      # imagePullSecrets:
+      # - name: {{ .Values.image.imagePullSecrets }}
+      # serviceAccount: flink-sa
+      volumes:
+      - configMap:
+          items:
+          - key: flink-conf
+            path: flink-conf.yaml
+          - key: base-config
+            path: base-config.conf
+          - key: {{ .Chart.Name }}
+            path: {{ .Chart.Name }}.conf
+          - key: log4j_console_properties
+            path: log4j-console.properties
+          - key: core-site.xml
+            path: core-site.xml
+          name: {{ .Chart.Name }}-config
+        name: flink-config-volume
+      containers:
+      - name: {{ .Chart.Name }}-taskmanager
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6122
+          name: rpc
+        resources:
+          requests:
+              cpu: "{{ .Values.taskmanager.cpu_requests }}"
+              memory: "{{ .Values.taskmanager.memory_requests }}"
+          limits:
+            cpu: "{{ .Values.taskmanager.cpu_limits }}"
+            memory: "{{ .Values.taskmanager.memory_limits }}"
+        volumeMounts:
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/log4j-console.properties
+            subPath: log4j-console.properties
+        volumeMounts:
+        - mountPath: /opt/flink/conf/flink-conf.yaml
+          name: flink-config-volume
+          subPath: flink-conf.yaml
+        - mountPath: /data/flink/conf/baseconfig.conf
+          name: flink-config-volume
+          subPath: base-config.conf
+        - mountPath: /data/flink/conf/{{ .Chart.Name }}.conf
+          name: flink-config-volume
+          subPath: {{ .Chart.Name }}.conf
+        - mountPath: /opt/flink/conf/log4j-console.properties
+          name: flink-config-volume
+          subPath: log4j-console.properties
+        - name: flink-config-volume
+          mountPath: /opt/hadoop/etc/hadoop/core-site.xml
+          subPath: core-site.xml
+        workingDir: /opt/flink
+        args: ["taskmanager"]
+        env:
+        - name: HADOOP_CONF_DIR
+          value: "/opt/hadoop/etc/hadoop"
+        - name: FLINK_PROPERTIES
+          value: |+
+            jobmanager.rpc.address: {{ .Chart.Name }}-jobmanager
+            taskmanager.rpc.port=6122
+            taskmanager.numberOfTaskSlots: 2
+            metrics.reporters: prom
+            metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+            metrics.reporter.prom.host: {{ .Chart.Name }}-taskmanager
+            metrics.reporter.prom.port: 9251
