@@ -1,0 +1,214 @@
+{{- $currentScope := .}}
+{{- range $jobName, $jobData := .Values.flink_jobs }}
+{{- if $jobData.enabled }}
+{{- with $currentScope }}
+{{ $component := "taskmanager" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s" $jobName $component }}
+  namespace: {{ include "base.namespace" $ }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  annotations:
+    checksum/config: {{ .Files.Glob "configs/*" | toYaml | sha256sum }}
+    checksum/job-config: {{ $jobData | toYaml | sha256sum }}
+  {{- if .Values.commonAnnotations }}
+    {{ include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "common.names.name" . }}
+      app.kubernetes.io/component: {{ printf "%s-%s" $jobName $component }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "common.names.name" . }}
+        app.kubernetes.io/component: {{ printf "%s-%s" $jobName $component }}
+        component: {{ printf "%s-%s" $jobName $component }}
+      annotations:
+        checksum/config: {{ .Files.Glob "configs/*" | toYaml | sha256sum }}
+        checksum/job-config: {{ $jobData | toYaml | sha256sum }}
+    spec:
+      {{- if .Values.serviceAccount.create}}
+      serviceAccountName: {{ include "base.serviceaccountname" . }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- $imagePullSecrets := default .Values.imagePullSecrets $jobData.imagePullSecrets }}
+      {{- with $imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $jobName }}-taskmanager
+          image: {{ include "base.image.flink" (dict "context" $ "scope"  $jobData) }}
+          imagePullPolicy: {{ default .Values.imagePullPolicy "IfNotPresent" }}
+          workingDir: {{ .Values.taskmanager.flink_work_dir }}
+          command: ["/opt/flink/bin/taskmanager.sh"]
+          args: ["start-foreground",
+  {{- if eq .Values.checkpoint_store_type "azure" }}
+            "-Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}",
+  {{- end }}
+  {{- if and (eq .Values.checkpoint_store_type "s3") (ne .Values.s3_auth_type "serviceAccount") }}
+            "-Ds3.access-key={{ .Values.s3_access_key }}",
+            "-Ds3.secret-key={{ .Values.s3_secret_key }}",
+            "-Ds3.endpoint={{ .Values.s3_endpoint }}",
+            "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
+  {{- end }}
+  {{- if eq .Values.checkpoint_store_type "gcs" }}
+            "-Dgoogle.cloud.auth.service.account.enable=true",
+  {{- end }}
+            "-Dweb.submit.enable=false",
+            "-Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter",
+            "-Dmetrics.reporter.prom.host={{ $jobName }}-taskmanager",
+            "-Dmetrics.reporter.prom.port=9251-9260",
+            "-Djobmanager.rpc.address={{ $jobName }}-jobmanager",
+            "-Dtaskmanager.rpc.port={{ .Values.taskmanager.rpc_port }}"]
+          ports:
+          - containerPort: {{ .Values.taskmanager.rpc_port }}
+            name: rpc
+          {{- toYaml (index $jobData "resources" $component )| nindent 10 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/flink-conf.yaml
+            subPath: flink-conf.yaml
+          - name: flink-config-volume
+            mountPath: /data/flink/conf/baseconfig.conf
+            subPath: baseconfig.conf
+          - name: flink-config-volume
+            mountPath: /data/flink/conf/{{ $jobName }}.conf
+            subPath: {{ $jobName }}.conf
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/log4j-console.properties
+            subPath: log4j-console.properties
+      volumes:
+      - name: flink-config-volume
+        configMap:
+          name: {{ $jobName }}-config
+          items:
+          - key: flink-conf
+            path: flink-conf.yaml
+          - key: baseconfig
+            path: baseconfig.conf
+          - key: config
+            path: {{ $jobName }}.conf
+          - key: log4j_console_properties
+            path: log4j-console.properties
+{{ $component := "jobmanager" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s" $jobName $component }}
+  namespace: {{ include "base.namespace" . }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  annotations:
+    checksum/config: {{ .Files.Glob "configs/*" | toYaml | sha256sum }}
+    checksum/job-config: {{ $jobData | toYaml | sha256sum }}
+  {{- if .Values.commonAnnotations }}
+  {{ include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "common.names.name" . }}
+      app.kubernetes.io/component: {{ printf "%s-%s" $jobName $component }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "common.names.name" . }}
+        app.kubernetes.io/component: {{ printf "%s-%s" $jobName $component }}
+        component: {{ printf "%s-%s" $jobName $component }}
+      annotations:
+        checksum/config: {{ .Files.Glob "configs/*" | toYaml | sha256sum }}
+        checksum/job-config: {{ $jobData | toYaml | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "base.serviceaccountname" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- $imagePullSecrets := default .Values.imagePullSecrets $jobData.imagePullSecrets }}
+      {{- with $imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $jobName }}-jobmanager
+          image: {{ include "base.image.flink" (dict "context" $ "scope"  $jobData) }}
+          imagePullPolicy: {{ default .Values.imagePullPolicy "IfNotPresent" }}
+          workingDir: /opt/flink
+          command: ["/opt/flink/bin/standalone-job.sh"]
+          args: ["start-foreground",
+                "--job-classname={{ index $jobData "job_classname" }}",
+  {{- if eq .Values.checkpoint_store_type "azure" }}
+                "-Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}",
+  {{- end }}
+  {{- if and (eq .Values.checkpoint_store_type "s3") (ne .Values.s3_auth_type "serviceAccount") }}
+                "-Ds3.access-key={{ .Values.s3_access_key }}",
+                "-Ds3.secret-key={{ .Values.s3_secret_key }}",
+                "-Ds3.endpoint={{ .Values.s3_endpoint }}",
+                "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
+  {{- end }}
+  {{- if eq .Values.checkpoint_store_type "gcs" }}
+            "-Dgoogle.cloud.auth.service.account.enable=true",
+  {{- end }}
+                "-Dweb.submit.enable=false",
+                "-Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter",
+                "-Dmetrics.reporter.prom.port={{ .Values.jobmanager.prom_port }}",
+                "-Djobmanager.rpc.address={{ $jobName }}-jobmanager",
+                "-Djobmanager.rpc.port={{ .Values.jobmanager.rpc_port }}",
+                "-Dparallelism.default=1",
+                "-Dblob.server.port={{ .Values.jobmanager.blob_port }}",
+                "-Dqueryable-state.server.ports={{ .Values.jobmanager.query_port }}",
+                "--config.file.path",
+                "/data/flink/conf/{{ $jobName }}.conf"]
+          ports:
+            {{- range .Values.service.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .targetPort }}
+            {{- end }}
+          {{-  toYaml (index $jobData "resources" $component )| nindent 10 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/flink-conf.yaml
+            subPath: flink-conf.yaml
+          - name: flink-config-volume
+            mountPath: /data/flink/conf/baseconfig.conf
+            subPath: baseconfig.conf
+          - name: flink-config-volume
+            mountPath: /data/flink/conf/{{ $jobName }}.conf
+            subPath: {{ $jobName }}.conf
+          - name: flink-config-volume
+            mountPath: /opt/flink/conf/log4j-console.properties
+            subPath: log4j-console.properties
+      volumes:
+      - name: flink-config-volume
+        configMap:
+          name: {{ $jobName }}-config
+          items:
+          - key: flink-conf
+            path: flink-conf.yaml
+          - key: baseconfig
+            path: baseconfig.conf
+          - key: config
+            path: {{ $jobName }}.conf
+          - key: log4j_console_properties
+            path: log4j-console.properties
+{{- end }}
+{{- end}}
+{{- end}}

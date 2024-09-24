@@ -1,0 +1,206 @@
+nameOverride: "web-console"
+fullnameOverride: "web-console"
+
+replicaCount: 1
+
+global:
+  image:
+    registry: "sanketikahub"
+
+registry: ""
+repository: "obsrv-web-console"
+tag: "1.0.0-GA"
+digest: ""
+
+imagePullPolicy: IfNotPresent
+imagePullSecrets: []
+
+commonLabels:
+  system.dataset.management: "true"
+
+commonAnnotations: {}
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # runAsNonRoot: true
+  # runAsUser: 1001
+  # fsGroup: 1001
+
+securityContext:
+  {}
+  # readOnlyRootFilesystem: false
+  # capabilities:
+  #   drop:
+  #   - ALL
+
+# This block is an interface for k8s service spec.
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - paths:
+        - /
+      # host: chart-example.local
+
+resources:
+  limits:
+    cpu: 0.5
+    memory: 1024Mi
+  requests:
+    cpu: 0.5
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+livenessProbe:
+  {}
+  # httpGet:
+  #   path: "/healthz"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+readinessProbe:
+  {}
+  # httpGet:
+  #   path: "/ready"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+configmap:
+  enabled: true
+  mountPath: /config
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+namespace: web-console
+serviceMonitor:
+  enabled: true
+  selectorLabels:
+    release: monitoring
+    app: web-console
+  endpoints:
+    # - port: http # the name of the port in your service, assuming the primary service port is named 'http' in this example.
+    #   path: /metrics
+    #   interval: 30s
+    #   scrapeTimeout: 10s
+    #   honorLabels: true
+    - path: /metrics
+      interval: 30s
+      scrapeTimeout: 5s
+      honorLabels: true
+      port: http
+
+# Example values.yaml structure
+initContainers:
+  {}
+  # - name: init-myservice
+  #   image: busybox:1.28
+  #   command: ['sh', '-c', "until nslookup kubernetes.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
+
+sidecars:
+  {}
+  # - name: log-reader # Sidecar container
+  #   image: busybox # Use another busybox image
+  #   command: ["/bin/sh"] # Override the default command
+  #   args: ["-c", "tail -f /var/log/app.log"] # Run a shell script that tails the log file
+
+rbac:
+  create: true
+  # rules:
+  #   - apiGroups:
+  #       - ""
+  #     resources:
+  #       - pods
+  #     verbs:
+  #       - get
+  #       - list
+  #
+  rules:
+    - apiGroups:
+        - "*"
+      resources:
+        - "*"
+      verbs:
+        - "*"
+
+startupCommand:
+  - "/config/create_service_account.sh"
+restartPolicy: "OnFailure"
+grafana_url: "http://grafana.monitoring.svc.cluster.local"
+
+env:
+  ENV: "{{ .Values.global.env }}"
+  PORT: "3000"
+  APP_NAME: "obsrv-web-console"
+  PROMETHEUS_URL: "http://monitoring-kube-prometheus-prometheus.monitoring:9090"
+  CONFIG_API_URL: "http://dataset-api.dataset-api:3000"
+  OBS_API_URL: "http://dataset-api.dataset-api:3000"
+  SYSTEM_API_URL: "http://command-api.command-api:8000"
+  ALERT_MANAGER_URL: "http://alertmanager-operated.monitoring:9093"
+  GRAFANA_ADMIN_URL: "http://grafana.monitoring.svc.cluster.local"
+  GRAFANA_URL:  "http://{{.Values.global.domain}}/grafana"
+  SUPERSET_URL: "http://{{.Values.global.domain}}"
+  REACT_APP_GRAFANA_URL: "{{.Values.global.domain}}/grafana"
+  REACT_APP_SUPERSET_URL: "{{.Values.global.domain}}"
+  SESSION_SECRET: "backend-session"
+  POSTGRES_CONNECTION_STRING: "postgres://{{.Values.global.postgresql.obsrv.user}}:{{.Values.global.postgresql.obsrv.password}}@{{.Values.global.postgresql.host}}:{{.Values.global.postgresql.port}}/{{.Values.global.postgresql.obsrv.name}}"
+  OAUTH_WEB_CONSOLE_URL: "{{.Values.global.domain}}/console"
+  AUTH_KEYCLOAK_REALM: "MyKeyCloakRealm"
+  AUTH_KEYCLOAK_PUBLIC_CLIENT: "false"
+  AUTH_KEYCLOAK_SSL_REQUIRED: "external"
+  AUTH_KEYCLOAK_CLIENT_ID: "myOauthClient"
+  AUTH_KEYCLOAK_CLIENT_SECRET: "SCWHeF9HgtJ5BjmJFruk2IW15a5auueq"
+  AUTH_KEYCLOAK_SERVER_URL: "http://localhost:8080/auth"
+  AUTH_GOOGLE_CLIENT_ID: "52913780720-2ldmrn41mbhciscjkenepcm76e0g6mh3.apps.googleusercontent.com"
+  AUTH_GOOGLE_CLIENT_SECRET: "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"
+  HTTPS: "false"
+  REACT_APP_VERSION: "v1.2.0"
+  GENERATE_SOURCEMAP: "false"
+  AUTH_AD_URL: "ldap://localhost:3004"
+  AUTH_AD_BASE_DN: "dc=example,dc=com"
+  AUTH_AD_USER_NAME: "admin"
+  AUTH_AD_PASSWORD: "password1"
+  REACT_APP_AUTHENTICATION_ALLOWED_TYPES: "obsrv,ad,google,keycloak"
+  AUTH_OIDC_ISSUER: "http://localhost:8080/auth/realms/TestOIDCrealm"
+  AUTH_OIDC_AUTHRIZATION_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/auth"
+  AUTH_OIDC_TOKEN_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/token"
+  AUTH_OIDC_USER_INFO_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/userinfo"
+  AUTH_OIDC_CLIENT_ID: "oidctestclient"
+  AUTH_OIDC_CLIENT_SECRET: "CsfLrFQwdRjZXhKr0t806BGVTWnN7M4k"
+  AUTH_TOKEN: "YWRtaW46cHJvbS1vcGVyYXRvcg=="
+# Seems to be unused
+# grafana_secret_allowed_namespaces: "dataset-api,web-console"
+# grafana_secret_name: "grafana-secret"

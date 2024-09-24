@@ -1,0 +1,764 @@
+cert-manager:
+  fullnameOverride: cert-manager
+  global:
+    commonLabels:
+      system.api: "true"
+  installCRDs: true
+  prometheus:
+    enabled: true
+    servicemonitor:
+      enabled: true
+      labels:
+        release: monitoring
+  webhook:
+    resources:
+      requests:
+        cpu: 0.05
+        memory: 100Mi
+      limits:
+        cpu: 0.05
+        memory: 100Mi
+  cainjector:
+    resources:
+      requests:
+        cpu: 0.05
+        memory: 100Mi
+      limits:
+        cpu: 0.05
+        memory: 100Mi
+
+kafka-exporter:
+  fullnameOverride: kafka-exporter
+
+kafka:
+  fullnameOverride: kafka
+  namespace: &kafkans "kafka"
+  zookeeper:
+    fullnameOverride: kafka-zookeeper
+    namespace: *kafkans
+
+kong:
+  fullnameOverride: kong
+
+postgresql-exporter:
+  fullnameOverride: postgresql-exporter
+
+postgresql:
+  fullnameOverride: postgresql
+
+druid-exporter:
+  fullnameOverride: druid-exporter
+
+superset:
+  fullnameOverride: superset
+
+zookeeper:
+  fullnameOverride: zookeeper
+
+dataset-api:
+  encryption_key: strong_encryption_key_to_encrypt
+  grafana_token: &grafana_token "YWRtaW46cHJvbS1vcGVyYXRvcg=="
+
+web-console:
+  GRAFANA_URL: ""
+  SUPERSET_URL: ""
+  REACT_APP_GRAFANA_URL: ""
+  REACT_APP_SUPERSET_URL: ""
+  OAUTH_WEB_CONSOLE_URL: ""
+  AUTH_KEYCLOAK_SSL_REQUIRED: "external"
+  AUTH_KEYCLOAK_CLIENT_ID: "myOauthClient"
+  AUTH_KEYCLOAK_CLIENT_SECRET: "SCWHeF9HgtJ5BjmJFruk2IW15a5auueq"
+  AUTH_KEYCLOAK_SERVER_URL: "http://localhost:8080/auth"
+  AUTH_GOOGLE_CLIENT_ID: "52913780720-2ldmrn41mbhciscjkenepcm76e0g6mh3.apps.googleusercontent.com"
+  AUTH_GOOGLE_CLIENT_SECRET: "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"
+  AUTH_AD_URL: "ldap://localhost:3004"
+  AUTH_AD_BASE_DN: "dc=example,dc=com"
+  AUTH_AD_USER_NAME: "admin"
+  AUTH_AD_PASSWORD: "password1"
+  REACT_APP_AUTHENTICATION_ALLOWED_TYPES: "obsrv,ad,google,keycloak"
+  AUTH_OIDC_ISSUER: "http://localhost:8080/auth/realms/TestOIDCrealm"
+  AUTH_OIDC_AUTHRIZATION_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/auth"
+  AUTH_OIDC_TOKEN_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/token"
+  AUTH_OIDC_USER_INFO_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/userinfo"
+  AUTH_OIDC_CLIENT_ID: "oidctestclient"
+  AUTH_OIDC_CLIENT_SECRET: "CsfLrFQwdRjZXhKr0t806BGVTWnN7M4k"
+  AUTH_TOKEN: *grafana_token
+
+spark:
+  fullnameOverride: spark
+  serviceAccount:
+    create: true
+    enabled: true
+    name: spark-sa
+    annotations: {}
+    automountServiceAccountToken: true
+  persistence:
+    enabled: true
+    masterTmp:
+      name: spark-master-tmp
+      storage:
+        size: 2Gi
+    workerTmp:
+      name: spark-worker-tmp
+      storage:
+        size: 2Gi
+    masterMetadata:
+      name: spark-master-metadata
+      storage:
+        size: 2Gi
+    workerMetadata:
+      name: spark-worker-metadata
+      storage:
+        size: 2Gi
+  appdata:
+    baseconfig:
+      conf: |+
+        env = {{ .Values.global.env }}
+        kafka {
+          bootstrap.servers = "{{ .Values.global.kafka.host }}"
+        }
+        cipher.secret = "encryptionKey"
+        postgres {
+          host = {{ .Values.global.postgresql.host }}
+          port = {{ .Values.global.postgresql.port }}
+          user = {{ .Values.global.postgresql.username }}
+          password = {{ .Values.global.postgresql.password }}
+          database = "obsrv"
+          maxConnections = 2
+        }
+    masterdata-indexer:
+      conf: |+
+        include file("/opt/bitnami/spark/conf/baseconfig.conf")
+        redis.host = {{ .Values.global.redis_denorm.host }}
+        redis.port = {{ .Values.global.redis_denorm.port }}
+        redis.scan.count = 1000
+        redis.max.pipeline.size = 1000
+        cloud.storage.container = "://{{ .Values.global.spark_cloud_bucket }}/"
+        cloud.storage.provider = {{ .Values.global.cloud_storage_provider }}
+        cloud.storage.prefix   = {{ .Values.global.cloud_store_provider }}
+        cloud.storage.accountName = ""
+        druid.indexer.url = "http://{{ .Values.global.druid.host }}:{{ .Values.global.druid.port }}/druid/indexer/v1/task"
+        druid.datasource.delete.url = "http://{{ .Values.global.druid.host }}:{{ .Values.global.druid.port }}/druid/coordinator/v1/datasources"
+        metrics {
+          topicName = ${{ .Values.global.env }}.spark.stats
+        }
+        #inputSourceSpec
+        source.spec="{\"spec\":{\"ioConfig\":{\"type\":\"index_parallel\",\"inputSource\":{\"type\":\"${{ .Values.global.cloud_store_provider }}\",\"objectGlob\":\"**.json.gz\",\"prefixes\":[\"FILE_PATH\"]}}}}"
+        #deltaIngestionSpec
+        delta.ingestion.spec= "{\"type\":\"index_parallel\",\"spec\":{\"dataSchema\":{\"dataSource\":\"DATASOURCE_REF\"},\"ioConfig\":{\"type\":\"index_parallel\"},\"tuningConfig\":{\"type\":\"index_parallel\",\"maxRowsInMemory\":500000,\"forceExtendableShardSpecs\":false,\"logParseExceptions\":true}}}"
+    object-discovery:
+      conf: |+
+        include file("/opt/bitnami/spark/conf/baseconfig.conf")
+        obsrvTag = "obsrv-{{ .Values.global.env }}"
+        metrics {
+          version = "1.0.0"
+          topicName = ${{ .Values.global.env }}.spark.stats
+        }
+        connector.version = "1.0.0"
+    object-processor:
+      conf: |+
+        include file("/opt/bitnami/spark/conf/baseconfig.conf")
+        batchSize = 10
+        obsrvTag = "obsrv-{{ .Values.global.env }}"
+        metrics {
+          version = "1.0.0"
+          topicName = ${{ .Values.global.env }}.spark.stats
+        }
+        connector.version = "1.0.0"
+    jdbc-connector:
+      conf: |+
+        include file("/opt/bitnami/spark/conf/baseconfig.conf")
+        connector.version = "1.0.0"
+        drivers {
+          mysql = "com.mysql.cj.jdbc.Driver"
+          postgresql = "org.postgresql.Driver"
+        }
+        jdbc {
+          connection{
+            retry = 5
+            retryDelay = 1000
+          }
+        }
+        metrics {
+          version = "1.0.0"
+          topicName = ${{ .Values.global.env }}.spark.stats
+        }
+    spark-defaults:
+      conf: |+
+        spark.master spark://spark-master-svc:7077
+        spark.ui.prometheus.enabled true
+        spark.executor.processTreeMetrics.enabled true
+        spark.history.fs.logDirectory /opt/bitnami/spark/spark-metadata/spark-events
+        spark.eventLog.enabled true
+        spark.eventLog.dir /opt/bitnami/spark/spark-metadata/spark-events
+        spark.hadoop.fs.s3a.endpoint s3.{{ .Values.global.cloud_storage_region }}.amazonaws.com
+        spark.hadoop.fs.s3a.impl org.apache.hadoop.fs.s3a.S3AFileSystem
+        spark.hadoop.fs.s3a.assumed.role.arn {{ .Values.global.spark_service_account_arn }}
+        spark.hadoop.fs.s3a.aws.credentials.provider org.apache.hadoop.fs.s3a.auth.AssumedRoleCredentialProvider
+        spark.hadoop.fs.s3a.assumed.role.credentials.provider com.amazonaws.auth.InstanceProfileCredentialsProvider
+
+redis-denorm:
+  nameOverride: "redis-denorm"
+  fullnameOverride: "redis-denorm"
+  commonLabels:
+    system.storage: "true"
+    system.processing: "true"
+  architecture: standalone
+  commonConfiguration: |-
+    # Enable RDB persistence
+     save 300 100
+  auth:
+    enabled: false
+  serviceAccount:
+    create: false
+  master:
+    count: 1
+    podLabels:
+      system.storage: "true"
+      system.processing: "true"
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    extraFlags:
+      - "--maxmemory 1024mb"
+      - "--maxmemory-policy noeviction"
+    containerPorts:
+      redis: 6379
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 2Gi
+      requests:
+        cpu: 0.5
+        memory: 1Gi
+    persistence:
+      enabled: true
+      labels:
+        system.storage: "true"
+        system.processing: "true"
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+  replica:
+    replicaCount: 1
+    podLabels:
+      system.storage: "true"
+      system.processing: "true"
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    extraFlags:
+      - "--maxmemory 1024mb"
+      - "--maxmemory-policy noeviction"
+    containerPorts:
+      redis: 6379
+    persistence:
+      enabled: true
+      labels:
+        system.storage: "true"
+        system.processing: "true"
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+    serviceAccount:
+      create: false
+
+redis-dedup:
+  fullnameOverride: redis-dedup
+  commonLabels:
+    system.storage: "true"
+    system.processing: "true"
+  architecture: standalone
+  commonConfiguration: |-
+    # Enable RDB persistence
+    save 300 100
+  auth:
+    enabled: false
+  master:
+    count: 1
+    podLabels:
+      system.storage: "true"
+      system.processing: "true"
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    extraFlags:
+      - "--maxmemory 512mb"
+      - "--maxmemory-policy volatile-ttl"
+    containerPorts:
+      redis: 6379
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 512Mi
+      requests:
+        cpu: 0.5
+        memory: 512Mi
+    persistence:
+      enabled: true
+      labels:
+        system.storage: "true"
+        system.processing: "true"
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+  replica:
+    replicaCount: 1
+    podLabels:
+      system.storage: "true"
+      system.processing: "true"
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    extraFlags:
+      - "--maxmemory 512mb"
+      - "--maxmemory-policy volatile-ttl"
+    containerPorts:
+      redis: 6379
+    persistence:
+      enabled: true
+      labels:
+        system.storage: "true"
+        system.processing: "true"
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+    serviceAccount:
+      create: true
+
+promtail:
+  fullnameOverride: promtail
+  namespace: loki
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: monitoring
+      system.monitoring: "true"
+  podLabels:
+    system.monitoring: "true"
+
+postgresql-migration:
+  superset_oauth_clientid: "451058501-dev.oauth.obsrv.ai"
+  superset_oauth_client_secret: "luXRJMh"
+  kong_ingress_domain: "{{ .Values.global.domain }}"
+  gf_auth_generic_oauth_client_id: "528806583-dev.oauth.obsrv.ai"
+  gf_auth_generic_oauth_client_secret: "el642dcXd1P3v6i+hODnGrUKx9ZSWAlmXWZaEoZQI7/R3NUGQlLTnNCV"
+  web_console_password: "$2a$10$bG9R7ioA4/pfw8m0GPcWTOZMhc2sNN4wEkKV.j50RvQW5iUki/4Za"
+  web_console_login: "admin@obsrv.in"
+  system_settings:
+    encryption_key: "strong_encryption_key_to_encrypt"
+    default_dataset_id: "ALL"
+    max_event_size: 1048576
+    dedup_period: 604800 # In seconds (7 days)
+
+loki:
+  minio:
+    enabled: false
+  loki:
+    nameOverride: loki
+    fullNameOverride: loki
+    namespace: loki
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: "filesystem"
+    compactor:
+      shared_store: filesystem
+      working_directory: /var/loki/boltdb-shipper-compactor
+      compaction_interval: 10m
+      retention_enabled: true
+      retention_delete_delay: 1h
+      retention_delete_worker_count: 150
+    limits_config:
+      enforce_metric_name: false
+      reject_old_samples: true
+      reject_old_samples_max_age: "168h"
+      max_cache_freshness_per_query: "10m"
+      split_queries_by_interval: "15m"
+      retention_period: 2d
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /var/loki/boltdb-shipper-active
+        cache_location: /var/loki/boltdb-shipper-cache
+        cache_ttl: 24h
+        shared_store: filesystem
+      filesystem:
+        directory: /var/loki/chunks
+  singleBinary:
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 1024Mi
+      requests:
+        cpu: 0.5
+        memory: 128Mi
+    replicas: 1
+    persistence:
+      size: 25Gi
+  test:
+    enabled: false
+  monitoring:
+    nameOverride: loki
+    fullnameOverride: loki
+    selfMonitoring:
+      enabled: false
+      grafanaAgent:
+        installOperator: false
+    dashboards:
+      namespace: monitoring
+      enabled: false
+    lokiCanary:
+      enabled: false
+    serviceMonitor:
+      metricsInstance:
+        enabled: false
+  read:
+    replicas: 1
+    #   resources:
+    #     limits:
+    #       cpu: 512m
+    #       memory: 1024Mi
+    #     requests:
+    #       cpu: 256m
+    #       memory: 512Mi
+  write:
+    replicas: 1
+    #   resources:
+    #     limits:
+    #       cpu: 512m
+    #       memory: 1024Mi
+    #     requests:
+    #       cpu: 256m
+    #       memory: 512Mi
+
+# loki:
+#   namespace: loki
+#   loki:
+#     auth_enabled: false
+#     podLabels:
+#       system.monitoring: "true"
+#     commonConfig:
+#       replication_factor: 1
+#     limits_config:
+#       enforce_metric_name: false
+#       reject_old_samples: true
+#       reject_old_samples_max_age: true
+#       max_cache_freshness_per_query: 168h
+#       split_queries_by_interval: 15m
+#       retention_period: 48h
+#   compactor:
+#     retention_enabled: true
+#     working_directory: /var/loki/compactor/retention
+#   test:
+#     enabled: false
+#   minio:
+#     enabled: true
+#     resources:
+#       limits:
+#         cpu: 0.1
+#         memory: 256Mi
+#       requests:
+#         cpu: 0.1
+#         memory: 128Mi
+#     metrics:
+#       serviceMonitor:
+#         enabled: tue
+#         includeNode: true
+#         additionalLabels:
+#           release: monitoring
+#           system.monitoring: "true"
+#   monitoring:
+#     dashboards:
+#       namespace: monitoring
+#     selfMonitoring:
+#       enabled: false
+#     lokiCanary:
+#       enabled: false
+#       resources:
+#       limits:
+#         cpu: 0.1
+#         memory: 256Mi
+#       requests:
+#         cpu: 0.1
+#         memory: 128Mi
+#     serviceMonitor:
+#       labels:
+#         release: monitoring
+#         system.monitoring: "true"
+#   gateway:
+#     resources:
+#       limits:
+#         cpu: 0.1
+#         memory: 256Mi
+#       requests:
+#         cpu: 0.1
+#         memory: 128Mi
+#   read:
+#     affinity: {}
+#     podLabels:
+#       system.monitoring: "true"
+#     replicas: 1
+#     resources:
+#       limits:
+#         cpu: 0.1
+#         memory: 256Mi
+#       requests:
+#         cpu: 0.1
+#         memory: 128Mi
+#   write:
+#     affinity: {}
+#     podLabels:
+#       system.monitoring: "true"
+#     replicas: 1
+#     resources:
+#       limits:
+#         cpu: 0.1
+#         memory: 256Mi
+#       requests:
+#         cpu: 0.1
+#         memory: 128Mi
+
+kube-prometheus-stack:
+  # fullnameOverride: kube-prometheus-stack
+  namespaceOverride: "monitoring"
+  commonLabels:
+    system.monitoring: "true"
+  alertmanager:
+    alertmanagerSpec:
+      podLabels:
+        system.monitoring: "true"
+      resources:
+        limits:
+          cpu: "0.1"
+          memory: 256Mi
+        requests:
+          cpu: "0.1"
+          memory: 128Mi
+  prometheusOperator:
+    resources:
+      limits:
+        cpu: "0.1"
+        memory: 256Mi
+      requests:
+        cpu: "0.1"
+        memory: 128Mi
+    prometheusConfigReloader:
+      resources:
+        limits:
+          cpu: "0.1"
+          memory: 256Mi
+        requests:
+          cpu: "0.1"
+          memory: 128Mi
+  prometheus:
+    commonMetaLabels:
+      system.monitoring: "true"
+    server:
+      resources:
+        limits:
+          cpu: 0.5
+          memory: 512Mi
+        requests:
+          cpu: 0.5
+          memory: 512Mi
+    prometheusSpec:
+      retention: 90d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+      additionalScrapeConfigs:
+        - job_name: s3-exporter
+          scrape_interval: 5m
+          scrape_timeout: 30s
+          metrics_path: /probe
+          http_sd_configs:
+            - url: http://s3-exporter.s3-exporter.svc.cluster.local:9340/discovery
+        - job_name: s3-backups
+          metrics_path: /probe
+          static_configs:
+            - targets:
+                - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql;
+                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=redis;
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: "^bucket=(.*);prefix=(.*);$"
+              replacement: "$${1}"
+              target_label: "__param_bucket"
+            - source_labels: [__address__]
+              regex: "^bucket=(.*);prefix=(.*);$"
+              replacement: "$${2}"
+              target_label: "__param_prefix"
+            - target_label: __address__
+              replacement: s3-exporter.s3-exporter.svc.cluster.local:9340
+
+kube-state-metrics:
+  namespaceOverride: "monitoring"
+  customLabels:
+    system.monitoring: "true"
+  metricLabelsAllowlist:
+    - pods=[*]
+    - deployments=[*]
+    - statefulsets=[*]
+    - persistentvolumeclaims=[*]
+    - persistentvolumes=[*]
+  resources:
+    limits:
+      cpu: "0.1"
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi
+  releaseLabel: true
+  prometheus:
+    monitor:
+      enabled: true
+      honorLabels: true
+  selfMonitor:
+    enabled: false
+
+grafana:
+  namespaceOverride: "monitoring"
+  adminPassword: prom-operator
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+      annotations: {}
+      multicluster:
+        global:
+          enabled: false
+        etcd:
+          enabled: false
+      provider:
+        allowUiUpdates: false
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+      isDefaultDatasource: true
+      uid: prometheus
+      annotations: {}
+      httpMethod: POST
+      createPrometheusReplicasDatasources: false
+      label: grafana_datasource
+      labelValue: "1"
+      exemplarTraceIdDestinations: {}
+  service:
+    enabled: true
+    portName: http-web
+    type: ClusterIP
+  serviceMonitor:
+    enabled: true
+    interval: ""
+  extraLabels:
+    system.monitoring: "true"
+  podLabels:
+    system.monitoring: "true"
+  resources:
+    limits:
+      cpu: 0.2
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi
+  env:
+    GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+    GF_AUTH_GENERIC_OAUTH_NAME: "obsrv"
+    GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+    GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "528806583-dev.oauth.obsrv.ai"
+    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "el642dcXd1P3v6i+hODnGrUKx9ZSWAlmXWZaEoZQI7/R3NUGQlLTnNCV"
+    GF_AUTH_GENERIC_OAUTH_SCOPES: "read"
+    GF_AUTH_GENERIC_OAUTH_AUTH_HTTP_METHOD: "POST"
+    GF_AUTH_GENERIC_OAUTH_USERNAME_FIELD: "email"
+    GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP: true
+    GF_AUTH_SKIP_ORG_ROLE_SYNC: true
+    GF_SECURITY_ALLOW_EMBEDDING: "true"
+    GF_SERVER_ROOT_URL: "https://{{ .Values.global.domain }}/grafana"
+    GF_SERVER_DOMAIN: "{{ .Values.global.domain }}"
+    GF_SERVER_SERVE_FROM_SUBPATH: true
+  persistence:
+    enabled: true
+    size: 1Gi
+  alerting:
+    infra.yaml:
+      file: alerting/infra.yaml
+    api.yaml:
+      file: alerting/api.yaml
+    ingestion.yaml:
+      file: alerting/ingestion.yaml
+    node.yaml:
+      file: alerting/node.yaml
+    processing.yaml:
+      file: alerting/processing.yaml
+    storage.yaml:
+      file: alerting/storage.yaml
+
+prometheus-node-exporter:
+  namespaceOverride: "monitoring"
+  fullnameOverride: node-exporter
+  podLabels:
+    system.monitoring: "true"
+    jobLabel: node-exporter
+  resources:
+    limits:
+      cpu: "0.1"
+      memory: 256Mi
+    requests:
+      cpu: "0.1"
+      memory: 128Mi
+  releaseLabel: true
+  extraArgs:
+    - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+    - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+  service:
+    portName: http-metrics
+  prometheus:
+    monitor:
+      enabled: true
+      jobLabel: node-exporter
+      scrapeTimeout: ""
+      proxyUrl: ""
+  rbac:
+    pspEnabled: false
+
+druid-raw-cluster:
+  namespace: &druidns "druid-raw"
+  zookeeper:
+    fullNameOverride: druid-raw-zookeeper
+    namespace: *druidns
+
+druid-operator:
+  fullNameOverride: druid-operator
+
+flink:
+  commonLabels:
+    app: flink

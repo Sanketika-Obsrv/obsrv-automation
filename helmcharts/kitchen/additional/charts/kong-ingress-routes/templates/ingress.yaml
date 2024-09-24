@@ -1,0 +1,39 @@
+{{- $ingress := .Values.ingress }}
+{{- range $key, $value := $ingress }}
+{{- if $value.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $value.name }}
+  namespace: {{ $value.namespace }}
+  annotations:
+    {{- range $annotationKey, $annotationValue := merge $.Values.global.ingress_annotations ($value.annotations | default (dict)) }}
+    {{ $annotationKey }}: "{{ $annotationValue }}"
+    {{- end }}
+spec:
+  {{- $ingressClassName := default $value.ingress_class_name $.Values.ingress_class_name }}
+  {{- if $ingressClassName }}
+  ingressClassName: {{ $value.ingress_class_name | default $.Values.ingress_class_name }}
+  {{- end}}
+  {{- $global_domains := $.Values.global.domain | default (list) | list }}
+  {{- $value_domains := $value.domains | default (list) }}
+  {{- $domains := $value_domains | default $global_domains }}
+  tls:
+  - secretName: {{ default $.Values.cert_secret_name $value.cert_secret_name  }}
+    hosts:
+    {{- toYaml $domains | nindent 4}}
+  rules:
+  - http:
+      paths:
+      {{- range $path := $value.paths }}
+      - path: {{ $path.path }}
+        pathType: {{ $value.path_type }}
+        backend:
+          service:
+            name: {{ $value.service_name }}
+            port:
+              number: {{ $value.service_port }}
+      {{- end }}
+{{- end }}
+{{- end }}

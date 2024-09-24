@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+  name: wc-grafana-token-job-sa
+  namespace: {{ include "base.namespace" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+  name: wc-grafana-token-job-role
+  namespace: {{ include "base.namespace" . }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+  name: wc-grafana-token-job-rolebinding
+  namespace: {{ include "base.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: wc-grafana-token-job-role
+subjects:
+  - kind: ServiceAccount
+    name: wc-grafana-token-job-sa
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wc-create-grafana-secret
+  namespace: {{ include "base.namespace" . }}
+  labels:
+    app: grafana
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    spec:
+      serviceAccountName: wc-grafana-token-job-sa
+      containers:
+        - name: wc-create-token
+          image: bitnami/kubectl:1.21
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              response=$(curl -Ssq "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts/search" \
+                  -H 'Accept: application/json' \
+                  -H 'Content-type: application/json' \
+                  -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}")
+              id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ .Values.namespace }}-sa") | .id')
+
+
+              # curl -X DELETE "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts/$id" \
+              #     -H 'Accept: application/json' \
+              #     -H 'Content-type: application/json' \
+              #     -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}"
+
+              # Check if the service account already exists or not
+              if [ -z "$id" ]; then
+                  echo "The ID for the service account 'grafana-{{ .Values.namespace }}-sa' could not be found. Creating new service account."
+
+                  response=$(curl -Ss -X POST "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts" \
+                      -H 'Accept: application/json' \
+                      -H 'Content-type: application/json' \
+                      -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}" \
+                      -d '{"name": "grafana-{{ .Values.namespace }}-sa","role": "Admin","isDisabled": false}')
+
+                  echo "SA creation response:"
+                  echo $response
+                  service_account_id=$(echo "$response" | jq -r '.id')
+
+                  if [ -z "$service_account_id" ]; then
+                      echo "failed to create service account"
+                      exit 1;
+                  else
+                      echo "generating token for 'grafana-{{ .Values.namespace }}-sa': $service_account_id"
+                      response=$(curl -Ss "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts/$service_account_id/tokens" \
+                      -H 'Accept: application/json' \
+                      -H 'Content-type: application/json' \
+                      -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}" \
+                      -d '{"name": "grafana-{{ .Values.namespace }}-sa"}')
+
+                      echo "token response:"
+                      echo $response
+                      auth_token=$(echo "$response" | jq -r '.key')
+
+                      if [ "$auth_token" = "null" ]
+                      then
+                          echo "unable to find the token for the service account. Please manually delete the service account and rerun this job."
+                          exit 1
+                      else
+                          if ! kubectl get secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
+                              echo "secret '{{ .Values.namespace }}-grafana-secret' does not exists..creating..."
+                          else
+                              echo "secret '{{ .Values.namespace }}-grafana-secret' already exists..deleting and recreating..."
+                              kubectl delete secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }}
+                          fi
+                          kubectl create secret generic {{ .Values.namespace }}-grafana-secret --from-literal=grafana_token="Bearer $auth_token" -n {{ .Values.namespace }}
+                      fi
+                  fi
+              else
+                  echo "Service account already exists. The ID of the service account 'grafana-{{ .Values.namespace }}-sa' is: $id"
+                  exit 0
+              fi
+      restartPolicy: OnFailure
+
+

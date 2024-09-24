@@ -1,0 +1,2 @@
+1 Changes to suport namespace and image sections
+values.yaml images anchor to change yaml indentation

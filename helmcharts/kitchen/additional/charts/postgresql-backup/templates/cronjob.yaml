@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ include "base.namespace" . }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ .Values.cronSchedule }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            {{- if .Values.podAnnotations }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 12 }}
+            {{- end }}
+          labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 12 }}
+        spec:
+          serviceAccountName: {{ include "base.serviceaccountname" . }}
+          restartPolicy: {{ .Values.restartPolicy }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.initContainers }}
+          initContainers:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: {{ .Chart.Name }}
+              image: "{{- include "base.image" .}}"
+              imagePullPolicy: {{ .Values.imagePullPolicy }}
+              {{- if .Values.livenessProbe }}
+              livenessProbe:
+                {{- toYaml .Values.livenessProbe | nindent 16 }}
+              {{- end }}
+              {{- if .Values.readinessProbe }}
+              readinessProbe:
+                {{- toYaml .Values.readinessProbe | nindent 16 }}
+              {{- end }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              envFrom:
+              - configMapRef:
+                  name: {{ include "common.names.fullname" . }}-env
+              {{- if .Values.configmap.enabled }}
+              volumeMounts:
+              - name: config
+                mountPath: {{ .Values.configmap.mountPath }}
+              {{- end }}
+            {{- with .Values.sidecars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.configmap.enabled }}
+          volumes:
+          - name: config
+            configMap:
+              name: {{ include "common.names.fullname" . }}
+          {{- end }}

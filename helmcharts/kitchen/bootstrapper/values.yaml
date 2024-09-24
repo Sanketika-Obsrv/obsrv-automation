@@ -1,0 +1,30 @@
+namespaces:
+- cert-manager
+- command-api
+- dataset-api
+- druid-raw
+- flink
+- hms
+- kafka
+- kong-ingress
+- kubernetes-reflector
+- loki
+- monitoring
+- postgresql
+- redis
+- s3-exporter
+- secor
+- spark
+- submit-ingestion
+- superset
+- system-rules-ingestor
+- trino
+- velero
+- volume-autoscaler
+- web-console
+
+global:
+  image:
+    dockerRegistrySecretName: obsrv-docker-secret
+    dockerConfigJson: |-
+      {"auths":{"DOCKER_REGISTRY_SERVER":{"username":"DOCKER_USER","password":"DOCKER_PASSWORD","email":"DOCKER_EMAIL","auth":"BASE64_ENCODED_USER_PASS"}}}
