@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: 1.0.0
+description: Obsrv Helm Chart
+maintainers:
+- name: Sanketika.in
+name: obsrv
+version: 0.1.0

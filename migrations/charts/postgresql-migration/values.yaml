@@ -1,0 +1,148 @@
+nameOverride: "postgresql-migration"
+fullnameOverride: "postgresql-migration"
+
+replicaCount: 1
+
+global:
+  image:
+    registry: ""
+
+namespace: postgresql
+registry: "docker.io"
+repository: "flyway/flyway"
+tag: "10.1"
+digest: ""
+
+imagePullPolicy: IfNotPresent
+imagePullSecrets: []
+
+commonLabels: {}
+
+commonAnnotations:
+  "helm.sh/hook": pre-install, pre-upgrade
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # runAsNonRoot: true
+  # runAsUser: 1001
+  # fsGroup: 1001
+
+securityContext: {}
+  # readOnlyRootFilesystem: false
+  # capabilities:
+  #   drop:
+  #   - ALL
+
+# This block is an interface for k8s service spec.
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - paths:
+      - /
+      # host: chart-example.local
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+livenessProbe: {}
+  # httpGet:
+  #   path: "/healthz"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+readinessProbe: {}
+  # httpGet:
+  #   path: "/ready"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+configmap:
+  enabled: true
+  mountPath: /flyway/script
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+serviceMonitor:
+  enabled: false
+  selectorLabels:
+    release: monitoring
+  endpoints: []
+  # - port: http # the name of the port in your service, assuming the primary service port is named 'http' in this example.
+  #   path: /metrics
+  #   interval: 30s
+  #   scrapeTimeout: 10s
+  #   honorLabels: true
+
+# Example values.yaml structure
+initContainers: {}
+  # - name: init-myservice
+  #   image: busybox:1.28
+  #   command: ['sh', '-c', "until nslookup kubernetes.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
+
+sidecars: {}
+  # - name: log-reader # Sidecar container
+  #   image: busybox # Use another busybox image
+  #   command: ["/bin/sh"] # Override the default command
+  #   args: ["-c", "tail -f /var/log/app.log"] # Run a shell script that tails the log file
+
+startupCommand:
+  - /flyway/script/migrate.sh
+restartPolicy: "OnFailure"
+FLYWAY_LOCATIONS: "filesystem:/flyway/migrations"
+FLYWAY_URL: "jdbc:postgresql://{{ .Values.global.postgresql.host }}:5432/"
+driver_class_name: "org.postgresql.Driver"
+migration_folder_list:
+  - 01-superset
+  - 02-druid-raw
+  - 03-obsrv
+  - 04-hms
+postgresql_superset_user_password: "{{ .Values.global.postgresql.superset.password }}"
+postgresql_druid_raw_user_password: "{{ .Values.global.postgresql.druid.password }}"
+postgresql_obsrv_user_password: "{{ .Values.global.postgresql.obsrv.password }}"
+postgresql_hms_user_password: "{{ .Values.global.postgresql.hms.password }}"
+superset_oauth_clientid: ""
+superset_oauth_client_secret: ""
+kong_ingress_domain: ""
+gf_auth_generic_oauth_client_id: ""
+gf_auth_generic_oauth_client_secret: ""
+web_console_password: ""
+web_console_login: ""
+system_settings:
+  encryption_key: "strong_encryption_key_to_encrypt"
+  default_dataset_id: "ALL"
+  max_event_size: 1048576
+  dedup_period: 604800 # In seconds (7 days)

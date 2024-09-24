@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hadoop-config
+  namespace: {{ .Values.namespace }}
+data:
+  core-site.xml: |
+    <configuration>
+    {{- range $key, $value := .Values.hadoop_core_site }}
+      <property>
+        <name>{{ $key }}</name>
+        <value>{{ $value }}</value>
+      </property>
+    {{- end }}
+    </configuration>

@@ -1,0 +1,3 @@
+removed redis dependency
+Added namespace/image functions
+Added image anchor in values.yaml
