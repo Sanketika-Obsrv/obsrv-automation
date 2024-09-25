@@ -30,23 +30,23 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.1-RC"
+    tag: "1.1.0-RC"
     digest: ""
 
   web-console: &web-console # registry: ""
-    repository: "sb-obsrv-web-console"
-    tag: "1.1-RC"
+    repository: "obsrv-web-console"
+    tag: "1.1.0-RC"
     digest: ""
 
   ## PIPELINE ENTERPRISE
   unified-pipeline: &unified-pipeline # registry: ""
     repository: unified-pipeline
-    tag: "1.1-RC"
+    tag: "1.1.0-RC"
     digest: ""
   
   cache-indexer: &cache-indexer # registry: ""
     repository: cache-indexer
-    tag: "1.1-RC"
+    tag: "1.1.0-RC"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS

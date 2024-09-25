@@ -255,7 +255,7 @@ lakehouse-connector:
       fs.s3a.access.key: *s3-access-key
       fs.s3a.secret.key: *s3-secret-access-key
   serviceAccount: 
-    create: *create_sa
+    create: false
     name: flink-sa
     annotations:
       <<: *flink_sa_annotation

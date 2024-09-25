@@ -3,7 +3,7 @@ imagepullsecrets: ""
 image:
   registry: sanketikahub
   repository: lakehouse-connector
-  tag: 1.0.3
+  tag: 1.0.8
 serviceMonitor:
   enabled: false
 replicaCount: 1
@@ -15,8 +15,8 @@ jobmanager:
   ui_port: 8081
   prom_port: 9250
   heap_memory: 1024
-  cpu_requests: 0.25
-  cpu_limits: 0.25
+  cpu_requests: 1
+  cpu_limits: 1
   memory_requests: 1024Mi
   memory_limits: 1024Mi
 
@@ -33,7 +33,7 @@ taskmanager:
   cpu_requests: 1
   cpu_limits: 1
   memory_requests: 1024Mi
-  memory_limits: 1024Mi
+  memory_limits: 2300Mi
 
 checkpoint_store_type: "s3"
 
@@ -156,8 +156,8 @@ base_config: |
   task {
     parallelism = 1
     consumer.parallelism = 1
-    checkpointing.interval = 30000
-    checkpointing.pause.between.seconds = 5000
+    checkpointing.interval = 120000
+    checkpointing.pause.between.seconds = 120000
     restart-strategy.attempts = 3
     restart-strategy.delay = 30000 # in milli-seconds
   }
@@ -229,23 +229,25 @@ lakehouse-connector:
         base.path = "{{ .Values.global.hudi_metadata_bucket }}"
       }
       write {
-        tasks = 2
-        task.max.memory = 256
-        compaction.max.memory = 100
+        tasks = 1
+        task.max.memory = 512
+        compaction.max.memory = 512
       }
       metadata.enabled = true
       compaction.enabled = true
+      delta.commits = 5
+      metadata.delta.commits = 5
       write.tasks = 2
-      write.batch.size = 16
-      compaction.tasks = 2
+      write.batch.size = 256
+      compaction.tasks = 1
       index.type = "BLOOM"
       delta.commits = 2
       delta.seconds = 10
       write.batch.size = 256
       compaction.tasks = 2
-      index.type = "BLOOM"
-      delta.commits = 2
-      delta.seconds = 600
+      write.lock.provider = "org.apache.hudi.client.transaction.lock.InProcessLockProvider"
+      write.concurrency.mode = "optimistic_concurrency_control"
+      metadata.index.column.stats.enabled = true
       compression.codec = "snappy"
       {{- if eq .Values.global.cloud_storage_provider "azure" }}
       fs.atomic_creation.support = "wasbs"
@@ -256,12 +258,13 @@ lakehouse-connector:
     }
   flink-conf: |+
     jobmanager.memory.flink.size: 1024m
-    taskmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 2048m
     taskmanager.numberOfTaskSlots: 1
     jobManager.numberOfTaskSlots: 1
     parallelism.default: 1
     jobmanager.execution.failover-strategy: region
     taskmanager.memory.network.fraction: 0.1
+    taskmanager.memory.managed.fraction: 0.3
     heartbeat.timeout: 8000
     heartbeat.interval: 5000
     state.savepoints.dir: file:///tmp

@@ -1,0 +1,17 @@
+**/target
+*.iml
+.idea
+.classpath
+*.DS_Store
+*.terrahelpbkp 
+**/.terraform/*
+automation-scripts/infra-setup/awscliv2.zip
+automation-scripts/infra-setup/aws/dist
+automation-scripts/infra-setup/aws/install
+automation-scripts/infra-setup/aws/README.md
+automation-scripts/infra-setup/aws/THIRD_PARTY_LICENSES
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+!overrides.tfvars
