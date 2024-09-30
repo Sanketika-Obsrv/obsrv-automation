@@ -132,7 +132,7 @@ spec:
 {{- $release_name := .Chart.Name }}
                "--job-classname={{ (index .Values $release_name).job_classname }}",
                "-Dweb.submit.enable=false",
-               "-Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter",
+               "-Dmetrics.reporter.prom.factory.class=org.apache.flink.metrics.prometheus.PrometheusReporterFactory",
                "-Dmetrics.reporter.prom.port={{ .Values.jobmanager.prom_port }}",
                "-Djobmanager.rpc.address={{ .Chart.Name }}-jobmanager",
                "-Djobmanager.rpc.port={{ .Values.jobmanager.rpc_port }}",
