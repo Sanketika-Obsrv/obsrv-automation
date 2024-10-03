@@ -156,7 +156,9 @@ serviceConfig:
       workflow:
         - MAKE_DATASET_LIVE
         - SUBMIT_INGESTION_TASKS
+        - CREATE_KAFKA_TOPIC
         - START_PIPELINE_JOBS
+        - DEPLOY_CONNECTORS
         - CREATE_ALERT_METRIC
         - CREATE_AUDIT_EVENT
     RESTART_PIPELINE:
