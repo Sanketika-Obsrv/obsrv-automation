@@ -18,7 +18,14 @@ additionalDataSources:
   url: http://loki-gateway.loki.svc.cluster.local
   jsonData:
     maxLines: 1000
-
+- name: Prometheus
+  type: prometheus
+  access: proxy
+  uid: prometheus
+  url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+  jsonData:
+    timeInterval: "5s"
+    httpMethod: "POST"
 # To add new dashboards, place the exported json in dashboards directory
 # If any dashboards are added / modified / removed,
 # bump up the chart version number in order to pick up changes

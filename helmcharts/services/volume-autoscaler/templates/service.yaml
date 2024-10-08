@@ -8,8 +8,8 @@ kind: Service
 
 metadata:
   # Should use name: {{ template "name" . }}
-  name: {{ template "name" . }}
-  namespace: {{ include "base.namespace" . }}
+  name: {{ include "volume-autoscaler.fullname" . }}
+  namespace: {{ (include "base.namespace" $) }}
 
   annotations:
     # Our service annotations (old method, backwards compatability)
@@ -44,11 +44,11 @@ spec:
   selector:
 {{- if .Values.usingNewRecommendedLabels }}
 {{- if .Values.labelsEnableDefault }}
-    app.kubernetes.io/name: {{ template "name" . }}
+    app.kubernetes.io/name: {{ include "volume-autoscaler.name" . }}
 {{- end }}
 {{- else }}
 {{- if .Values.labelsEnableDefault }}
-    app: {{ template "name" . }}
+    app: {{ include "volume-autoscaler.name" . }}
 {{- end }}
 {{- end }}
 {{- if .Values.labels }}

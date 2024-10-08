@@ -10,8 +10,8 @@ metadata:
 {{- if .Values.serviceMonitorLabels }}
 {{ toYaml .Values.serviceMonitorLabels | indent 4 }}
 {{- end }}
-  name: {{ template "name" . }}
-  namespace: {{ include "base.namespace" . }}
+  name: {{ include "volume-autoscaler.fullname" . }}
+  namespace: {{ (include "base.namespace" $) }}
 spec:
   endpoints:
   - interval: 30s
@@ -22,5 +22,8 @@ spec:
     - volume-autoscaler
   selector:
     matchLabels:
-      app.kubernetes.io/instance: "volume-autoscaler"
+      app.kubernetes.io/instance: {{ .Release.Name }}
       app.kubernetes.io/name: "volume-autoscaler"
+      {{- with .Values.serviceMonitorLabels }}
+      {{- toYaml . | nindent 6 }}
+    {{- end }}

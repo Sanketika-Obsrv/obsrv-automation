@@ -287,23 +287,7 @@ loki:
       selector: null
 
 
-grafana:
-  resources:
-    limits:
-      cpu: 0.2
-      memory: 256Mi
-    requests:
-      cpu: 0.1
-      memory: 128Mi
-  persistence:
-    type: pvc
-    # storageClassName: default
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
-    # annotations: {}
-    finalizers:
-      - kubernetes.io/pvc-protection
+
 
 #druid-raw-cluster need changes in yaml files
 druid-raw-cluster:
@@ -430,7 +414,7 @@ kube-prometheus-stack:
     resources:
       limits:
         cpu: 0.1
-        memory: 256Mi
+        memory: 512Mi
       requests:
         cpu: 0.1
         memory: 128Mi
@@ -452,15 +436,42 @@ kube-prometheus-stack:
           cpu: 0.5
           memory: 512Mi
           #issue getting resources
+  grafana:
+    resources:
+      limits:
+        cpu: 0.2
+        memory: 128Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+    persistence:
+      type: pvc
+      # storageClassName: default
+      accessModes:
+        - ReadWriteOnce
+      size: 10Gi
+      # annotations: {}
+      finalizers:
+        - kubernetes.io/pvc-protection        
 
-kube-state-metrics:
-  resources:
-    limits:
-      cpu: 0.1
-      memory: 256Mi
-    requests:
-      cpu: 0.1
-      memory: 128Mi
+  kube-state-metrics:
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+
+  prometheus-node-exporter:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 100m
+        memory: 32Mi
+        
 
 kubernetes-reflector:
   resources:
@@ -480,14 +491,6 @@ postgresql-exporter:
       cpu: 50m
       memory: 128Mi
 
-prometheus-node-exporter:
-  resources:
-    limits:
-      cpu: 100m
-      memory: 64Mi
-    requests:
-      cpu: 100m
-      memory: 32Mi
 
 secor:
   resources:

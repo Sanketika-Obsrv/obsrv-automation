@@ -1,9 +1,9 @@
 global:
   image:
     registry: &global_registry "sanketikahub"
-    dockerRegistrySecretName: &dockerSecretName ""
+    dockerRegistrySecretName: &dockerSecretName "registry-secret-name"
     dockerConfigJson: |-
-      {"auths":{"DOCKER_REGISTRY_SERVER":{"username":"DOCKER_USER","password":"DOCKER_PASSWORD","email":"DOCKER_EMAIL","auth":"BASE64_ENCODED_USER_PASS"}}}
+      {"auths":{"http://registry.your-domain.io":{"username":"REGISTRY_USER","password":"REGISTRY_PASSWORD","email":"email@your-domain.io","auth":"UkVHSVNUUllfVVNFUjpSRUdJU1RSWV9QQVNTV09SRA=="}}}
 
 
 imagePullSecrets: &imagePullSecrets
@@ -19,7 +19,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.1-RC"
+    tag: "1.1.0-RC"
     digest: ""
 
   # dataset-api: #open source
@@ -43,7 +43,7 @@ images: &images
     repository: unified-pipeline
     tag: "1.1.0-RC"
     digest: ""
-  
+
   cache-indexer: &cache-indexer # registry: ""
     repository: cache-indexer
     tag: "1.1.0-RC"
@@ -108,7 +108,7 @@ images: &images
     repository: "bitnami/redis"
     tag: "7.0.11-debian-11-r15"
     digest: ""
-    pullSecrets: 
+    pullSecrets:
       - *dockerSecretName
 
   # submit-ingestion: &submit-ingestion
@@ -321,15 +321,15 @@ images: &images
     tag: "432"
     digest: ""
 
-  promitor-agent-scraper: &promitor-agent-scraper 
+  promitor-agent-scraper: &promitor-agent-scraper
     repository: containers.promitor.io/tomkerkhove/promitor-agent-scraper
     pullPolicy: IfNotPresent
     pullSecrets: []
-  
+
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.0.8
-  
+    tag: 1.1-RC
+
   nlq-api: &nlq-api
     repository: text2sql
     tag: 0.1.0
@@ -351,7 +351,7 @@ internal: &internal
   dataset-api:
     <<: *dataset-api
     imagePullSecrets: *imagePullSecrets
-  
+
   nlq-api:
     <<: *nlq-api
     imagePullSecrets: *imagePullSecrets
@@ -525,15 +525,15 @@ internal: &internal
 
   volume-autoscaler:
     <<: *volume-autoscaler
-  
-  promitor-agent-scraper: 
+
+  promitor-agent-scraper:
     image:
       <<: *promitor-agent-scraper
-    
+
   lakehouse-connector:
-    image: 
+    image:
       <<: *lakehouse-connector
-      
+
 
 ## Sourcing internal as root element,
 ## should need arise

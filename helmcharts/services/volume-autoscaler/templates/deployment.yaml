@@ -6,8 +6,8 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: {{ template "name" . }}
-  namespace: {{ include "base.namespace" . }}
+  name: {{ include "volume-autoscaler.fullname" . }}
+  namespace: {{ (include "base.namespace" $) }}
 {{- include "labels" . | indent 2 }}
 
 # Deployment specification
@@ -39,11 +39,11 @@ spec:
     matchLabels:
 {{- if .Values.usingNewRecommendedLabels }}
 {{- if .Values.labelsEnableDefault }}
-      app.kubernetes.io/name: {{ .Values.name | trunc 63 | trimSuffix "-" | quote }}
+      app.kubernetes.io/name: {{ include "volume-autoscaler.name" . }}
 {{- end }}
 {{- else }}
 {{- if .Values.labelsEnableDefault }}
-      app: {{ template "name" . }}
+      app: {{ include "volume-autoscaler.name" . }}
 {{- end }}
 {{- end }}
 
@@ -101,7 +101,7 @@ spec:
       containers:
 
         # The primary container for our service
-        - name: {{ template "name" . }}
+        - name: {{ include "volume-autoscaler.name" . }}
           image: "{{- include "base.image" .}}"
 {{- if and .Values.tty (eq (.Values.tty | toString) "true") }}
           stdin: true
@@ -435,7 +435,7 @@ SORRY for this mess, this is needed because of the above
 
 # Service Account creation
 {{- if or (eq .Values.serviceAccount.enabled true) (eq .Values.rbac.create true) }}
-      serviceAccountName: {{ template "name" . }}
+      serviceAccountName: {{ include "volume-autoscaler.fullname" . }}
 {{- end }}
 
 # This is our image pull secret references, if we have image pull secrets

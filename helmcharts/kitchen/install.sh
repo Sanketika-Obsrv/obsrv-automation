@@ -19,7 +19,7 @@ case $cloud_env in
         ;;
 esac
 
-cp -rf ../{global-values.yaml,images.yaml} ./
+cp -rf ../{global-values.yaml,global-resource-values.yaml,images.yaml} ./
 
 if [ "$2" == "template" ]; then
     cmd="template"
@@ -31,51 +31,51 @@ case "$1" in
 bootstrap)
     rm -rf bootstrapper
     cp -rf ../bootstrapper ./bootstrapper
-    helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace --debug
+    helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace --debug
     ;;
 coredb)
     rm -rf coredb
     cp -rf ../obsrv coredb
     cp -rf ../services/{kafka,postgresql,redis-denorm,redis-dedup,kong,druid-operator} coredb/charts/
-    helm $cmd coredb ./coredb -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 migrations)
     rm -rf migrations
     cp -rf ../obsrv migrations
     cp -rf ../services/{postgresql-migration,cert-manager,kubernetes-reflector,grafana-configs} migrations/charts/
 
-    helm $cmd migrations ./migrations -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 monitoring)
     rm -rf monitoring
     cp -rf ../obsrv monitoring
-    cp -rf ../services/{promtail,loki,grafana,kube-prometheus-stack,prometheus-node-exporter,kafka-message-exporter,kube-state-metrics,alert-rules} monitoring/charts/
-    helm $cmd monitoring ./monitoring -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    cp -rf ../services/{promtail,loki,grafana,kube-prometheus-stack,kafka-message-exporter,alert-rules} monitoring/charts/
+    helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name --debug
     ;;
 coreinfra)
     rm -rf coreinfra
     cp -rf ../obsrv coreinfra
     cp -rf ../services/{druid-raw-cluster,flink,superset} coreinfra/charts/
 
-    helm $cmd coreinfra ./coreinfra -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 obsrvapis)
     rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
     cp -rf ../services/{command-api,dataset-api} obsrvapis/charts/
-    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 hudi)
     rm -rf hudi
     cp -rf ../obsrv hudi
     cp -rf ../services/{hms,trino,lakehouse-connector} hudi/charts/
-    helm $cmd hudi ./hudi -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd hudi ./hudi -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 obsrvtools)
     rm -rf obsrvtools
     cp -rf ../obsrv obsrvtools
     cp -rf ../services/{web-console,submit-ingestion} obsrvtools/charts/
-    helm $cmd obsrvtools ./obsrvtools -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd obsrvtools ./obsrvtools -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 additional)
     rm -rf additional
@@ -92,7 +92,7 @@ additional)
         ;;
     esac
 
-    helm $cmd additional ./additional -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 all)
     # bash $0 bootstrap
@@ -121,7 +121,7 @@ reset)
     fi
     cp -rf ../obsrv ./$1-ind
     cp -rf ../services/$1 ./$1-ind/charts/
-    helm $cmd $1-ind ./$1-ind -n obsrv -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd $1-ind ./$1-ind -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     rm -rf ./$1-ind
     ;;
 esac
