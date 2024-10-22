@@ -69,7 +69,7 @@ defaults:
   druid_indexer_host: &druid-indexer-host "druid-raw-indexers.druid-raw.svc.cluster.local"
 
   redirection_auth_path: &redirection_auth_path ""
-  domain: &domain "34.172.33.15.sslip.io"
+  domain: &domain "13.234.121.41.sslip.io"
 
   ssl_enabled: &ssl_enabled true
 
@@ -237,12 +237,6 @@ prometheus: &prometheus
 loki:
   namespace: *loki-namespace
 
-grafana:
-  fullnameOverride: "grafana"
-  namespaceOverride: *monitoring-namespace #TODO: check why namespace  doesn't work here
-  env:
-    GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
-    GF_SECURITY_ADMIN_USER: *grafana-admin-user
 
 druid-raw-cluster: &druid-raw-cluster
   namespace: *druid-namespace
@@ -263,9 +257,20 @@ kafka-message-exporter:
 
 kube-prometheus-stack:
   namespaceOverride: *monitoring-namespace
+  kube-state-metrics:
+    namespaceOverride: *monitoring-namespace
+  prometheus-node-exporter:
+    namespaceOverride: *monitoring-namespace
+  grafana:
+    fullnameOverride: "grafana"
+    namespaceOverride: *monitoring-namespace 
+    env:
+      GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
+      GF_SECURITY_ADMIN_USER: *grafana-admin-user
+  
 
-kube-state-metrics:
-  namespaceOverride: *monitoring-namespace
+  
+
 
 kubernetes-reflector:
   namespace: *kubernetes-reflector-namespace
@@ -285,8 +290,6 @@ postgresql-exporter:
       user: *pguser
       password: *pgpassword
 
-prometheus-node-exporter:
-  namespaceOverride: *monitoring-namespace
 
 spark: &spark
   namespace: *spark-namespace
