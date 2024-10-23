@@ -158,7 +158,7 @@ env:
   denorm_redis_port: "{{ .Values.global.redis_denorm.port }}"
   dedup_redis_host: "{{ .Values.global.redis_dedup.host }}"
   dedup_redis_port: "{{ .Values.global.redis_dedup.port }}"
-  cloud_storage_provider: "{{ .Values.global.storage_provider }}"
+  cloud_storage_provider: "{{ .Values.global.cloud_storage_provider }}"
   cloud_storage_region: "{{ .Values.global.cloud_storage_region }}"
   container: "{{ .Values.global.dataset_api_container }}"
   container_prefix: "connector-registry"

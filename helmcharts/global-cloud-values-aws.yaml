@@ -3,43 +3,45 @@ global:
   cloud_store_provider: &cloud_store_provider "s3"
   cloud_storage_region: &cloud_storage_region "ap-south-1"
   dataset_api_container: ""
-  postgresql_backup_cloud_bucket: &backups_bucket "backups-obsrv-test-905418313089"
-  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-test-905418313089"
-  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-test-905418313089"
-  cloud_storage_bucket: &cloud_storage_bucket "obsrv-test-905418313089"
+  postgresql_backup_cloud_bucket: &backups_bucket "backups-obsrv-v2-dev-905418313089"
+  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-v2-dev-905418313089"
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-v2-dev-905418313089 "
+  cloud_storage_bucket: &cloud_storage_bucket "obsrv-v2-dev-905418313089"
+  cloud_storage_config: |+
+    '{"identity":"name","credential":"key" , "region": region- name}'
 
   spark_cloud_bucket: ""
   storage_class_name: &storage_class_name "gp2"
   spark_service_account_arn: ""
   secor_backup_bucket: &secor_backup_bucket "telemetry_data_store"
-  checkpoint_bucket: &checkpoint_bucket "s3://checkpoint-obsrv-test-905418313089"
+  checkpoint_bucket: &checkpoint_bucket "s3://checkpoint-obsrv-v2-dev-905418313089"
   deep_store_type: &deep_store_type "s3"
   s3_access_key: &s3-access-key ""
   s3_secret_key: &s3-secret-access-key ""
 kong_annotations: &kong_annotations 
   service.beta.kubernetes.io/aws-load-balancer-type: nlb
   service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-  service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "eipalloc-0aa23e2d7c6e7d1f0"
-  service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-07f8d7579cb8fe885"
+  service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "eipalloc-048c5d808e0cbfe90"
+  service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-058fb1b800efeff66"
 
 service_accounts:
   enabled: &create_sa true
   secor: &secor_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-secor-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-secor-sa-iam-role"
   dataset_api: &dataset_api_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-dataset-api-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-dataset-api-sa-iam-role"
   druid_raw: &druid_raw_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-druid-raw-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-druid-raw-sa-iam-role"
   flink: &flink_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-flink-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-flink-sa-iam-role"
   postgresql_backup: &postgresql_backup_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-postgresql-backup-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-postgresql-backup-sa-iam-role"
   redis_backup: &redis_backup_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-redis-backup-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-redis-backup-sa-iam-role"
   s3_exporter: &s3_exporter_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-s3-exporter-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-s3-exporter-sa-iam-role"
   spark: &spark_sa_annotation
-    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/test-obsrv-spark-sa-iam-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::905418313089:role/dev-obsrv-v2-spark-sa-iam-role"
 
 redis-service-account: &redis-service-account
   serviceAccount:
