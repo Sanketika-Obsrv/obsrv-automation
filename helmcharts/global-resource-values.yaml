@@ -291,7 +291,7 @@ loki:
 
 #druid-raw-cluster need changes in yaml files
 druid-raw-cluster:
-  druid_brokers_pod:
+  druid_brokers:
     resources:
       limits:
         cpu: 500m
@@ -300,7 +300,7 @@ druid-raw-cluster:
         cpu: 250m
         memory: 128Mi
       
-  druid_coordinator_pod:
+  druid_coordinator:
     resources:
       limits:
         cpu: 500m
@@ -309,7 +309,7 @@ druid-raw-cluster:
         cpu: 250m
         memory: 500Mi
 
-  druid_overlord_pod:
+  druid_overlord:
     resources:
       limits:
         cpu: 500m
@@ -318,7 +318,7 @@ druid-raw-cluster:
         cpu: 250m
         memory: 256Mi
 
-  druid_historical_pod:
+  druid_historical:
     resources:
       limits:
         cpu: 1
@@ -331,13 +331,13 @@ druid-raw-cluster:
         - ReadWriteOnce
       size: 50Gi
 
-  druid_middlemanager_pod:
+  druid_middlemanager:
     persistence:
       accessModes:
         - ReadWriteOnce
       size: 1Gi
 
-  druid_indexer_pod:
+  druid_indexer:
     resources:
       limits:
         cpu: 1
@@ -350,7 +350,7 @@ druid-raw-cluster:
         - ReadWriteOnce
       size: 20Gi
 
-  druid_router_pod:
+  druid_router:
     resources:
       limits:
         cpu: 512m
@@ -500,7 +500,7 @@ secor:
     requests:
       cpu: 128m
       memory: 512Mi
-      #issue running helm templete
+      
   
 spark:
   master:
