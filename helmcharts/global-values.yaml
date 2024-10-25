@@ -267,6 +267,19 @@ kube-prometheus-stack:
     env:
       GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
       GF_SECURITY_ADMIN_USER: *grafana-admin-user
+    grafana.ini:
+      smtp:
+        enabled: true
+        host: ""
+        user: ""
+        password: ""
+        from_address: ""
+        cert_file: ""
+        key_file: ""
+        ehlo_identity: ""
+        startTLS_policy: ""
+        skip_verify: true
+        from_name: "Grafana"    
   
 
   

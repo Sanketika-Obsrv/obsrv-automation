@@ -619,136 +619,111 @@ kube-prometheus-stack:
             - target_label: __address__
               replacement: s3-exporter.s3-exporter.svc.cluster.local:9340
 
-kube-state-metrics:
-  namespaceOverride: "monitoring"
-  customLabels:
-    system.monitoring: "true"
-  metricLabelsAllowlist:
-    - pods=[*]
-    - deployments=[*]
-    - statefulsets=[*]
-    - persistentvolumeclaims=[*]
-    - persistentvolumes=[*]
-  resources:
-    limits:
-      cpu: "0.1"
-      memory: 256Mi
-    requests:
-      cpu: "0.1"
-      memory: 128Mi
-  releaseLabel: true
-  prometheus:
-    monitor:
-      enabled: true
-      honorLabels: true
-  selfMonitor:
-    enabled: false
+  kube-state-metrics:
+    namespaceOverride: "monitoring"
+    customLabels:
+      system.monitoring: "true"
+    metricLabelsAllowlist:
+      - pods=[*]
+      - deployments=[*]
+      - statefulsets=[*]
+      - persistentvolumeclaims=[*]
+      - persistentvolumes=[*]
+    resources:
+      limits:
+        cpu: "0.1"
+        memory: 256Mi
+      requests:
+        cpu: "0.1"
+        memory: 128Mi
+    releaseLabel: true
+    prometheus:
+      monitor:
+        enabled: true
+        honorLabels: true
+    selfMonitor:
+      enabled: false
 
-grafana:
-  namespaceOverride: "monitoring"
-  adminPassword: prom-operator
-  sidecar:
-    dashboards:
+  grafana:
+    namespaceOverride: "monitoring"
+    # adminPassword: prom-operator
+    service:
       enabled: true
-      label: grafana_dashboard
-      labelValue: "1"
-      searchNamespace: ALL
-      annotations: {}
-      multicluster:
-        global:
-          enabled: false
-        etcd:
-          enabled: false
-      provider:
-        allowUiUpdates: false
-    datasources:
+      portName: http-web
+      type: ClusterIP
+    serviceMonitor:
       enabled: true
-      defaultDatasourceEnabled: true
-      isDefaultDatasource: true
-      uid: prometheus
-      annotations: {}
-      httpMethod: POST
-      createPrometheusReplicasDatasources: false
-      label: grafana_datasource
-      labelValue: "1"
-      exemplarTraceIdDestinations: {}
-  service:
-    enabled: true
-    portName: http-web
-    type: ClusterIP
-  serviceMonitor:
-    enabled: true
-    interval: ""
-  extraLabels:
-    system.monitoring: "true"
-  podLabels:
-    system.monitoring: "true"
-  resources:
-    limits:
-      cpu: 0.2
-      memory: 256Mi
-    requests:
-      cpu: "0.1"
-      memory: 128Mi
-  env:
-    GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
-    GF_AUTH_GENERIC_OAUTH_NAME: "obsrv"
-    GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
-    GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "528806583-dev.oauth.obsrv.ai"
-    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "el642dcXd1P3v6i+hODnGrUKx9ZSWAlmXWZaEoZQI7/R3NUGQlLTnNCV"
-    GF_AUTH_GENERIC_OAUTH_SCOPES: "read"
-    GF_AUTH_GENERIC_OAUTH_AUTH_HTTP_METHOD: "POST"
-    GF_AUTH_GENERIC_OAUTH_USERNAME_FIELD: "email"
-    GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP: true
-    GF_AUTH_SKIP_ORG_ROLE_SYNC: true
-    GF_SECURITY_ALLOW_EMBEDDING: "true"
-    GF_SERVER_ROOT_URL: "https://{{ .Values.global.domain }}/grafana"
-    GF_SERVER_DOMAIN: "{{ .Values.global.domain }}"
-    GF_SERVER_SERVE_FROM_SUBPATH: true
-  persistence:
-    enabled: true
-    size: 1Gi
-  alerting:
-    infra.yaml:
-      file: alerting/infra.yaml
-    api.yaml:
-      file: alerting/api.yaml
-    ingestion.yaml:
-      file: alerting/ingestion.yaml
-    node.yaml:
-      file: alerting/node.yaml
-    processing.yaml:
-      file: alerting/processing.yaml
-    storage.yaml:
-      file: alerting/storage.yaml
+      interval: ""
+    extraLabels:
+      system.monitoring: "true"
+    podLabels:
+      system.monitoring: "true"
+    resources:
+      limits:
+        cpu: 0.2
+        memory: 256Mi
+      requests:
+        cpu: "0.1"
+        memory: 128Mi
+    env:
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: "obsrv"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "528806583-dev.oauth.obsrv.ai"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "el642dcXd1P3v6i+hODnGrUKx9ZSWAlmXWZaEoZQI7/R3NUGQlLTnNCV"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: "read"
+      GF_AUTH_GENERIC_OAUTH_AUTH_HTTP_METHOD: "POST"
+      GF_AUTH_GENERIC_OAUTH_USERNAME_FIELD: "email"
+      GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP: true
+      GF_AUTH_SKIP_ORG_ROLE_SYNC: true
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SERVER_ROOT_URL: "https://{{ .Values.global.domain }}/grafana"
+      GF_SERVER_DOMAIN: "{{ .Values.global.domain }}"
+      GF_SERVER_SERVE_FROM_SUBPATH: true
+    persistence:
+      enabled: true
+      size: 1Gi
+    alerting:
+      infra.yaml:
+        file: alerting/infra.yaml
+      api.yaml:
+        file: alerting/api.yaml
+      ingestion.yaml:
+        file: alerting/ingestion.yaml
+      node.yaml:
+        file: alerting/node.yaml
+      processing.yaml:
+        file: alerting/processing.yaml
+      storage.yaml:
+        file: alerting/storage.yaml
 
-prometheus-node-exporter:
-  namespaceOverride: "monitoring"
-  fullnameOverride: node-exporter
-  podLabels:
-    system.monitoring: "true"
-    jobLabel: node-exporter
-  resources:
-    limits:
-      cpu: "0.1"
-      memory: 256Mi
-    requests:
-      cpu: "0.1"
-      memory: 128Mi
-  releaseLabel: true
-  extraArgs:
-    - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
-    - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
-  service:
-    portName: http-metrics
-  prometheus:
-    monitor:
-      enabled: true
+  prometheus-node-exporter:
+    namespaceOverride: "monitoring"
+    fullnameOverride: node-exporter
+    podLabels:
+      system.monitoring: "true"
       jobLabel: node-exporter
-      scrapeTimeout: ""
-      proxyUrl: ""
-  rbac:
-    pspEnabled: false
+    resources:
+      limits:
+        cpu: "0.1"
+        memory: 256Mi
+      requests:
+        cpu: "0.1"
+        memory: 128Mi
+    releaseLabel: true
+    extraArgs:
+      - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+      - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+    service:
+      portName: http-metrics
+    prometheus:
+      monitor:
+        enabled: true
+        jobLabel: node-exporter
+        scrapeTimeout: ""
+        proxyUrl: ""
+    rbac:
+      pspEnabled: false
 
 druid-raw-cluster:
   namespace: &druidns "druid-raw"
