@@ -15,11 +15,13 @@ global:
   checkpoint_store_type: *cloud_store_provider
   storageClass: &storage_class "standard"
   dataset_api_container: ""
+  config_api_container: ""
   serviceAccounts:
     enabled: &create_sa true
     redis: &redis-sa-annotations obsrv-redis-backup-sa@obsrv-installation.iam.gserviceaccount.com
     velero: &velero-sa-annotations obsrv-velero-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
     dataset-api: &dataset-api-sa-annotations obsrv-dataset-api-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
+    config-api: &config-api-sa-annotations obsrv-config-api-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
     druid-raw: &druid-raw-sa-annotations obsrv-druid-raw-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
     flink-sa: &flink-sa-annotations obsrv-flink-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
     spark: &spark-sa-annotations obsrv-spark-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
@@ -71,6 +73,13 @@ dataset-api-service-account: &dataset-api-service-account
     name: dataset-api-sa
     annotations:
       iam.gke.io/gcp-service-account: *dataset-api-sa-annotations
+
+config-api-service-account: &config-api-service-account
+  serviceAccount:
+    create: *create_sa
+    name: config-api-sa
+    annotations:
+      iam.gke.io/gcp-service-account: *config-api-sa-annotations      
 
 postgres-backup-service-account: &postgres-backup-service-account
   serviceAccount:
@@ -187,6 +196,12 @@ dataset-api:
   exhaust_service:
     CLOUD_STORAGE_PROVIDER: *storage_provider
     CONTAINER_PREFIX: "telemetry-data"
+
+config-api:
+  <<: *config-api-service-account
+  exhaust_service:
+    CLOUD_STORAGE_PROVIDER: *storage_provider
+    CONTAINER_PREFIX: "telemetry-data"    
 
 druid-raw-cluster:
   druid_deepstorage_type: *deep_store_type

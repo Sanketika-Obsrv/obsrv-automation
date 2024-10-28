@@ -7,6 +7,7 @@ global:
   velero_backup_cloud_bucket: &velero_backup_cloud_bucket "obsrv-dev-velero"
   cloud_storage_bucket: &cloud_storage_bucket "obsrv-dev-backups"
   dataset_api_container: &dataset_api_container "dataset-api"
+  config_api_container: &config_api_container "config-api"
   storage_class_name: &storage_class_name "managed-premium"
   azure_storage_account_name: &azure_storage_account_name "azure_storage_account_name"
   azure_storage_account_key: &azure_storage_account_key "azure_storage_account_key"
@@ -169,8 +170,17 @@ dataset-api-service-account: &dataset-api-service-account
     create: *create_sa
     annotations: {}
 
+config-api-service-account: &config-api-service-account
+serviceAccount:
+  create: *create_sa
+  annotations: {}  
+
 dataset-api:
   <<: *dataset-api-service-account
+
+config-api:
+  <<: *config-api-service-account
+
 
 druid-raw-service-account: &druid-raw-service-account
   serviceAccount:

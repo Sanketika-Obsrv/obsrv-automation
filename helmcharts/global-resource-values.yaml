@@ -572,6 +572,15 @@ dataset-api:
       cpu: 0.5
       memory: 512Mi
 
+config-api:
+  resources:
+    limits:
+      cpu: 0.5
+      memory: 1024Mi
+    requests:
+      cpu: 0.5
+      memory: 512Mi      
+
 web-console:
   resources:
     limits:
