@@ -15,6 +15,7 @@ defaults:
     secor_namespace: &secor-namespace "secor"
     command_api_namespace: &command-api-namespace "command-api"
     dataset_api_namespace: &dataset-api-namespace "dataset-api"
+    config_api_namespace: &config-api-namespace "config-api"
     kubernetes_reflector_namespace: &kubernetes-reflector-namespace "kubernetes-reflector"
     submit_ingestion_namespace: &submit-ingestion-namespace "submit-ingestion"
     kong_namespace: &kong-namespace "kong"
@@ -63,6 +64,7 @@ defaults:
   # druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
   druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc:8888"
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
+  config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
 
   cron_schedule: &cron-schedule "0 0 * * *"
   druid_router_host: &druid-router-host "druid-raw-routers.druid-raw.svc.cluster.local"
@@ -337,6 +339,14 @@ dataset-api: &dataset-api
   env:
     GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
+
+config-api: &config-api
+  namespace: *config-api-namespace
+  host: *config-service-url
+  env:
+    GRAFANA_AUTH_TOKEN: *grafana-auth-token
+    GRAFANA_ADMIN_URL: *grafana-url
+
 
 grafana-configs:
   namespace: *monitoring-namespace

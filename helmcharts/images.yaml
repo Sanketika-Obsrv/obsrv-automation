@@ -19,7 +19,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.1.0-RC"
+    tag: "1.1.0-test"
     digest: ""
 
   # dataset-api: #open source
@@ -33,9 +33,15 @@ images: &images
     tag: "1.1.0-RC"
     digest: ""
 
+  config-api: &config-api # registry: ""
+    repository: config-service-ext
+    tag: "1.2.0-RC"
+    digest: ""  
+
+  
   web-console: &web-console # registry: ""
     repository: "obsrv-web-console"
-    tag: "1.1.0-RC"
+    tag: "1.2.0-RC"
     digest: ""
 
   ## PIPELINE ENTERPRISE
@@ -351,6 +357,10 @@ internal: &internal
   dataset-api:
     <<: *dataset-api
     imagePullSecrets: *imagePullSecrets
+
+  config-api:
+    <<: *config-api
+    imagePullSecrets: *imagePullSecrets   
 
   nlq-api:
     <<: *nlq-api

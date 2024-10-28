@@ -134,6 +134,13 @@ variable "dataset_api_sa_iam_role_name" {
   default     = "dataset-api-sa-iam-role"
 }
 
+variable "config_api_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for dataset api service account."
+  default     = "config_api_sa_iam_role_name"
+}
+
+
 variable "spark_sa_iam_role_name" {
   type        = string
   description = "IAM role name for dataset api service account."
@@ -151,6 +158,13 @@ variable "dataset_api_namespace" {
   description = "Dataset service namespace."
   default     = "dataset-api"
 }
+
+variable "config_api_namespace" {
+  type        = string
+  description = "Dataset service namespace."
+  default     = "config-api"
+}
+
 
 variable "flink_sa_iam_role_name" {
   type        = string

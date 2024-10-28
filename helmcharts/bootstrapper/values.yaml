@@ -24,6 +24,7 @@ namespaces:
 - velero
 - volume-autoscaler
 - web-console
+- config-api
 
 global:
   image:
