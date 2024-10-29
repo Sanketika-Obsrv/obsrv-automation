@@ -249,7 +249,7 @@ spec:
           value: |+
             jobmanager.rpc.address: {{ .Chart.Name }}-jobmanager
             taskmanager.rpc.port=6122
-            taskmanager.numberOfTaskSlots: 2
+            taskmanager.numberOfTaskSlots: 1
             metrics.reporters: prom
             metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
             metrics.reporter.prom.host: {{ .Chart.Name }}-taskmanager

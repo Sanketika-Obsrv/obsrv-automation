@@ -463,7 +463,7 @@ flink_jobs:
     flink-conf: |+
       jobmanager.memory.flink.size: 1024m
       taskmanager.memory.flink.size: 1024m
-      taskmanager.numberOfTaskSlots: 2
+      taskmanager.numberOfTaskSlots:1
       jobmanager.numberOfTaskSlots: 1
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
@@ -504,7 +504,7 @@ flink_jobs:
     flink-conf: |+
       jobmanager.memory.flink.size: 1024m
       taskmanager.memory.flink.size: 1024m
-      taskmanager.numberOfTaskSlots: 2
+      taskmanager.numberOfTaskSlots:1
       jobmanager.numberOfTaskSlots: 1
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
