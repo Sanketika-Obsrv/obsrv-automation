@@ -1,7 +1,9 @@
 output "dataset_api_sa_annotations" {
   value = aws_iam_role.dataset_api_sa_iam_role.arn
 }
-
+output "config_api_sa_annotations" {
+  value = aws_iam_role.dataset_api_sa_iam_role.arn
+}
 output "spark_sa_annotations" {
   value = aws_iam_role.spark_sa_iam_role.arn
 }
