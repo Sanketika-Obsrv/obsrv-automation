@@ -261,6 +261,8 @@ kafka-message-exporter:
 
 kube-prometheus-stack:
   namespaceOverride: *monitoring-namespace
+  prometheus-windows-exporter:
+   namespaceOverride: *monitoring-namespace
   kube-state-metrics:
     namespaceOverride: *monitoring-namespace
   prometheus-node-exporter:
