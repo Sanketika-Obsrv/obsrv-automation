@@ -373,24 +373,35 @@ druid-raw-cluster:
       size: 1Gi
         
 flink:
-  flink_jobs:
-    merget-pipeline:
+ flink_resource: &flink_resources
+    taskmanager:
       resources:
-        limits:
-          cpu: 0.25
-          memory: 1024Mi
         requests:
-          cpu: 0.25
+          cpu: 100m
+          memory: 100Mi
+        limits:
+          cpu: 1
           memory: 1024Mi
-    master-data-processor:
+    jobmanager:
       resources:
-        limits:
-          cpu: 0.5
-          memory: 1024Mi
         requests:
-          cpu: 0.5
+          cpu: 100m
+          memory: 100Mi
+        limits:
+          cpu: 1
           memory: 1024Mi
+ flink_jobs:
+    unified-pipeline:
+      resources: *flink_resources
+    transformer-ext:
+      resources: *flink_resources
+    master-data-processor-ext:
+    resources: *flink_resources
+    cache-indexer:
+        resources: *flink_resources
 
+    
+  
 kafka-message-exporter:
   resources:
     limits:
@@ -625,3 +636,60 @@ volume-autoscaler:
     requests:
       cpu: 0.05
       memory: 100Mi
+
+lakehouse-connector:  
+  jobmanager:
+    cpu_requests: 1
+    cpu_limits: 1
+    memory_requests: 1024Mi
+    memory_limits: 1024Mi
+
+  taskmanager:
+    cpu_requests: 1
+    cpu_limits: 1
+    memory_requests: 1024Mi
+    memory_limits: 2300Mi 
+
+trino: 
+  coordinator:  
+    resources: 
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  worker:
+    resources: 
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+s3-exporter: 
+  resources:
+    limits:
+      cpu: 50m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+nlq-api:
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 512Mi
+    limits:
+      cpu: 0.5
+      memory: 1Gi
+hms:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 250Mi
+    requests:
+      cpu: 100m
+      memory: 250Mi
