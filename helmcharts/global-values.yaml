@@ -71,7 +71,7 @@ defaults:
   druid_indexer_host: &druid-indexer-host "druid-raw-indexers.druid-raw.svc.cluster.local"
 
   redirection_auth_path: &redirection_auth_path ""
-  domain: &domain "13.234.121.41.sslip.io"
+  domain: &domain "18.119.23.219.sslip.io"
 
   ssl_enabled: &ssl_enabled true
 
@@ -91,8 +91,10 @@ kafka: &kafka
   hudiConnectorTopic: *hudiConnectorTopic
   connectorsMetricTopic: *connectorsMetricTopic
   connectorsFailedTopic: *connectorsFailedTopic
-
+  numPartitions: 2 
   provisioning:
+    numPartitions: 2
+    replicationFactor: 1
     topics:
       - name: *ingestTopic
         partitions: 1

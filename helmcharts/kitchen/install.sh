@@ -49,7 +49,7 @@ migrations)
 monitoring)
     rm -rf monitoring
     cp -rf ../obsrv monitoring
-    cp -rf ../services/{promtail,loki,grafana,kube-prometheus-stack,kafka-message-exporter,alert-rules} monitoring/charts/
+    cp -rf ../services/{promtail,loki,kube-prometheus-stack,kafka-message-exporter,alert-rules} monitoring/charts/
     helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name --debug
     ;;
 coreinfra)
@@ -62,7 +62,7 @@ coreinfra)
 obsrvapis)
     rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
-    cp -rf ../services/{command-api,dataset-api} obsrvapis/charts/
+    cp -rf ../services/{command-api,dataset-api,config-api} obsrvapis/charts/
     helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 hudi)
@@ -95,18 +95,21 @@ additional)
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 all)
-    # bash $0 bootstrap
-    # bash $0 coredb
+    bash $0 bootstrap
+    bash $0 coredb
     bash $0 migrations
     bash $0 monitoring
     bash $0 coreinfra
     bash $0 obsrvapis
+    bash $0 hudi
     bash $0 obsrvtools
     bash $0 additional
+
     ;;
 reset)
     helm uninstall additional -n obsrv
     helm uninstall obsrvtools -n obsrv
+    helm uninstall hudi -n obsrv
     helm uninstall obsrvapis -n obsrv
     helm uninstall coreinfra -n obsrv
     helm uninstall monitoring -n obsrv
