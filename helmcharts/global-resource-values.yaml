@@ -652,21 +652,21 @@ lakehouse-connector:
 
 trino: 
   coordinator:  
-    resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 256Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 256Mi
+    resources: 
+      limits:
+        cpu: 1
+        memory: 1024Mi
+      requests:
+        cpu: 1
+        memory: 1024Mi
   worker:
-    resources: {}
-      # limits:
-      #   cpu: 200m
-      #   memory: 256Mi
-      # requests:
-      #   cpu: 200m
-      #   memory: 256Mi
+    resources: 
+      limits:
+        cpu: 1
+        memory: 1024Mi
+      requests:
+        cpu: 1
+        memory: 1024Mi
 
 s3-exporter: 
   resources:

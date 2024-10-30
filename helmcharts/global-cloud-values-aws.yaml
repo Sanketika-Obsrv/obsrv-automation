@@ -2,13 +2,14 @@ global:
   cloud_storage_provider: &cloud_storage_provider "aws"
   cloud_store_provider: &cloud_store_provider "s3"
   cloud_storage_region: &cloud_storage_region "us-east-2"
-  dataset_api_container: ""
-  config_api_container: ""
+  dataset_api_container: "backups-obsrv-v2release-test-725876873105"
+  config_api_container: "backups-obsrv-v2release-test-725876873105"
   postgresql_backup_cloud_bucket: &backups_bucket "backups-obsrv-v2release-test-725876873105"
   redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-v2release-test-725876873105"
   velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-v2release-test-725876873105"
   cloud_storage_bucket: &cloud_storage_bucket "obsrv-v2-testrelease-725876873105"
-  hudi_metadata_bucket: &hudi_metadata_bucket "obsrv-release-test-725876873105"
+  hudi_metadata_bucket: &hudi_metadata_bucket "s3a://obsrv-release-test-725876873105/hudi"
+ 
   cloud_storage_config: |+
     '{"identity":"name","credential":"key" , "region": region- name}'
 
@@ -281,7 +282,8 @@ trino:
 
 hms:
   envVars:
-    WAREHOUSE_DIR: s3a://lakehouse-benchmarking/hudi/
+    WAREHOUSE_DIR: *hudi_metadata_bucket 
+   
 
   hadoop_core_site:
     fs.s3a.access.key:  *s3-access-key
