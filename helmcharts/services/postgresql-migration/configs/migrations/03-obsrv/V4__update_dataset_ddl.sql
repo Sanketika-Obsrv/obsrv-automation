@@ -147,3 +147,6 @@ VALUES
         NOW(),
         NOW()
     );
+ALTER TABLE oauth_users ADD COLUMN roles TEXT[] DEFAULT ARRAY['viewer'];
+ALTER TABLE oauth_users ADD COLUMN status VARCHAR(255) DEFAULT 'active';
+ALTER TABLE oauth_users ADD CONSTRAINT oauth_users_user_name_key UNIQUE (user_name);
