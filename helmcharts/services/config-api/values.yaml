@@ -160,7 +160,7 @@ env:
   dedup_redis_port: "{{ .Values.global.redis_dedup.port }}"
   cloud_storage_provider: "{{ .Values.global.cloud_storage_provider }}"
   cloud_storage_region: "{{ .Values.global.cloud_storage_region }}"
-  container: "{{ .Values.global.config_api_container }}"
+  container: "{{ .Values.global.config_api_cloud_bucket }}"
   container_prefix: "connector-registry"
   storage_url_expiry: "3600"
   exhaust_query_range: "31" # In Days

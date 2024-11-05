@@ -151,6 +151,11 @@ serviceConfig:
         release_name: cache-indexer
         job_manager_url: "cache-indexer.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
 
+      - name: "Flink-Hudi-Connector"
+        release_name: lakehouse-connector
+        job_manager_url: "lakehouse-connector-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
+    
+
   commands:
     PUBLISH_DATASET:
       workflow:
