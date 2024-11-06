@@ -603,6 +603,10 @@ kube-prometheus-stack:
             - url: http://s3-exporter.s3-exporter.svc.cluster.local:9340/discovery
         - job_name: s3-backups
           metrics_path: /probe
+          scrape_interval: 10m
+          scrape_timeout: 3m
+          http_sd_configs:
+            - url: http://s3-exporter.s3-exporter.svc.cluster.local:9340/discovery
           static_configs:
             - targets:
                 - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql;
