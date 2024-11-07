@@ -75,7 +75,7 @@ web-console:
   AUTH_AD_BASE_DN: "dc=example,dc=com"
   AUTH_AD_USER_NAME: "admin"
   AUTH_AD_PASSWORD: "password1"
-  REACT_APP_AUTHENTICATION_ALLOWED_TYPES: "obsrv,ad,google,keycloak"
+  AUTHENTICATION_ALLOWED_TYPES: "obsrv,ad"
   AUTH_OIDC_ISSUER: "http://localhost:8080/auth/realms/TestOIDCrealm"
   AUTH_OIDC_AUTHRIZATION_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/auth"
   AUTH_OIDC_TOKEN_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/token"
@@ -610,18 +610,24 @@ kube-prometheus-stack:
           static_configs:
             - targets:
                 - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql;
-                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=redis;
+                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=dedup-redis;
+                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=denorm-redis;
           relabel_configs:
             - source_labels: [__address__]
               regex: "^bucket=(.*);prefix=(.*);$"
-              replacement: "$${1}"
+              replacement: "$1"
               target_label: "__param_bucket"
             - source_labels: [__address__]
               regex: "^bucket=(.*);prefix=(.*);$"
-              replacement: "$${2}"
+              replacement: "$2"
               target_label: "__param_prefix"
             - target_label: __address__
               replacement: s3-exporter.s3-exporter.svc.cluster.local:9340
+            - target_label: bucket
+              replacement: "$1"
+            - target_label: prefix
+              replacement: "$2"
+
 
   kube-state-metrics:
     namespaceOverride: "monitoring"

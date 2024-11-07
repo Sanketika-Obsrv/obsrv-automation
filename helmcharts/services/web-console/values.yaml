@@ -194,7 +194,7 @@ env:
   AUTH_AD_BASE_DN: "dc=example,dc=com"
   AUTH_AD_USER_NAME: "admin"
   AUTH_AD_PASSWORD: "password1"
-  REACT_APP_AUTHENTICATION_ALLOWED_TYPES: "obsrv,ad,google,keycloak"
+  AUTHENTICATION_ALLOWED_TYPES: "obsrv,ad"
   AUTH_OIDC_ISSUER: "http://localhost:8080/auth/realms/TestOIDCrealm"
   AUTH_OIDC_AUTHRIZATION_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/auth"
   AUTH_OIDC_TOKEN_URL: "http://localhost:8080/auth/realms/TestOIDCrealm/protocol/openid-connect/token"

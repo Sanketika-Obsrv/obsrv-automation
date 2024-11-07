@@ -575,7 +575,7 @@
   severity: critical
 
 - name: "Critical Alert: PostgreSQL Database Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-db-backups", prefix=~"postgresql"})
+  query: (time() - s3_last_modified_object_date{job="s3-backups", prefix=~"postgresql"})
   operator: gt
   threshold: [86400]
   category: DB Backup
@@ -587,7 +587,7 @@
   severity: critical
 
 - name: "Critical Alert: Dedup Redis Database Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-db-backups", prefix=~"dedup-redis"})
+  query: (time() - s3_last_modified_object_date{job="s3-backups", prefix=~"dedup-redis"})
   operator: gt
   threshold: [86400]
   category: DB Backup
@@ -599,7 +599,7 @@
   severity: critical
 
 - name: "Critical Alert: Denorm Redis Database Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-db-backups", prefix=~"denorm-redis"})
+  query: (time() - s3_last_modified_object_date{job="s3-backups", prefix=~"denorm-redis"})
   operator: gt
   threshold: [86400]
   category: DB Backup
@@ -611,7 +611,7 @@
   severity: critical
 
 - name: "Critical Alert: Velero (Kubernetes Cluster) Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-common-backups", bucket=~"velero.*"})
+  query: (time() - s3_last_modified_object_date{job="s3-backups", bucket=~"velero.*"})
   operator: gt
   threshold: [86400]
   category: DB Backup
