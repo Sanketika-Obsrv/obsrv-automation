@@ -71,7 +71,9 @@ defaults:
   druid_indexer_host: &druid-indexer-host "druid-raw-indexers.druid-raw.svc.cluster.local"
 
   redirection_auth_path: &redirection_auth_path ""
-  domain: &domain "3.147.16.119.sslip.io"
+  domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP 
+
+
 
   ssl_enabled: &ssl_enabled true
 
@@ -452,8 +454,8 @@ volume-autoscaler:
   scale_above_percent: "80"
   # How much to scale disks up by, as a percentage of their current size
   scale_up_percent: "20"
-  # An minimum amount of bytes to scale up by (typically because providers like AWS only support 10GB increments in disk size)
-  scale_up_min_increment: "10737418240"
+  # An minimum amount of bytes to scale up by (typically because providers like AWS only support 100GB increments in disk size)
+  scale_up_min_increment: "107374182400"
   # An maximum amount of bytes to scale up by (helps prevent large disks from growing too fast/exponentially).  Set to 16TB by default, which basically means this is disabled
   scale_up_max_increment: ""
   # The maximum size of disks to scale up to.  By default on AWS using EBS volumes this is set to 16TB as that is the EBS Max disk size.

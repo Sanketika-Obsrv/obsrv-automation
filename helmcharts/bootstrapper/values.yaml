@@ -28,6 +28,6 @@ namespaces:
 
 global:
   image:
-    dockerRegistrySecretName: registry-secret-name
+    dockerRegistrySecretName: obsrv-docker-secret
     dockerConfigJson: |-
-      {"auths":{"http://registry.your-domain.io":{"username":"REGISTRY_USER","password":"REGISTRY_PASSWORD","email":"email@your-domain.io","auth":"UkVHSVNUUllfVVNFUjpSRUdJU1RSWV9QQVNTV09SRA=="}}}
+      {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
