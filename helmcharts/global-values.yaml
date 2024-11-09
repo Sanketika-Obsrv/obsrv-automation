@@ -15,6 +15,7 @@ defaults:
     secor_namespace: &secor-namespace "secor"
     command_api_namespace: &command-api-namespace "command-api"
     dataset_api_namespace: &dataset-api-namespace "dataset-api"
+    config_api_namespace: &config-api-namespace "config-api"
     kubernetes_reflector_namespace: &kubernetes-reflector-namespace "kubernetes-reflector"
     submit_ingestion_namespace: &submit-ingestion-namespace "submit-ingestion"
     kong_namespace: &kong-namespace "kong"
@@ -63,13 +64,16 @@ defaults:
   # druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
   druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc:8888"
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
+  config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
 
   cron_schedule: &cron-schedule "0 0 * * *"
   druid_router_host: &druid-router-host "druid-raw-routers.druid-raw.svc.cluster.local"
   druid_indexer_host: &druid-indexer-host "druid-raw-indexers.druid-raw.svc.cluster.local"
 
   redirection_auth_path: &redirection_auth_path ""
-  domain: &domain "34.172.33.15.sslip.io"
+  domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP 
+
+
 
   ssl_enabled: &ssl_enabled true
 
@@ -89,32 +93,34 @@ kafka: &kafka
   hudiConnectorTopic: *hudiConnectorTopic
   connectorsMetricTopic: *connectorsMetricTopic
   connectorsFailedTopic: *connectorsFailedTopic
-
+  numPartitions: 4
   provisioning:
+    numPartitions: 4
+    replicationFactor: 1
     topics:
       - name: *ingestTopic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
       - name: *masterdataIngestTopic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
       - name: *telemetryEventsTopic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
       - name: *system_stats_topic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
       - name: *masterdata_system_stats_topic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
       - name: *hudiConnectorTopic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
       - name: *connectorsMetricTopic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
       - name: *connectorsFailedTopic
-        partitions: 1
+        partitions: 4
         replicationFactor: 1
 
 
@@ -237,12 +243,6 @@ prometheus: &prometheus
 loki:
   namespace: *loki-namespace
 
-grafana:
-  fullnameOverride: "grafana"
-  namespaceOverride: *monitoring-namespace #TODO: check why namespace  doesn't work here
-  env:
-    GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
-    GF_SECURITY_ADMIN_USER: *grafana-admin-user
 
 druid-raw-cluster: &druid-raw-cluster
   namespace: *druid-namespace
@@ -263,9 +263,32 @@ kafka-message-exporter:
 
 kube-prometheus-stack:
   namespaceOverride: *monitoring-namespace
-
-kube-state-metrics:
-  namespaceOverride: *monitoring-namespace
+  prometheus-windows-exporter:
+   namespaceOverride: *monitoring-namespace
+  kube-state-metrics:
+    namespaceOverride: *monitoring-namespace
+  prometheus-node-exporter:
+    namespaceOverride: *monitoring-namespace
+  grafana:
+    fullnameOverride: "grafana"
+    namespaceOverride: *monitoring-namespace 
+    env:
+      GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
+      GF_SECURITY_ADMIN_USER: *grafana-admin-user
+    grafana.ini:
+      smtp:
+        enabled: true
+        host: ""
+        user: ""
+        password: ""
+        from_address: ""
+        cert_file: ""
+        key_file: ""
+        ehlo_identity: ""
+        startTLS_policy: ""
+        skip_verify: true
+        from_name: "Grafana"    
+  
 
 kubernetes-reflector:
   namespace: *kubernetes-reflector-namespace
@@ -285,8 +308,6 @@ postgresql-exporter:
       user: *pguser
       password: *pgpassword
 
-prometheus-node-exporter:
-  namespaceOverride: *monitoring-namespace
 
 spark: &spark
   namespace: *spark-namespace
@@ -321,6 +342,14 @@ dataset-api: &dataset-api
   env:
     GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
+
+config-api: &config-api
+  namespace: *config-api-namespace
+  host: *config-service-url
+  env:
+    GRAFANA_AUTH_TOKEN: *grafana-auth-token
+    GRAFANA_ADMIN_URL: *grafana-url
+
 
 grafana-configs:
   namespace: *monitoring-namespace
@@ -421,6 +450,16 @@ velero:
 
 volume-autoscaler:
   namespace: *volume-autoscaler-namespace
+  # How much full the disk must be before considering scaling
+  scale_above_percent: "80"
+  # How much to scale disks up by, as a percentage of their current size
+  scale_up_percent: "20"
+  # An minimum amount of bytes to scale up by (typically because providers like AWS only support 100GB increments in disk size)
+  scale_up_min_increment: "107374182400"
+  # An maximum amount of bytes to scale up by (helps prevent large disks from growing too fast/exponentially).  Set to 16TB by default, which basically means this is disabled
+  scale_up_max_increment: ""
+  # The maximum size of disks to scale up to.  By default on AWS using EBS volumes this is set to 16TB as that is the EBS Max disk size.
+  scale_up_max_size: ""
 
 hms:
   namespace: *hms_namespace

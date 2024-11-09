@@ -185,6 +185,21 @@ resource "aws_iam_role" "dataset_api_sa_iam_role" {
 
 data "aws_caller_identity" "current" {}
 
+resource "aws_iam_role" "config_api_sa_iam_role" {
+  name                = "${var.env}-${var.building_block}-${var.config_api_sa_iam_role_name}"
+  assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.config_api_namespace}", SA_NAME = "${var.config_api_namespace}-sa" })
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+  depends_on          = [aws_iam_openid_connect_provider.eks_openid]
+  tags = merge(
+    {
+      Name = "${var.env}-${var.config_api_sa_iam_role_name}"
+    },
+    local.common_tags,
+  var.additional_tags)
+}
+
+
+
 resource "aws_iam_role" "spark_sa_iam_role" {
   name = "${var.env}-${var.building_block}-${var.spark_sa_iam_role_name}"
   assume_role_policy = templatefile("${path.module}/oidc_assume_role_spark.json.tfpl", {

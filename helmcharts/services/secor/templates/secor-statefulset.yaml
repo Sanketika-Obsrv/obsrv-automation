@@ -62,6 +62,9 @@ spec:
            - name: "data-path"
              mountPath: /mnt/data
           resources:
+            limits:
+              cpu: {{ get (get (get $.Values.secor_jobs $jobName) "limits") "cpu" }}
+              memory: {{ get (get (get $.Values.secor_jobs $jobName) "limits") "memory"}}
             requests:
               cpu: {{ get (get (get $.Values.secor_jobs $jobName) "requests") "cpu" }}
               memory: {{ get (get (get $.Values.secor_jobs $jobName) "requests") "memory"}}

@@ -288,6 +288,7 @@ master:
           /opt/bitnami/livy/bin/livy-server start
           /opt/bitnami/spark/sbin/start-history-server.sh
           /opt/bitnami/spark/conf/custom-init.sh
+          python3 /data/connectors-init/connector.py
   ## @param master.extraVolumes Optionally specify extra list of additional volumes for the master pod(s)
   ##
   extraVolumes: []

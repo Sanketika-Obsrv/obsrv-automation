@@ -1,6 +1,0 @@
-This chart has gone through the following changes
-1. The deployment.yaml has been modified to work with the our image sections
-2. The helpers.tpl file has been added with our custom function named base.image
-3. The values.yaml file has been modified to work with our image section design
-4. The default values for serviceMonitorLabels and prometheus_url in the values.yaml are provided
-5. Added labels in values.yaml

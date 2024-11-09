@@ -1,8 +1,7 @@
+# The name of the service and pods/deployment/etc being deployed
 global:
   image:
     registry: ""
-
-# The name of the service and pods/deployment/etc being deployed
 name: volume-autoscaler
 namespace: volume-autoscaler
 
@@ -52,14 +51,6 @@ deploymentStrategy:
 image:
   repository: devopsnirvana/kubernetes-volume-autoscaler
   tag: 1.0.5  # This should be replaced with an semver tag release automatically during CI for releases
-
-registry: "docker.io"
-repository: devopsnirvana/kubernetes-volume-autoscaler
-tag: 1.0.5  # This should be replaced with an semver tag release automatically during CI for releases
-digest: ""
-
-imagePullPolicy: IfNotPresent
-imagePullSecrets: []
 
 globalEnvs:
   ####################################
@@ -119,12 +110,16 @@ globalEnvs:
 
 
 # Additional pod annotations
-podAnnotations: {}
+podAnnotations: 
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
   # tick: "1528451892"
 
 # Additional labels put onto anything that can be labelled (pods, services)
-labels:
+labels: 
   system.storage: "true"
+  release: monitoring
 
 # This adds lifecycle events for the deployment
 lifecycle: {}
@@ -230,6 +225,9 @@ rbac:
       verbs:
         - list
         - patch
+        - get
+        - list
+        - watch
     # This is so we can send events into Kubernetes viewable in the event viewer
     - apiGroups: [""]
       resources:

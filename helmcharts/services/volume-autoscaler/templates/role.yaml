@@ -2,8 +2,8 @@
 apiVersion: {{ template "rbac.apiVersion" . }}
 kind: {{ if .Values.rbac.clusterWideAccess }}"ClusterRole"{{ else }}"Role"{{ end }}
 metadata:
-  name: {{ template "name" . }}
-  namespace: {{ include "base.namespace" . }}
+  name: {{ include "volume-autoscaler.fullname" . }}
+  namespace: {{ (include "base.namespace" $) }}
   # include labels for this service to identify it
 {{- include "labels" . | indent 2 }}
 rules:

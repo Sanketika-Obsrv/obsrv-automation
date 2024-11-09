@@ -353,44 +353,7 @@ baseconfig: |
     port = "{{ .Values.global.cassandra.port }}"
   }
 
-# !!! Don't override the resources here. It's just a template
-# Proper way to override resouce is to
-# flink_jobs:
-#   master-data-processor:
-#     resources:
-#       taskmanager:
-#         resources:
-#           requests:
-#             cpu: 100m
-#             memory: 100Mi
-#           limits:
-#             cpu: 1
-#             memory: 1024Mi
-#       jobmanager:
-#         resources:
-#           requests:
-#             cpu: 100m
-#             memory: 100Mi
-#           limits:
-#             cpu: 1
-#             memory: 1024Mi
-dummy_flink_resource: &flink_resources
-  taskmanager:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 100Mi
-      limits:
-        cpu: 1
-        memory: 1024Mi
-  jobmanager:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 100Mi
-      limits:
-        cpu: 1
-        memory: 1024Mi
+
 
 serviceMonitor: &serviceMonitor
   jobmanager:
@@ -420,7 +383,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: org.sunbird.obsrv.pipeline.task.UnifiedPipelineStreamTask
-    resources: *flink_resources
+    
     serviceMonitor: *serviceMonitor
 
     config: |+
@@ -463,7 +426,7 @@ flink_jobs:
     flink-conf: |+
       jobmanager.memory.flink.size: 1024m
       taskmanager.memory.flink.size: 1024m
-      taskmanager.numberOfTaskSlots: 2
+      taskmanager.numberOfTaskSlots:1
       jobmanager.numberOfTaskSlots: 1
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
@@ -482,7 +445,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: in.sanketika.obsrv.transformer.task.TransformerStreamTask
-    resources: *flink_resources
+    
     serviceMonitor: *serviceMonitor
 
     config: |+
@@ -504,7 +467,7 @@ flink_jobs:
     flink-conf: |+
       jobmanager.memory.flink.size: 1024m
       taskmanager.memory.flink.size: 1024m
-      taskmanager.numberOfTaskSlots: 2
+      taskmanager.numberOfTaskSlots:1
       jobmanager.numberOfTaskSlots: 1
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
@@ -523,7 +486,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: in.sanketika.obsrv.pipeline.task.MasterDataProcessorStreamTask
-    resources: *flink_resources
+    
     serviceMonitor: *serviceMonitor
 
     config: |+
@@ -588,7 +551,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: org.sunbird.obsrv.streaming.CacheIndexerStreamTask
-    resources: *flink_resources
+    
     serviceMonitor: *serviceMonitor
 
     config: |+

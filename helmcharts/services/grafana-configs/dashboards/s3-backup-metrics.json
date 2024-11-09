@@ -356,19 +356,6 @@
       "type": "stat"
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 10
-      },
-      "id": 15,
-      "panels": [],
-      "title": "Logs",
-      "type": "row"
-    },
-    {
       "datasource": {
         "type": "loki",
         "uid": "loki"
@@ -377,18 +364,18 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 11
+        "y": 15
       },
       "id": 22,
       "options": {
-        "dedupStrategy": "exact",
-        "enableLogDetails": false,
-        "prettifyLogMessage": true,
-        "showCommonLabels": false,
-        "showLabels": false,
         "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": true,
+        "enableLogDetails": false,
+        "dedupStrategy": "exact",
+        "sortOrder": "Descending"
       },
       "targets": [
         {
@@ -404,7 +391,8 @@
       ],
       "title": "PostgreSQL Backup Logs",
       "type": "logs"
-    },
+    }
+    ,
     {
       "datasource": {
         "type": "loki",

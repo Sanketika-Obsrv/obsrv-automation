@@ -1,17 +1,17 @@
 {{- if .Values.rbac.create -}}
 apiVersion: {{ template "rbac.apiVersion" . }}
-kind: {{ if .Values.rbac.clusterWideAccess }}"ClusterRoleBinding"{{ else }}"RoleBinding"{{ end }}
+kind: {{ if .Values.rbac.clusterWideAccess }}ClusterRoleBinding{{ else }}RoleBinding{{ end }}
 metadata:
-  name: {{ template "name" . }}
-  namespace: {{ include "base.namespace" . }}
-  # include labels for this service to identify it
+  name: {{ include "volume-autoscaler.fullname" . }}
+  namespace: {{ (include "base.namespace" $) }}
+  labels:
 {{- include "labels" . | indent 2 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: {{ if .Values.rbac.clusterWideAccess }}"ClusterRole"{{ else }}"Role"{{ end }}
-  name: {{ template "name" . }}
+  kind: {{ if .Values.rbac.clusterWideAccess }}ClusterRole{{ else }}Role{{ end }}
+  name: {{ include "volume-autoscaler.fullname" . }}
 subjects:
-- kind: ServiceAccount
-  name: {{ template "name" . }}
-  namespace: "{{ include "base.namespace" . }}"
+  - kind: ServiceAccount
+    name: {{ include "volume-autoscaler.fullname" . }}
+    namespace: {{ (include "base.namespace" $) }}
 {{- end -}}

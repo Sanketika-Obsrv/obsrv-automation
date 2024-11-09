@@ -75,7 +75,7 @@ secor_jobs:
     timestamp_key: "syncts"
   raw-backup:
     <<: *base_config
-    enabled: false
+    enabled: true
     topic: "{{.Values.global.env}}.raw"
     service_name: "raw-backup"
     consumer_group: "{{.Values.global.env}}.raw"
@@ -83,7 +83,7 @@ secor_jobs:
     timestamp_key: "obsrv_meta.syncts"
   unique-backup:
     <<: *base_config
-    enabled: false
+    enabled: true
     topic: "{{.Values.global.env}}.unique"
     service_name: "unique-backup"
     consumer_group: "{{.Values.global.env}}.unique"
@@ -91,7 +91,7 @@ secor_jobs:
     timestamp_key: "obsrv_meta.syncts"
   denorm-backup:
     <<: *base_config
-    enabled: false
+    enabled: true
     topic: "{{.Values.global.env}}.denorm"
     service_name: "denorm-backup"
     consumer_group: "{{.Values.global.env}}.denorm"
@@ -99,7 +99,7 @@ secor_jobs:
     timestamp_key: "obsrv_meta.syncts"
   transform-backup:
     <<: *base_config
-    enabled: false
+    enabled: true
     topic: "{{.Values.global.env}}.transform"
     service_name: "transform-backup"
     consumer_group: "{{.Values.global.env}}.transform"
@@ -128,6 +128,7 @@ secor_jobs:
     timestamp_key: "ets"
   masterdata-ingest-backup:
     <<: *base_config
+    enabled: false
     topic: "{{.Values.global.env}}.masterdata.ingest"
     service_name: "masterdata-ingest-backup"
     consumer_group: "{{.Values.global.env}}.masterdata-ingest"

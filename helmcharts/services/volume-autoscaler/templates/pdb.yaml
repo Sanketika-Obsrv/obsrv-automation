@@ -7,8 +7,8 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "name" . }}
-  namespace: {{ include "base.namespace" . }}
+  name: {{ include "volume-autoscaler.fullname" . }}
+  namespace: {{ (include "base.namespace" $) }}
 spec:
 {{- if .Values.podDistuptionBudget.maxUnavailable }}
   maxUnavailable: {{ .Values.podDistuptionBudget.maxUnavailable }}
@@ -20,11 +20,11 @@ spec:
     matchLabels:
 {{- if .Values.usingNewRecommendedLabels }}
 {{- if .Values.labelsEnableDefault }}
-      app.kubernetes.io/name: {{ template "name" . }}
+      app.kubernetes.io/name: {{ include "volume-autoscaler.name" . }}
 {{- end }}
 {{- else }}
 {{- if .Values.labelsEnableDefault }}
-      app: {{ template "name" . }}
+      app:{{ include "volume-autoscaler.name" . }}
 {{- end }}
 {{- end }}
 

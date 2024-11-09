@@ -15,3 +15,8 @@ automation-scripts/infra-setup/aws/THIRD_PARTY_LICENSES
 *.tfstate
 *.tfstate.*
 !overrides.tfvars
+
+# Ignore everything in the helmcharts/kitchen directory
+helmcharts/kitchen/*
+# Exclude install.sh from being ignored
+!helmcharts/kitchen/install.sh

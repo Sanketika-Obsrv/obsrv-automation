@@ -151,12 +151,17 @@ serviceConfig:
         release_name: cache-indexer
         job_manager_url: "cache-indexer.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
 
+      - name: "Flink-Hudi-Connector"
+        release_name: lakehouse-connector
+        job_manager_url: "lakehouse-connector-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
+    
+
   commands:
     PUBLISH_DATASET:
       workflow:
+        - CREATE_KAFKA_TOPIC
         - MAKE_DATASET_LIVE
         - SUBMIT_INGESTION_TASKS
-        - CREATE_KAFKA_TOPIC
         - START_PIPELINE_JOBS
         - DEPLOY_CONNECTORS
         - CREATE_ALERT_METRIC
@@ -266,6 +271,8 @@ serviceConfig:
     brokers: "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
     telemetry:
       topic: "system.telemetry.events"
+    replication_factor: 1 
+    no_of_partitions: 1
 
   helm_charts_base_dir: /app/helm-charts
 

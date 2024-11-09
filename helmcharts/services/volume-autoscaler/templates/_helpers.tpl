@@ -1,10 +1,31 @@
 {{/*
 Define the standardized name of this helm chart and its objects
 */}}
-{{- define "name" -}}
-{{- required "A valid Values.name is required!" .Values.name | trunc 63 | trimSuffix "-" -}}
+{{/* vim: set filetype=mustache: */}}
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "volume-autoscaler.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "volume-autoscaler.fullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 {{/*
 Define the standardized namespace, this is NOT defined in the output yaml files,
 but it is used inside some variables and eg: for the urls generated for our
@@ -54,7 +75,7 @@ labels:
 
 {{- if .Values.labelsEnableDefault }}
   app.kubernetes.io/name: {{ .Values.name | trunc 63 | trimSuffix "-" | quote }}
-  app.kubernetes.io/instance: {{ .Values.name | trunc 63 | trimSuffix "-" | quote }}
+  app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- else }}

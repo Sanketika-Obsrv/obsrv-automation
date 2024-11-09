@@ -1,2 +1,0 @@
-{{- include "common.tplvalues.render" (dict "value" .Values.config "context" $) }}
-
