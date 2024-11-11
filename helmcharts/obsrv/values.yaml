@@ -60,11 +60,9 @@ dataset-api:
   grafana_token: &grafana_token "YWRtaW46cHJvbS1vcGVyYXRvcg=="
 
 web-console:
-  GRAFANA_URL: ""
-  SUPERSET_URL: ""
-  REACT_APP_GRAFANA_URL: ""
-  REACT_APP_SUPERSET_URL: ""
-  OAUTH_WEB_CONSOLE_URL: ""
+  GRAFANA_URL:  "http://{{.Values.global.domain}}/grafana"
+  SUPERSET_URL: "http://{{.Values.global.domain}}"
+  OAUTH_WEB_CONSOLE_URL: "{{.Values.global.domain}}/console"
   AUTH_KEYCLOAK_SSL_REQUIRED: "external"
   AUTH_KEYCLOAK_CLIENT_ID: "myOauthClient"
   AUTH_KEYCLOAK_CLIENT_SECRET: "SCWHeF9HgtJ5BjmJFruk2IW15a5auueq"
@@ -595,38 +593,40 @@ kube-prometheus-stack:
               requests:
                 storage: 10Gi
       additionalScrapeConfigs:
-        - job_name: s3-exporter
+        - job_name: s3-common-backups
+          metrics_path: /probe
           scrape_interval: 5m
           scrape_timeout: 30s
+          static_configs:
+            - targets:
+                - bucket={{ .Values.global.velero_backup_cloud_bucket}};
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: "^bucket=(.*);$"
+              replacement: "${1}"
+              target_label: "__param_bucket"
+            - target_label: __address__
+              replacement: s3-exporter.s3-exporter.svc.cluster.local:9340
+        - job_name: "s3-backups"
           metrics_path: /probe
-          http_sd_configs:
-            - url: http://s3-exporter.s3-exporter.svc.cluster.local:9340/discovery
-        - job_name: s3-backups
-          metrics_path: /probe
-          scrape_interval: 10m
-          scrape_timeout: 3m
-          http_sd_configs:
-            - url: http://s3-exporter.s3-exporter.svc.cluster.local:9340/discovery
+          scrape_interval: 5m
+          scrape_timeout: 30s
           static_configs:
             - targets:
                 - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql;
                 - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=dedup-redis;
-                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=denorm-redis;
+                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=denorm-redis;                
           relabel_configs:
             - source_labels: [__address__]
               regex: "^bucket=(.*);prefix=(.*);$"
-              replacement: "$1"
+              replacement: "${1}"
               target_label: "__param_bucket"
             - source_labels: [__address__]
               regex: "^bucket=(.*);prefix=(.*);$"
-              replacement: "$2"
+              replacement: "${2}"
               target_label: "__param_prefix"
             - target_label: __address__
-              replacement: s3-exporter.s3-exporter.svc.cluster.local:9340
-            - target_label: bucket
-              replacement: "$1"
-            - target_label: prefix
-              replacement: "$2"
+              replacement: s3-exporter.s3-exporter.svc.cluster.local:9340 # S3 exporter.   
 
 
   kube-state-metrics:

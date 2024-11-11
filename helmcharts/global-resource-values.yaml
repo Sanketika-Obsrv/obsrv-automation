@@ -451,10 +451,10 @@ kube-prometheus-stack:
     resources:
       limits:
         cpu: 0.2
-        memory: 128Mi
+        memory: 1024Mi
       requests:
         cpu: 0.1
-        memory: 128Mi
+        memory: 500Mi
     persistence:
       type: pvc
       # storageClassName: default
@@ -658,7 +658,7 @@ trino:
         memory: 1024Mi
       requests:
         cpu: 1
-        memory: 1024Mi
+        memory: 1536Mi
   worker:
     resources: 
       limits:
@@ -666,7 +666,7 @@ trino:
         memory: 1024Mi
       requests:
         cpu: 1
-        memory: 1024Mi
+        memory: 1536Mi
 
 s3-exporter: 
   resources:

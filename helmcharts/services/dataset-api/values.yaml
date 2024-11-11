@@ -177,3 +177,7 @@ env:
   pipeline_merged_job_manager_url: "http://unified-pipeline-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   masterdata_processor_job_manager_url: "http://master-data-processor-ext-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   prometheus_url: "{{ .Values.global.prometheus.url }}"
+  user_token_public_key: ""
+  is_RBAC_enabled: "false"
+  user_token_keycloak_public_key: ""
+  keycloak_audience: ""
