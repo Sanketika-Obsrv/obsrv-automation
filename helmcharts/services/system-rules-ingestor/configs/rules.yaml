@@ -611,7 +611,7 @@
   severity: critical
 
 - name: "Critical Alert: Velero (Kubernetes Cluster) Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-common-backups", bucket=~"velero.*"})
+  query: (time() - s3_last_modified_object_date{job="s3-backups", bucket=~"velero.*"})
   operator: gt
   threshold: [86400]
   category: db backup
