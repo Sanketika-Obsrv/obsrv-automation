@@ -57,8 +57,24 @@ resource "aws_s3_bucket" "s3_backups_bucket" {
       Name = "backups-${local.storage_bucket}"
     },
     local.common_tags,
-    var.additional_tags)
+    var.additional_tags
+  )
 }
+
+# Define CORS configuration separately for the bucket
+resource "aws_s3_bucket_cors_configuration" "s3_backups_bucket_cors" {
+  bucket = aws_s3_bucket.s3_backups_bucket.bucket
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "POST", "PUT", "DELETE"]
+    allowed_origins = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
+
 
 # resource "aws_s3_object" "object" {
 #     for_each = fileset("../sample-data/", "*")
