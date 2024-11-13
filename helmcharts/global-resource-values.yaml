@@ -655,18 +655,18 @@ trino:
     resources: 
       limits:
         cpu: 1
-        memory: 1024Mi
+        memory: 2048Mi
       requests:
         cpu: 1
-        memory: 1024Mi
+        memory: 2048Mi
   worker:
     resources: 
       limits:
         cpu: 1
-        memory: 1024Mi
+        memory: 2048Mi
       requests:
         cpu: 1
-        memory: 1024Mi
+        memory: 2048Mi
 
 s3-exporter: 
   resources:
@@ -689,7 +689,7 @@ hms:
   resources:
     limits:
       cpu: 100m
-      memory: 250Mi
+      memory: 1024Mi
     requests:
       cpu: 100m
-      memory: 250Mi
+      memory: 1024Mi
