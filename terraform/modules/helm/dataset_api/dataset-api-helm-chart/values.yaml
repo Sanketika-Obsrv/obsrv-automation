@@ -1,15 +1,9 @@
 namespace: "dataset-api"
 replicaCount: 1
 image:
-<<<<<<< HEAD
   registry: "sanketikahub"
   repository: "obsrv-api-service"
   image_tag: 1.0.0-GA
-=======
-  registry: "sunbird"
-  repository: "sb-obsrv-api-service"
-  image_tag: 2.0.1-GA
->>>>>>> opensource-repo/main
   imagePullSecrets: ""
 cpu_requests: 0.5
 cpu_limits: 0.5
@@ -44,7 +38,7 @@ denorm_redis_service:
   REDIS_PORT: 6379
 exhaust_service:
   CLOUD_STORAGE_PROVIDER: "aws"
-  CLOUD_STORAGE_REGION: ""
+  CLOUD_STORAGE_REGION: "us-east-2"
   CONTAINER: "" # Bucket name.
   CONTAINER_PREFIX: "telemetry-data"
   STORAGE_URL_EXPIRY: 3600
@@ -60,7 +54,6 @@ MAX_QUERY_THRESHOLD: "5000"
 MAX_QUERY_LIMIT: "5000"
 MAX_DATE_RANGE: "30"
 EXCLUDE_DATASOURCE_VALIDATION: "system-stats,failed-events-summary,masterdata-system-stats,system-events"
-<<<<<<< HEAD
 enable_lakehouse: false
 lakehouse_service:
     LAKEHOUSE_HOST: http://obsrv-trino
@@ -71,10 +64,5 @@ lakehouse_service:
 service_account_annotations:
   eks.amazonaws.com/role-arn: ""
 
-=======
-
-service_account_annotations:
-  eks.amazonaws.com/role-arn: ""
->>>>>>> opensource-repo/main
 service:
   type: LoadBalancer

@@ -22,26 +22,18 @@ variable "secor_image_tag" {
 variable "jobs" {
   description = "Create release names"
   type        = list(string)
-<<<<<<< HEAD
   default = [
     "ingest-backup", "failed-backup", "transform-backup",
     # "raw-backup", "unique-backup", "denorm-backup",
     "system-events", "system-telemetry-events",
     "masterdata-ingest-backup", "masterdata-transform-backup", "masterdata-failed-backup"
-=======
-  default     = [
-  "ingest-backup", "raw-backup",
-  "failed-backup", "unique-backup",
-  "denorm-backup", "transform-backup",
-  "system-events", "system-telemetry-events"
->>>>>>> opensource-repo/main
   ]
 }
 
 variable "secor_image_repository" {
   type        = string
   description = "secor image version"
-  default     = "sunbird/secor"
+  default     = "sanketikahub/secor"
 }
 
 variable "secor_namespace" {
