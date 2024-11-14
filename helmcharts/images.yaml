@@ -2,9 +2,9 @@ global:
   image:
     registry: &global_registry "sanketikahub"
     dockerRegistrySecretName: &dockerSecretName "registry-secret-name"
-    #<fill-value>: Replace the dockerConfigJson below for the private images
+     #Replace the dockerConfigJson below for the private images
     dockerConfigJson: |-
-      {"auths": {"http://<registry.your-domain.io>": {"auth": "<base64-encoded REGISTRY_USER:REGISTRY_PASSWORD>"}}}  
+      {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}  
 
 
 
