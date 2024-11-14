@@ -15,8 +15,8 @@ remote_state {
 #   kubernetes_storage_class       = "gp2"
 #   druid_deepstorage_type         = "s3"
 #   flink_checkpoint_store_type    = "s3"
-#   dataset_api_container_registry = "sanketikahub"
-#   dataset_api_image_tag          = "1.0.4"
-#   flink_container_registry       = "manjudr"
-#   flink_image_tag                = "2.1"
+#   dataset_api_container_registry = "sunbird"
+#   dataset_api_image_tag          = "1.0.0"
+#   flink_container_registry       = "sunbird"
+#   flink_image_tag                = "1.0.0"
 # }

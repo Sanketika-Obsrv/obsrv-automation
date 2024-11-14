@@ -14,8 +14,11 @@ Prerequisites:
     export AWS_TERRAFORM_BACKEND_BUCKET_NAME=mybucket
     export AWS_TERRAFORM_BACKEND_BUCKET_REGION=myregion
     ```
+<<<<<<< HEAD
 - You will need `velero cli` to create the cluster backups. Learn how to install velero cli at ([Velero cli](https://velero.io/docs/v1.3.0/velero-install/))
 
+=======
+>>>>>>> opensource-repo/main
 #### Steps:
 * Execute the below steps in the same terminal session:
     ```
@@ -50,6 +53,7 @@ Add `-auto-approve` to the above `terragrunt` command to install without providi
 ```
 terragrunt apply -target=module.eks -var-file=vars/cluster_overrides.tfvars -var-file=vars/dev.tfvars -auto-approve && terragrunt apply -var-file=vars/cluster_overrides.tfvars -var-file=vars/dev.tfvars -target=module.get_kubeconfig -auto-approve && terragrunt apply -var-file=vars/cluster_overrides.tfvars -var-file=vars/dev.tfvars -auto-approve
 ```
+<<<<<<< HEAD
 
 *** GCP ***
 ### Prerequisites:
@@ -154,6 +158,8 @@ kubectl get ingress -A
 13. Navigate to <domain>/console to access the web console
 
 
+=======
+>>>>>>> opensource-repo/main
 **Azure**
 ### Prerequisites:
 * Log into your cloud environment in your terminal. Please see [Sign in with Azure CLI](https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli) for reference.

@@ -50,12 +50,25 @@ variable "web_console_chart_depends_on" {
 variable "web_console_image_repository" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
+<<<<<<< HEAD
   default     = "sanketikahub/obsrv-web-console"
+=======
+  default     = "sunbird" 
+>>>>>>> opensource-repo/main
 }
 
 variable "web_console_image_tag" {
   type        = string
   description = "web console image tag."
+<<<<<<< HEAD
+=======
+}
+
+variable "web_console_image_name" {
+  type        = string
+  description = "web console image name."
+  default = "sb-obsrv-web-console"
+>>>>>>> opensource-repo/main
 }
 
 variable "web_console_configs" {

@@ -69,20 +69,63 @@ variable "kubernetes_storage_class" {
   description = "Storage class name for the Kubernetes cluster"
   default     = "gp2"
 }
+<<<<<<< HEAD
 variable "monitoring_grafana_oauth_configs" {
   type        = map(any)
   description = "Grafana oauth related variables. See below commented code for values that need to be passed"
+=======
+
+variable "dataset_api_container_registry" {
+  type        = string
+  description = "Container registry. For example docker.io/obsrv"
+  default     = "sunbird"
+}
+
+variable "dataset_api_image_tag" {
+  type        = string
+  description = "Dataset api image tag."
+}
+
+variable "flink_container_registry" {
+  type        = string
+  description = "Container registry. For example docker.io/obsrv"
+  default     = "sunbird"
+}
+
+variable "flink_image_tag" {
+   type        = string
+   description = "Flink kubernetes service name."
+>>>>>>> opensource-repo/main
 }
 
 # web console variables start
 variable "web_console_configs" {
   type        = map(any)
   description = "Web console config variables. See below commented code for values that need to be passed"
+<<<<<<< HEAD
+=======
+  default = {
+    port                               = "3000"
+    app_name                           = "obsrv-web-console"
+    prometheus_url                     = "http://monitoring-kube-prometheus-prometheus.monitoring:9090"
+    react_app_grafana_url              = "http://localhost:80"
+    react_app_superset_url             = "http://localhost:8081"
+    https                              = "false"
+    react_app_version                  = "v1.2.0"
+    generate_sourcemap                 = "false"
+  }
+}
+
+variable "web_console_image_tag" {
+  type        = string
+  description = "web console image tag."
+>>>>>>> opensource-repo/main
 }
 
 variable "web_console_image_repository" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
+<<<<<<< HEAD
   default     = "sanketikahub/obsrv-web-console"
 }
 
@@ -183,3 +226,52 @@ variable "storage_provider" {
   default     = "aws"
 }
 
+=======
+  default     = "sunbird"
+}
+
+variable "flink_release_names" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    extractor       = "extractor"
+    preprocessor    = "preprocessor"
+    denormalizer    = "denormalizer"
+    transformer     = "transformer"
+    druid-router    = "druid-router"
+    master-data-processor = "master-data-processor"
+    # kafka-connector = "kafka-connector"
+  }
+}
+
+variable "flink_merged_pipeline_release_names" {
+  description = "Create release names"
+  type        = map(string)
+  default = {
+    merged-pipeline = "merged-pipeline"
+    master-data-processor = "master-data-processor"
+    # kafka-connector = "kafka-connector"
+  }
+}
+
+variable "merged_pipeline_enabled" {
+  description = "Toggle to deploy merged pipeline"
+  type = bool
+  default = true
+}
+
+variable "command_service_image_tag" {
+  type        = string
+  description = "CommandService image tag."
+}
+
+variable "superset_image_tag" {
+  type        = string
+  description = "Superset image tag."
+}
+
+variable "secor_image_tag" {
+  type        = string
+  description = "secor image version"
+}
+>>>>>>> opensource-repo/main

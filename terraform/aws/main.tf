@@ -54,6 +54,7 @@ module "eks" {
 
 module "iam" {
   source                = "../modules/aws/iam"
+  count                 = var.create_velero_user ? 1 : 0
   env                   = var.env
   count                 = var.create_velero_user ? 1 : 0
   building_block        = var.building_block
@@ -268,6 +269,7 @@ module "eip" {
   building_block = var.building_block
 }
 
+<<<<<<< HEAD
 # module "kong_ingress" {
 #   source                        = "../modules/helm/kong_ingress"
 #   env                           = var.env
@@ -287,6 +289,31 @@ module "eip" {
 #   depends_on          = [module.kong_ingress]
 #   kong_ingress_domain = var.kong_ingress_domain != "" ? var.kong_ingress_domain : "${module.eip.kong_ingress_ip.public_ip}.sslip.io"
 # }
+=======
+module "monitoring" {
+  source                           = "../modules/helm/monitoring"
+  env                              = var.env
+  building_block                   = var.building_block
+  service_type                     = var.service_type
+  depends_on                       = [module.eks]
+}
+
+module "superset" {
+  source                            = "../modules/helm/superset"
+  env                               = var.env
+  building_block                    = var.building_block
+  postgresql_admin_username         = module.postgresql.postgresql_admin_username
+  postgresql_admin_password         = module.postgresql.postgresql_admin_password
+  postgresql_superset_user_password = module.postgresql.postgresql_superset_user_password
+  superset_chart_depends_on         = [module.postgresql_migration, module.redis_dedup]
+  redis_namespace                   = module.redis_dedup.redis_namespace
+  redis_release_name                = module.redis_dedup.redis_release_name
+  postgresql_service_name           = module.postgresql.postgresql_service_name
+  service_type                      = var.service_type
+  superset_image_tag                = var.superset_image_tag
+  
+}
+>>>>>>> opensource-repo/main
 
 # module "cert_manager" {
 #   source         = "../modules/helm/cert_manager"
@@ -306,11 +333,177 @@ module "eip" {
 #   letsencrypt_ssl_admin_email = var.letsencrypt_ssl_admin_email
 # }
 
+<<<<<<< HEAD
 module "eks_storage_class" {
   source         = "../modules/helm/eks_storage_class"
   env            = var.env
   building_block = var.building_block
   depends_on     = [module.eks]
+=======
+module "redis_dedup" {
+  source               = "../modules/helm/redis_dedup"
+  env                  = var.env
+  building_block       = var.building_block
+  depends_on           = [module.eks, module.monitoring]
+}
+
+module "redis_denorm" {
+  source               = "../modules/helm/redis_denorm"
+  env                  = var.env
+  building_block       = var.building_block
+  depends_on           = [module.eks, module.monitoring,module.redis_dedup]
+}
+
+module "kafka" {
+  source         = "../modules/helm/kafka"
+  env            = var.env
+  building_block = var.building_block
+  depends_on     = [module.eks, module.monitoring]
+}
+
+module "flink" {
+  source                              = "../modules/helm/flink"
+  env                                 = var.env
+  building_block                      = var.building_block
+  flink_container_registry            = var.flink_container_registry
+  flink_image_tag                     = var.flink_image_tag
+  flink_merged_pipeline_release_names = var.flink_merged_pipeline_release_names
+  flink_release_names                 = var.flink_release_names
+  merged_pipeline_enabled             = var.merged_pipeline_enabled
+  flink_checkpoint_store_type         = var.flink_checkpoint_store_type
+  flink_chart_depends_on              = [module.kafka, module.postgresql_migration, module.redis_dedup, module.redis_denorm]
+  postgresql_obsrv_username           = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password      = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database           = module.postgresql.postgresql_obsrv_database
+  checkpoint_base_url                 = "s3://${module.s3.checkpoint_storage_bucket}"
+  denorm_redis_namespace              = module.redis_denorm.redis_namespace
+  denorm_redis_release_name           = module.redis_denorm.redis_release_name
+  dedup_redis_namespace               = module.redis_dedup.redis_namespace
+  dedup_redis_release_name            = module.redis_dedup.redis_release_name
+  flink_sa_annotations                = "eks.amazonaws.com/role-arn: ${module.eks.flink_sa_iam_role}"
+  flink_namespace                     = module.eks.flink_namespace
+  postgresql_service_name             = module.postgresql.postgresql_service_name
+}
+
+module "druid_raw_cluster" {
+  source                             = "../modules/helm/druid_raw_cluster"
+  env                                = var.env
+  building_block                     = var.building_block
+#  s3_access_key                      = module.iam.s3_access_key
+#  s3_secret_key                      = module.iam.s3_secret_key
+  s3_bucket                          = module.s3.s3_bucket
+  druid_deepstorage_type             = var.druid_deepstorage_type
+  druid_raw_cluster_chart_depends_on = [module.postgresql_migration, module.druid_operator]
+  kubernetes_storage_class           = var.kubernetes_storage_class
+  druid_raw_user_password            = module.postgresql.postgresql_druid_raw_user_password
+  druid_raw_sa_annotations           = "eks.amazonaws.com/role-arn: ${module.eks.druid_raw_sa_iam_role}"
+  druid_cluster_namespace            = module.eks.druid_raw_namespace
+  service_type                       = var.service_type
+}
+
+module "druid_operator" {
+  source          = "../modules/helm/druid_operator"
+  env             = var.env
+  building_block  = var.building_block
+  depends_on      = [module.eks]
+}
+
+module "kafka_exporter" {
+  source                          = "../modules/helm/kafka_exporter"
+  env                             = var.env
+  building_block                  = var.building_block
+  kafka_exporter_chart_depends_on = [module.kafka, module.monitoring]
+}
+
+module "postgresql_exporter" {
+  source                               = "../modules/helm/postgresql_exporter"
+  env                                  = var.env
+  building_block                       = var.building_block
+  postgresql_exporter_chart_depends_on = [module.postgresql, module.monitoring]
+}
+
+module "druid_exporter" {
+  source                          = "../modules/helm/druid_exporter"
+  env                             = var.env
+  building_block                  = var.building_block
+  druid_exporter_chart_depends_on = [module.druid_raw_cluster, module.monitoring]
+}
+
+resource "random_string" "data_encryption_key" {
+  length = 32
+  special = false
+}
+
+module "dataset_api" {
+  source                             = "../modules/helm/dataset_api"
+  env                                = var.env
+  building_block                     = var.building_block
+  dataset_api_container_registry     = var.dataset_api_container_registry
+  dataset_api_image_tag              = var.dataset_api_image_tag
+  # dataset_api_postgres_user_password = module.postgresql.postgresql_dataset_api_user_password
+  postgresql_obsrv_username          = module.postgresql.postgresql_obsrv_username
+  postgresql_obsrv_user_password     = module.postgresql.postgresql_obsrv_user_password
+  postgresql_obsrv_database          = module.postgresql.postgresql_obsrv_database
+  dataset_api_sa_annotations         = "eks.amazonaws.com/role-arn: ${module.eks.dataset_api_sa_annotations}"
+  dataset_api_chart_depends_on       = [module.postgresql_migration, module.kafka]
+  denorm_redis_namespace             = module.redis_denorm.redis_namespace
+  denorm_redis_release_name          = module.redis_denorm.redis_release_name
+  dedup_redis_namespace              = module.redis_dedup.redis_namespace
+  dedup_redis_release_name           = module.redis_dedup.redis_release_name
+  dataset_api_namespace              = module.eks.dataset_api_namespace
+  s3_bucket                          = module.s3.s3_bucket
+  service_type                       = var.service_type
+}
+
+module "secor" {
+  source                    = "../modules/helm/secor"
+  env                       = var.env
+  building_block            = var.building_block
+  secor_sa_annotations      = "eks.amazonaws.com/role-arn: ${module.eks.secor_sa_iam_role}"
+  secor_chart_depends_on    = [module.kafka]
+  timezone                   = var.timezone
+  secor_namespace           = module.eks.secor_namespace
+  cloud_storage_bucket      = module.s3.s3_bucket
+  kubernetes_storage_class  = var.kubernetes_storage_class
+  region                    = var.region
+  secor_image_tag           = var.secor_image_tag
+}
+
+module "submit_ingestion" {
+  source                            = "../modules/helm/submit_ingestion"
+  env                               = var.env
+  building_block                    = var.building_block
+  submit_ingestion_chart_depends_on = [module.kafka, module.druid_raw_cluster]
+  druid_cluster_release_name        = module.druid_raw_cluster.druid_cluster_release_name
+  druid_cluster_namespace           = module.druid_raw_cluster.druid_cluster_namespace
+}
+
+module "velero" {
+  source                       = "../modules/helm/velero"
+  env                          = var.env
+  building_block               = var.building_block
+  cloud_provider               = "aws"
+  velero_backup_bucket         = module.s3.velero_storage_bucket
+  velero_backup_bucket_region  = var.region
+  velero_aws_access_key_id     = var.create_velero_user ?  module.iam[0].velero_user_access_key : var.velero_aws_access_key_id
+  velero_aws_secret_access_key = var.create_velero_user ? module.iam[0].velero_user_secret_key : var.velero_aws_secret_access_key 
+}
+
+module "alert_rules" {
+  source                       = "../modules/helm/alert_rules"
+  alertrules_chart_depends_on  = [module.monitoring]
+}
+
+module "web_console" {
+  source                           = "../modules/helm/web_console"
+  env                              = var.env
+  building_block                   = var.building_block
+  web_console_configs              = var.web_console_configs
+  depends_on                       = [module.eks, module.monitoring, module.dataset_api]
+  web_console_image_repository     = var.web_console_image_repository
+  web_console_image_tag            = var.web_console_image_tag
+  service_type                     = var.service_type
+>>>>>>> opensource-repo/main
 }
 
 module "get_kubeconfig" {
@@ -341,6 +534,7 @@ module "get_kubeconfig" {
 #   enable_lakehouse                      = var.enable_lakehouse
 # }
 
+<<<<<<< HEAD
 # module "trino" {
 #   source          = "../modules/helm/trino"
 #   count           = var.enable_lakehouse ? 1 : 0
@@ -426,3 +620,18 @@ module "get_kubeconfig" {
 #   spark_sa_annotations        = "eks.amazonaws.com/role-arn: ${module.eks.spark_sa_annotations}"
 #   spark_sa_role               = module.eks.spark_sa_annotations
 # }
+=======
+module "postgresql_migration" {
+  source                                = "../modules/helm/postgresql_migration"
+  env                                   = var.env
+  building_block                        = var.building_block
+  postgresql_admin_username             = module.postgresql.postgresql_admin_username
+  postgresql_admin_password             = module.postgresql.postgresql_admin_password
+  postgresql_migration_chart_depends_on = [module.postgresql]
+  postgresql_url                        = module.postgresql.postgresql_service_name
+  postgresql_superset_user_password     = module.postgresql.postgresql_superset_user_password
+  postgresql_druid_raw_user_password    = module.postgresql.postgresql_druid_raw_user_password
+  postgresql_obsrv_user_password        = module.postgresql.postgresql_obsrv_user_password
+  data_encryption_key                   = resource.random_string.data_encryption_key.result
+}
+>>>>>>> opensource-repo/main

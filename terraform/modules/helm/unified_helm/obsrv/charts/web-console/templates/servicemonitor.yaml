@@ -1,0 +1,19 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: web-console
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: web-console
+    release: monitoring
+spec:
+  jobLabel: jobLabel
+  selector:
+    matchLabels:
+      app: web-console
+  endpoints:
+  - port: http-web-console
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 5s

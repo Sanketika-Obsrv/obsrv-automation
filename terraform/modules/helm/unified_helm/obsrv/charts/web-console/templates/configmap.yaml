@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-config"
+  namespace: "{{ .Values.namespace }}"
+  labels:
+    app: "{{ .Chart.Name }}"
+data:
+  ENV: "{{ .Values.ENV }}"
+  PORT: "{{ .Values.PORT }}"
+  APP_NAME: "{{ .Values.APP_NAME }}"
+  PROMETHEUS_URL: "{{ .Values.PROMETHEUS_URL }}"
+  HTTPS: "{{ .Values.HTTPS }}"
+  REACT_APP_VERSION: "{{ .Values.REACT_APP_VERSION }}"
+  GENERATE_SOURCEMAP: "{{ .Values.GENERATE_SOURCEMAP }}"
+  REACT_APP_GRAFANA_URL: "{{ .Values.REACT_APP_GRAFANA_URL }}"
+  REACT_APP_SUPERSET_URL: "{{ .Values.REACT_APP_SUPERSET_URL }}"

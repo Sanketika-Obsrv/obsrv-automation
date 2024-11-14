@@ -70,7 +70,11 @@ data:
       port = "9042"
     }
 
+<<<<<<< HEAD
   flink-conf: |
+=======
+  flink-conf: |+
+>>>>>>> opensource-repo/main
     jobmanager.memory.flink.size: 1024m
     taskmanager.memory.flink.size: 1024m
     taskmanager.numberOfTaskSlots: 1

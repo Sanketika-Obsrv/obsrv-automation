@@ -1,0 +1,1364 @@
+global:
+  azure:
+    images:
+      command_api:
+        # tag: 1.0.2
+        # digest: sha256:88c1a2b627ff9238c906935531117cd387e622eeee37176c1ef2d3ef36a698e3
+        digest: 1.0.2
+        image: flink-command-service
+        # tag: 2.0.2
+        # digest: sha256:d7b7a53765ace3e906f6e4a2a5c1f203429f49a1c77e323804dd6eae59200cf6
+        # image: obsrv-command-service
+        registry: docker.io/sunbird
+      dataset_api:
+        # tag:1.0.2
+        # digest: sha256:02e7455eee1194a4fd93cbb8f23e5dc6459a7a001393079358e0a5436f68997d
+        digest: 1.0.2-GA
+        image: obsrv-api-service
+        registry: docker.io/sunbird
+      druid_exporter:
+        # tag: v0.11
+        digest: sha256:fd3ce79c4505b078bd9d382bc3b7c49326f9a13814e6ef30d755a78bf3dc613d
+        image: druid-exporter
+        registry: docker.io/sunbird
+      druid_operator:
+        digest: sha256:2991a809adf4905468faeeca7f1d4d822c22957ea1c17b8c50799b40a4c81023
+        image: druid-operator
+        registry: docker.io/druidio
+      druid_raw_cluster:
+        # tag 28.0.1
+        # digest: sha256:25f8e8be98f368237138caf611ddfcaafe487b4c5d678ba0bd048a02fef5f84a
+        digest: 28.0.1
+        image: druid
+        registry: docker.io/apache
+      zookeeper:
+        digest: sha256:37f17d102c85227c3cc888a63edac865e8842b43b6af73be508a464055a347f8
+        image: zookeeper
+        registry: docker.io/bitnami
+      # os_shell:
+      #   # tag: 11-debian-11-r37
+      #   digest: sha256:77bdba3135998baadc20015e00a9742eebac52167b90c3e46d0c339a2d668b12
+      #   image: os-shell
+      #   registry: docker.io/bitnami
+      merged_pipeline:
+        # tag: release-0.5.0_RC27
+        # digest: sha256:211bc5b9e335fe0f8c5b8470db45ab2fec40cb0d7f64ad256a8d37a3749842d3
+        digest: release-0.5.0_RC27
+        image: merged-pipeline
+        registry: docker.io/sunbird
+      master_data_processor:
+        # tag: release-0.5.0_RC27
+        # digest: sha256:1a48c84305875b7b806a7042a07e7e70f1c383e1b99094df7d5fc18484f7ea6c
+        digest: release-0.5.0_RC27
+        image: master-data-processor
+        registry: docker.io/sunbird
+      kafka:
+        # tag: 3.6.0
+        digest: sha256:647a79c852a60b9bac1832f24e26c1654a8efcbc4d839f0ae75dc8c60ba03e4a
+        image: kafka
+        registry: docker.io/sunbird
+      # autodiscovery:
+      #   # tag: 1.25.12-debian-11-r26
+      #   digest: sha256:9774c3452853d3ba9c4744d0acfa36d63f9d87ba7e43fd292caf7dae9115fac4
+      #   image: kubectl
+      #   registry: docker.io/bitnami
+      kafka_exporter:
+        # tag: 1.0.1
+        digest: sha256:88c54d4e1328634929cbcc4f0b3cade990b271183b6580d020016683ab86e752
+        image: kafka-exporter
+        registry: docker.io/sunbird
+      jmx_exporter:
+        # tag: 1.0.0
+        digest: sha256:3b6b7dd0d194939cf463a37a1851bdca610a5aac306cea86c16faf39a2bf8241
+        image: jmx-exporter
+        registry: docker.io/sunbird
+      # bitnami_shell:
+      #   # tag: 11-debian-11-r136
+      #   digest: sha256:0aa4e2314721a29fa2a8ea0ed901e2db2842c4217fc60ed5700ee62dbcd0fcbc
+      #   image: bitnami-shell
+      #   registry: docker.io/bitnami
+      # postgresql:
+      #   # tag: 14.9.0-debian-11-r2
+      #   digest: sha256:f349e5f081c5894c80321fbb22981c00e22f802055d2ac34a3b9260e0be6df44
+      #   image: postgresql
+      #   registry: docker.io/bitnami
+      # postgres:
+      #   # tag: 15.4-alpine
+      #   digest: sha256:4acb0925f2de9716f925fedd83580f6dc2f48e32623e598a39896942fe2b3783
+      #   image: postgres
+      #   registry: docker.io/sunbird
+      #   # registry: docker.io
+      # only for local testing
+      postgres:
+        # tag: 16.1-alpine
+        digest: sha256:d9449d47e5bc5ac6b832168b0f38e7ea7762ac75c574963d5ebfd75090f55d35
+        image: postgres
+        registry: docker.io
+      postgresql_exporter:
+        # tag: 1.0.1
+        digest: sha256:ca88db0e369a5db389b635fc385147de74df2f1fc4d2194a857fa687e701b1f8
+        image: postgres-exporter
+        registry: docker.io/sunbird
+      # redis:
+      #   digest: sha256:017aaf627b7e115f6fb036c6e3360a0de4d83f1d62b315db31e89a0c09a4698e
+      #   image: redis
+      #   registry: docker.io/bitnami
+      # using redis alpine image
+      redis:
+        # tag: 7.2.2-alpine
+        digest: sha256:dbb2b5e28cf1d8b759a39f02479a5c4e03ca5e27d79bf2b20c6f662c57ec814a
+        image: redis
+        registry: docker.io/sunbird
+      # redis_sentinel:
+      #   digest: sha256:a0317520a0275f1937a280fec73748b7a7995c17e137dab58b38e4b1fb4dfc15
+      #   image: redis-sentinel
+      #   registry: docker.io/bitnami
+      redis_exporter:
+        # tag: 1.0.0
+        digest: sha256:75f36755b86359945962164c1963a93d45ee433e14669a23a7ee8661845a2fe0
+        image: redis-exporter
+        registry: docker.io/sunbird
+      secor:
+        # tag: 1.0.0-GA
+        digest: sha256:90c2fc137cc242e5c08c2460298d8bec00d91aabe81c4a6a9c8f28bc67c602f6
+        image: secor
+        registry: docker.io/sunbird
+      ubuntu:
+        digest: sha256:33a5cc25d22c45900796a1aca487ad7a7cb09f09ea00b779e3b2026b4fc2faba
+        image: ubuntu
+        registry: docker.io/library
+      k8s_sidecar:
+        # tag: 1.25.2
+        digest: sha256:bc9996fb095fe5c313658140fab7f398663205d18894df633830fb5eadb680a4
+        image: k8s-sidecar
+        #registry: quay.io/kiwigrid
+        registry: docker.io/sunbird
+      grafana_image_renderer:
+        # tag: 3.11.1
+        digest: sha256:6d21854e5ad94014426f4f5fe18c1573980aea2718b730793d2e65cf17048e83
+        image: grafana-image-renderer
+        registry: docker.io/sunbird
+      curl:
+        # tag: 8.4.0
+        digest: sha256:9b8e72d8278b18784f805c5ad3dbf4e57fa6f396475b7cf58a75ad3d8242ec68
+        image: curl
+        #registry: docker.io/alpine
+        registry: docker.io/sunbird
+      busybox:
+        digest: sha256:95cf004f559831017cdf4628aaf1bb30133677be8702a8c5f2994629f637a209
+        image: busybox
+        registry: docker.io/library
+      grafana:
+        # tag: 9.5.2
+        digest: sha256:2aafd24a138277142a86b6ed43b7537e1ec8226478f5240c459e9330a3461cdb
+        image: grafana
+        registry: docker.io/grafana
+      kube_rbac_proxy:
+        digest: sha256:23959f17f0c06988423b2aa899e9d387b9bfabd4fd005e6aa2444aa66de50793
+        image: kube-rbac-proxy
+        registry: quay.io/brancz
+      node_exporter:
+        # tag: master
+        digest: sha256:ee95038eb4cd16a0c12afa1fc019224529b2d589cc457bb5eb1ad7ca5b8ac5d0
+        image: node-exporter
+        registry: docker.io/prom
+      alertmanager:
+        # tag: main_v1.0.1
+        digest: sha256:fe15798ee1eabfc366dd5de79629356f0899fdb021b2274a18f8674e7790e082
+        image: alertmanager
+        registry: docker.io/sunbird
+      prometheus_operator:
+        # tag: v0.66.0
+        digest: sha256:116bdf06d6070ba9d1988704c30a5dd82bd63aa31603241aafd858389bd5a748
+        image: prometheus-operator
+        registry: docker.io/sunbird
+      prometheus_config_reloader:
+        digest: sha256:65dde6b23d0fe81778c2b1027785f2244a71d1702b67f08700b2308c381e5400
+        image: prometheus-config-reloader
+        registry: quay.io/prometheus-operator
+      # thanos:
+      #   digest: sha256:e7d337d6ac2aea3f0f9314ec9830291789e16e2b480b9d353be02d05ce7f2a7e
+      #   image: thanos
+      #   registry: quay.io/thanos
+      prometheus:
+        # tag: main
+        digest: sha256:17b15b91b841c30df91387c457853b241561b426b7f2cb39fde2f906c35a47c1
+        image: prometheus
+        registry: docker.io/prom
+      kube_state_metrics:
+        digest: sha256:ec5732e28f151de3847df60f48c5a570aacdb692ff1ce949d97105ae5e5a6722
+        image: kube-state-metrics
+        registry: registry.k8s.io/kube-state-metrics
+      alpine:
+        # tag:3.16
+        digest: sha256:b7976818ac23c46dbc69437dd41c5ba32750f0345ad706209d2208b4db84e1e8
+        image: alpine
+        registry: docker.io/library
+      kube_webhook_certgen:
+        digest: sha256:543c40fd093964bc9ab509d3e791f9989963021f1e9e4c9c7b6700b02bfb227b
+        image: kube-webhook-certgen
+        registry: registry.k8s.io/ingress-nginx
+      grafana_agent_operator:
+        # tag: main
+        digest: sha256:533ab218f658aac5b58ab79d6054e89dca60a14f0f1598019b6e38ebaa6181c7
+        image: agent-operator
+        registry: docker.io/sunbird
+      minio:
+        # tag: 1.0.1
+        digest: sha256:3c32ef6089b3ea230a55f6e7e594aaf47a216cd9b6309f701a5a4facec1b31e8
+        image: minio
+        registry: docker.io/sunbird
+      # kubectl_image:
+      #   digest: sha256:9774c3452853d3ba9c4744d0acfa36d63f9d87ba7e43fd292caf7dae9115fac4
+      #   image: kubectl
+      #   registry: docker.io/bitnami
+      kubectl_image:
+        # tag: 1.0.0
+        digest: sha256:eb0a7c497343851e3e8f15a4f894d87b0b7a0212ae249b735c96679dec6b295e
+        image: kubectl
+        registry: docker.io/sunbird
+      mc_image:
+        # tag: 1.0.0
+        digest: sha256:3ad2b67ae3f9191745b44133b1a1d1386d9aa081902af47d8c8ea297a49aceaa
+        image: minio-client
+        registry: docker.io/sunbird
+      # enterprise_logs:
+      #   digest: sha256:469d8fdb73288d7a3e243c74856f155f8c498c9710102c338758ba431b235ef9
+      #   image: enterprise-logs
+      #   registry: docker.io/grafana
+      # enterprise_logs_provisioner:
+      #   digest: sha256:1e1e6da087fadee34fe7c1224da80bd6011e7841927bc73fde974bffba50fc54
+      #   image: enterprise-logs-provisioner
+      #   registry: docker.io/grafana
+      loki_test:
+        # latest
+        digest: sha256:4eca92e66d9367ba6f0920c6998d9955bb979346d69db315e32e77d6f1b47fe8
+        image: loki-helm-test
+        registry: docker.io/grafana
+      loki_canary:
+        # tag: 1.0.0
+        digest: sha256:e9bee1c12811406df9712fbd7383bd0a5afe8e3a7c622716303d63cec9012a2b
+        image: loki-canary
+        registry: docker.io/sunbird
+      loki:
+        # tag: 1.0.0
+        digest: sha256:6a2ae34b94e5074bde4904dc85c2d9eae6c351dcf0568ff88882a851a0368b18
+        image: loki
+        registry: docker.io/sunbird
+      loki_gateway:
+        # tag: 1.25-alpine-1
+        digest: sha256:341c4f6f422f1aaec1d0f7fb82f8f82f4618a5e0f8d07b026df5f4e26e24727d
+        image: nginx-unprivileged
+        registry: docker.io/sunbird
+      promtail:
+        # tag: main-2327789
+        digest: sha256:bab40183b93472314aa7f3f4a6c3c639dda1799664085a7618e026a8dcc95288
+        image: promtail
+        registry: docker.io/sunbird
+      web_console:
+        # tag: 1.0.2-alert-desc
+        # digest: sha256:be2a77a9b346a3e8946da8df8ec5042112729f5685eb60e34e1448e1a44e184b
+        digest: 1.0.0-GA
+        image: sb-obsrv-web-console
+        # registry: obsrvms.azurecr.io
+        registry: docker.io/sunbird
+      # superset:
+      #   # tag: 2.0.0
+      #   digest: sha256:ca32ff641daca7447edfe78345e1abbc3b278895b1d4a245e69e28020e3310b7
+      #   image: superset
+      #   registry: docker.io/apache
+
+  env: &global-env "dev"
+  building_block: &global-bb "obsrv"
+  # redis_host: &global-redis-host "obsrv-redis-master.redis.svc.cluster.local"
+  # postgresql_host: &global-psql-host "obsrv-postgresql-hl.postgresql.svc.cluster.local"
+  # postgresql_druid_url: &global-psql-druid-conn "jdbc:postgresql://obsrv-postgresql-hl.postgresql.svc.cluster.local:5432/druid_raw"
+  druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
+  druid_URL: &global-druid-URL "http://druid-raw-routers.druid-raw.svc:8888"
+
+  postgresql_obsrv_username: &psql-obsrv-user "obsrv"
+  postgresql_obsrv_database: &psql-obsrv-db "obsrv"
+  postgresql_obsrv_user_password: &psql-obsrv-pwd "obsrv123"
+  postgresql_druid_user_password: &psql-druid-pwd "druidraw123"
+
+  s3_bucket: &s3-bucket ""
+  s3_access_key: &s3-key ""
+  s3_secret_key: &s3-secret ""
+  region: &global-region ""
+
+  azure_storage_account_name: ""
+  azure_storage_account_key: ""
+  azure_storage_container: ""
+
+  gcs_bucket: &gcs-bucket ""
+
+  druid_deepstorage_type: &global-druid-deep-store-type "azure"
+  kubernetes_storage_class: &global-k9s-storage-class "managed-premium"
+
+  sys-events-kafka-topic: &sys-events-kafka-topic "dev.system.events"
+  sys-telemetry-events-kafka-topic: &sys-telemetry-events-kafka-topic "dev.system.telemetry.events"
+
+alert-rules:
+  enabled: false
+  namespace: monitoring
+
+dataset-api:
+  enabled: true
+  namespace: dataset-api
+  SYSTEM_ENV: *global-env
+  service:
+    type: NodePort
+  druid_service:
+    DRUID_HOST: *global-druid-host
+    DRUID_PORT: 8888
+  postgres_service:
+    POSTGRES_PORT: 5432
+    POSTGRES_DATABASE: *psql-obsrv-db
+    POSTGRES_USERNAME: *psql-obsrv-user
+    POSTGRES_PASSWORD: *psql-obsrv-pwd
+  dockerhub: sunbird
+  repository: obsrv-api-service
+  image_tag: 1.0.1
+  imagePullSecrets: ""
+  dedup_redis_service:
+    REDIS_PORT: 6379
+  denorm_redis_service:
+    REDIS_PORT: 6379
+  exhaust_service:
+    # LABEL_CONTAINER: *azure-container
+    # CLOUD_STORAGE_PROVIDER: "aws"
+    CLOUD_STORAGE_REGION: "East US 2"
+    CLOUD_STORAGE_PROVIDER: "azure"
+    # CONTAINER: *azure-container
+    CONTAINER_PREFIX: "telemetry-data"
+    # CLOUD_STORAGE_CONFIG: '{"identity":"","credential":""}'
+  # service_account_annotations:
+  #   meta.helm.sh/release-namespace: dataset-api
+
+command-api:
+  enabled: true
+  namespace: command-api
+  system_env: *global-env
+
+druid-exporter:
+  enabled: true
+  namespace: druid-raw
+  druidURL: *global-druid-URL
+  serviceMonitor:
+    enabled: true
+    namespace: druid-raw
+    interval: 30s
+    scrapeTimeout: 10s
+
+druid-operator:
+  enabled: true
+  namespace: druid-raw
+
+druid-raw-cluster:
+  enabled: true
+  namespace: druid-raw
+  # druid_namespace: druid-raw
+  druid_metadata_storage_connector_user: druid_raw
+  druid_metadata_storage_connector_password: *psql-druid-pwd
+  # druid_metadata_storage_connector_connectURI: *global-psql-druid-conn
+  druid_worker_capacity: 2
+  druid_env: *global-env
+  storageClass: *global-k9s-storage-class
+  druid_deepstorage_type: *global-druid-deep-store-type
+  druid_indexer_logs_type: *global-druid-deep-store-type
+  # druid_indexer_logs_container: *azure-container
+  s3_bucket: *s3-bucket
+  s3_access_key: *s3-key
+  s3_secret_key: *s3-secret
+  # azure_storage_account_name: *azure-account-name
+  # azure_storage_account_key: *azure-account-key
+  # azure_storage_container: *azure-container
+  gcs_bucket: *gcs-bucket
+  zookeeper:
+    namespace: druid-raw
+  serviceAccount:
+    create: false
+    annotations:
+      meta.helm.sh/release-namespace: druid-raw
+      eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-obsrv-test-druid-raw-sa-iam-role
+    name: druid-raw-sa
+
+merged-pipeline:
+  enabled: true
+  name: merged-pipeline
+  namespace: flink
+  env: *global-env
+  checkpoint_store_type: azure
+
+master-data-processor:
+  enabled: true
+  name: master-data-processor
+  namespace: flink
+  env: *global-env
+  checkpoint_store_type: azure
+
+flink-sa:
+  enabled: false
+  namespace: flink
+  serviceAccount:
+    annotations:
+      meta.helm.sh/release-namespace: flink
+      eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-obsrv-test-flink-sa-iam-role
+    name: flink-sa
+
+grafana-configs:
+  enabled: true
+  namespace: monitoring
+
+kafka:
+  enabled: true
+  namespace: kafka
+  provisioning:
+    enabled: true
+    topics:
+      - name: "dev.ingest"
+        partitions: 1
+        replicationFactor: 1
+        config:
+          max.message.bytes: "10000024"
+        # https://kafka.apache.org/documentation/#topicconfigs
+      - name: "dev.masterdata.ingest"
+        partitions: 1
+        replicationFactor: 1
+        config:
+          max.message.bytes: "10000024"
+        # https://kafka.apache.org/documentation/#topicconfigs
+  persistence:
+    size: 50Gi
+  zookeeper:
+    persistence:
+      size: 8Gi
+    namespace: kafka
+    fullnameOverride: kafka-zookeeper
+  metrics:
+    kafka:
+      enabled: false
+    jmx:
+      enabled: false
+
+kafka-exporter:
+  enabled: true
+  namespace: kafka
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      namespace: kafka
+      interval: "30s"
+      additionalLabels:
+        app: kafka-exporter
+        release: monitoring
+
+postgresql:
+  enabled: true
+  namespace: postgresql
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 14.9.0-debian-11-r2
+  auth:
+    enablePostgresUser: true
+    postgresPassword: postgres
+  primary:
+    extendedConfiguration: |
+      password_encryption = md5
+    resources:
+      limits: {}
+      requests:
+        memory: 256Mi
+        cpu: 250m
+    persistence:
+      size: 1Gi
+      enabled: true
+      mountPath: /bitnami/postgresql
+
+    initdb:
+      user: postgres
+      password: postgres
+      scriptsConfigMap: ""
+      scripts:
+        00_create_superset_db.sql: |
+          CREATE DATABASE superset;
+        01_create_superset_user.sql: |
+          CREATE USER superset WITH ENCRYPTED PASSWORD 'superset123';
+          ALTER DATABASE superset OWNER TO superset;
+          GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
+        02_create_druid_raw_db.sql: |
+          CREATE DATABASE druid_raw;
+        03_create_druid_raw_user.sql: |
+          CREATE USER druid_raw WITH ENCRYPTED PASSWORD 'druidraw123';
+          ALTER DATABASE druid_raw OWNER TO druid_raw;
+          GRANT ALL PRIVILEGES ON DATABASE druid_raw TO druid_raw;
+        04_create_obsrv_db.sql: |
+          CREATE DATABASE obsrv;
+        05_create_obsrv_user.sql: |
+          CREATE USER obsrv WITH ENCRYPTED PASSWORD 'obsrv123';
+          ALTER DATABASE obsrv OWNER TO obsrv;
+          GRANT ALL PRIVILEGES ON DATABASE obsrv TO obsrv;
+        06_create_tables.sql: |
+          \c obsrv
+
+          CREATE TABLE IF NOT EXISTS datasets (
+              id TEXT PRIMARY KEY,
+              dataset_id TEXT,
+              type TEXT NOT NULL,
+              name TEXT,
+              validation_config JSON,
+              extraction_config JSON,
+              dedup_config JSON,
+              data_schema JSON,
+              denorm_config JSON,
+              router_config JSON,
+              dataset_config JSON,
+              tags TEXT[],
+              data_version INT,
+              status TEXT,
+              created_by TEXT,
+              updated_by TEXT,
+              created_date TIMESTAMP NOT NULL DEFAULT now(),
+              updated_date TIMESTAMP NOT NULL,
+              published_date TIMESTAMP NOT NULL DEFAULT now()
+          );
+
+          CREATE INDEX IF NOT EXISTS datasets_status ON datasets(status);
+
+          CREATE TABLE IF NOT EXISTS datasources (
+            id TEXT PRIMARY KEY,
+            datasource text NOT NULL,
+            dataset_id TEXT NOT NULL REFERENCES datasets (id),
+            ingestion_spec json NOT NULL,
+            datasource_ref text NOT NULL,
+            retention_period json,
+            archival_policy json,
+            purge_policy json,
+            backup_config json NOT NULL,
+            metadata json,
+            status text NOT NULL,
+            created_by text NOT NULL,
+            updated_by text NOT NULL,
+            created_date TIMESTAMP NOT NULL DEFAULT now(),
+            updated_date TIMESTAMP NOT NULL,
+            published_date TIMESTAMP NOT NULL DEFAULT now(),
+            UNIQUE (dataset_id, datasource)
+          );
+
+          CREATE INDEX IF NOT EXISTS datasources_dataset ON datasources(dataset_id);
+
+          CREATE INDEX IF NOT EXISTS datasources_status ON datasources(status);
+
+          CREATE TABLE IF NOT EXISTS dataset_transformations (
+            id TEXT PRIMARY KEY,
+            dataset_id TEXT NOT NULL REFERENCES datasets (id),
+            field_key TEXT NOT NULL,
+            transformation_function JSON,
+            status TEXT NOT NULL,
+            created_by TEXT NOT NULL,
+            updated_by TEXT NOT NULL,
+            created_date TIMESTAMP NOT NULL DEFAULT now(),
+            updated_date TIMESTAMP NOT NULL,
+            published_date TIMESTAMP NOT NULL DEFAULT now(),
+            mode TEXT,
+            metadata JSON,
+            UNIQUE (dataset_id, field_key)
+          );
+
+          CREATE INDEX IF NOT EXISTS dataset_transformations_dataset ON dataset_transformations (dataset_id);
+
+          CREATE INDEX IF NOT EXISTS dataset_transformations_status ON dataset_transformations (status);
+
+          CREATE TABLE IF NOT EXISTS dataset_source_config (
+            id TEXT PRIMARY KEY,
+            dataset_id TEXT NOT NULL REFERENCES datasets (id),
+            connector_type text NOT NULL,
+            connector_config json NOT NULL,
+            status text NOT NULL,
+            connector_stats json,
+            created_by text NOT NULL,
+            updated_by text NOT NULL,
+            created_date TIMESTAMP NOT NULL DEFAULT now(),
+            updated_date TIMESTAMP NOT NULL,
+            published_date TIMESTAMP NOT NULL,
+            UNIQUE (dataset_id)
+          );
+          CREATE INDEX IF NOT EXISTS  dataset_source_config_dataset ON dataset_source_config(dataset_id);
+
+          CREATE INDEX IF NOT EXISTS dataset_source_config_status ON dataset_source_config(status);
+
+          GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
+
+          GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
+
+postgresql-exporter:
+  enabled: true
+  namespace: postgresql
+  serviceMonitor:
+    enabled: true
+    namespace: postgresql
+    interval: 30s
+    labels:
+      release: monitoring
+      system.monitoring: "true"
+
+redis-dedup:
+  enabled: true
+  namespace: redis
+  commonLabels:
+    system.storage: 'true'
+    system.processing: 'true'
+  image:
+    registry: docker.io
+    repository: bitnami/redis
+    tag: 7.0.5-debian-11-r15
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets:
+      - ""
+
+  architecture: standalone
+  commonConfiguration: |-
+    # Enable RDB persistence
+    save 300 100
+
+  auth:
+    enabled: false
+
+  master:
+    count: 1
+    ## @param master.configuration Configuration for Redis&reg; master nodes
+    ## ref: https://redis.io/topics/config
+    ##
+    configuration: ""
+    podLabels:
+      system.storage: 'true'
+      system.processing: 'true'
+    disableCommands:
+      - FLUSHALL
+    ## @param master.extraFlags Array with additional command line flags for Redis&reg; master
+    ## e.g:
+    extraFlags:
+      - "--maxmemory 512mb"
+      - "--maxmemory-policy volatile-ttl"
+    containerPorts:
+      redis: 6379
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 512Mi
+      requests:
+        cpu: 0.5
+        memory: 512Mi
+    persistence:
+      enabled: true
+      labels:
+        system.storage: 'true'
+        system.processing: 'true'
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+    # sidecars:
+    #   - name: redis-backup
+    #     image: sunbird/redis-backup:0.5
+    #     imagePullPolicy: IfNotPresent
+    #     volumeMounts:
+    #       - mountPath: /data
+    #         name: redis-data
+    #     env:
+    #       - name: REDIS_BACKUP_CRON_SCHEDULE
+    #         value: "00 00 * * *"
+    #       - name: CLOUD_SERVICE
+    #         value: azure
+    #       - name: AZURE_BACKUP_BUCKET
+    #         value: ""
+    #       - name: S3_BACKUP_BUCKET
+    #         value: ""
+    #       - name: GCS_BACKUP_BUCKET
+    #         value: ""
+    #       - name: REDIS_RDB_FILE_PATH
+    #         value: /data
+    #       - name: REDIS_REPLICATION_MODE
+    #         value: master
+    #     resources:
+    #       limits:
+    #         cpu: 0.2
+    #         memory: 100Mi
+    serviceAccount:
+      create: false
+    #   name: ${redis_backup_service_account_name}
+    #   annotations:
+    #     ${redis_backup_sa_annotations}
+
+  replica:
+    replicaCount: 1
+    ## @param replica.configuration Configuration for Redis&reg; replicas nodes
+    ## ref: https://redis.io/topics/config
+    ##
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
+    ## e.g:
+    extraFlags:
+      - "--maxmemory 512mb"
+      - "--maxmemory-policy volatile-ttl"
+    ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
+    ##
+    containerPorts:
+      redis: 6379
+    persistence:
+      enabled: true
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+    serviceAccount:
+      create: false
+
+redis-denorm:
+  enabled: true
+  namespace: redis
+  commonLabels:
+      system.storage: 'true'
+      system.processing: 'true'
+  image:
+    registry: docker.io
+    repository: bitnami/redis
+    tag: 7.0.5-debian-11-r15
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets:
+      - ""
+
+  architecture: standalone
+  commonConfiguration: |-
+    # Enable RDB persistence
+    save 300 100
+
+  auth:
+    enabled: false
+
+  master:
+    count: 1
+    podLabels:
+      system.storage: 'true'
+      system.processing: 'true'
+    ## @param master.configuration Configuration for Redis&reg; master nodes
+    ## ref: https://redis.io/topics/config
+    ##
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    ## @param master.extraFlags Array with additional command line flags for Redis&reg; master
+    ## e.g:
+    extraFlags:
+      - "--maxmemory 1024mb"
+      - "--maxmemory-policy noeviction"
+    containerPorts:
+      redis: 6379
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 2Gi
+      requests:
+        cpu: 0.5
+        memory: 1Gi
+    persistence:
+      enabled: true
+      labels:
+        system.storage: 'true'
+        system.processing: 'true'
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+    # sidecars:
+    #   - name: redis-backup
+    #     image: sunbird/redis-backup:0.5
+    #     imagePullPolicy: IfNotPresent
+    #     volumeMounts:
+    #       - mountPath: /data
+    #         name: redis-data
+    #     env:
+    #       - name: REDIS_BACKUP_CRON_SCHEDULE
+    #         value: "00 00 * * *"
+    #       - name: CLOUD_SERVICE
+    #         value: azure
+    #       - name: AZURE_BACKUP_BUCKET
+    #         value: ""
+    #       - name: S3_BACKUP_BUCKET
+    #         value: ""
+    #       - name: GCS_BACKUP_BUCKET
+    #         value: ""
+    #       - name: REDIS_RDB_FILE_PATH
+    #         value: /data
+    #       - name: REDIS_REPLICATION_MODE
+    #         value: master
+    #     resources:
+    #       limits:
+    #         cpu: 0.2
+    #         memory: 100Mi
+    serviceAccount:
+      create: false
+    #   name: ${redis_backup_service_account_name}
+    #   annotations:
+    #     ${redis_backup_sa_annotations}
+
+  replica:
+    replicaCount: 1
+    ## @param replica.configuration Configuration for Redis&reg; replicas nodes
+    ## ref: https://redis.io/topics/config
+    ##
+    configuration: ""
+    disableCommands:
+      - FLUSHALL
+    ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
+    ## e.g:
+    extraFlags:
+      - "--maxmemory 1024mb"
+      - "--maxmemory-policy noeviction"
+    ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
+    ##
+    containerPorts:
+      redis: 6379
+    persistence:
+      enabled: true
+      path: /data
+      subPath: ""
+      subPathExpr: ""
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+    serviceAccount:
+      create: false
+
+secor:
+  enabled: true
+  namespace: secor
+
+  # common variables used across all jobs
+  extractor_timestamp_key: &extractor-timestamp-key "syncts"
+  default_timestamp_key: &default-timestamp-key "obsrv_meta.syncts"
+  fallback_timestamp_key: &fallback-timestamp-key "ets"
+  # kafka_broker_host: &kafka-broker-host "obsrv-kafka-headless.kafka.svc.cluster.local"
+  # zookeeper_quorum: &zookeeper-quorum "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
+  file_size: &file-size "100000000"
+  file_age: &file-age "100"
+  backup_pv_size: &backup-pv-size "1Gi"
+  request_cpu: &request-cpu "128m"
+  request_memory: &request-memory "512Mi"
+  secor_cpu_limit: &secor-cpu-limit "128m"
+  secor_memory_limit: &secor-memory-limit "512Mi"
+  threads: &threads 2
+
+  cloud_store_provider: "azure"
+  # cloud_storage_bucket: *azure-container
+  # azure_account: *azure-account-name
+  # azure_secret: *azure-account-key
+  upload_manager: "com.pinterest.secor.uploader.AzureUploadManager"
+  storageClass: *global-k9s-storage-class
+  secor_env: *global-env
+  region: *global-region
+  image_repository: "sunbird/secor"
+  pullPolicy: "IfNotPresent"
+  image_tag: "0.30"
+  jvm_memory: "1024m"
+  timezone: "UTC"
+  # message_timezone: "UTC"
+  # parser_timezone: "Asia/Kolkata"
+  secor_jobs:
+    ingest-backup:
+      replicas: 1
+      consumer_group: "dev_ingest"
+      service_name: "ingest-backup"
+      base_path: "telemetry-data/ingest"
+      timestamp_key: *extractor-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.ingest"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    raw-backup:
+      replicas: 1
+      consumer_group: "dev_raw"
+      service_name: "raw"
+      base_path: "telemetry-data/raw"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.raw"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    failed-backup:
+      replicas: 1
+      consumer_group: "dev_failed"
+      service_name: "failed"
+      base_path: "telemetry-data/failed"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.failed"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    unique-backup:
+      replicas: 1
+      consumer_group: "dev_unique"
+      service_name: "unique"
+      base_path: "telemetry-data/unique"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.unique"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    denorm-backup:
+      replicas: 1
+      consumer_group: "dev_denorm"
+      service_name: "denorm"
+      base_path: "telemetry-data/denorm"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.denorm"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    transform-backup:
+      replicas: 1
+      consumer_group: "dev_transform"
+      service_name: "transform"
+      base_path: "telemetry-data/transformed"
+      timestamp_key: *default-timestamp-key
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.transform"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    system-events:
+      replicas: 1
+      consumer_group: "dev_system_events"
+      service_name: "system-events"
+      base_path: "telemetry-data/system-events"
+      timestamp_key: "ets"
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.system.events"
+      # kafka_broker_host: *kafka-broker-host
+      # zookeeper_quorum: *zookeeper-quorum
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: "data.dataset"
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.ChannelDateMessageParser"
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000
+
+    system-telemetry-events:
+      replicas: 1
+      consumer_group: "dev_system_telemetry_events"
+      service_name: "system-telemetry-events"
+      base_path: "telemetry-data/system-telemetry-events"
+      timestamp_key: "ets"
+      fallback_timestamp_key: *fallback-timestamp-key
+      topic: "dev.system.telemetry.events"
+      # kafka_broker_host: "${kafka_broker_host}"
+      # zookeeper_quorum: "${zookeeper_quorum}"
+      max_file_size: *file-size
+      max_file_age: *file-age
+      partition_prefix_enabled: "false"
+      partition_prefix_key: ""
+      partition_prefix_mapping: "{}"
+      message_channel_identifier: ""
+      output_file_pattern: "{partition}-{currentTimestamp}.json"
+      message_parser: "com.pinterest.secor.parser.PatternDateMessageParser" 
+      storage:
+        size: *backup-pv-size
+      requests:
+        cpu: *request-cpu
+        memory: *request-memory
+      limits:
+        cpu: *secor-cpu-limit
+        memory: *secor-memory-limit
+      lag_threshold_warning: 100000
+      threads: *threads
+      lag_threshold_critical: 200000 
+
+  alertrules:
+    enabled: false
+
+  describedobject:
+    name: "data-path"
+
+submit-ingestion:
+  enabled: true
+  namespace: submit-ingestion
+  druid_router_host: "druid-raw-routers.druid-raw.svc.cluster.local"
+  druid_router_port: 8888
+  druid_indexer_host: "druid-raw-indexers.druid-raw.svc.cluster.local"
+  druid_indexer_port: 8091
+  datasource:
+    system_events:
+      topic: *sys-events-kafka-topic
+      name: "system-events"
+      segment_granularity: "hour"
+      query_granularity: "hour"
+      task_duration: "PT1H"
+      task_completion: "PT1H"
+      task_count: 1
+      replicas: 1
+      enable: true
+    system_telemetry_events:
+      topic: *sys-telemetry-events-kafka-topic
+      name: "system-telemetry-events"
+      segment_granularity: "hour"
+      query_granularity: "hour"
+      task_duration: "PT1H"
+      task_completion: "PT1H"   
+      task_count: 1
+      replicas: 1 
+      enable: true
+
+monitoring:
+  enabled: true
+  namespace: monitoring
+  namespaceOverride: monitoring
+  commonLabels:
+    system.monitoring: 'true'
+  alertmanager:
+    alertmanagerSpec:
+      podLabels: 
+        system.monitoring: 'true'
+      resources:
+        limits:
+          cpu: 128m
+          memory: 256Mi
+        requests:
+          cpu: 128m
+          memory: 256Mi
+  prometheusOperator:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    prometheusConfigReloader:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 50Mi
+        requests:
+          cpu: 200m
+          memory: 50Mi
+  kube-state-metrics:
+    namespaceOverride: monitoring
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 32Mi
+  grafana:
+    namespaceOverride: monitoring
+    extraLabels: 
+      system.monitoring: 'true'
+    podLabels: 
+        system.monitoring: 'true'
+    resources:
+      limits:
+        cpu: 0.2
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+  prometheus:
+    commonMetaLabels:
+      system.monitoring: 'true'
+    server:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    prometheusSpec:
+      retention: 90d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+  prometheus-node-exporter:
+    namespaceOverride: monitoring
+    podLabels: 
+      system.monitoring: 'true'
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 100m
+        memory: 32Mi
+
+loki:
+  enabled: true
+  namespace: loki
+  nameOverride: loki
+  fullnameOverride: loki
+  auth_enabled: false
+  podLabels:
+    system.monitoring: "true"
+  commonConfig:
+    replication_factor: 1
+  limits_config:
+    enforce_metric_name: false
+    reject_old_samples: true
+    reject_old_samples_max_age: "168h"
+    max_cache_freshness_per_query: "10m"
+    split_queries_by_interval: "15m"
+    retention_period: "48h"
+  storage:
+    type: azure
+  compactor:
+    retention_enabled: true
+    working_directory: /var/loki/compactor/retention
+  test:
+    enabled: false
+  minio:
+    enabled: true
+    namespace: loki
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 256Mi
+    metrics:
+      serviceMonitor:
+        enabled: true
+        namespace: loki
+        includeNode: true
+        additionalLabels:
+          release: monitoring
+  grafana-agent-operator:
+    namespace: loki
+  monitoring:
+    nameOverride: loki
+    fullnameOverride: loki
+    selfMonitoring:
+      enabled: false
+    dashboards:
+      namespace: monitoring
+    lokiCanary:
+      enabled: false
+      namespace: monitoring
+      resources:
+        limits:
+          cpu: 0.1
+          memory: 256Mi
+        requests:
+          cpu: 0.1
+          memory: 128Mi
+    serviceMonitor:
+      labels:
+        release: monitoring
+        system.monitoring: "true"
+  gateway:
+    resources:
+      limits:
+        cpu: 0.1
+        memory: 256Mi
+      requests:
+        cpu: 0.1
+        memory: 128Mi
+  read:
+    #    affinity: {}
+    replicas: 1
+    podLabels:
+      system.monitoring: 'true'
+    resources:
+      limits:
+        cpu: 512m
+        memory: 1024Mi
+      requests:
+        cpu: 256m
+        memory: 512Mi
+  write:
+    #    affinity: {}
+    replicas: 1
+    podLabels:
+      system.monitoring: 'true'
+    resources:
+      limits:
+        cpu: 512m
+        memory: 1024Mi
+      requests:
+        cpu: 256m
+        memory: 512Mi
+
+promtail:
+  enabled: true
+  namespace: loki
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: monitoring
+      system.monitoring: "true"
+  podLabels:
+    system.monitoring: 'true'
+
+web-console:
+  enabled: true
+  namespace: web-console
+  service:
+    type: NodePort

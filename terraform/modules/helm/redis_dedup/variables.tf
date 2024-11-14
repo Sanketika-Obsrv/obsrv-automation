@@ -35,7 +35,15 @@ variable "redis_install_timeout" {
 variable "redis_release_name" {
   type        = string
   description = "Redis helm release name."
+<<<<<<< HEAD
   default     = "obsrv-dedup-redis"
+=======
+<<<<<<<< HEAD:terraform/modules/helm/redis_denorm/variables.tf
+  default     = "obsrv-denorm-redis"
+========
+  default     = "obsrv-dedup-redis"
+>>>>>>>> opensource-repo/main:terraform/modules/helm/redis_dedup/variables.tf
+>>>>>>> opensource-repo/main
 }
 
 variable "redis_namespace" {
@@ -70,14 +78,22 @@ variable "redis_replica_maxmemory" {
 variable "redis_replica_persistence_size" {
   type        = string
   description = "Redis disk path for persistence"
+<<<<<<< HEAD
   default     = "1Gi"
+=======
+  default     = "2Gi"
+>>>>>>> opensource-repo/main
 }
 
 
 variable "redis_maxmemory_eviction_policy" {
   type        = string
   description = "Redis maxmemory eviction policy"
+<<<<<<< HEAD
   default     = "volatile-ttl"
+=======
+  default     = "noeviction"
+>>>>>>> opensource-repo/main
 }
 
 variable "redis_persistence_path" {
@@ -92,6 +108,18 @@ variable "redis_master_persistence_size" {
   default     = "1Gi"
 }
 
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:terraform/modules/helm/redis_denorm/variables.tf
+========
+variable "redis_replica_persistence_size" {
+  type        = string
+  description = "Redis disk path for persistence"
+  default     = "1Gi"
+}
+
+>>>>>>>> opensource-repo/main:terraform/modules/helm/redis_dedup/variables.tf
+>>>>>>> opensource-repo/main
 variable "redis_custom_values_yaml" {
   type        = string
   description = "Redis chart values.yaml path."

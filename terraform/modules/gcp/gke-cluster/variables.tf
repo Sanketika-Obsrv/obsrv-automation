@@ -68,7 +68,11 @@ variable "description" {
 variable "kubernetes_version" {
   description = "The Kubernetes version of the masters. If set to 'latest' it will pull latest available version in the selected region."
   type        = string
+<<<<<<< HEAD
   default     = "latest"
+=======
+  default     = "1.28.3-gke.1286000"
+>>>>>>> opensource-repo/main
 }
 
 variable "gke_node_pool_instance_type" {

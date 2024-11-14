@@ -4,17 +4,27 @@
 install_obsrv() {
     echo "Obsrv installation has started.."
     terragrunt init
+<<<<<<< HEAD
     terrahelp decrypt  -simple-key=<decryption_key> -file=vars/dev.tfvars
     terragrunt apply -target module.eks -var-file=vars/cluster_overrides.tfvars -var-file=vars/dev.tfvars -auto-approve
     terragrunt apply -target module.get_kubeconfig -var-file=vars/cluster_overrides.tfvars -var-file=vars/dev.tfvars -auto-approve
     terragrunt apply -var-file=vars/cluster_overrides.tfvars -var-file=vars/dev.tfvars -auto-approve
+=======
+    terragrunt apply -target module.eks -var-file=vars/cluster_overrides.tfvars -auto-approve
+    terragrunt apply -target module.get_kubeconfig -var-file=vars/cluster_overrides.tfvars -auto-approve
+    terragrunt apply -var-file=vars/cluster_overrides.tfvars -auto-approve
+>>>>>>> opensource-repo/main
     echo "Installation completed successfully!"
 }
 
 # Function to destroy Obsrv
 destroy_obsrv() {
     echo "Destroying Obsrv..."
+<<<<<<< HEAD
     terragrunt destroy -var-file=vars/cluster_overrides.tfvars -var-file=vars/dev.tfvars -auto-approve
+=======
+    terragrunt destroy -var-file=vars/cluster_overrides.tfvars -auto-approve
+>>>>>>> opensource-repo/main
     echo "Obsrv has been successfully destroyed."
 }
 
@@ -25,7 +35,11 @@ version_compare() {
     IFS='.' read v2_major v2_minor v2_patch <<< "$version2"
 
     if [ "$v1_major" -gt "$v2_major" ] || [ "$v1_major" -eq "$v2_major" -a "$v1_minor" -gt "$v2_minor" ] || [ "$v1_major" -eq "$v2_major" -a "$v1_minor" -eq "$v2_minor" -a "$v1_patch" -ge "$v2_patch" ]; then
+<<<<<<< HEAD
         echo true
+=======
+        echo true  
+>>>>>>> opensource-repo/main
     else
         echo false
     fi
@@ -38,7 +52,11 @@ get_installed_version() {
         installed_version=$(eval "$version_command")
         echo "$installed_version"
     else
+<<<<<<< HEAD
         echo "0.0.0"
+=======
+        echo "0.0.0" 
+>>>>>>> opensource-repo/main
     fi
 }
 
@@ -76,7 +94,11 @@ install_tool() {
         else
             echo "Skipping installation of $tool_name."
         fi
+<<<<<<< HEAD
     fi
+=======
+    fi    
+>>>>>>> opensource-repo/main
 }
 
 # Function to validate and install required tools

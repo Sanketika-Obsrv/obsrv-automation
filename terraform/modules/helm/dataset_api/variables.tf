@@ -7,6 +7,10 @@ variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."
 }
+variable "service_type" {
+  type = string
+  description = "Kubernetes service type either NodePort or LoadBalancer. It is NodePort by default"
+}
 
 variable "dataset_api_release_name" {
   type        = string
@@ -77,6 +81,7 @@ variable "dataset_api_chart_depends_on" {
 variable "dataset_api_container_registry" {
   type        = string
   description = "Container registry. For example docker.io/obsrv"
+  default     = "sunbird"
 }
 
 variable "dataset_api_image_name" {

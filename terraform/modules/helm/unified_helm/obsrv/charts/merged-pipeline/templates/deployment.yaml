@@ -1,0 +1,405 @@
+---
+# Source: obsrv-chart/charts/merged-pipeline/templates/flink_job_configmap.yaml
+apiVersion: v1
+data:
+  base-config: |+
+    job {
+      env = {{ .Values.env }}
+      enable.distributed.checkpointing = true
+      statebackend {
+        base.url = "wasbs://{{ .Values.global.azure_storage_container }}@{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net/flink-jobs"
+      }
+    }
+    kafka {
+      broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
+      producer.broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
+      consumer.broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
+      zookeeper = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:2181"
+      producer {
+        max-request-size = 1572864
+        batch.size = 98304
+        linger.ms = 10
+        compression = "snappy"
+      }
+      output.system.event.topic = ${job.env}".system.events"
+    }
+    task {
+      parallelism = 1
+      consumer.parallelism = 1
+      checkpointing.interval = 30000
+      checkpointing.pause.between.seconds = 5000
+      restart-strategy.attempts = 3
+      restart-strategy.delay = 30000 # in milli-seconds
+    }
+
+    redis.connection.timeout = 100
+    redis {
+      host = {{ .Release.Name }}-redis-dedup-master.redis.svc.cluster.local
+      port = 6379
+    }
+
+    redis-meta {
+      host = {{ .Release.Name }}-redis-denorm-master.redis.svc.cluster.local
+      port = 6379
+    }
+
+    postgres {
+      host = {{ .Release.Name }}-postgresql-hl.postgresql.svc.cluster.local
+      port = 5432
+      maxConnections = 2
+      user = "postgres"
+      password = "postgres"
+      database = "obsrv"
+    }
+
+    lms-cassandra {
+      host = "localhost"
+      port = "9042"
+    }
+
+  flink-conf: |
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    taskmanager.memory.process.size: 1700m
+    jobmanager.memory.process.size: 1600m
+    state.savepoints.dir: file:///tmp
+  job_classname: org.sunbird.obsrv.pipeline.task.MergedPipelineStreamTask
+  log4j_console_properties: |
+    # This affects logging for both user code and Flink
+    rootLogger.level = INFO
+    rootLogger.appenderRef.console.ref = ConsoleAppender
+
+    # Uncomment this if you want to _only_ change Flink's logging
+    logger.flink.name = org.apache.flink
+    logger.flink.level = INFO
+
+    # The following lines keep the log level of common libraries/connectors on
+    # log level INFO. The root logger does not override this. You have to manually
+    # change the log levels here.
+    logger.akka.name = akka
+    logger.akka.level = ERROR
+    logger.kafka.name= org.apache.kafka
+    logger.kafka.level = ERROR
+    logger.hadoop.name = org.apache.hadoop
+    logger.hadoop.level = INFO
+    logger.zookeeper.name = org.apache.zookeeper
+    logger.zookeeper.level = ERROR
+
+    # Log all infos to the console
+    appender.console.name = ConsoleAppender
+    appender.console.type = CONSOLE
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+
+    # Suppress the irrelevant (wrong) warnings from the Netty channel handler
+    logger.netty.name = org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline
+    logger.netty.level = OFF
+  merged-pipeline: |
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = ${job.env}".ingest"
+      output.raw.topic = ${job.env}".raw"
+      output.extractor.duplicate.topic = ${job.env}".extractor.duplicate"
+      output.failed.topic = ${job.env}".failed"
+      output.batch.failed.topic = ${job.env}".extractor.failed"
+      event.max.size = "1048576" # Max is only 1MB
+      output.invalid.topic = ${job.env}".invalid"
+      output.unique.topic = ${job.env}".unique"
+      output.duplicate.topic = ${job.env}".duplicate"
+      output.denorm.topic = ${job.env}".denorm"
+      output.denorm.failed.topic = ${job.env}".denorm.failed"
+      output.transform.topic = ${job.env}".transform"
+      stats.topic = ${job.env}".stats"
+      groupId = ${job.env}"-single-pipeline-group"
+      producer {
+        max-request-size = 5242880
+      }
+    }
+    task {
+      window.time.in.seconds = 5
+      window.count = 30
+      window.shards = 1400
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+    redis {
+      database {
+        extractor.duplication.store.id = 1
+        preprocessor.duplication.store.id = 2
+        key.expiry.seconds = 3600
+      }
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: flink
+  name: merged-pipeline-config
+  namespace: flink
+
+---
+# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flink
+    component: merged-pipeline-jobmanager
+  name: merged-pipeline-jobmanager
+  namespace: flink
+spec:
+  ports:
+  - name: rpc
+    port: 6123
+  - name: blob
+    port: 6124
+  - name: query
+    port: 6125
+  - name: ui
+    port: 8081
+  - name: prom
+    port: 9250
+  selector:
+    app: flink
+    component: merged-pipeline-jobmanager
+  type: ClusterIP
+---
+# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: merged-pipeline-jobmanager-webui
+  namespace: flink
+spec:
+  ports:
+  - name: rest
+    port: 80
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app: flink
+    component: merged-pipeline-jobmanager
+  type: ClusterIP
+---
+# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flink
+    component: merged-pipeline-taskmanager
+  name: merged-pipeline-taskmanager
+  namespace: flink
+spec:
+  ports:
+  - name: prom
+    port: 9251
+  selector:
+    app: flink
+    component: merged-pipeline-taskmanager
+  type: ClusterIP
+---
+
+---
+# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: merged-pipeline-taskmanager
+  namespace: flink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: merged-pipeline-taskmanager
+  template:
+    metadata:
+      labels:
+        azure-extensions-usage-release-identifier: obsrv-base
+        app: flink
+        component: merged-pipeline-taskmanager
+        system.processing: "true"
+    spec:
+      containers:
+      - args:
+        - start-foreground
+        - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
+        - -Dweb.submit.enable=false
+        - -Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter
+        - -Dmetrics.reporter.prom.host=merged-pipeline-taskmanager
+        - -Dmetrics.reporter.prom.port=9251-9260
+        - -Djobmanager.rpc.address=merged-pipeline-jobmanager
+        - -Dtaskmanager.rpc.port=6122
+        - --config.file.path
+        - /data/flink/conf/merged-pipeline.conf
+        command:
+        - /opt/flink/bin/taskmanager.sh
+        {{ if .Values.global.azure.images.merged_pipeline }}
+        image: "{{ .Values.global.azure.images.merged_pipeline.registry }}/{{ .Values.global.azure.images.merged_pipeline.image }}:{{ .Values.global.azure.images.merged_pipeline.digest }}"
+        {{ else }}
+        image: sunbird/merged-pipeline:release-0.5.0_RC26
+        {{ end }}
+        imagePullPolicy: IfNotPresent
+        name: merged-pipeline-taskmanager
+        ports:
+        - containerPort: 6122
+          name: rpc
+        resources:
+          limits:
+            cpu: "1"
+          requests:
+            cpu: "0.7"
+        volumeMounts:
+        - mountPath: /opt/flink/conf/flink-conf.yaml
+          name: flink-config-volume
+          subPath: flink-conf.yaml
+        - mountPath: /opt/flink/conf/log4j-console.properties
+          name: flink-config-volume
+          subPath: log4j-console.properties
+        - mountPath: /data/flink/conf/baseconfig.conf
+          name: flink-config-volume
+          subPath: base-config.conf
+        - mountPath: /data/flink/conf/merged-pipeline.conf
+          name: flink-config-volume
+          subPath: merged-pipeline.conf
+        workingDir:
+      volumes:
+      - configMap:
+          items:
+          - key: flink-conf
+            path: flink-conf.yaml
+          - key: log4j_console_properties
+            path: log4j-console.properties
+          - key: base-config
+            path: base-config.conf
+          - key: merged-pipeline
+            path: merged-pipeline.conf
+          name: merged-pipeline-config
+        name: flink-config-volume
+---
+# Source: obsrv-chart/charts/merged-pipeline/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: merged-pipeline-jobmanager
+  namespace: flink
+spec:
+  selector:
+    matchLabels:
+      app: flink
+      component: merged-pipeline-jobmanager
+      azure-extensions-usage-release-identifier: obsrv-base
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "9250"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flink
+        component: merged-pipeline-jobmanager
+        azure-extensions-usage-release-identifier: obsrv-base
+    spec:
+      initContainers:
+      - name: check-db-ready
+      {{ if .Values.global.azure.images.postgres }}
+        image: "{{ .Values.global.azure.images.postgres.registry }}/{{ .Values.global.azure.images.postgres.image }}@{{ .Values.global.azure.images.postgres.digest }}"
+      {{ else }}
+        image: postgres:latest
+      {{ end }}
+        command: ['sh', '-c', 
+          'until pg_isready -h {{ .Release.Name }}-postgresql-hl.postgresql.svc.cluster.local -p 5432; 
+          do echo waiting for database; sleep 2; done;']
+      - name: wait-for-available-kafka
+      {{ if .Values.global.azure.images.kafka }}
+        image: "{{ .Values.global.azure.images.kafka.registry }}/{{ .Values.global.azure.images.kafka.image }}@{{ .Values.global.azure.images.kafka.digest }}"
+      {{ else }}
+        image: docker.io/bitnami/kafka:3.5.1-debian-11-r21
+      {{ end }}
+        command:
+          - /bin/bash
+        args:
+          - -ec
+          - |
+            until wait-for-port \
+            --host={{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local \
+            --state=inuse \
+            --timeout=120 \
+            9092; \
+            do echo waiting for kafka; sleep 2; done;
+            echo "Kafka is available";
+      containers:
+      - args:
+        - start-foreground
+        - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
+        - --job-classname=org.sunbird.obsrv.pipeline.task.MergedPipelineStreamTask
+        - -Dweb.submit.enable=false
+        - -Dmetrics.reporter.prom.class=org.apache.flink.metrics.prometheus.PrometheusReporter
+        - -Dmetrics.reporter.prom.port=9250
+        - -Djobmanager.rpc.address=merged-pipeline-jobmanager
+        - -Djobmanager.rpc.port=6123
+        - -Dparallelism.default=1
+        - -Dblob.server.port=6124
+        - -Dqueryable-state.server.ports=6125
+        - --config.file.path
+        - /data/flink/conf/merged-pipeline.conf
+        command:
+        - /opt/flink/bin/standalone-job.sh
+        {{ if .Values.global.azure.images.merged_pipeline }}
+        image: "{{ .Values.global.azure.images.merged_pipeline.registry }}/{{ .Values.global.azure.images.merged_pipeline.image }}:{{ .Values.global.azure.images.merged_pipeline.digest }}"
+        {{ else }}
+        image: sunbird/merged-pipeline:release-0.5.0_RC26
+        {{ end }}
+        imagePullPolicy: IfNotPresent
+        name: merged-pipeline-jobmanager
+        ports:
+        - containerPort: 6123
+          name: rpc
+        - containerPort: 6124
+          name: blob
+        - containerPort: 6125
+          name: query
+        - containerPort: 8081
+          name: ui
+        resources:
+          limits:
+            cpu: "1"
+          requests:
+            cpu: "0.7"
+        volumeMounts:
+        - mountPath: /opt/flink/conf/flink-conf.yaml
+          name: flink-config-volume
+          subPath: flink-conf.yaml
+        - mountPath: /data/flink/conf/baseconfig.conf
+          name: flink-config-volume
+          subPath: base-config.conf
+        - mountPath: /data/flink/conf/merged-pipeline.conf
+          name: flink-config-volume
+          subPath: merged-pipeline.conf
+        - mountPath: /opt/flink/conf/log4j-console.properties
+          name: flink-config-volume
+          subPath: log4j-console.properties
+        workingDir: /opt/flink
+      # restartPolicy: OnFailure
+      volumes:
+      - configMap:
+          items:
+          - key: flink-conf
+            path: flink-conf.yaml
+          - key: base-config
+            path: base-config.conf
+          - key: merged-pipeline
+            path: merged-pipeline.conf
+          - key: log4j_console_properties
+            path: log4j-console.properties
+          name: merged-pipeline-config
+        name: flink-config-volume
+---
