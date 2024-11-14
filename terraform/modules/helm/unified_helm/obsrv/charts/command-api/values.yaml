@@ -1,0 +1,31 @@
+http_port: 8000
+image: sunbird/flink-command-service:1.0.0
+
+service_config: |
+  flink:
+    namespace: flink
+    reinstall_sleep_time: 3
+    jobs:
+      - name: "PipelineMergedJob"
+        release_name: merged-pipeline
+        job_manager_url: "merged-pipeline-jobmanager.flink.svc.cluster.local:8081"
+      - name: "MasterDataProcessorJob"
+        release_name: master-data-processor
+        job_manager_url: "master-data-processor-jobmanager.flink.svc.cluster.local:8081"
+
+  commands:
+    RESTART_PIPELINE:
+      workflow:
+        - RESTART_PIPELINE_JOBS
+
+  helm_charts_base_dir: /app/helm-charts
+
+rbac:
+  # kubernetes.rest-service.exposed.type: NodePort requires
+  # list permission for nodes at the cluster scope.
+  # Set create to true if you are using NodePort type.
+  nodesRule:
+    create: true
+
+serviceAccount:
+  name: command-api-serviceaccount

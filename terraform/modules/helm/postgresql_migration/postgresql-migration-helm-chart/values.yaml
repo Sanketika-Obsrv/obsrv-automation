@@ -14,6 +14,7 @@ config:
 postgresql_superset_user_password: ""
 postgresql_druid_raw_user_password: ""
 postgresql_obsrv_user_password: ""
+<<<<<<< HEAD
 superset_oauth_clientid: ""
 superset_oauth_client_secret: ""
 kong_ingress_domain: ""
@@ -23,6 +24,9 @@ web_console_password: ""
 web_console_login: ""
 postgresql_hms_user_password: ""
 enable_lakehouse: false
+=======
+
+>>>>>>> opensource-repo/main
 system_settings:
   encryption_key: "strong_encryption_key_to_encrypt"
   default_dataset_id: "ALL"

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web-console
+    system.infra: "true"
+  name: web-console
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: web-console
+  template:
+    metadata:
+      labels:
+        azure-extensions-usage-release-identifier: obsrv-base
+        app: web-console
+    spec:
+      containers:
+        - name: web-console
+        {{ if .Values.global.azure.images.web_console }}
+          image: "{{ .Values.global.azure.images.web_console.registry }}/{{ .Values.global.azure.images.web_console.image }}:{{ .Values.global.azure.images.web_console.digest }}"
+        {{ else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        {{ end }}
+          imagePullPolicy: Always
+          name: web-console
+          resources:
+            requests:
+              cpu: "{{ .Values.cpu_requests }}"
+              memory: "{{ .Values.memory_requests }}"
+            limits:
+              cpu: "{{ .Values.cpu_limits }}"
+              memory: "{{ .Values.memory_limits }}"
+          envFrom:
+           - configMapRef:
+              name: {{ .Chart.Name }}-config

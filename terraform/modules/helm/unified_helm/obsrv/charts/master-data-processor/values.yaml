@@ -1,9 +1,15 @@
 namespace: "flink"
 imagepullsecrets: ""
 image:
+<<<<<<< HEAD
   registry: sanketikahub
   repository: master-data-processor-ext
   tag: 1.0.2-GA
+=======
+  registry: sunbird
+  repository: master-data-processor
+  tag: release-0.5.0_RC23
+>>>>>>> opensource-repo/main
 serviceMonitor:
   enabled: false
 replicaCount: 1
@@ -157,7 +163,10 @@ master-data-processor:
       output.unique.topic = ${job.env}".masterdata.unique"
       output.duplicate.topic = ${job.env}".masterdata.duplicate"
       output.transform.topic = ${job.env}".masterdata.transform"
+<<<<<<< HEAD
       output.transform.failed.topic = ${job.env}".failed"
+=======
+>>>>>>> opensource-repo/main
       stats.topic = ${job.env}".masterdata.stats"
       groupId = ${job.env}"-masterdata-pipeline-group"
 

@@ -182,4 +182,3 @@ variable "storage_provider" {
   description = "storage provider name e.g: aws, azure, gcp"
   default     = "aws"
 }
-

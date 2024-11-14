@@ -1,0 +1,76 @@
+apiVersion: v2
+name: obsrv-chart
+description: A Helm chart for Obsrv
+version: 0.1.0
+appVersion: 1.16.0
+dependencies:
+  - name: monitoring
+    version: 46.5.0
+    condition: monitoring.enabled
+  - name: alert-rules
+    version: 0.1.21
+    condition: alert-rules.enabled
+  - name: command-api
+    version: 1.0.0
+    condition: command-api.enabled
+  - name: dataset-api
+    version: 1.0.2
+    condition: dataset-api.enabled
+  - name: druid-exporter
+    version: 0.11.0
+    condition: druid-exporter.enabled
+  - name: druid-operator
+    version: 0.1.1
+    condition: druid-operator.enabled
+  - name: druid-raw-cluster
+    version: 0.1.1
+    condition: druid-raw-cluster.enabled
+  - name: flink-sa
+    version: 0.1.1
+    condition: flink-sa.enabled
+  - name: grafana-configs
+    version: 0.1.3
+    condition: grafana-configs.enabled
+  - name: kafka
+    version: 20.0.2
+    condition: kafka.enabled
+  - name: kafka-exporter
+    version: 1.0.0
+    condition: kafka-exporter.enabled
+  - name: master-data-processor
+    version: 0.1.2
+    condition: master-data-processor.enabled
+  - name: merged-pipeline
+    version: 0.1.2
+    condition: merged-pipeline.enabled
+  - name: postgresql
+    version: 12.2.7
+    condition: postgresql.enabled
+  - name: postgresql-exporter
+    version: 4.2.1
+    condition: postgresql-exporter.enabled
+  - name: redis-dedup
+    version: 17.14.3
+    condition: redis-dedup.enabled
+  - name: redis-denorm
+    version: 17.14.3
+    condition: redis-denorm.enabled
+  - name: secor
+    condition: secor.enabled
+  - name: submit-ingestion
+    version: 0.1.0
+    condition: submit-ingestion.enabled
+  - name: secor
+    version: 0.1.0
+    condition: secor.enabled
+  - name: loki
+    version: 4.8.0
+    condition: loki.enabled
+  - name: promtail
+    version: 6.9.3
+    condition: promtail.enabled
+  - name: web-console
+    version: 0.1.0
+    condition: web-console.enabled
+  # - name: superset
+  #   condition: superset.enabled

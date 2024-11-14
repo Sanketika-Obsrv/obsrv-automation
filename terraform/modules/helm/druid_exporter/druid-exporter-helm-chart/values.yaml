@@ -8,7 +8,7 @@ image:
 
 annotations: {}
 
-druidURL: http://druid-raw-routers.druid-raw.svc:8888
+druidURL: http://druid-raw-sb-dev-routers.druid-raw.svc:8888
 logLevel: info
 logFormat: json
 noHistogram: false

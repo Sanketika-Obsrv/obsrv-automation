@@ -1,0 +1,27 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: alert-rules
+    app: {{ .Values.prometheus_rule_selector_app }}
+    release: {{ .Values.prometheus_rule_selector_release }}
+  name: {{ .Values.fullnameOverride }}-druid-rules
+  namespace: {{ .Values.namespace }}
+spec:
+  groups:
+  - name: alertrules.process
+    rules:
+     ### druid health   
+    - alert: druid_health_status
+      expr: druid_health_status{service='druid-exporter-prometheus-druid-exporter'} != 1
+      for: 1m
+      labels:
+        severity: critical
+        bb: {{.Values.bb}}
+        type: {{.Values.ingestion.type}}
+      annotations:
+        message: Health alert for druid.
+        job_id: Druid
+        alertname: Druid health
+      
