@@ -79,18 +79,340 @@ extraSecretEnv: {}
   # GOOGLE_KEY: ...
   # GOOGLE_SECRET: ...
 
-extraConfigs: {}
-  # datasources-init.yaml: |
-  #     databases:
-  #     - allow_csv_upload: true
-  #       allow_ctas: true
-  #       allow_cvas: true
-  #       database_name: example-db
-  #       extra: "{\r\n    \"metadata_params\": {},\r\n    \"engine_params\": {},\r\n    \"\
-  #         metadata_cache_timeout\": {},\r\n    \"schemas_allowed_for_csv_upload\": []\r\n\
-  #         }"
-  #       sqlalchemy_uri: example://example-db.local
-  #       tables: []
+extraConfigs:
+  import_datasources.yaml: |
+    databases:
+    - allow_csv_upload: true
+      allow_ctas: true
+      allow_cvas: true
+      database_name: obsrv
+      sqlalchemy_uri: druid://dataset-api.dataset-api.svc.cluster.local:3000/v2/obsrv/data/sql-query
+      uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
+      version: 1.0.0
+      tables:
+      - table_name: system-events
+        main_dttm_col: __time
+        description: null
+        default_endpoint: null
+        offset: 0
+        cache_timeout: null
+        schema: druid
+        sql: null
+        params: null
+        template_params: null
+        filter_select_enabled: false
+        fetch_values_predicate: null
+        extra: null
+        uuid: 62edf6c5-87c8-4b03-8a0a-f67613d3e24d
+        metrics:
+        - metric_name: total_processing_time
+          verbose_name: Total Processing Time
+          metric_type: double
+          expression: SUM(total_processing_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: latency_time
+          verbose_name: Latency Time
+          metric_type: double
+          expression: SUM(latency_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: processing_time
+          verbose_name: Processing Time
+          metric_type: double
+          expression: SUM(processing_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: extractor_time
+          verbose_name: Extractor Time
+          metric_type: double
+          expression: SUM(extractor_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: validator_time
+          verbose_name: Validator Time
+          metric_type: double
+          expression: SUM(validator_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: dedup_time
+          verbose_name: Deduplication Time
+          metric_type: double
+          expression: SUM(dedup_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: denorm_time
+          verbose_name: Denormalization Time
+          metric_type: double
+          expression: SUM(denorm_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: transformer_time
+          verbose_name: Transformer Time
+          metric_type: double
+          expression: SUM(transformer_time)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: error_count
+          verbose_name: Error Count
+          metric_type: long
+          expression: SUM(error_count)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: count
+          verbose_name: COUNT(*)
+          metric_type: count
+          expression: COUNT(*)
+          description: null
+          d3format: null
+          warning_text: null
+        - metric_name: count
+          verbose_name: COUNT(*)
+          metric_type: count
+          expression: COUNT(*)
+          description: Count
+          d3format: null
+          warning_text: null
+        columns:
+        - column_name: __time
+          verbose_name: Event Time
+          is_dttm: true
+          is_active: true
+          type: LONG
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Event Time
+          python_date_format: null
+          extra: null
+        - column_name: event_type
+          verbose_name: Event Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Event Type
+          python_date_format: null
+          extra: null
+        - column_name: ctx_module
+          verbose_name: Context Module
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Module
+          python_date_format: null
+          extra: null
+        - column_name: ctx_pdata_id
+          verbose_name: Context Pdata Id
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Pdata Id
+          python_date_format: null
+          extra: null
+        - column_name: ctx_pdata_type
+          verbose_name: Context Pdata Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Pdata Type
+          python_date_format: null
+          extra: null
+        - column_name: ctx_pdata_pid
+          verbose_name: Context Pdata Pid
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Pdata Pid
+          python_date_format: null
+          extra: null
+        - column_name: error_pdata_id
+          verbose_name: Error Pdata Id
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Pdata Id
+          python_date_format: null
+          extra: null
+        - column_name: error_pdata_status
+          verbose_name: Error Pdata Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Pdata Status
+          python_date_format: null
+          extra: null
+        - column_name: error_type
+          verbose_name: Error Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Type
+          python_date_format: null
+          extra: null
+        - column_name: error_code
+          verbose_name: Error Code
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Code
+          python_date_format: null
+          extra: null
+        - column_name: error_message
+          verbose_name: Error Message
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Message
+          python_date_format: null
+          extra: null
+        - column_name: error_level
+          verbose_name: Error Level
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Error Level
+          python_date_format: null
+          extra: null
+        - column_name: ctx_dataset
+          verbose_name: Context Dataset
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Dataset
+          python_date_format: null
+          extra: null
+        - column_name: ctx_dataset_type
+          verbose_name: Context Dataset Type
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Context Dataset Type
+          python_date_format: null
+          extra: null
+        - column_name: extractor_status
+          verbose_name: Extractor Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Extractor Status
+          python_date_format: null
+          extra: null
+        - column_name: validator_status
+          verbose_name: Validator Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Validator Status
+          python_date_format: null
+          extra: null
+        - column_name: dedup_status
+          verbose_name: Deduplication Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Deduplication Status
+          python_date_format: null
+          extra: null
+        - column_name: denorm_status
+          verbose_name: Denormalization Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Denormalization Status
+          python_date_format: null
+          extra: null
+        - column_name: transformer_status
+          verbose_name: Transformer Status
+          is_dttm: false
+          is_active: true
+          type: STRING
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: Transformer Status
+          python_date_format: null
+          extra: null
+        version: 1.0.0
+        database_uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
 
 extraSecrets:
   custom_sso_security_manager.py: |
