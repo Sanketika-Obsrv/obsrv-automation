@@ -101,9 +101,7 @@ all)
     bash $0 monitoring
     bash $0 coreinfra
     bash $0 obsrvapis
-    if $cloud_env == "aws"; then
-        bash $0 hudi
-    fi
+    bash $0 hudi
     bash $0 obsrvtools
     bash $0 additional
     ;;
