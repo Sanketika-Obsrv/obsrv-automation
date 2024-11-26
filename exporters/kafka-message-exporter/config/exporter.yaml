@@ -1,0 +1,15 @@
+- name: spark-stats
+  enabled: false
+  topic: dev.stats
+  prefixPath: actor.id
+  prefix: ''
+- name: wfs
+  enabled: false
+  topic: wfs.metric
+  prefixPath: ''
+  prefix: 'wfs'
+- name: obsrv-connectors
+  enabled: true
+  topic: obsrv-connectors-metrics
+  prefixPath: actor.id
+  prefix: ''

@@ -290,7 +290,7 @@ images: &images
 
   kafka-message-exporter: &kafka-message-exporter # registry: ""
     repository: kafka-message-exporter
-    tag: 1.0.3-GA
+    tag: 1.2.0-RC
     digest: ""
 
   druid_operator: &druid_operator

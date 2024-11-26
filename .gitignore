@@ -20,3 +20,5 @@ automation-scripts/infra-setup/aws/THIRD_PARTY_LICENSES
 helmcharts/kitchen/*
 # Exclude install.sh from being ignored
 !helmcharts/kitchen/install.sh
+node_modules
+package-lock.json
