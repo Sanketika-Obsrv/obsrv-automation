@@ -3,8 +3,8 @@ global:
   cloud_store_provider: &cloud_store_provider "s3"
   cloud_storage_region: &cloud_storage_region "<fill-value>" # Update the region to deploy obsrv instance
 
-  dataset_api_cloud_bucket: "<fill-value>"  # Update the dataset APIs bucket name
-  config_api_cloud_bucket: "<fill-value>"   # Update the config APIs bucket name
+  dataset_api_container: "<fill-value>"  # Update the dataset APIs bucket name
+  config_api_container: "<fill-value>"   # Update the config APIs bucket name
   postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name 
   redis_backup_cloud_bucket: &redis_backup_cloud_bucket "<fill-value>" # Update with the backup bucket name 
   velero_backup_cloud_bucket: &velero_backup_cloud_bucket "<fill-value>" # Update with velero backup  bucket name
