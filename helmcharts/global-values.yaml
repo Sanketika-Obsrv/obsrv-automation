@@ -27,7 +27,6 @@ defaults:
     volume_autoscaler_namespace: &volume-autoscaler-namespace "volume-autoscaler"
     hms_namespace: &hms_namespace "hms"
     trino_namespace: &trino_namespace "trino"
-    nlq_api_namespace: &nlq_api_namespace "nlq"
 
   postgres:
     pghost: &pghost "postgresql-hl.postgresql.svc.cluster.local"
@@ -271,7 +270,7 @@ kube-prometheus-stack:
     namespaceOverride: *monitoring-namespace
   grafana:
     fullnameOverride: "grafana"
-    namespaceOverride: *monitoring-namespace 
+    namespaceOverride: *monitoring-namespace
     env:
       GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
       GF_SECURITY_ADMIN_USER: *grafana-admin-user
@@ -287,8 +286,8 @@ kube-prometheus-stack:
         ehlo_identity: ""
         startTLS_policy: ""
         skip_verify: true
-        from_name: "Grafana"    
-  
+        from_name: "Grafana"
+
 
 kubernetes-reflector:
   namespace: *kubernetes-reflector-namespace
@@ -312,7 +311,7 @@ postgresql-exporter:
 spark: &spark
   namespace: *spark-namespace
 
-superset_oauth: &superset_oauth 
+superset_oauth: &superset_oauth
   enabled: true
   client_id: *superset_oauth_clientid
   client_secret: *superset_oauth_client_secret
@@ -329,7 +328,7 @@ superset:
       db_name: *psql-superset-db
       db_username: *psql-superset-user
       db_password: *psql-superset-pwd
-  oauth: 
+  oauth:
     <<: *superset_oauth
 
 command-api: &command-api
@@ -475,10 +474,6 @@ trino:
 
 lakehouse-connector:
   namespace: *flink_namespace
-
-nlq-api:
-  namespace: *nlq_api_namespace
-  openai_api_key: "<OPENAI_API_KEY>"
 
 global:
   env: *env

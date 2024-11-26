@@ -458,7 +458,7 @@ worker:
   coreLimit: 5
   ## @param worker.dir Set a custom working directory for the application
   ##
-  dir: ""
+  dir: "/tmp"
   ## @param worker.javaOptions Set options for the JVM in the form `-Dx=y`
   ##
   javaOptions: ""
@@ -600,6 +600,7 @@ worker:
         - "-c"
         - |+
           /opt/bitnami/spark/conf/custom-init.sh
+          chmod 777 /tmp
   ## @param worker.extraVolumes Optionally specify extra list of additional volumes for the worker pod(s)
   ##
   extraVolumes: []

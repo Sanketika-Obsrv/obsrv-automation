@@ -11,7 +11,6 @@ namespaces:
 - kubernetes-reflector
 - loki
 - monitoring
-- nlq
 - postgresql
 - redis
 - s3-exporter

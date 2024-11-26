@@ -42,14 +42,3 @@ ingress:
     service_port: 80
     paths:
       - path: "/grafana"
-  nlq-service:
-    enabled: true
-    name: nlq-api
-    namespace: nlq
-    path_type: "ImplementationSpecific"
-    service_name: "nlq-api"
-    domains: []
-    annotations: {}
-    service_port: 8501
-    paths:
-      - path: "/nlq"

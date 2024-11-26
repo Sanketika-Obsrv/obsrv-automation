@@ -36,7 +36,6 @@ kafka:
       requests:
         cpu: 100m
         memory: 256Mi
-  
 
 postgresql:
   primary:
@@ -57,7 +56,6 @@ postgresql:
         system.ingestion: "true"
         system.querying: "true"
         system.api: "true"
-    
   readReplicas:
     resources:
       limits:
@@ -124,7 +122,7 @@ redis-dedup:
       accessModes:
         - ReadWriteOnce
       size: 2Gi
-      
+
 kong:
   resources:
     limits:
@@ -299,7 +297,7 @@ druid-raw-cluster:
       requests:
         cpu: 250m
         memory: 128Mi
-      
+
   druid_coordinator:
     resources:
       limits:
@@ -371,7 +369,7 @@ druid-raw-cluster:
       accessModes:
         - ReadWriteOnce
       size: 1Gi
-        
+
 flink:
  flink_resource: &flink_resources
     taskmanager:
@@ -400,8 +398,6 @@ flink:
     cache-indexer:
         resources: *flink_resources
 
-    
-  
 kafka-message-exporter:
   resources:
     limits:
@@ -463,7 +459,7 @@ kube-prometheus-stack:
       size: 10Gi
       # annotations: {}
       finalizers:
-        - kubernetes.io/pvc-protection        
+        - kubernetes.io/pvc-protection
 
   kube-state-metrics:
     resources:
@@ -482,7 +478,6 @@ kube-prometheus-stack:
       requests:
         cpu: 100m
         memory: 32Mi
-        
 
 kubernetes-reflector:
   resources:
@@ -511,8 +506,7 @@ secor:
     requests:
       cpu: 128m
       memory: 512Mi
-      
-  
+
 spark:
   master:
     resources:
@@ -573,7 +567,7 @@ command-api:
     requests:
       cpu: 0.1
       memory: 128Mi
-      
+
 dataset-api:
   resources:
     limits:
@@ -590,7 +584,7 @@ config-api:
       memory: 1024Mi
     requests:
       cpu: 0.5
-      memory: 512Mi      
+      memory: 512Mi
 
 web-console:
   resources:
@@ -637,7 +631,7 @@ volume-autoscaler:
       cpu: 0.05
       memory: 100Mi
 
-lakehouse-connector:  
+lakehouse-connector:
   jobmanager:
     cpu_requests: 1
     cpu_limits: 1
@@ -648,11 +642,11 @@ lakehouse-connector:
     cpu_requests: 1
     cpu_limits: 1
     memory_requests: 1024Mi
-    memory_limits: 2300Mi 
+    memory_limits: 2300Mi
 
-trino: 
-  coordinator:  
-    resources: 
+trino:
+  coordinator:
+    resources:
       limits:
         cpu: 1
         memory: 2048Mi
@@ -660,7 +654,7 @@ trino:
         cpu: 1
         memory: 2048Mi
   worker:
-    resources: 
+    resources:
       limits:
         cpu: 1
         memory: 2048Mi
@@ -668,7 +662,7 @@ trino:
         cpu: 1
         memory: 2048Mi
 
-s3-exporter: 
+s3-exporter:
   resources:
     limits:
       cpu: 50m
@@ -677,14 +671,6 @@ s3-exporter:
       cpu: 50m
       memory: 128Mi
 
-nlq-api:
-  resources:
-    requests:
-      cpu: 0.5
-      memory: 512Mi
-    limits:
-      cpu: 0.5
-      memory: 1Gi
 hms:
   resources:
     limits:
