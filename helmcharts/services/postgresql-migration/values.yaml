@@ -10,7 +10,7 @@ global:
 namespace: postgresql
 registry: "docker.io"
 repository: "flyway/flyway"
-tag: "10.1"
+tag: "11"
 digest: ""
 
 imagePullPolicy: IfNotPresent
