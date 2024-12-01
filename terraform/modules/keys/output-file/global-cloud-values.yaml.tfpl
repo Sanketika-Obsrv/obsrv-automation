@@ -1,0 +1,5 @@
+global:
+  USER_TOKEN_PRIVATE_KEY: |-
+    ${join("\n    ", split("\n", private_key))}
+  USER_TOKEN_PUBLIC_KEY: 
+    ${join("\n    ", split("\n", public_key))}
