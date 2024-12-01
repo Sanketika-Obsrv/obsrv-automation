@@ -1,5 +1,5 @@
 resource "local_file" "global_key_values_yaml" {
-  content  = templatefile("${path.module}/global-key-values.yaml.tfpl.tfpl", {
+  content  = templatefile("${path.module}/global-key-values.yaml.tfpl", {
     private_key = var.private_key
     public_key = var.public_key
   })
