@@ -344,8 +344,8 @@ output "public_key_pem" {
 }
 
 output "generated_yaml_file" {
-  description = "The path to the generated global-cloud-values.yaml file"
-  value       = module.output_file.global_values_cloud_file_path  
+  description = "The path to the generated global-key-values.yaml file"
+  value       = module.output_file.global_values_key_file_path  
 }
 # module "postgresql_migration" {
 #   source                                = "../modules/helm/postgresql_migration"

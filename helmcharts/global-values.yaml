@@ -66,7 +66,6 @@ defaults:
   druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc:8888"
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
   config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
-  # postgtrs_url: &pghost "postgresql-hl.postgresql.svc.cluster.local"
 
   cron_schedule: &cron-schedule "0 0 * * *"
   druid_router_host: &druid-router-host "druid-raw-routers.druid-raw.svc.cluster.local"
@@ -464,7 +463,7 @@ velero:
   schedules:
     obsrv-daily-backup:
       disabled: false
-      schedule: "* * * * *"
+      schedule: "0 0 * * *"
       useOwnerReferencesInBackup: false
       template:
         ttl: "247h"

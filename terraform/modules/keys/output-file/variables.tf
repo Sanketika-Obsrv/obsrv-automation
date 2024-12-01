@@ -8,6 +8,6 @@ variable "public_key" {
   type        = string
 }
 variable "file_path" {
-  description = "The path where the global-cloud-values.yaml file should be created"
+  description = "The path where the global-key-values.yaml file should be created"
   type        = string
 }
