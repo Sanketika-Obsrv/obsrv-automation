@@ -1,0 +1,109 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-obsrv-user
+  namespace: {{ include "base.namespace" . }}
+  annotations:
+    deployment_version: "v2" 
+spec:
+  template:
+    metadata:
+      labels:
+        app: create-obsrv-user
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: create-obsrv-user
+        image: debian:bullseye-slim
+        command:
+        - sh
+        - -c
+        - |
+          echo "Updating package repositories and installing required tools..."
+          apt-get update && apt-get install -y curl jq postgresql-client
+
+          echo "Waiting for Keycloak to be ready..."
+          until curl --insecure -s -o /dev/null -w "%{http_code}" http://oauth-keycloak:80/realms/obsrvWebConsole/ > /dev/null; do
+            sleep 5
+          done
+
+          echo "Keycloak is ready. Starting user creation..."
+
+          # Obtain admin access token using admin credentials
+          echo "Getting access token for admin user..."
+          access_token=$(curl --insecure -s -X POST http://oauth-keycloak:80/realms/master/protocol/openid-connect/token \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "client_id=admin-cli" \
+            --data-urlencode "username={{ .Values.auth.adminUser }}" \
+            --data-urlencode "password={{ .Values.auth.adminPassword }}" \
+            --data-urlencode "grant_type=password" | jq -r '.access_token')
+
+          if [ -z "$access_token" ]; then
+            echo "Failed to get access token."
+            exit 1
+          fi
+
+          echo "Access token retrieved successfully."
+
+          # Create a new user in the obsrvWebConsole realm
+          echo "Creating new Keycloak user..."
+          create_user_response=$(curl --insecure -s -o response.json -w "%{http_code}" \
+            -X POST http://oauth-keycloak:80/admin/realms/obsrvWebConsole/users \
+            -H "Authorization: Bearer $access_token" \
+            -H "Content-Type: application/json" \
+            -d '{
+                  "username": "{{ .Values.obsrvuser }}",
+                  "enabled": true,
+                  "credentials": [
+                    {
+                      "type": "password",
+                      "value": "{{ .Values.obsrvpassword}}",
+                      "temporary": false
+                    }
+                  ]
+                }')
+
+          if [ "$create_user_response" -eq 201 ]; then
+            echo "Keycloak user 'obsrv_admin' created successfully in realm 'obsrvWebConsole'."
+          elif [ "$create_user_response" -eq 409 ]; then
+            echo "User 'obsrv_admin' already exists in realm 'obsrvWebConsole'."
+          else
+            echo "Failed to create user. HTTP status: $create_user_response"
+            cat response.json
+            exit 1
+          fi
+
+          # Fetch user details to get the user ID
+          echo "Fetching user details to get the user ID..."
+          user_details_response=$(curl --insecure -s -X GET http://oauth-keycloak:80/admin/realms/obsrvWebConsole/users \
+            -H "Authorization: Bearer $access_token" \
+            -G --data-urlencode "username=obsrv_admin")
+
+          # Extract the user ID from the response
+          user_id=$(echo $user_details_response | jq -r '.[0].id')
+
+          if [ -z "$user_id" ]; then
+            echo "Failed to extract user ID from the response."
+            exit 1
+          fi
+
+          echo "User ID: $user_id"
+
+          # Update PostgreSQL with the new user ID in the existing table
+          echo "Updating PostgreSQL table with the new user ID..."
+
+          PGPASSWORD=postgres psql -h postgresql-hl.postgresql.svc.cluster.local -U postgres -d obsrv -c "
+          UPDATE \"oauth_users\" SET
+            \"id\" = '$user_id',
+            \"last_updated_on\" = NOW()
+          WHERE \"user_name\" = 'obsrv_admin';
+          "
+
+          if [ $? -eq 0 ]; then
+            echo "PostgreSQL table updated successfully."
+          else
+            echo "Failed to update PostgreSQL table."
+            exit 1
+          fi
+
+          exit 0
