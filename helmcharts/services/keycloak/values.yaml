@@ -277,11 +277,7 @@ args: []
 ##   - name: FOO
 ##     value: "bar"
 ##
-extraEnvVars:
-  - name: KEYCLOAK_HOSTNAME
-    value: ""
-  - name: KEYCLOAK_PROXY
-    value: edge
+extraEnvVars: ""
 ## @param extraEnvVarsCM Name of existing ConfigMap containing extra env vars
 ##
 extraEnvVarsCM: ""

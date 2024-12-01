@@ -45,6 +45,9 @@ defaults:
     hms_user_name: &psql-hms-user "hms"
     hms_user_password: &psql-hms-pwd "hms123"
 
+    
+    
+
   grafana:
     grafana_admin_user: &grafana-admin-user "admin"
     grafana_admin_password: &grafana-admin-password "adminpassword"
@@ -165,6 +168,7 @@ postgresql: &postgresql
     user: *psql-hms-user
     password: *psql-hms-pwd
 
+
   # Internal. Don't touch
   auth:
     enablePostgresUser: true
@@ -185,6 +189,8 @@ postgresql: &postgresql
           CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
         04_create_hms_db.sql: |
           CREATE DATABASE hms;
+        05_create_keycloak.sql: |
+          CREATE DATABASE keycloak;  
     extendedConfiguration: |
       password_encryption = md5
       shared_preload_libraries = 'pg_stat_statements' # (change requires restart)
@@ -213,7 +219,7 @@ keycloak:
   namespace: *keycloak_namespace  
   extraEnvVars:
   - name: KEYCLOAK_HOSTNAME
-    value: *domain
+    value: ""
   - name: KEYCLOAK_PROXY
     value: edge 
   externalDatabase: 

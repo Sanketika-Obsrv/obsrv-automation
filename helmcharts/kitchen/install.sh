@@ -115,9 +115,11 @@ all)
     bash $0 coreinfra
     bash $0 obsrvapis
     bash $0 hudi
+    bash $0 otel
+    bash $0 oauth
     bash $0 obsrvtools
     bash $0 additional
-    bash $0 otel
+    
     ;;
 reset)
     helm uninstall additional -n obsrv
@@ -128,8 +130,10 @@ reset)
     helm uninstall monitoring -n obsrv
     helm uninstall migrations -n obsrv
     helm uninstall coredb -n obsrv
-    helm uninstall obsrv-bootstrap -n obsrv
     helm uninstall opentelemetry-collector -n obsrv
+    helm uninstall oauth -n obsrv
+    helm uninstall obsrv-bootstrap -n obsrv
+     
     ;;
 *)
     if [ ! -d "../services/$1" ]; then
@@ -138,7 +142,7 @@ reset)
     fi
     cp -rf ../obsrv ./$1-ind
     cp -rf ../services/$1 ./$1-ind/charts/
-    helm $cmd $1-ind ./$1-ind -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd $1-ind ./$1-ind -n obsrv -f global-resource-values.yaml -f global-key-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     rm -rf ./$1-ind
     ;;
 esac
