@@ -110,6 +110,10 @@ config:
       endpoint: "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
       tls:
         insecure: true
+      default_labels_enabled:
+        exporter: true
+        job: true  
+
     prometheus:
       endpoint: "0.0.0.0:9090"
       namespace: "otel"  # A prefix for the metrics, e.g., obsrv_<metric_name>
@@ -124,18 +128,35 @@ config:
       endpoint: ${env:MY_POD_IP}:13133
   processors:
     batch:
-      timeout: 500ms
-      send_batch_size: 100
-      send_batch_max_size: 500      # Increase the queue size to hold more logs
+      timeout: 200ms
+      send_batch_size: 200
+      send_batch_max_size: 500
     # Default memory limiter configuration for the collector based on k8s resource limits.
     memory_limiter:
       # check_interval is the time between measurements of memory usage.
       check_interval: 5s
       # By default limit_mib is set to 80% of ".Values.resources.limits.memory"
-      limit_percentage: 85
+      limit_percentage: 80
       # By default spike_limit_mib is set to 25% of ".Values.resources.limits.memory"
-      spike_limit_percentage: 35
+      spike_limit_percentage: 50
 
+    resource:
+      attributes:
+        - action: insert
+          key: loki.resource.labels
+          value: k8s.pod.name, k8s.namespace.name,  k8s.job.name, k8s.statefulset.name, k8s.daemonset.name, k8s.replicaSet.name, k8s.container.name, k8s.deployment.name
+        
+        - action: insert
+          key: loki.format
+          value: raw
+
+    attributes:
+      actions:
+        - action: insert
+          key: loki.attribute.labels
+          value: k8s.pod.name, k8s.namespace.name,  k8s.job.name, k8s.statefulset.name, k8s.daemonset.name, k8s.replicaSet.name, k8s.container.name, k8s.deployment.name
+
+        
   receivers:
     otlp:
       protocols:
@@ -162,17 +183,19 @@ config:
     pipelines:
       logs:
         exporters:
-          #- otlphttp
-          - loki
+          #- loki
+          - debug
         processors:
           - memory_limiter
           - batch
+          - resource
+          - attributes
         receivers:
           - otlp
           - filelog
       metrics:
         exporters:
-          - prometheus
+          #- prometheus
           - debug
         processors:
           - memory_limiter
