@@ -181,3 +181,4 @@ env:
   is_RBAC_enabled: "false"
   user_token_keycloak_public_key: ""
   keycloak_audience: ""
+  otel_enable: "true"

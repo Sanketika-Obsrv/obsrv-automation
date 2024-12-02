@@ -69,13 +69,15 @@ defaults:
   druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc:8888"
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
   config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
+  otel_collector_endpoint: "http://opentelemetry-collector.otel.svc.cluster.local:4317"
+
 
   cron_schedule: &cron-schedule "0 0 * * *"
   druid_router_host: &druid-router-host "druid-raw-routers.druid-raw.svc.cluster.local"
   druid_indexer_host: &druid-indexer-host "druid-raw-indexers.druid-raw.svc.cluster.local"
 
   redirection_auth_path: &redirection_auth_path ""
-  domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP 
+  domain: &domain "<fill-value>sslip.io"  # Update with the Allocation ID of the Elastic IP 
 
 
 
@@ -369,6 +371,8 @@ dataset-api: &dataset-api
   env:
     GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
+    otel_collector_endpoint: *otel_collector_endpoint
+
 
 config-api: &config-api
   namespace: *config-api-namespace
