@@ -18,6 +18,11 @@ do
   # echo ""
   echo "Running fly migration for \"$db\"";
   echo ""
-  flyway migrate -url=jdbc:postgresql://postgresql-hl:5432/$db -locations="filesystem:/migrations/$line"
+  # Check if the command is successful else run flyway repair
+  if ! flyway migrate -url=jdbc:postgresql://postgresql-hl:5432/$db -locations="filesystem:/migrations/$line"; then
+    echo "Flyway migration failed. Running flyway repair and retrying migration"
+    flyway repair -url=jdbc:postgresql://postgresql-hl:5432/$db -locations="filesystem:/migrations/$line"
+    flyway migrate -url=jdbc:postgresql://postgresql-hl:5432/$db -locations="filesystem:/migrations/$line"
+  fi
   echo ""
 done <<< $(ls /migrations | sort -n)

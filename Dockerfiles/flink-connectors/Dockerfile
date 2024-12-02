@@ -1,4 +1,4 @@
-FROM flink:1.17.2-scala_2.12-java11 AS base_image
+FROM flink:1.17.2-scala_2.12-java11
 
 USER root
 RUN apt update -y
@@ -15,6 +15,3 @@ RUN cd $FLINK_HOME/plugins/gs-fs-hadoop && curl -LO https://repo1.maven.org/mave
 
 COPY ./connectors /data/connectors-init
 RUN pip install -r /data/connectors-init/requirements.txt
-
-FROM base_image AS kafka_connector_image
-COPY kafka-connector-1.0.0-distribution.tar.gz /tmp/obsrv-connectors-extracted/

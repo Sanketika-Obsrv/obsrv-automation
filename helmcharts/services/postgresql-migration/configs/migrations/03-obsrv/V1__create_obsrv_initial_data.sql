@@ -198,27 +198,6 @@ CREATE INDEX IF NOT EXISTS  dataset_source_config_draft_dataset ON dataset_sourc
 
 CREATE INDEX IF NOT EXISTS dataset_source_config_draft_status ON dataset_source_config_draft (status);
 
-CREATE TABLE IF NOT EXISTS connector_objects_info (
-    "id" text PRIMARY KEY,
-    "connector_id" text,
-    "dataset_id" text,
-    "status" text NOT NULL,
-    "location" text,
-    "format" text,
-    "file_size_kb" int8,
-    "in_time" timestamp DEFAULT now(),
-    "download_time" int8,
-    "start_processing_time" timestamp DEFAULT now(),
-    "end_processing_time" timestamp DEFAULT now(),
-    "file_hash" text,
-    "num_of_retries" int4,
-    "created_by" text DEFAULT 'SYSTEM'::text,
-    "updated_by" text DEFAULT 'SYSTEM'::text,
-    "created_at" timestamp DEFAULT now(),
-    "updated_at" timestamp DEFAULT now(),
-    "tags" _text
-);
-
 CREATE TABLE IF NOT EXISTS system_settings (
   "key" text NOT NULL,
   "value" text NOT NULL,
