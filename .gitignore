@@ -23,7 +23,7 @@ helmcharts/kitchen/*
 node_modules
 package-lock.json
 
-# Ignore the global-key-values.yaml file because it automaticaly created by terrafrm
+Ignore the global-key-values.yaml file as it is automatically created by Terraform
 helmcharts/global-key-values.yaml
 helmcharts/private_key.pem
 helmcharts/public_key.pem
