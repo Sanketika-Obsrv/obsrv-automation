@@ -49,6 +49,9 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   spark: &spark_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
+  velero: &velero_sa_annotation 
+    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
+   
 
 
 redis-service-account: &redis-service-account
@@ -137,13 +140,15 @@ s3-exporter-service-account: &s3-exporter-service-account
       <<: *s3_exporter_sa_annotation
 
 velero-backup: &velero-backup
+  serviceAccount:
+    server:
+      create: *create_sa
+      name: velero-backup-sa
+      annotations:
+        eks.amazonaws.com/role-arn: *velero_sa_annotation
+      labels:
   credentials:
-    useSecret: true
-    secretContents:
-      cloud: |
-        [default]
-        aws_access_key_id="<fill-value>"   # Update with the AWS access key 
-        aws_secret_access_key="<fill-value>" # Update with the AWS secret key
+    useSecret: false
   configuration:
     provider: *cloud_storage_provider
     backupStorageLocation:

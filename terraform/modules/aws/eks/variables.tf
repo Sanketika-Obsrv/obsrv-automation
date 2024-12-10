@@ -243,3 +243,13 @@ variable "eks_endpoint_private_access" {
    description = "API server endpoint access"
    default     = false
 }
+variable "velero_backup_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for postgresql backup service account."
+  default     = "velero-backup-sa-iam-role"
+}
+variable "velero_namespace" {
+  type        = string
+  description = "Velero namespace."
+  default = "velero"
+}
