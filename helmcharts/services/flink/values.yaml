@@ -133,7 +133,7 @@ taskmanager:
 checkpoint_store_type: null
 
 # AWS S3 Details
-s3_auth_type: "serviceAccount"
+s3_auth_type: ""
 s3_access_key: ""
 s3_secret_key: ""
 s3_endpoint: ""

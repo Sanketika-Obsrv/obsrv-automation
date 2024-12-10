@@ -42,7 +42,7 @@ coredb)
 migrations)
     rm -rf migrations
     cp -rf ../obsrv migrations
-    cp -rf ../services/{postgresql-migration,cert-manager,kubernetes-reflector,grafana-configs} migrations/charts/
+    cp -rf ../services/{minio,postgresql-migration,cert-manager,kubernetes-reflector,grafana-configs} migrations/charts/
 
     helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
@@ -96,12 +96,6 @@ additional)
         ;;
     "azure")
         cp -rf ../services/azure-exporter additional/charts/
-        ;;
-    "gcp")
-        echo "No additional services for GCP."
-        ;;    
-    *)
-        cp -rf ../services/minio additional/charts/
         ;;
     esac
 

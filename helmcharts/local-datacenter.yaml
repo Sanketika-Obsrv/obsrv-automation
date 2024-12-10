@@ -1,29 +1,34 @@
 global:
-  storageClass: &storage_class "standard"
-  redis-namespace: &redis-namespace "redis"
-  project_id: &project_id "obsrv-installation"
+  cloud_storage_provider: &cloud_storage_provider "aws"
+  cloud_store_provider: &cloud_store_provider "s3"
+  cloud_storage_region: &cloud_storage_region "us-east-1"
   cloud_storage_config: &cloud_storage_config |+
-    '{ "identity": "AWS_ACCESS_KEY_ID", "credential": "AWS_SECRET_ACCESS_KEY_ID", "region": "us-east-2" }'
-  dataset_api_container: "test-connector"
-  cloud_storage_provider: "aws"
-  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-dev-31381366265"
-  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-dev-31381366265"
+    '{"identity":"minioadmin","credential":"198CImxTlly79Dx9ZCDJ","region":"us-east-1","endpoint": "http://34.29.133.101:9000", "s3ForcePathStyle": true}'
+  storageClass: &storage_class "standard"
   storage_provider: &storage_provider "aws"
-  cloud_storage_region: "us-east-2"
+  redis_namespace: &redis-namespace "redis"
+  dataset_api_container: "storage-obsrv-local"
+  config_api_container: "storage-obsrv-local"
+  postgresql_backup_cloud_bucket: &backups_bucket "backups-obsrv-local" # Update with the backup bucket name 
+  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-local" # Update with the backup bucket name 
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-local" # Update with velero backup  bucket name
+  cloud_storage_bucket: &cloud_storage_bucket "storage-obsrv-local" # Update with the name of cloud storage bucket 
+  # Should check wether we can create prefix directly for hudi 
+  hudi_metadata_bucket: &hudi_metadata_bucket "s3a://<fill-value>/hudi" # Update with hudi bucket name
 
-  s3_bucket: &s3-bucket "druid-storage"
+  s3_bucket: &s3-bucket "storage-obsrv-local"
   s3_access_key: &s3-access-key "minioadmin"
   s3_secret_key: &s3-secret-access-key "198CImxTlly79Dx9ZCDJ"
-  region: &region "ap-south-1"
+  region: &region "us-east-1"
   s3_endpoint_url: &s3-endpoint-url "http://minio.minio.svc.cluster.local:9000"
   s3_path_style_access: &s3-path-style-access "true"
   s3_protocol: &s3-protocol "http"
   s3_signing_region: &s3-signing-region "us-east-1"
   backup_bucket: &backup_bucket ""
-  checkpoint_bucket: &checkpoint_bucket ""
+  checkpoint_bucket: &checkpoint_bucket "s3://checkpoint-obsrv-local"
 
   cloud_store_provider: &cloud_store_provider "s3"
-  postgresql_backup_cloud_bucket: &postgresql_backup_cloud_bucket "obsrv-data"
+  postgresql_backup_cloud_bucket: &postgresql_backup_cloud_bucket "backups-obsrv-local"
 
   storage_type: &storage-type "s3"
   enable_lakehouse: &enable_lakehouse "true"
@@ -62,7 +67,7 @@ redis_dedup_backup_sidecar: &redis_dedup_backup_sidecar
     <<: *service-account-disable
     sidecars:
       - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.4-GA
+        image: sanketikahub/redis-backup:1.0.6-GA
         volumeMounts:
           - mountPath: "/data"
             name: redis-data
@@ -78,8 +83,8 @@ redis_dedup_backup_sidecar: &redis_dedup_backup_sidecar
             value: "00 * * * *"
           - name: CLOUD_SERVICE
             value: *storage-type
-          - name: BACKUP_BUCKET
-            value: *s3-bucket
+          - name: S3_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
           - name: REDIS_RDB_FILE_PATH
             value: "/data"
           - name: REDIS_REPLICATION_MODE
@@ -102,7 +107,7 @@ redis_denorm_backup_sidecar: &redis_denorm_backup_sidecar
     <<: *service-account-disable
     sidecars:
       - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.4-GA
+        image: sanketikahub/redis-backup:1.0.6-GA
         volumeMounts:
           - mountPath: "/data"
             name: redis-data
@@ -118,8 +123,8 @@ redis_denorm_backup_sidecar: &redis_denorm_backup_sidecar
             value: "00 * * * *"
           - name: CLOUD_SERVICE
             value: *storage-type
-          - name: BACKUP_BUCKET
-            value: *backup_bucket
+          - name: S3_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
           - name: REDIS_RDB_FILE_PATH
             value: "/data"
           - name: REDIS_REPLICATION_MODE
@@ -144,17 +149,17 @@ velero-backup: &velero-backup
     secretContents:
       cloud: |
         [default]
-        aws_access_key_id="7xSgQhiRnJg3pUzvIiBV"
-        aws_secret_access_key="4R4n5Hz8vcJLjWvtWAuQSR1tQzwCFMIBFpT26Au3"
+        aws_access_key_id="minioadmin"
+        aws_secret_access_key="198CImxTlly79Dx9ZCDJ"
   configuration:
     provider: *storage_provider
     backupStorageLocation:
       provider: *storage_provider
-      bucket: *s3-bucket
+      bucket: *velero_backup_cloud_bucket
       config:
         region: *region
         s3ForcePathStyle: true
-        s3Url: "http://192.168.1.2:9000"
+        s3Url: *s3-endpoint-url
     volumeSnapshotLocation:
       name: default
       namespace: velero
@@ -184,10 +189,15 @@ system-rules-ingestor:
 flink:
   serviceMonitor:
     enabled: true
-  checkpoint_store_type: *storage_class
+  s3_auth_type: ""
+  s3_access_key: *s3-access-key
+  s3_secret_key: *s3-secret-access-key
+  s3_endpoint: *s3-endpoint-url
+  s3_path_style_access: *s3-path-style-access
+  checkpoint_store_type: *cloud_store_provider
   checkpointing:
-    enabled: false
-    statebackend: file:///tmp/
+    enabled: true
+    statebackend: *checkpoint_bucket
   
 command-api:
   imagePullPolicy: Always
@@ -205,8 +215,8 @@ dataset-api:
 secor:
   <<: *service-account-disable
   storage_type: *storage-type
-  bucket_name: *s3-bucket
-  s3_bucket_name: *s3-bucket
+  bucket_name: *backups_bucket
+  s3_bucket_name: *backups_bucket
   s3_access_key: *s3-access-key
   s3_secret_id: *s3-secret-access-key
   s3_region: *region
@@ -243,7 +253,15 @@ lakehouse-connector:
   image:
     registry: sanketikahub
     repository: lakehouse-connector
-    tag: 1.0.3
+    tag: 1.3.0-RC
+  s3_access_key: *s3-access-key
+  s3_secret_key: *s3-secret-access-key
+  s3_endpoint: *s3-endpoint-url
+  s3_path_style_access: *s3-path-style-access
+  checkpoint_store_type: *cloud_store_provider
+  checkpointing:
+    enabled: true
+    statebackend: *checkpoint_bucket
   
   hadoop_core_site: 
       fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem 
@@ -257,8 +275,8 @@ trino:
     lakehouse: |-
       connector.name=hudi
       hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
-      hive.s3.aws-access-key=7xSgQhiRnJg3pUzvIiBV
-      hive.s3.aws-secret-key=4R4n5Hz8vcJLjWvtWAuQSR1tQzwCFMIBFpT26Au3
+      hive.s3.aws-access-key="minioadmin"
+      hive.s3.aws-secret-key="198CImxTlly79Dx9ZCDJ"
       hive.s3.ssl.enabled=false 
 
 hms:
@@ -271,6 +289,15 @@ hms:
   hadoop_core_site:
     fs.s3a.access.key:  *s3-access-key
     fs.s3a.secret.key:  *s3-secret-access-key
-    # fs.s3a.endpoint: *s3-endpoint-url 
-    # fs.s3a.path.style.access: false
+    fs.s3a.endpoint: *s3-endpoint-url 
+    fs.s3a.path.style.access: *s3-path-style-access
     # fs.s3a.connection.ssl.enabled: true
+
+minio:
+  enabled: true
+  auth:
+    rootUser: *s3-access-key
+    rootPassword: *s3-secret-access-key
+  defaultBuckets: backups-obsrv-local, velero-obsrv-local, checkpoint-obsrv-local, storage-obsrv-local 
+  service:
+    type: LoadBalancer
