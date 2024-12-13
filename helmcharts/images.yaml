@@ -76,7 +76,7 @@ images: &images
   postgresql: &postgresql
     registry: "docker.io"
     repository: "bitnami/postgresql"
-    tag: "16.1.0-debian-11-r19"
+    tag: "17.2.0"
     digest: ""
 
   postgresql-exporter: &postgresql-exporter
@@ -107,7 +107,7 @@ images: &images
   promtail: &promtail
     registry: "docker.io"
     repository: "grafana/promtail"
-    tag: "2.7.4"
+    tag: "3.2.2"
     digest: ""
 
   redis: &redis
@@ -150,7 +150,7 @@ images: &images
   alertmanager: &alertmanager
     registry: quay.io
     repository: prometheus/alertmanager
-    tag: v0.25.0
+    tag: v0.28.0-rc.0
     digest: ""
 
   prometheus-operator-webhook: &prometheus-operator-webhook
@@ -217,7 +217,7 @@ images: &images
   prometheus-node-exporter: &prometheus-node-exporter
     registry: quay.io
     repository: prometheus/node-exporter
-    tag: "v1.5.0"
+    tag: "v1.8.2"
     digest: ""
 
   velero: &velero
