@@ -44,6 +44,9 @@ defaults:
     hms_db_name: &psql-hms-db "hms"
     hms_user_name: &psql-hms-user "hms"
     hms_user_password: &psql-hms-pwd "hms123"
+    keycloak_db_name: &psql-keycloak-db "keycloak"
+    keycloak_user_name: &psql-keycloak-user "keycloak"
+    keycloak_user_password: &psql-keycloak-pwd "keycloak123"
 
   grafana:
     grafana_admin_user: &grafana-admin-user "admin"
@@ -75,6 +78,7 @@ defaults:
 
   redirection_auth_path: &redirection_auth_path ""
   domain: &domain "3.7.102.251.sslip.io"  # Update with the Allocation ID of the Elastic IP
+  keycloak_domain: &keycloak-domain "keycloak.3.7.102.251.sslip.io"
 
 
 
@@ -230,13 +234,13 @@ keycloak:
     keystoreFilename: "tls.key"
   extraEnvVars:
     - name: KC_HOSTNAME
-      value: "https://keycloak.3.7.102.251.sslip.io"
+      value: *keycloak-domain
   externalDatabase:
     host: *pghost
     port: 5432
-    user: postgres
-    database: keycloak
-    password: "postgres"
+    user: *psql-keycloak-user
+    database: *psql-keycloak-db
+    password: *psql-keycloak-pwd
   obsrvuser: obsrv_admin
   obsrvpassword: enDoPvTAxFSd
 
@@ -451,6 +455,10 @@ kong:
 kong-ingress-routes:
   namespace: *kong-ingress-namespace
   domain: *domain
+  ingress:
+    keycloak:
+      domains:
+        - *keycloak-domain
 
 letsencrypt-ssl:
   enabled: *ssl_enabled
