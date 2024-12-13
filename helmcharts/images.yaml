@@ -21,7 +21,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.2.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   # dataset-api: #open source
@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.2.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -42,18 +42,18 @@ images: &images
 
   web-console: &web-console # registry: ""
     repository: "obsrv-web-console"
-    tag: "1.2.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   ## PIPELINE ENTERPRISE
   unified-pipeline: &unified-pipeline # registry: ""
     repository: unified-pipeline
-    tag: "1.1.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   cache-indexer: &cache-indexer # registry: ""
     repository: cache-indexer
-    tag: "1.1.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
@@ -341,7 +341,7 @@ images: &images
 
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.1-RC
+    tag: 1.3.0-RC
 
   opentelemetry-collector: &opentelemetry-collector
     repository: otel/opentelemetry-collector-contrib
