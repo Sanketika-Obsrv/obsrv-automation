@@ -162,7 +162,7 @@ images: &images
   prometheus-operator: &prometheus-operator
     registry: quay.io
     repository: prometheus-operator/prometheus-operator
-    tag: "v0.65.1"
+    tag: "v0.78.2"
     digest: ""
 
   prometheus-config-reloader: &prometheus-config-reloader
