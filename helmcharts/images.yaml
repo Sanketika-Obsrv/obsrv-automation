@@ -82,7 +82,7 @@ images: &images
   postgresql-exporter: &postgresql-exporter
     registry: "quay.io"
     repository: "prometheuscommunity/postgres-exporter"
-    tag: "v0.11.1"
+    tag: "v0.16.0"
     digest: ""
 
   postgresql-migration: &postgresql-migration
@@ -181,7 +181,7 @@ images: &images
   grafana: &grafana
     registry: docker.io
     repository: grafana/grafana
-    tag: "9.5.2"
+    tag: "11.4.0"
     digest: ""
 
   grafana-test-framework: &grafana-test-framework
@@ -223,12 +223,12 @@ images: &images
   velero: &velero
     registry: "docker.io"
     repository: "velero/velero"
-    tag: "v1.10.2"
+    tag: "v1.15.0"
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
   superset: &superset # registry: ""
-    repository: "sanketikahub/superset"
-    tag: "3.0.2"
+    repository: "apache/superset"
+    tag: "4.1.1"
     digest: ""
 
   secor: &secor # registry: ""
