@@ -24,7 +24,12 @@ spec:
     hosts:
     {{- toYaml $domains | nindent 4}}
   rules:
+  {{- with $domain := index $domains 0 }}
+  - host: {{ $domain }}
+    http:
+  {{- else }}
   - http:
+  {{- end }}
       paths:
       {{- range $path := $value.paths }}
       - path: {{ $path.path }}

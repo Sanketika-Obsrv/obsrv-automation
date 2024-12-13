@@ -313,9 +313,13 @@ images: &images
   keycloak: &keycloak
     registry: docker.io
     repository:  bitnami/keycloak
-    tag: "25.0.5-debian-12-r1"
+    tag: "26.0.5-debian-12-r2"
     digest: ""
 
+  keycloakConfigCli: &keycloakConfigCli
+    registry: docker.io
+    repository: bitnami/keycloak-config-cli
+    tag: 6.2.0-debian-12-r0
 
   hms: &hms
     # registry: ""
@@ -453,6 +457,10 @@ internal: &internal
     image:
       <<: *keycloak
 
+    keycloakConfigCli:
+      image:
+        <<: *keycloakConfigCli
+
   druid_exporter:
     image:
       <<: *druid_exporter
@@ -548,7 +556,7 @@ internal: &internal
 
   opentelemetry-collector:
     <<: *opentelemetry-collector
-    imagePullSecrets: *imagePullSecrets    
+    imagePullSecrets: *imagePullSecrets
 
 
 ## Sourcing internal as root element,

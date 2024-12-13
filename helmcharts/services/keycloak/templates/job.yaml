@@ -4,7 +4,7 @@ metadata:
   name: create-obsrv-user
   namespace: {{ include "base.namespace" . }}
   annotations:
-    deployment_version: "v2" 
+    deployment_version: "v2"
 spec:
   template:
     metadata:

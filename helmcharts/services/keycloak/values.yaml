@@ -103,7 +103,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: bitnami/keycloak
-  tag: 25.0.5-debian-12-r1
+  tag: 26.0.5-debian-12-r2
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -1113,7 +1113,7 @@ keycloakConfigCli:
   image:
     registry: docker.io
     repository: bitnami/keycloak-config-cli
-    tag: 6.1.6-debian-12-r3
+    tag: 6.2.0-debian-12-r0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -1280,7 +1280,7 @@ keycloakConfigCli:
   ##     realm: realm2
   ##     clients: []
   ##
-  configuration: 
+  configuration:
     obsrv.json: |
       {
         "id": "78b14577-d627-476d-b308-217929a6ae0f",
@@ -3646,12 +3646,12 @@ postgresql:
   enabled: false
   auth:
     postgresPassword: ""
-    username: 
+    username:
     password: ""
-    database: 
+    database:
     existingSecret: ""
     secretKeys:
-      userPasswordKey: 
+      userPasswordKey:
   architecture: standalone
 ## External PostgreSQL configuration
 ## All of these values are only used when postgresql.enabled is set to false
@@ -3668,7 +3668,7 @@ postgresql:
 ## @param externalDatabase.existingSecretPasswordKey Name of an existing secret key containing the database credentials
 ## @param externalDatabase.annotations Additional custom annotations for external database secret object
 ##
-externalDatabase: 
+externalDatabase:
   host: ""
   port: 5432
   user: postgres
