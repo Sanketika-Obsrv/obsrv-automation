@@ -36,13 +36,13 @@ bootstrap)
 coredb)
     rm -rf coredb
     cp -rf ../obsrv coredb
-    cp -rf ../services/{kafka,postgresql,redis-denorm,redis-dedup,kong,druid-operator} coredb/charts/
+    cp -rf ../services/{kafka,postgresql,redis-denorm,redis-dedup,kong,druid-operator,cert-manager} coredb/charts/
     helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
 migrations)
     rm -rf migrations
     cp -rf ../obsrv migrations
-    cp -rf ../services/{postgresql-migration,cert-manager,kubernetes-reflector,grafana-configs} migrations/charts/
+    cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
 
     helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     ;;
@@ -82,7 +82,7 @@ oauth)
     cp -rf ../obsrv oauth
     cp -rf ../services/keycloak oauth/charts/
     helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
-    ;;    
+    ;;
 
 obsrvtools)
     rm -rf obsrvtools
@@ -93,7 +93,7 @@ obsrvtools)
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
-    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,letsencrypt-ssl,velero,volume-autoscaler} additional/charts/
+    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
 
     # copy cloud specific helm charts
     case $cloud_env in
@@ -119,7 +119,7 @@ all)
     bash $0 oauth
     bash $0 obsrvtools
     bash $0 additional
-    
+
     ;;
 reset)
     helm uninstall additional -n obsrv
@@ -133,7 +133,7 @@ reset)
     helm uninstall opentelemetry-collector -n obsrv
     helm uninstall oauth -n obsrv
     helm uninstall obsrv-bootstrap -n obsrv
-     
+
     ;;
 *)
     if [ ! -d "../services/$1" ]; then
