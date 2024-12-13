@@ -132,7 +132,7 @@ images: &images
   loki: &loki
     registry: "docker.io"
     repository: "grafana/loki"
-    tag: "2.9.3"
+    tag: "3.2.2"
     digest: ""
 
   loki-gateway: &loki-gateway
