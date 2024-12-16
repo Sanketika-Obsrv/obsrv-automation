@@ -7,7 +7,7 @@ global:
   config_api_container: "<fill-value>"   # Update the config APIs bucket name
   postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name 
   redis_backup_cloud_bucket: &redis_backup_cloud_bucket "<fill-value>" # Update with the backup bucket name 
-  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "<fill-value>" # Update with velero backup  bucket name
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-sandbox-905418313089" # Update with velero backup  bucket name
   cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the name of cloud storage bucket 
   hudi_metadata_bucket: &hudi_metadata_bucket "s3a://<fill-value>/hudi" # Update with hudi bucket name
  
@@ -49,6 +49,9 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   spark: &spark_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
+  velero: &velero_sa_annotation 
+    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
+   
 
 
 redis-service-account: &redis-service-account
@@ -137,23 +140,27 @@ s3-exporter-service-account: &s3-exporter-service-account
       <<: *s3_exporter_sa_annotation
 
 velero-backup: &velero-backup
+  serviceAccount:
+    server:
+      create: *create_sa
+      name: velero-backup-sa
+      annotations:
+        <<: *velero_sa_annotation 
+      labels:
   credentials:
-    useSecret: true
-    secretContents:
-      cloud: |
-        [default]
-        aws_access_key_id="<fill-value>"   # Update with the AWS access key 
-        aws_secret_access_key="<fill-value>" # Update with the AWS secret key
+    useSecret: false
   configuration:
-    provider: *cloud_storage_provider
     backupStorageLocation:
+    - name:
+      provider: *cloud_storage_provider
       bucket: *velero_backup_cloud_bucket
       config:
         region: *cloud_storage_region
     volumeSnapshotLocation:
-      name: default
-      config:
-        region: *cloud_storage_region
+      - name:
+        provider: *cloud_storage_provider
+        config:
+          region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-aws
       image: velero/velero-plugin-for-aws

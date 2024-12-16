@@ -21,21 +21,23 @@ metadata:
 spec:
   namespaceSelector:
     matchNames:
-      - {{ (include "base.namespace" $) }}
+      - {{ .Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "velero.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-    {{- with .Values.metrics.serviceMonitor.additionalLabels }}
-      {{- toYaml . | nindent 6 }}
-    {{- end }}
-
   endpoints:
   - port: http-monitoring
     interval: {{ .Values.metrics.scrapeInterval }}
     scrapeTimeout: {{ .Values.metrics.scrapeTimeout }}
     {{- if .Values.metrics.serviceMonitor.scheme }}
     scheme: {{ .Values.metrics.serviceMonitor.scheme }}
+    {{- end }}
+    {{- if .Values.metrics.serviceMonitor.metricRelabelings }}
+    metricRelabelings: {{- toYaml .Values.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+    {{- end }}
+    {{- if .Values.metrics.serviceMonitor.relabelings }}
+    relabelings: {{ toYaml .Values.metrics.serviceMonitor.relabelings | nindent 6 }}
     {{- end }}
     {{- if .Values.metrics.serviceMonitor.tlsConfig }}
     tlsConfig:
