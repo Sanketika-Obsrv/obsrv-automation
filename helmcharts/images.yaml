@@ -244,12 +244,12 @@ images: &images
   cert_manager_cainjector: &cert_manager_cainjector
     registry: quay.io/jetstack
     repository: jetstack/cert-manager-cainjector
-    tag: v1.15.4
+    tag: v1.16.2
     digest: ""
 
   cert_manager_webhook: &cert_manager_webhook # registry: ""
     repository: cert-manager-webhook
-    tag: v1.12.2
+    tag: v1.16.2
     digest: ""
 
   cert_manager_controller: &cert_manager_controller
