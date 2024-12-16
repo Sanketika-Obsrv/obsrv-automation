@@ -19,7 +19,7 @@ case $cloud_env in
         ;;
 esac
 
-cp -rf ../{global-values.yaml,global-resource-values.yaml,global-key-values.yaml,images.yaml} ./
+cp -rf ../{global-values.yaml,global-resource-values.yaml,images.yaml} ./
 
 if [ "$2" == "template" ]; then
     cmd="template"
@@ -63,7 +63,7 @@ obsrvapis)
     rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
     cp -rf ../services/{command-api,dataset-api,config-api} obsrvapis/charts/
-    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-key-values.yaml -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name --debug
+    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name --debug
     ;;
 hudi)
     rm -rf hudi
@@ -88,8 +88,7 @@ obsrvtools)
     rm -rf obsrvtools
     cp -rf ../obsrv obsrvtools
     cp -rf ../services/{web-console,submit-ingestion} obsrvtools/charts/
-    helm $cmd obsrvtools ./obsrvtools -n obsrv -f global-key-values.yaml -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
-    ;;
+    helm $cmd obsrvtools ./obsrvtools -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
@@ -142,8 +141,7 @@ reset)
     fi
     cp -rf ../obsrv ./$1-ind
     cp -rf ../services/$1 ./$1-ind/charts/
-    helm $cmd $1-ind ./$1-ind -n obsrv -f global-resource-values.yaml -f global-key-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd $1-ind ./$1-ind -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
     rm -rf ./$1-ind
     ;;
 esac
-

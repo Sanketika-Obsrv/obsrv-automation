@@ -23,7 +23,7 @@ spec:
           apt-get update && apt-get install -y curl jq postgresql-client
 
           echo "Waiting for Keycloak to be ready..."
-          until curl --insecure -s -o /dev/null -w "%{http_code}" http://oauth-keycloak:80/realms/obsrvWebConsole/ > /dev/null; do
+          until curl --insecure -s -o /dev/null -w "%{http_code}" http://keycloak:80/realms/obsrvWebConsole/ > /dev/null; do
             sleep 5
           done
 
@@ -31,7 +31,7 @@ spec:
 
           # Obtain admin access token using admin credentials
           echo "Getting access token for admin user..."
-          access_token=$(curl --insecure -s -X POST http://oauth-keycloak:80/realms/master/protocol/openid-connect/token \
+          access_token=$(curl --insecure -s -X POST http://keycloak:80/realms/master/protocol/openid-connect/token \
             -H "Content-Type: application/x-www-form-urlencoded" \
             --data-urlencode "client_id=admin-cli" \
             --data-urlencode "username={{ .Values.auth.adminUser }}" \
@@ -48,7 +48,7 @@ spec:
           # Create a new user in the obsrvWebConsole realm
           echo "Creating new Keycloak user..."
           create_user_response=$(curl --insecure -s -o response.json -w "%{http_code}" \
-            -X POST http://oauth-keycloak:80/admin/realms/obsrvWebConsole/users \
+            -X POST http://keycloak:80/admin/realms/obsrvWebConsole/users \
             -H "Authorization: Bearer $access_token" \
             -H "Content-Type: application/json" \
             -d '{
@@ -75,7 +75,7 @@ spec:
 
           # Fetch user details to get the user ID
           echo "Fetching user details to get the user ID..."
-          user_details_response=$(curl --insecure -s -X GET http://oauth-keycloak:80/admin/realms/obsrvWebConsole/users \
+          user_details_response=$(curl --insecure -s -X GET http://keycloak:80/admin/realms/obsrvWebConsole/users \
             -H "Authorization: Bearer $access_token" \
             -G --data-urlencode "username=obsrv_admin")
 

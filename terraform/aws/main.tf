@@ -319,7 +319,6 @@ module "get_kubeconfig" {
   building_block = var.building_block
   region         = var.region
 }
-
 module "tls-keys" {
   source = "../modules/keys/tls-keys"  
   key_algorithm = "RSA"
@@ -327,11 +326,12 @@ module "tls-keys" {
 }
 
 module "output_file" {
-  source       = "../modules/keys/output-file"  
-  private_key  = module.tls-keys.private_key_pem  
-  public_key   = module.tls-keys.public_key_pem  
-  file_path    = "../../helmcharts/global-key-values.yaml"  
+  source       = "../modules/keys/output-file"
+  private_key  = module.tls-keys.private_key_pem
+  public_key   = module.tls-keys.public_key_pem
+  file_path    = "global-values.yaml"
 }
+
 
 output "private_key_pem" {
   value     = module.tls-keys.private_key_pem
@@ -344,8 +344,8 @@ output "public_key_pem" {
 }
 
 output "generated_yaml_file" {
-  description = "The path to the generated global-key-values.yaml file"
-  value       = module.output_file.global_values_key_file_path  
+  description = "The path to the generated global-values.yaml file"
+  value       = module.output_file.global_values_file_path  
 }
 # module "postgresql_migration" {
 #   source                                = "../modules/helm/postgresql_migration"

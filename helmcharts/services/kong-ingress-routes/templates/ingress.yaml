@@ -19,6 +19,14 @@ spec:
   {{- $global_domains := $.Values.global.domain | default (list) | list }}
   {{- $value_domains := $value.domains | default (list) }}
   {{- $domains := $value_domains | default $global_domains }}
+
+  {{- $domainWithoutScheme := list }}
+  {{- range $domains }}
+    {{- $domainWithoutScheme = append $domainWithoutScheme (regexReplaceAll "(http|https)://" . "") }}
+  {{- end }}
+
+  {{- $domains = $domainWithoutScheme }}
+
   tls:
   - secretName: {{ default $.Values.cert_secret_name $value.cert_secret_name  }}
     hosts:

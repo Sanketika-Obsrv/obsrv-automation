@@ -1,4 +1,3 @@
-global:
   user_token_private_key: |-
     ${join("\n    ", split("\n", private_key))}
   user_token_public_key: 
