@@ -138,7 +138,7 @@ images: &images
   loki-gateway: &loki-gateway
     registry: "docker.io"
     repository: "nginxinc/nginx-unprivileged"
-    tag: "1.24-alpine"
+    tag: "1.27-alpine"
     digest: ""
 
   kubernetes-reflector: &kubernetes-reflector
