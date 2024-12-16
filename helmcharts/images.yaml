@@ -169,7 +169,7 @@ images: &images
     registry: "quay.io"
     repository: prometheus-operator/prometheus-config-reloader
     # if not set appVersion field from Chart.yaml is used
-    tag: "v0.65.1"
+    tag: "v0.79.0"
     digest: ""
 
   prometheus: &prometheus
