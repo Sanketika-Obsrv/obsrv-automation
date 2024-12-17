@@ -301,18 +301,18 @@ images: &images
   druid_operator: &druid_operator
     registry: "docker.io/druidio"
     repository: druidio/druid-operator
-    tag: "latest"
+    tag: "0.0.9"
     digest: ""
 
   druid-raw-cluster: &druid-raw-cluster
     registry: "docker.io/druidio"
     repository: docker.io/apache
-    tag: "latest"
+    tag: "28.0.1"
     digest: ""
 
   druid_exporter: &druid_exporter
-    registry: "quay.io"
-    repository: opstree/druid-exporter
+    registry: "docker.io"
+    repository: sanketikahub/druid-exporter
     tag: "v0.11"
     digest: ""
 
