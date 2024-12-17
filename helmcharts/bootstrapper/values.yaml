@@ -10,6 +10,7 @@ namespaces:
 - kong-ingress
 - kubernetes-reflector
 - loki
+- minio
 - monitoring
 - postgresql
 - redis

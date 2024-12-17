@@ -1,4 +1,5 @@
 global:
+  ssl_enabled: &ssl_enabled true
   project_id: &project_id "obsrv-installation"
   deep_store_type: &deep_store_type "google"
   cloud_storage_provider: &cloud_storage_provider "gcp"
@@ -79,7 +80,7 @@ config-api-service-account: &config-api-service-account
     create: *create_sa
     name: config-api-sa
     annotations:
-      iam.gke.io/gcp-service-account: *config-api-sa-annotations      
+      iam.gke.io/gcp-service-account: *config-api-sa-annotations
 
 postgres-backup-service-account: &postgres-backup-service-account
   serviceAccount:
@@ -201,7 +202,7 @@ config-api:
   <<: *config-api-service-account
   exhaust_service:
     CLOUD_STORAGE_PROVIDER: *storage_provider
-    CONTAINER_PREFIX: "telemetry-data"    
+    CONTAINER_PREFIX: "telemetry-data"
 
 druid-raw-cluster:
   druid_deepstorage_type: *deep_store_type
@@ -260,3 +261,10 @@ flink:
   checkpointing:
     enabled: true
     statebackend: *checkpoint_bucket
+
+letsencrypt-ssl:
+  enabled: *ssl_enabled
+
+kong:
+  proxy:
+    type: LoadBalancer

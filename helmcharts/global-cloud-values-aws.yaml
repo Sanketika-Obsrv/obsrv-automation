@@ -1,19 +1,20 @@
 global:
+  ssl_enabled: &ssl_enabled true
   cloud_storage_provider: &cloud_storage_provider "aws"
   cloud_store_provider: &cloud_store_provider "s3"
   cloud_storage_region: &cloud_storage_region "<fill-value>" # Update the region to deploy obsrv instance
 
   dataset_api_container: "<fill-value>"  # Update the dataset APIs bucket name
   config_api_container: "<fill-value>"   # Update the config APIs bucket name
-  postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name 
-  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "<fill-value>" # Update with the backup bucket name 
+  postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name
+  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "<fill-value>" # Update with the backup bucket name
   velero_backup_cloud_bucket: &velero_backup_cloud_bucket "<fill-value>" # Update with velero backup  bucket name
-  cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the name of cloud storage bucket 
+  cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the name of cloud storage bucket
   hudi_metadata_bucket: &hudi_metadata_bucket "s3a://<fill-value>/hudi" # Update with hudi bucket name
- 
+
   # Update the configuration by replacing 'name' with the access key, 'key' with the secret key, and 'region-name' with the specific region for access.
   cloud_storage_config: |+
-    '{"identity":"name","credential":"key","region":"region-name"}' 
+    '{"identity":"name","credential":"key","region":"region-name"}'
 
   spark_cloud_bucket: ""
   storage_class_name: &storage_class_name "gp2"
@@ -21,13 +22,14 @@ global:
   secor_backup_bucket: &secor_backup_bucket "<fill-value>" # Update with secor bucket name
   checkpoint_bucket: &checkpoint_bucket "s3://<fill-value>" # Update with checkpoint bucket name
   deep_store_type: &deep_store_type "s3"
-  s3_access_key: &s3-access-key "<fill-value>" # Update with the AWS access key 
+  s3_access_key: &s3-access-key "<fill-value>" # Update with the AWS access key
   s3_secret_key: &s3-secret-access-key "<fill-value>" # Update with the AWS secret key
-kong_annotations: &kong_annotations 
-  service.beta.kubernetes.io/aws-load-balancer-type: nlb
-  service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-  service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "<fill-value>" # Update with the Elastic IP allocation 
-  service.beta.kubernetes.io/aws-load-balancer-subnets: "<fill-value>" # Update with the public subnet ID 
+  s3_endpoint_url: &s3-endpoint-url ""
+  kong_annotations: &kong_annotations
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "<fill-value>" # Update with the Elastic IP allocation
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "<fill-value>" # Update with the public subnet ID
 
 service_accounts:
   enabled: &create_sa true
@@ -35,7 +37,7 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>"  # Update with the ARN of the IAM role for this service account
   dataset_api: &dataset_api_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-  config_api: &config_api_sa_annotation  
+  config_api: &config_api_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   druid_raw: &druid_raw_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
@@ -198,8 +200,8 @@ s3-exporter:
 dataset-api:
   <<: *dataset-api-service-account
 
-secor-service-account: &secor-service-account 
-  serviceAccount: 
+secor-service-account: &secor-service-account
+  serviceAccount:
     create: *create_sa
     name: secor-sa
     annotations:
@@ -210,12 +212,13 @@ secor:
   s3_bucket_name: *backups_bucket
   s3_region: *cloud_storage_region
   storageClass: *storage_class_name
-  <<: *secor-service-account 
-      
+  <<: *secor-service-account
+
 kong:
   proxy:
     annotations:
       <<: *kong_annotations
+    type: LoadBalancer
 
 flink-service-account: &flink-service-account
   serviceAccount:
@@ -265,36 +268,39 @@ loki:
     working_directory: /var/loki/compactor/retention
 
 lakehouse-connector:
-  hadoop_core_site: 
-      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem 
+  hadoop_core_site:
+      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem
       fs.s3a.access.key: *s3-access-key
       fs.s3a.secret.key: *s3-secret-access-key
-  serviceAccount: 
+  serviceAccount:
     create: false
     name: flink-sa
   checkpointing:
     enabled: true
-    statebackend: *hudi_metadata_bucket  
+    statebackend: *hudi_metadata_bucket
     annotations:
       <<: *flink_sa_annotation
-    
+
 trino:
-  additionalCatalogs: 
+  additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
       hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
       hive.s3.aws-access-key=<fill-value>
       hive.s3.aws-secret-key=<fill-value>
-      hive.s3.ssl.enabled=false 
- 
+      hive.s3.ssl.enabled=false
+
 hms:
   envVars:
-    WAREHOUSE_DIR: *hudi_metadata_bucket 
-   
+    WAREHOUSE_DIR: *hudi_metadata_bucket
+
 
   hadoop_core_site:
     fs.s3a.access.key:  *s3-access-key
     fs.s3a.secret.key:  *s3-secret-access-key
-    # fs.s3a.endpoint: *s3-endpoint-url 
+    # fs.s3a.endpoint: *s3-endpoint-url
     # fs.s3a.path.style.access: false
     # fs.s3a.connection.ssl.enabled: true
+
+letsencrypt-ssl:
+  enabled: *ssl_enabled

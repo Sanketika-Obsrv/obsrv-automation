@@ -30,7 +30,7 @@ imagePullSecrets: []
   #   - myRegistrKeySecretName
 
 service:
-  type: NodePort
+  type: ClusterIP
   port: 80
   targetPort: 9187
   name: http

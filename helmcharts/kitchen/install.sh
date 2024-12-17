@@ -31,7 +31,7 @@ case "$1" in
 bootstrap)
     rm -rf bootstrapper
     cp -rf ../bootstrapper ./bootstrapper
-    helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace --debug
+    helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace
     ;;
 coredb)
     rm -rf coredb
@@ -44,20 +44,29 @@ migrations)
     cp -rf ../obsrv migrations
     cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
 
-    helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
+    if [ "$ssl_enabled" == "true" ]; then
+        cp -rf ../services/cert-manager migrations/charts/
+    fi
+
+    if [ -z "$cloud_env" ]; then
+        cp -rf ../services/minio migrations/charts/
+    fi  
+
+    helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 monitoring)
     rm -rf monitoring
     cp -rf ../obsrv monitoring
     cp -rf ../services/{promtail,loki,kube-prometheus-stack,kafka-message-exporter,alert-rules} monitoring/charts/
-    helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name --debug
+    helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name
     ;;
 coreinfra)
     rm -rf coreinfra
     cp -rf ../obsrv coreinfra
     cp -rf ../services/{druid-raw-cluster,flink,superset} coreinfra/charts/
 
-    helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 obsrvapis)
     rm -rf obsrvapis
@@ -69,13 +78,13 @@ hudi)
     rm -rf hudi
     cp -rf ../obsrv hudi
     cp -rf ../services/{hms,trino,lakehouse-connector} hudi/charts/
-    helm $cmd hudi ./hudi -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd hudi ./hudi -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 otel)
     rm -rf opentelemetry-collector
     cp -rf ../obsrv opentelemetry-collector
     cp -rf ../services/opentelemetry-collector opentelemetry-collector/charts/
-    helm $cmd opentelemetry-collector ./opentelemetry-collector -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd opentelemetry-collector ./opentelemetry-collector -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 oauth)
     rm -rf oauth
@@ -88,7 +97,8 @@ obsrvtools)
     rm -rf obsrvtools
     cp -rf ../obsrv obsrvtools
     cp -rf ../services/{web-console,submit-ingestion} obsrvtools/charts/
-    helm $cmd obsrvtools ./obsrvtools -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd obsrvtools ./obsrvtools -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    ;;
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
@@ -104,7 +114,7 @@ additional)
         ;;
     esac
 
-    helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 all)
     bash $0 bootstrap
@@ -141,7 +151,7 @@ reset)
     fi
     cp -rf ../obsrv ./$1-ind
     cp -rf ../services/$1 ./$1-ind/charts/
-    helm $cmd $1-ind ./$1-ind -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd $1-ind ./$1-ind -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf ./$1-ind
     ;;
 esac

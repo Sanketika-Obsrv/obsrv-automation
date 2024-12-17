@@ -40,6 +40,8 @@ s3_bucket: "" # bucket name
 druid_storage_baseKey: druid/segments
 druid_s3_endpoint_url: ""
 druid_s3_endpoint_signingRegion: ""
+druid_s3_protocol: "https"
+druid_s3_path_style_access: "false"
 
 # Azure Container Details
 azure_storage_account_name: ""

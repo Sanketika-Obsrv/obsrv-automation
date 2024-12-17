@@ -1,12 +1,14 @@
-domain: "kong.example"
 ingress_class_name: "kong"
 cert_secret_name: "kong-ingress-ssl-cert"
-namespace: kong-ingress-routes
+namespace: kong-ingress
 global:
-  ingress_annotations:
+  ssl_annotations:
     konghq.com/preserve-host: "true"
     konghq.com/protocols: "https"
     konghq.com/https-redirect-status-code: "301"
+  ingress_annotations:
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: "http"
 
 ingress:
   webconsole:

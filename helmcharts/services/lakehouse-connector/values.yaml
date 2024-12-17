@@ -233,6 +233,9 @@ lakehouse-connector:
         task.max.memory = 512
         compaction.max.memory = 512
       }
+      metrics.reporter.type = "PROMETHEUS_PUSHGATEWAY"
+      metrics.reporter.host = monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local
+      metrics.reporter.port = 9090
       metadata.enabled = true
       compaction.enabled = true
       delta.commits = 5

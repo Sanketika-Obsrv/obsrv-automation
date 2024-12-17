@@ -27,6 +27,7 @@ defaults:
     volume_autoscaler_namespace: &volume-autoscaler-namespace "volume-autoscaler"
     hms_namespace: &hms_namespace "hms"
     trino_namespace: &trino_namespace "trino"
+    minio_namespace: &minio_namespace "minio"
     opentelemetry-collector: &opentelemetry-collector "otel"
     keycloak_namespace: &keycloak_namespace "keycloak"
 
@@ -48,7 +49,7 @@ defaults:
     keycloak_user_name: &psql-keycloak-user "keycloak"
     keycloak_user_password: &psql-keycloak-pwd "keycloak123"
 
-  grafana:
+  grafana: &grafana
     grafana_admin_user: &grafana-admin-user "admin"
     grafana_admin_password: &grafana-admin-password "adminpassword"
     grafana_auth_token: &grafana-auth-token "YWRtaW46YWRtaW5wYXNzd29yZA=="
@@ -506,7 +507,6 @@ kong-ingress-routes:
         - *keycloak-domain
 
 letsencrypt-ssl:
-  enabled: *ssl_enabled
   namespace: *web-console-namesapce
   cert_issuer_name: "letsencrypt-prod"
   # prod letsencrypt url, to be used on prod instances
@@ -567,14 +567,16 @@ trino:
 lakehouse-connector:
   namespace: *flink_namespace
 
-
+minio:
+  namespace: *minio_namespace
+  fullnameOverride: "minio"
 
 global:
   env: *env
   building_block: *building-block
   encryption_key: *encryption-key
   domain: *domain
-  ssl_enabled: *ssl_enabled
+  grafana: *grafana
   kafka: *kafka
   zookeeper: *zookeeper
   druid: *druid

@@ -54,26 +54,26 @@ spec:
           args:
             - -c
             - |
-              response=$(curl -Ssq "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts/search" \
+              response=$(curl -Ssq "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/search" \
                   -H 'Accept: application/json' \
                   -H 'Content-type: application/json' \
-                  -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}")
+                  -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}")
               id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ .Values.namespace }}-sa") | .id')
 
 
-              # curl -X DELETE "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts/$id" \
+              # curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
               #     -H 'Accept: application/json' \
               #     -H 'Content-type: application/json' \
-              #     -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}"
+              #     -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}"
 
               # Check if the service account already exists or not
               if [ -z "$id" ]; then
                   echo "The ID for the service account 'grafana-{{ .Values.namespace }}-sa' could not be found. Creating new service account."
 
-                  response=$(curl -Ss -X POST "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts" \
+                  response=$(curl -Ss -X POST "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts" \
                       -H 'Accept: application/json' \
                       -H 'Content-type: application/json' \
-                      -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}" \
+                      -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
                       -d '{"name": "grafana-{{ .Values.namespace }}-sa","role": "Admin","isDisabled": false}')
 
                   echo "SA creation response:"
@@ -85,10 +85,10 @@ spec:
                       exit 1;
                   else
                       echo "generating token for 'grafana-{{ .Values.namespace }}-sa': $service_account_id"
-                      response=$(curl -Ss "{{ .Values.env.GRAFANA_ADMIN_URL }}/api/serviceaccounts/$service_account_id/tokens" \
+                      response=$(curl -Ss "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$service_account_id/tokens" \
                       -H 'Accept: application/json' \
                       -H 'Content-type: application/json' \
-                      -H "Authorization: Basic {{ .Values.env.GRAFANA_AUTH_TOKEN }}" \
+                      -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
                       -d '{"name": "grafana-{{ .Values.namespace }}-sa"}')
 
                       echo "token response:"

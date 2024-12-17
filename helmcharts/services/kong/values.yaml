@@ -270,7 +270,7 @@ cluster:
 proxy:
   # Enable creating a Kubernetes service for the proxy
   enabled: true
-  type: LoadBalancer
+  type: NodePort
   loadBalancerClass:
   # Override proxy Service name
   nameOverride: ""
@@ -293,7 +293,7 @@ proxy:
     servicePort: 80
     containerPort: 8000
     # Set a nodePort which is available if service type is NodePort
-    # nodePort: 32080
+    nodePort: 32080
     # Additional listen parameters, e.g. "reuseport", "backlog=16384"
     parameters: []
 
@@ -305,7 +305,7 @@ proxy:
     # Set a target port for the TLS port in proxy service
     # overrideServiceTargetPort: 8000
     # Set a nodePort which is available if service type is NodePort
-    # nodePort: 32443
+    nodePort: 32443
     # Additional listen parameters, e.g. "reuseport", "backlog=16384"
     parameters:
     - http2

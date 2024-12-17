@@ -25,8 +25,8 @@ resource "google_container_cluster" "cluster" {
   network    = var.network
   subnetwork = var.subnetwork
 
-  logging_service    = var.logging_service
-  monitoring_service = var.monitoring_service
+  # logging_service    = var.logging_service
+  # monitoring_service = var.monitoring_service
   min_master_version = local.kubernetes_version
   deletion_protection = var.deletion_protection
 

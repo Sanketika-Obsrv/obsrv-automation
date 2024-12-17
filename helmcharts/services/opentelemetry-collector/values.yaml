@@ -61,21 +61,21 @@ presets:
   # Best used with mode = daemonset.
   # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubeletstats-receiver for details on the receiver.
   kubeletMetrics:
-    enabled: true
+    enabled: false
   # Configures the collector to collect kubernetes events.
   # Adds the k8sobject receiver to the logs pipeline
   # and collects kubernetes events by default.
   # Best used with mode = deployment or statefulset.
   # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubernetes-objects-receiver for details on the receiver.
   kubernetesEvents:
-    enabled: true
+    enabled: false
   # Configures the Kubernetes Cluster Receiver to collect cluster-level metrics.
   # Adds the k8s_cluster receiver to the metrics pipeline
   # and adds the necessary rules to ClusteRole.
   # Best used with mode = deployment or statefulset.
   # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubernetes-cluster-receiver for details on the receiver.
   clusterMetrics:
-    enabled: true
+    enabled: false
 
 configMap:
   # Specifies whether a configMap should be created (true by default)
@@ -169,7 +169,7 @@ config:
           - /var/log/pods/*/*/*.log
       exclude:
           # Exclude logs from all containers named otel-collector
-          - /var/log/pods/*/otel-collector/*.log    
+          - /var/log/pods/*/opentelemetry-collector/*.log    
       start_at: "beginning"  # Optionally start reading logs from the end (default is "beginning")
       include_file_path: true
       include_file_name: false
@@ -183,8 +183,8 @@ config:
     pipelines:
       logs:
         exporters:
-          #- loki
-          - debug
+          - loki
+          #- debug
         processors:
           - memory_limiter
           - batch
@@ -195,8 +195,8 @@ config:
           - filelog
       metrics:
         exporters:
-          #- prometheus
-          - debug
+          - prometheus
+          #- debug
         processors:
           - memory_limiter
           - batch

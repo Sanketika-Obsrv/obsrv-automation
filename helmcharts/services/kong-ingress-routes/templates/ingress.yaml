@@ -8,9 +8,15 @@ metadata:
   name: {{ $value.name }}
   namespace: {{ $value.namespace }}
   annotations:
+  {{- if $.Values.global.ssl_enabled }}
+    {{- range $annotationKey, $annotationValue := merge $.Values.global.ssl_annotations ($value.annotations | default (dict)) }}
+    {{ $annotationKey }}: "{{ $annotationValue }}"
+    {{- end }}
+  {{- else }}
     {{- range $annotationKey, $annotationValue := merge $.Values.global.ingress_annotations ($value.annotations | default (dict)) }}
     {{ $annotationKey }}: "{{ $annotationValue }}"
     {{- end }}
+  {{- end }}
 spec:
   {{- $ingressClassName := default $value.ingress_class_name $.Values.ingress_class_name }}
   {{- if $ingressClassName }}
@@ -27,10 +33,12 @@ spec:
 
   {{- $domains = $domainWithoutScheme }}
 
+  {{- if $.Values.global.ssl_enabled }}
   tls:
   - secretName: {{ default $.Values.cert_secret_name $value.cert_secret_name  }}
     hosts:
     {{- toYaml $domains | nindent 4}}
+  {{- end }}
   rules:
   {{- with $domain := index $domains 0 }}
   - host: {{ $domain }}

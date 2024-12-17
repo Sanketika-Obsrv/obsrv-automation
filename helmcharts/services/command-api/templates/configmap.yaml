@@ -48,7 +48,7 @@ metadata:
   annotations:
     reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
     reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "flink"
+    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "flink-connectors"
 {{- if .Values.commonAnnotations }}
 {{ include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
 {{- end }}
