@@ -9,6 +9,7 @@ namespaces:
 - kafka
 - kong-ingress
 - kubernetes-reflector
+- keycloak
 - loki
 - minio
 - monitoring
@@ -26,7 +27,7 @@ namespaces:
 - web-console
 - config-api
 - otel
-- keycloak
+
 global:
   image:
     dockerRegistrySecretName: obsrv-docker-secret

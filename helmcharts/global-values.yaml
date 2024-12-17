@@ -71,6 +71,7 @@ defaults:
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
   config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
   otel_collector_endpoint: &otel_collector_endpoint "http://opentelemetry-collector.otel.svc.cluster.local:4317"
+   otel_enable: &otel_enable "false"
 
 
   cron_schedule: &cron-schedule "0 0 * * *"
@@ -398,6 +399,10 @@ dataset-api: &dataset-api
     y8ULRaQjA1BpbWLdfxGDe+01ZLPPyyfu66MXOcCl1+ZMKHoaJdQ9+Ughl9dvAr3s
     RQIDAQAB
     -----END PUBLIC KEY-----"
+    is_RBAC_enabled: "false"
+    keycloak_audience: *otel_enable
+   
+
 
 
 
