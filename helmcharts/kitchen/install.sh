@@ -37,7 +37,7 @@ coredb)
     rm -rf coredb
     cp -rf ../obsrv coredb
     cp -rf ../services/{kafka,postgresql,redis-denorm,redis-dedup,kong,druid-operator,cert-manager} coredb/charts/
-    helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 migrations)
     rm -rf migrations
@@ -72,7 +72,7 @@ obsrvapis)
     rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
     cp -rf ../services/{command-api,dataset-api,config-api} obsrvapis/charts/
-    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name --debug
+    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name
     ;;
 hudi)
     rm -rf hudi
@@ -90,7 +90,7 @@ oauth)
     rm -rf oauth
     cp -rf ../obsrv oauth
     cp -rf ../services/keycloak oauth/charts/
-    helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --debug
+    helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 
 obsrvtools)
