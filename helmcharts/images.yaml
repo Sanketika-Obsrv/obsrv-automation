@@ -187,7 +187,7 @@ images: &images
   grafana-test-framework: &grafana-test-framework
     registry: "docker.io"
     repository: bats/bats
-    tag: "v1.4.1"
+    tag: "1.11.1"
     digest: ""
 
   grafana-download-dashboards: &grafana-download-dashboards
