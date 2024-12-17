@@ -9,6 +9,7 @@ namespaces:
 - kafka
 - kong-ingress
 - kubernetes-reflector
+- keycloak
 - loki
 - minio
 - monitoring

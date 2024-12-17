@@ -29,6 +29,7 @@ defaults:
     trino_namespace: &trino_namespace "trino"
     minio_namespace: &minio_namespace "minio"
     opentelemetry-collector: &opentelemetry-collector "otel"
+    keycloak_namespace: &keycloak_namespace "keycloak"
 
   postgres:
     pghost: &pghost "postgresql-hl.postgresql.svc.cluster.local"
@@ -44,6 +45,9 @@ defaults:
     hms_db_name: &psql-hms-db "hms"
     hms_user_name: &psql-hms-user "hms"
     hms_user_password: &psql-hms-pwd "hms123"
+    keycloak_db_name: &psql-keycloak-db "keycloak"
+    keycloak_user_name: &psql-keycloak-user "keycloak"
+    keycloak_user_password: &psql-keycloak-pwd "keycloak123"
 
   grafana: &grafana
     grafana_admin_user: &grafana-admin-user "admin"
@@ -66,6 +70,9 @@ defaults:
   druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc:8888"
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
   config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
+  otel_collector_endpoint: &otel_collector_endpoint "http://opentelemetry-collector.otel.svc.cluster.local:4317"
+  otel_enable: &otel_enable "false"
+
 
   cron_schedule: &cron-schedule "0 0 * * *"
   druid_router_host: &druid-router-host "druid-raw-routers.druid-raw.svc.cluster.local"
@@ -73,7 +80,52 @@ defaults:
 
   redirection_auth_path: &redirection_auth_path ""
   domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
+  keycloak_domain: &keycloak-domain "https://keycloak.<fill-value>.sslip.io" # Update with the Allocation ID of the Elastic IP
+  
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
+
+  user_token_keycloak_public_key: &user_token_keycloak_public_key |-
+   -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7I2wYeaG/bIvCwuB/DE0
+    4/8U5CspE5h/1R4Uscb4tqPYT7+oG93y/RzUKSjbm1kWILyD8QwnNFjYqQ3Ls/Bm
+    9cksA7Fo1hpaNkuYzo5AN3tG3n6LD/IdYuoWtfgM6VXwfkpjqRu6ST+pXN3nED6x
+    RXsSXgktlzyNPBWKDxRPQRM72hYPprODfWvJBfFP5sC8sZL/jWepI2c0gIsWH1T9
+    JPFz/aVKBml/1z2JdSwUCXwID1Zq4joaXX/uB8zUTVImAQo79x4AE2sGOY+hZ/DF
+    y8ULRaQjA1BpbWLdfxGDe+01ZLPPyyfu66MXOcCl1+ZMKHoaJdQ9+Ughl9dvAr3s
+    RQIDAQAB
+    -----END PUBLIC KEY-----
+
+  user_token_private_key: &user_token_private_key |-
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEowIBAAKCAQEA7I2wYeaG/bIvCwuB/DE04/8U5CspE5h/1R4Uscb4tqPYT7+o
+    G93y/RzUKSjbm1kWILyD8QwnNFjYqQ3Ls/Bm9cksA7Fo1hpaNkuYzo5AN3tG3n6L
+    D/IdYuoWtfgM6VXwfkpjqRu6ST+pXN3nED6xRXsSXgktlzyNPBWKDxRPQRM72hYP
+    prODfWvJBfFP5sC8sZL/jWepI2c0gIsWH1T9JPFz/aVKBml/1z2JdSwUCXwID1Zq
+    4joaXX/uB8zUTVImAQo79x4AE2sGOY+hZ/DFy8ULRaQjA1BpbWLdfxGDe+01ZLPP
+    yyfu66MXOcCl1+ZMKHoaJdQ9+Ughl9dvAr3sRQIDAQABAoIBAQDMQYg08MZNF2eR
+    hO1HYwHFgQN8BVyhpAN1dVTvMNyfcBieu+IfteVT82mq5LHDkQgPWlgfcpwDklf6
+    mYP0KrfssTmFMtJQVU7iJSKb8K64eYT3J5NSQIBpYbIcjEQx0tgnZHprkhqnlwXZ
+    v23+U/PkB+ITOp+YQFu/ruWYIbRRfe4gtdnoBi2Y3n3sT7b8gwnnd9MHT4KPHvS6
+    oKpMuWMK3Z9BDldZ4ChoiACZY+moZsBiwJRJFG3UX4XarHRc+e9tfcqXF15PTcu1
+    snAKf8NgDgkX2m5yzV1A5qWaAzuD3BUaIQKfmcL0oQ27rXUPmT3sLp0Ot9rHz/mF
+    FcR8O7d9AoGBAPnNYyOGL8IM42i2bWUPTLIc9KB1Qa5BapRoZCYLr/W3L15PN/0d
+    ZpjA3dkP2YH1TUAzIJE9745zUBGOzQWBf+5F9k7mzJnRxW/P+InCbuklHMdeoDdJ
+    iR/jBMfHyY0vxwSK5/YQbzcJALf679nn77aK6qec9Uw4s7uBp+1367UzAoGBAPJs
+    JvX2YRGHkVfqTOWf5VNcyDJbfhB+rnewcOz3k1nTMFgIuYsjptPZUEVsUZDsgJF8
+    XR8bYyXLWvfKkT2CyESXE3kopbxXmugcZQTi61z2Mr+joVccmk5wSbmpZe4hqbxF
+    L/kxysCbAhYCkO9F2ywN2U6i7JKLfSmsyHyEKminAoGAfUypgsMnJ3Xhh7+hxcRT
+    2y+tAONwC6EifciTG4ZXP7AgIXUpB1x8/vgXD27k0kwh8Kb0mgXwKIrsybHQYwef
+    DPyo3NDmJe3T1A8Egs01ZtrHwbVUNgc7sfPkjPVIwvoJIN0wFvwNXRS1+JL1Rl8R
+    nYW2yFZxsEbs2IvjmLjDUYMCgYAlbx31DT6f/lcrRDrrmm1HGiSv4gDteyJlyREn
+    BnPygvIMJgzAt5ijTgNfNQLDZkHUNWgLzabZxzUc3mLfJLrYHJwdMXGmS8DX5sqS
+    npfJmxrrDNF1Ki2Jvz0jNk1PIFOdhvGJgW7VnxoLXAoVaKwXeWv9AJuXZYLGVLAA
+    ykfiMQKBgAgcA5sCEVCkXoURl0iRnL9xOc79xl5QtvgL3DekGodGLjio9RFk1jTR
+    zVgxIqWDZMtAGtQdZ4C+eeXHle9WWTLEVB144M5puRnAKD0kByGNtPs2NztvZzh0
+    qAS+vHjbBdrtZDa0nNsBgP5aS8NAn7n6FMsQVipPqrKoLyxN43ad
+    -----END RSA PRIVATE KEY-----
+
+
+
 
 #coredb-charts/
 kafka: &kafka
@@ -160,6 +212,12 @@ postgresql: &postgresql
     user: *psql-hms-user
     password: *psql-hms-pwd
 
+  keycloak:
+    name: *psql-keycloak-db
+    user: *psql-keycloak-user
+    password: *psql-keycloak-pwd
+
+
   # Internal. Don't touch
   auth:
     enablePostgresUser: true
@@ -180,6 +238,8 @@ postgresql: &postgresql
           CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
         04_create_hms_db.sql: |
           CREATE DATABASE hms;
+        05_create_keycloak.sql: |
+          CREATE DATABASE keycloak;
     extendedConfiguration: |
       password_encryption = md5
       shared_preload_libraries = 'pg_stat_statements' # (change requires restart)
@@ -203,6 +263,33 @@ druid: &druid
 
 opentelemetry-collector:
   namespace: *opentelemetry-collector
+
+keycloak:
+  namespace: *keycloak_namespace
+  fullnameOverride: keycloak
+  ingress:
+    tls: true
+    secrets:
+      - "kong-ingress-ssl-cert"
+  tls:
+    enabled: true
+    autoGenerated: false
+    existingSecret: "kong-ingress-ssl-cert"
+    usePem: true
+    truststoreFilename: "tls.crt"
+    keystoreFilename: "tls.key"
+  extraEnvVars:
+    - name: KC_HOSTNAME
+      value: *keycloak-domain
+  externalDatabase:
+    host: *pghost
+    port: 5432
+    user: *psql-keycloak-user
+    database: *psql-keycloak-db
+    password: *psql-keycloak-pwd
+  obsrvuser: obsrv_admin
+  obsrvpassword: enDoPvTAxFSd
+
 
 redis-denorm: &redis_denorm
   namespace: *redis-namespace
@@ -341,6 +428,11 @@ dataset-api: &dataset-api
   env:
     GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
+    otel_collector_endpoint: *otel_collector_endpoint
+    user_token_keycloak_public_key: *user_token_keycloak_public_key
+    is_RBAC_enabled: "false"
+    keycloak_audience: ""
+    otel_enable: *otel_enable
 
 config-api: &config-api
   namespace: *config-api-namespace
@@ -369,6 +461,9 @@ web-console:
   env:
     GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
+    KEYCLOAK_SERVER_URL: *keycloak-domain
+    user_token_private_key:  *user_token_private_key
+
 
 #additional-charts/
 alert-rules: &alert-rules
@@ -411,6 +506,11 @@ kong:
 
 kong-ingress-routes:
   namespace: *kong-ingress-namespace
+  domain: *domain
+  ingress:
+    keycloak:
+      domains:
+        - *keycloak-domain
 
 letsencrypt-ssl:
   namespace: *web-console-namesapce

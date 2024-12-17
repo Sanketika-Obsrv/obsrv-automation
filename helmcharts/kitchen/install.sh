@@ -37,17 +37,18 @@ coredb)
     rm -rf coredb
     cp -rf ../obsrv coredb
     cp -rf ../services/{kafka,postgresql,redis-denorm,redis-dedup,kong,druid-operator} coredb/charts/
+
+    ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
+    if [ "$ssl_enabled" == "true" ]; then
+        cp -rf ../services/cert-manager coredb/charts/
+    fi
+
     helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 migrations)
     rm -rf migrations
     cp -rf ../obsrv migrations
-    cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs} migrations/charts/
-
-    ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
-    if [ "$ssl_enabled" == "true" ]; then
-        cp -rf ../services/cert-manager migrations/charts/
-    fi
+    cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
 
     if [ -z "$cloud_env" ]; then
         cp -rf ../services/minio migrations/charts/
@@ -72,7 +73,7 @@ obsrvapis)
     rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
     cp -rf ../services/{command-api,dataset-api,config-api} obsrvapis/charts/
-    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name
     ;;
 hudi)
     rm -rf hudi
@@ -86,6 +87,12 @@ otel)
     cp -rf ../services/opentelemetry-collector opentelemetry-collector/charts/
     helm $cmd opentelemetry-collector ./opentelemetry-collector -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
+oauth)
+    rm -rf oauth
+    cp -rf ../obsrv oauth
+    cp -rf ../services/keycloak oauth/charts/
+    helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    ;;
 
 obsrvtools)
     rm -rf obsrvtools
@@ -96,7 +103,7 @@ obsrvtools)
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
-    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,letsencrypt-ssl,velero,volume-autoscaler} additional/charts/
+    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
 
     # copy cloud specific helm charts
     case $cloud_env in
@@ -118,9 +125,11 @@ all)
     bash $0 coreinfra
     bash $0 obsrvapis
     bash $0 hudi
+    bash $0 otel
+    bash $0 oauth
     bash $0 obsrvtools
     bash $0 additional
-    bash $0 otel
+
     ;;
 reset)
     helm uninstall additional -n obsrv
@@ -131,8 +140,10 @@ reset)
     helm uninstall monitoring -n obsrv
     helm uninstall migrations -n obsrv
     helm uninstall coredb -n obsrv
-    helm uninstall obsrv-bootstrap -n obsrv
     helm uninstall opentelemetry-collector -n obsrv
+    helm uninstall oauth -n obsrv
+    helm uninstall obsrv-bootstrap -n obsrv
+
     ;;
 *)
     if [ ! -d "../services/$1" ]; then
@@ -145,4 +156,3 @@ reset)
     rm -rf ./$1-ind
     ;;
 esac
-

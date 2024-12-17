@@ -26,6 +26,13 @@ spec:
   {{- $value_domains := $value.domains | default (list) }}
   {{- $domains := $value_domains | default $global_domains }}
 
+  {{- $domainWithoutScheme := list }}
+  {{- range $domains }}
+    {{- $domainWithoutScheme = append $domainWithoutScheme (regexReplaceAll "(http|https)://" . "") }}
+  {{- end }}
+
+  {{- $domains = $domainWithoutScheme }}
+
   {{- if $.Values.global.ssl_enabled }}
   tls:
   - secretName: {{ default $.Values.cert_secret_name $value.cert_secret_name  }}
@@ -33,7 +40,12 @@ spec:
     {{- toYaml $domains | nindent 4}}
   {{- end }}
   rules:
+  {{- with $domain := index $domains 0 }}
+  - host: {{ $domain }}
+    http:
+  {{- else }}
   - http:
+  {{- end }}
       paths:
       {{- range $path := $value.paths }}
       - path: {{ $path.path }}
