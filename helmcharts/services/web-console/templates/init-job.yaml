@@ -16,19 +16,19 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get", "create"]
+    verbs: ["get", "create", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
-  name: grafana-token-job-rolebinding
+  name: {{ include "common.names.fullname" . }}-grafana-token-job-rolebinding
   namespace: {{ include "base.namespace" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: grafana-token-job-role
+  name: {{ include "common.names.fullname" . }}-grafana-token-job-role
 subjects:
   - kind: ServiceAccount
     name: {{ include "common.names.fullname" . }}-grafana-token-job-sa
@@ -36,7 +36,7 @@ subjects:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: create-webconsole-grafana-secret
+  name: {{ include "common.names.fullname" . }}-create-grafana-secret
   namespace: {{ include "base.namespace" . }}
   labels:
     app: grafana
@@ -48,7 +48,7 @@ spec:
     spec:
       serviceAccountName: {{ include "common.names.fullname" . }}-grafana-token-job-sa
       containers:
-        - name: create-token
+        - name: {{ include "common.names.fullname" . }}-create-token
           image: bitnami/kubectl:1.21
           command: ["/bin/sh"]
           args:
@@ -60,11 +60,15 @@ spec:
                   -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}")
               id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ .Values.namespace }}-sa") | .id')
 
-
               # curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
               #     -H 'Accept: application/json' \
               #     -H 'Content-type: application/json' \
               #     -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}"
+              # response=$(curl -Ssq "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/search" \
+              #     -H 'Accept: application/json' \
+              #     -H 'Content-type: application/json' \
+              #     -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}")
+              # id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ .Values.namespace }}-sa") | .id')
 
               # Check if the service account already exists or not
               if [ -z "$id" ]; then

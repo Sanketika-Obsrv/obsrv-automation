@@ -16,7 +16,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get", "create"]
+    verbs: ["get", "create", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -59,7 +59,11 @@ spec:
                   -H 'Content-type: application/json' \
                   -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}")
               id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ .Values.namespace }}-sa") | .id')
-
+              # response=$(curl -Ssq "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/search" \
+              #     -H 'Accept: application/json' \
+              #     -H 'Content-type: application/json' \
+              #     -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}")
+              # id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ .Values.namespace }}-sa") | .id')
 
               # curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
               #     -H 'Accept: application/json' \
