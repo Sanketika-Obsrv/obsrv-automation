@@ -258,21 +258,21 @@ CREATE TABLE IF NOT EXISTS "oauth_clients" (
 );
 
 INSERT INTO "public"."oauth_clients" ("id", "name", "client_id", "client_secret", "redirect_uri", "is_trusted", "created_on", "last_updated_on")
-VALUES ('1', 'Superset ', '{{ .Values.superset_oauth_clientid }}', '{{ .Values.superset_oauth_client_secret }}', 'https://{{ tpl .Values.kong_ingress_domain . }}/oauth-authorized/obsrv', 't', '2023-07-04 10:12:08.913786', NULL)
+VALUES ('1', 'Superset ', '{{ .Values.superset_oauth_clientid }}', '{{ .Values.superset_oauth_client_secret }}', 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ tpl .Values.kong_ingress_domain . }}/oauth-authorized/obsrv', 't', '2023-07-04 10:12:08.913786', NULL)
 ON CONFLICT(id) DO
   UPDATE SET
   client_id = '{{ .Values.superset_oauth_clientid }}',
   client_secret = '{{ .Values.superset_oauth_client_secret }}',
-  redirect_uri = 'https://{{ tpl .Values.kong_ingress_domain . }}/oauth-authorized/obsrv';
+  redirect_uri = 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ tpl .Values.kong_ingress_domain . }}/oauth-authorized/obsrv';
 
 
 INSERT INTO "public"."oauth_clients" ("id", "name", "client_id", "client_secret", "redirect_uri", "is_trusted", "created_on", "last_updated_on")
-VALUES ('2', 'Grafana', '{{ .Values.gf_auth_generic_oauth_client_id }}', '{{ .Values.gf_auth_generic_oauth_client_secret }}', 'https://{{ tpl .Values.kong_ingress_domain . }}/grafana/login/generic_oauth', 't', '2023-07-04 10:12:08.904986', NULL)
+VALUES ('2', 'Grafana', '{{ .Values.gf_auth_generic_oauth_client_id }}', '{{ .Values.gf_auth_generic_oauth_client_secret }}', 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ tpl .Values.kong_ingress_domain . }}/grafana/login/generic_oauth', 't', '2023-07-04 10:12:08.904986', NULL)
 ON CONFLICT(id) DO
   UPDATE SET
   client_id = '{{ .Values.gf_auth_generic_oauth_client_id }}',
   client_secret = '{{ .Values.gf_auth_generic_oauth_client_secret }}',
-  redirect_uri = 'https://{{ tpl .Values.kong_ingress_domain . }}/grafana/login/generic_oauth';
+  redirect_uri = 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ tpl .Values.kong_ingress_domain . }}/grafana/login/generic_oauth';
 
 CREATE TABLE IF NOT EXISTS "oauth_users" (
   id VARCHAR(255) PRIMARY KEY,

@@ -487,14 +487,14 @@ configOverrides:
            'access_token_headers':{
                'Authorization': 'Basic {{ .Values.oauth.auth_token }}'
            },
-           'api_base_url':'https://{{ .Values.global.domain }}',
-           'access_token_url':'https://{{ .Values.global.domain }}/console/api/oauth/v1/token',
+           'api_base_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}',
+           'access_token_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token',
            'authorize_url':'/console/api/oauth/v1/authorize'
         }
       }
     ]
     AUTH_USER_REGISTRATION = True
-    AUTH_OAUTH_REDIRECT_URI='https://{{ .Values.global.domain }}/oauth-authorized/obsrv'
+    AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
     ENABLE_PROXY_FIX = True
 
