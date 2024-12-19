@@ -52,7 +52,7 @@ migrations)
 
     if [ -z "$cloud_env" ]; then
         cp -rf ../services/minio migrations/charts/
-    fi  
+    fi
 
     helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
@@ -88,10 +88,14 @@ otel)
     helm $cmd opentelemetry-collector ./opentelemetry-collector -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 oauth)
-    rm -rf oauth
-    cp -rf ../obsrv oauth
-    cp -rf ../services/keycloak oauth/charts/
-    helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    if [ -z "$cloud_env" ]; then
+        echo "oauth not yet supported for local datacenter"
+    else
+        rm -rf oauth
+        cp -rf ../obsrv oauth
+        cp -rf ../services/keycloak oauth/charts/
+        helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    fi
     ;;
 
 obsrvtools)
