@@ -688,3 +688,12 @@ opentelemetry-collector:
     requests:
       cpu: 250m
       memory: 512Mi
+
+keycloak:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 750Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi      

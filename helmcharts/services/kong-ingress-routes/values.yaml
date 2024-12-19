@@ -44,3 +44,14 @@ ingress:
     service_port: 80
     paths:
       - path: "/grafana"
+  keycloak:
+    enabled: true
+    name: keycloak
+    namespace: keycloak
+    path_type: "ImplementationSpecific"
+    service_name: "keycloak"
+    domains: []
+    annotations: {}
+    service_port: 80
+    paths:
+      - path: "/"

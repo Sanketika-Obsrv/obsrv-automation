@@ -299,3 +299,19 @@ resource "aws_iam_role" "redis_backup_sa_iam_role" {
     local.common_tags,
   var.additional_tags)
 }
+
+resource "aws_iam_role" "velero_backup_sa_iam_role" {
+  name                = "${var.env}-${var.building_block}-${var.velero_backup_sa_iam_role_name}"
+  assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.velero_namespace}", SA_NAME = "${var.velero_namespace}-backup-sa" })
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+  depends_on          = [aws_iam_openid_connect_provider.eks_openid]
+  tags = merge(
+    {
+      Name = "${var.env}-${var.velero_backup_sa_iam_role_name}"
+    },
+    local.common_tags,
+  var.additional_tags)
+}
+
+
+
