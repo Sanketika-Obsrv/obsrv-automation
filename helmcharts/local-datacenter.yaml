@@ -188,6 +188,7 @@ system-rules-ingestor:
   <<: *service-account-disable
 
 flink:
+  s3_auth_type: "credentials"
   serviceMonitor:
     enabled: true
   s3_auth_type: ""
