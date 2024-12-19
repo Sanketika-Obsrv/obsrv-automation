@@ -97,7 +97,6 @@ oauth)
         helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     fi
     ;;
-
 obsrvtools)
     rm -rf obsrvtools
     cp -rf ../obsrv obsrvtools
@@ -129,7 +128,7 @@ all)
     bash $0 coreinfra
     bash $0 obsrvapis
     bash $0 hudi
-    bash $0 otel
+    # bash $0 otel
     bash $0 oauth
     bash $0 obsrvtools
     bash $0 additional
@@ -138,6 +137,8 @@ all)
 reset)
     helm uninstall additional -n obsrv
     helm uninstall obsrvtools -n obsrv
+    helm uninstall oauth -n obsrv
+    helm uninstall otel -n obsrv
     helm uninstall hudi -n obsrv
     helm uninstall obsrvapis -n obsrv
     helm uninstall coreinfra -n obsrv
