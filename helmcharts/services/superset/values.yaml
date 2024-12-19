@@ -458,7 +458,7 @@ configOverrides:
   sql_alchemy_config: |
     SQLALCHEMY_DATABASE_URI = 'postgresql://{{ tpl .Values.postgresql.db_username . }}:{{ tpl .Values.postgresql.db_password . }}@{{ tpl .Values.global.postgresql.host . }}:{{ tpl (.Values.global.postgresql.port | toString) . }}/{{ tpl .Values.postgresql.db_name . }}'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SECRET_KEY = 'thisISaSECRET_1234'
+    SECRET_KEY = 'xCHEuo3xQNLdqgvM7GAR4Gf9kjyQzFzIrGi1maZdb0xibHu47o5hIyAX'
 
   # map_box_key: |
   #  MAPBOX_API_KEY=''

@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 apache/superset:3.0.2
+FROM apache/superset:4.1.1
 USER root
-RUN pip install Authlib
+RUN pip install Authlib psycopg2-binary
 USER superset

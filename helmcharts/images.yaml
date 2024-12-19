@@ -21,7 +21,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.3.0-RC"
+    tag: "1.3.1-RC"
     digest: ""
 
   # dataset-api: #open source
@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.3.0-RC"
+    tag: "1.3.1-RC"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -227,7 +227,7 @@ images: &images
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
   superset: &superset # registry: ""
-    repository: "apache/superset"
+    repository: "sanketikahub/superset"
     tag: "4.1.1"
     digest: ""
 
@@ -546,18 +546,18 @@ internal: &internal
   lakehouse-connector:
     image:
       <<: *lakehouse-connector
-      
+
   minio:
     image:
       <<: *minio
-      
+
   opentelemetry-collector:
     image:
     <<: *opentelemetry-collector
 
   opentelemetry-collector:
     <<: *opentelemetry-collector
-    imagePullSecrets: *imagePullSecrets    
+    imagePullSecrets: *imagePullSecrets
 
 
 ## Sourcing internal as root element,
