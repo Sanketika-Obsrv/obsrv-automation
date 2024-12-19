@@ -259,6 +259,11 @@ kong:
   livenessProbe: ### For Dev Only
   readinessProbe: ### For Dev Only
 
+kong-ingress-routes:
+  ingress:
+    keycloak:
+      enabled: *ssl_enabled
+
 lakehouse-connector:
   enable_lakehouse: *enable_lakehouse
   namespace: flink
