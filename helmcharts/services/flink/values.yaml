@@ -92,7 +92,7 @@ configmap:
   mountPath: /config
 
 serviceAccount:
-  create: true
+  create: false
   name: ""
 
 # Example values.yaml structure
@@ -352,7 +352,7 @@ baseconfig: |
     host = "{{ .Values.global.cassandra.host }}"
     port = "{{ .Values.global.cassandra.port }}"
   }
-  
+
   otel.collector.endpoint="http://opentelemetry-collector.otel.svc.cluster.local:4317"
   otel.enable = true
 
@@ -384,7 +384,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: org.sunbird.obsrv.pipeline.task.UnifiedPipelineStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
@@ -446,7 +446,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: in.sanketika.obsrv.transformer.task.TransformerStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
@@ -487,7 +487,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: in.sanketika.obsrv.pipeline.task.MasterDataProcessorStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
@@ -552,7 +552,7 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: org.sunbird.obsrv.streaming.CacheIndexerStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
