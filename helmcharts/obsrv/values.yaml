@@ -369,6 +369,20 @@ postgresql-migration:
     dedup_period: 604800 # In seconds (7 days)
 
 loki:
+  nameOverride: loki
+  fullnameOverride: loki
+  deploymentMode: SingleBinary
+  singleBinary:
+    resources:
+      limits:
+        cpu: 0.5
+        memory: 512Mi
+      requests:
+        cpu: 0.5
+        memory: 128Mi
+    replicas: 1
+    persistence:
+      size: 5Gi
   minio:
     enabled: false
   loki:
@@ -381,38 +395,28 @@ loki:
     storage:
       type: "filesystem"
     compactor:
-      shared_store: filesystem
-      working_directory: /var/loki/boltdb-shipper-compactor
+      working_directory: /var/loki/compactor
       compaction_interval: 10m
       retention_enabled: true
+      delete_request_store: filesystem
       retention_delete_delay: 1h
       retention_delete_worker_count: 150
-    limits_config:
-      enforce_metric_name: false
-      reject_old_samples: true
-      reject_old_samples_max_age: "168h"
-      max_cache_freshness_per_query: "10m"
-      split_queries_by_interval: "15m"
-      retention_period: 2d
     storage_config:
-      boltdb_shipper:
-        active_index_directory: /var/loki/boltdb-shipper-active
-        cache_location: /var/loki/boltdb-shipper-cache
+      tsdb_shipper:  # Changed from boltdb_shipper to tsdb_shipper
+        active_index_directory: /var/loki/tsdb-index
+        cache_location: /var/loki/tsdb-cache
         cache_ttl: 24h
-        shared_store: filesystem
       filesystem:
         directory: /var/loki/chunks
-  singleBinary:
-    resources:
-      limits:
-        cpu: 0.5
-        memory: 1024Mi
-      requests:
-        cpu: 0.5
-        memory: 128Mi
-    replicas: 1
-    persistence:
-      size: 25Gi
+    schemaConfig: # required for TSDB
+      configs:
+        - from: "2023-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
   test:
     enabled: false
   monitoring:
@@ -430,6 +434,9 @@ loki:
     serviceMonitor:
       metricsInstance:
         enabled: false
+  sidecar:
+    rules:
+      enabled: false
   read:
     replicas: 1
     #   resources:
@@ -449,92 +456,6 @@ loki:
     #       cpu: 256m
     #       memory: 512Mi
 
-# loki:
-#   namespace: loki
-#   loki:
-#     auth_enabled: false
-#     podLabels:
-#       system.monitoring: "true"
-#     commonConfig:
-#       replication_factor: 1
-#     limits_config:
-#       enforce_metric_name: false
-#       reject_old_samples: true
-#       reject_old_samples_max_age: true
-#       max_cache_freshness_per_query: 168h
-#       split_queries_by_interval: 15m
-#       retention_period: 48h
-#   compactor:
-#     retention_enabled: true
-#     working_directory: /var/loki/compactor/retention
-#   test:
-#     enabled: false
-#   minio:
-#     enabled: true
-#     resources:
-#       limits:
-#         cpu: 0.1
-#         memory: 256Mi
-#       requests:
-#         cpu: 0.1
-#         memory: 128Mi
-#     metrics:
-#       serviceMonitor:
-#         enabled: tue
-#         includeNode: true
-#         additionalLabels:
-#           release: monitoring
-#           system.monitoring: "true"
-#   monitoring:
-#     dashboards:
-#       namespace: monitoring
-#     selfMonitoring:
-#       enabled: false
-#     lokiCanary:
-#       enabled: false
-#       resources:
-#       limits:
-#         cpu: 0.1
-#         memory: 256Mi
-#       requests:
-#         cpu: 0.1
-#         memory: 128Mi
-#     serviceMonitor:
-#       labels:
-#         release: monitoring
-#         system.monitoring: "true"
-#   gateway:
-#     resources:
-#       limits:
-#         cpu: 0.1
-#         memory: 256Mi
-#       requests:
-#         cpu: 0.1
-#         memory: 128Mi
-#   read:
-#     affinity: {}
-#     podLabels:
-#       system.monitoring: "true"
-#     replicas: 1
-#     resources:
-#       limits:
-#         cpu: 0.1
-#         memory: 256Mi
-#       requests:
-#         cpu: 0.1
-#         memory: 128Mi
-#   write:
-#     affinity: {}
-#     podLabels:
-#       system.monitoring: "true"
-#     replicas: 1
-#     resources:
-#       limits:
-#         cpu: 0.1
-#         memory: 256Mi
-#       requests:
-#         cpu: 0.1
-#         memory: 128Mi
 
 kube-prometheus-stack:
   # fullnameOverride: kube-prometheus-stack
