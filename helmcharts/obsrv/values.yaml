@@ -372,6 +372,13 @@ loki:
   nameOverride: loki
   fullnameOverride: loki
   deploymentMode: SingleBinary
+  common:
+    ring:
+      instance_addr: 127.0.0.1
+      kvstore:
+        store: inmemory
+    replication_factor: 1
+    path_prefix: /tmp/loki
   singleBinary:
     resources:
       limits:
@@ -437,6 +444,10 @@ loki:
   sidecar:
     rules:
       enabled: false
+  resultsCache:
+    enabled: false
+  chunksCache:
+    enabled: false
   read:
     replicas: 1
     #   resources:
