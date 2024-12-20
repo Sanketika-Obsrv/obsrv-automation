@@ -84,7 +84,7 @@ defaults:
   
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
 
-  user_token_keycloak_public_key: &user_token_keycloak_public_key "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7I2wYeaG/bIvCwuB/DE04/8U5CspE5h/1R4Uscb4tqPYT7+oG93y/RzUKSjbm1kWILyD8QwnNFjYqQ3Ls/Bm9cksA7Fo1hpaNkuYzo5AN3tG3n6LD/IdYuoWtfgM6VXwfkpjqRu6ST+pXN3nED6xRXsSXgktlzyNPBWKDxRPQRM72hYPprODfWvJBfFP5sC8sZL/jWepI2c0gIsWH1T9JPFz/aVKBml/1z2JdSwUCXwID1Zq4joaXX/uB8zUTVImAQo79x4AE2sGOY+hZ/DFy8ULRaQjA1BpbWLdfxGDe+01ZLPPyyfu66MXOcCl1+ZMKHoaJdQ9+Ughl9dvAr3sRQIDAQAB\n-----END PUBLIC KEY-----\n"
+  user_token_public_key: &user_token_public_key "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7I2wYeaG/bIvCwuB/DE04/8U5CspE5h/1R4Uscb4tqPYT7+oG93y/RzUKSjbm1kWILyD8QwnNFjYqQ3Ls/Bm9cksA7Fo1hpaNkuYzo5AN3tG3n6LD/IdYuoWtfgM6VXwfkpjqRu6ST+pXN3nED6xRXsSXgktlzyNPBWKDxRPQRM72hYPprODfWvJBfFP5sC8sZL/jWepI2c0gIsWH1T9JPFz/aVKBml/1z2JdSwUCXwID1Zq4joaXX/uB8zUTVImAQo79x4AE2sGOY+hZ/DFy8ULRaQjA1BpbWLdfxGDe+01ZLPPyyfu66MXOcCl1+ZMKHoaJdQ9+Ughl9dvAr3sRQIDAQAB\n-----END PUBLIC KEY-----\n"
 
   user_token_private_key: &user_token_private_key |-
     -----BEGIN RSA PRIVATE KEY-----
@@ -420,7 +420,7 @@ dataset-api: &dataset-api
     GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
     otel_collector_endpoint: *otel_collector_endpoint
-    user_token_keycloak_public_key: *user_token_keycloak_public_key
+    user_token_public_key: *user_token_public_key
     is_RBAC_enabled: "false"
     keycloak_audience: ""
     otel_enable: *otel_enable
@@ -453,7 +453,7 @@ web-console:
     GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
     KEYCLOAK_SERVER_URL: *keycloak-domain
-    user_token_private_key:  *user_token_private_key
+    USER_TOKEN_PRIVATE_KEY:  *user_token_private_key
 
 
 #additional-charts/

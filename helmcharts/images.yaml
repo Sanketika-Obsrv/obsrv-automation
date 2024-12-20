@@ -223,7 +223,7 @@ images: &images
   velero: &velero
     registry: "docker.io"
     repository: "velero/velero"
-    tag: "v1.10.2"
+    tag: "v1.15.0"
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
   superset: &superset # registry: ""

@@ -5,12 +5,10 @@ kind: Schedule
 metadata:
   name: {{ include "velero.fullname" $ }}-{{ $scheduleName }}
   namespace: {{ (include "base.namespace" $) }}
-  annotations:
   {{- if $schedule.annotations }}
+  annotations:
     {{- toYaml $schedule.annotations | nindent 4 }}
   {{- end }}
-    "helm.sh/hook": post-install,post-upgrade,post-rollback
-    "helm.sh/hook-delete-policy": before-hook-creation
   labels:
     app.kubernetes.io/name: {{ include "velero.name" $ }}
     app.kubernetes.io/instance: {{ $.Release.Name }}
@@ -20,6 +18,9 @@ metadata:
       {{- toYaml $schedule.labels | nindent 4 }}
     {{- end }}
 spec:
+{{- if $schedule.paused }}
+  paused: {{ $schedule.paused }}
+{{- end }}
 {{- if $schedule.useOwnerReferencesInBackup }}
   useOwnerReferencesInBackup: {{ $schedule.useOwnerReferencesInBackup }}
 {{- end }}

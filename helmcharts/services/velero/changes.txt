@@ -1,1 +1,0 @@
-1. Some of the common varaible values are updated in the values.yaml which are command to all clouds.

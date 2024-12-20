@@ -1,5 +1,4 @@
 {{- if .Values.deployNodeAgent }}
-{{- $provider := .Values.configuration.provider -}}
 {{/* 'nodeAgent.securityContext' got renamed to 'nodeAgent.containerSecurityContext', merge both dicts into one for backward compatibility */}}
 {{- $containerSecurityContext := merge (.Values.nodeAgent.containerSecurityContext | default dict) (.Values.nodeAgent.securityContext | default dict) -}}
 apiVersion: apps/v1
@@ -34,10 +33,20 @@ spec:
       {{- if .Values.podLabels }}
         {{- toYaml .Values.podLabels | nindent 8 }}
       {{- end }}
-      {{- with .Values.podAnnotations }}
+    {{- if or .Values.podAnnotations .Values.metrics.enabled (and .Values.credentials.useSecret (not .Values.credentials.existingSecret)) }}
       annotations:
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if and (.Values.metrics.enabled) (not .Values.metrics.nodeAgentPodMonitor.enabled) }}
+        {{- with .Values.metrics.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- if and .Values.credentials.useSecret (not .Values.credentials.existingSecret) }}
+        checksum/secret: {{ template "chart.config-checksum" . }}
+      {{- end }}
+    {{- end }}
     spec:
     {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
@@ -74,9 +83,9 @@ spec:
       containers:
         - name: node-agent
         {{- if .Values.image.digest }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
         {{- else }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.metrics.enabled }}
@@ -99,6 +108,9 @@ spec:
             {{- with .logFormat }}
             - --log-format={{ . }}
             {{- end }}
+          {{- end }}
+          {{- with .Values.nodeAgent.extraArgs }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
             {{- if .Values.credentials.useSecret }}
@@ -132,24 +144,19 @@ spec:
             - name: VELERO_SCRATCH_DIR
               value: /scratch
           {{- if .Values.credentials.useSecret }}
-            {{- if eq $provider "aws" }}
             - name: AWS_SHARED_CREDENTIALS_FILE
               value: /credentials/cloud
-            {{- else if eq $provider "gcp" }}
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /credentials/cloud
-            {{- else if eq $provider "azure" }}
             - name: AZURE_CREDENTIALS_FILE
               value: /credentials/cloud
-            {{- else if eq $provider "alibabacloud" }}
             - name: ALIBABA_CLOUD_CREDENTIALS_FILE
               value: /credentials/cloud
-            {{- end }}
           {{- end }}
           {{- with .Values.configuration.extraEnvVars }}
           {{- range $key, $value := . }}
             - name: {{ default "none" $key }}
-              value: {{ default "none" $value | quote }}
+              value: {{ tpl (default "none" $value) $ | quote }}
           {{- end }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
@@ -171,7 +178,6 @@ spec:
           lifecycle: {{ toYaml .Values.nodeAgent.lifecycle | nindent 12 }}
           {{- end }}
           securityContext:
-            privileged: {{ .Values.nodeAgent.privileged }}
             {{- with $containerSecurityContext }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -195,4 +201,8 @@ spec:
     dnsConfig:
       {{- toYaml . | nindent 8 }}
     {{- end }}
+  {{- with .Values.nodeAgent.updateStrategy }}
+  updateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
