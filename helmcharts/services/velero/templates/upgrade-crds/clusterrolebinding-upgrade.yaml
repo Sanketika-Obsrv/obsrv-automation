@@ -15,7 +15,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 subjects:
   - kind: ServiceAccount
-    namespace: {{ .Release.Namespace }}
+    namespace: {{ (include "base.namespace" $) }}
     name: {{ include "velero.serverServiceAccount" . }}-upgrade-crds
 roleRef:
   kind: ClusterRole

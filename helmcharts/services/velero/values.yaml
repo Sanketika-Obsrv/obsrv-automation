@@ -231,6 +231,7 @@ metrics:
 
   serviceMonitor:
     enabled: true
+    autodetect: true
     additionalLabels:
       release: monitoring
 
