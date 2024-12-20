@@ -609,10 +609,10 @@ velero:
   resources:
     limits:
       cpu: 0.1
-      memory: 256Mi
+      memory: 1024Mi
     requests:
       cpu: 0.1
-      memory: 128Mi
+      memory: 500Mi
   nodeAgent:
     resources:
       requests:
@@ -692,7 +692,7 @@ opentelemetry-collector:
 keycloak:
   resources:
     limits:
-      cpu: 500m
+      cpu: 750m
       memory: 750Mi
     requests:
       cpu: 250m

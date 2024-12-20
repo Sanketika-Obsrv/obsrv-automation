@@ -53,9 +53,8 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   velero: &velero_sa_annotation 
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-   
 
-
+ 
 redis-service-account: &redis-service-account
   serviceAccount:
     create: *create_sa
@@ -147,26 +146,29 @@ velero-backup: &velero-backup
       create: *create_sa
       name: velero-backup-sa
       annotations:
-        eks.amazonaws.com/role-arn: *velero_sa_annotation
+        <<: *velero_sa_annotation 
       labels:
   credentials:
     useSecret: false
   configuration:
-    provider: *cloud_storage_provider
     backupStorageLocation:
+    - name:
+      provider: *cloud_storage_provider
       bucket: *velero_backup_cloud_bucket
       config:
         region: *cloud_storage_region
     volumeSnapshotLocation:
-      name: default
-      config:
-        region: *cloud_storage_region
+      - name:
+        provider: *cloud_storage_provider
+        config:
+          region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-aws
       image: velero/velero-plugin-for-aws
       volumeMounts:
         - name: plugins
           mountPath: /target
+
 
 spark:
   persistence:
