@@ -39,12 +39,24 @@ service-account-disable: &service-account-disable
     enabled: false
     create: false
 
-loki:
-  storage:
-    type: *storage_class
-  compactor:
-    retention_enabled: true
-    working_directory: /var/loki/compactor/retention
+### Enable to Write to MinIO: WIP
+# loki:
+#   loki:
+#     storage:
+#       type: s3
+#       bucketNames:
+#         chunks: "loki-logs"
+#         ruler: "loki-logs"
+#         admin: "loki-logs"
+#       s3:
+#         endpoint: *s3-endpoint-url
+#         region: *s3-signing-region
+#         secretAccessKey: *s3-secret-access-key
+#         accessKeyId: *s3-access-key
+#         s3ForcePathStyle: true
+#         insecure: true
+#     compactor:
+#       delete_request_store: *cloud_store_provider
 
 druid-raw-cluster:
   <<: *service-account-disable
