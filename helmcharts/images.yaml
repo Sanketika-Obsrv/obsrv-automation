@@ -118,6 +118,11 @@ images: &images
     pullSecrets:
       - *dockerSecretName
 
+  redis-exporter: &redis-exporter
+    repository: oliver006/redis_exporter
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "v1.66.0"
   # submit-ingestion: &submit-ingestion
   #   registry: "docker.io"
   #   repository: "ubuntu"
@@ -404,6 +409,11 @@ internal: &internal
   redis-denorm:
     image:
       <<: *redis
+
+  redis-exporter: 
+     image:
+       <<: *redis-exporter    
+
 
   loki:
     singleBinary:

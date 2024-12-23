@@ -292,6 +292,12 @@ redis-dedup: &redis_dedup
   host: &redis-url redis-dedup-headless.redis.svc.cluster.local
   port: 6379
 
+redis-exporter:
+  namespace: *redis-namespace
+  fullnameOverride: redis-exporter
+  
+
+
 flink: &flink
   namespace: *flink_namespace
   host: "flink-headless.flink.svc.cluster.local"

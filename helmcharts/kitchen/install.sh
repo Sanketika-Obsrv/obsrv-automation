@@ -103,7 +103,7 @@ obsrvtools)
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
-    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
+    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,redis-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
 
     # copy cloud specific helm charts
     case $cloud_env in
