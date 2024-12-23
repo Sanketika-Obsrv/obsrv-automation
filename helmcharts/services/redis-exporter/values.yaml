@@ -67,7 +67,7 @@ extraManifests: []
   #     extra-data: "value"
 
 # If serviceMonitor.multipleTarget is enabled, this configuration is actually not used
-redisAddress: redis://redis-dedup-headless.redis.svc.cluster.local
+redisAddress: 
 
 # deployment additional annotations and labels
 annotations: {}
@@ -126,11 +126,7 @@ serviceMonitor:
   telemetryPath: /metrics
   labels:
     release: monitoring
-  targets:
-    - url: redis://redis-denorm-headless.redis.svc.cluster.local
-      name: denorm-redis
-    - url: redis://redis-dedup-headless.redis.svc.cluster.local
-      name: dedup-redis 
+  targets: [] 
       # additionalRelabeling:
       #   - sourceLabels: [type]
       #     targetLabel: type
