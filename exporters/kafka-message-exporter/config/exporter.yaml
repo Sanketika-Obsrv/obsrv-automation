@@ -1,6 +1,6 @@
 - name: spark-stats
   enabled: false
-  topic: dev.stats
+  topic: stats
   prefixPath: actor.id
   prefix: ''
 - name: wfs

@@ -56,12 +56,12 @@ defaults:
     grafana_url: &grafana-url "http://grafana.monitoring.svc.cluster.local"
 
   kafka-topics:
-    ingestTopic: &ingestTopic "dev.ingest"
-    system_stats_topic: &system_stats_topic "dev.stats"
-    masterdata_system_stats_topic: &masterdata_system_stats_topic "dev.masterdata.stats"
-    masterdataIngestTopic: &masterdataIngestTopic "dev.masterdata.ingest"
+    ingestTopic: &ingestTopic "ingest"
+    system_stats_topic: &system_stats_topic "stats"
+    masterdata_system_stats_topic: &masterdata_system_stats_topic "masterdata.stats"
+    masterdataIngestTopic: &masterdataIngestTopic "masterdata.ingest"
     telemetryEventsTopic: &telemetryEventsTopic "system.telemetry.events"
-    hudiConnectorTopic: &hudiConnectorTopic "dev.hudi.connector.in"
+    hudiConnectorTopic: &hudiConnectorTopic "hudi.connector.in"
     connectorsMetricTopic: &connectorsMetricTopic "obsrv-connectors-metrics"
     connectorsFailedTopic: &connectorsFailedTopic "connectors.failed"
 
