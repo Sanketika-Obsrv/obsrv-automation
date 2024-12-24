@@ -182,6 +182,11 @@ images: &images
     tag: v2.44.0
     digest: ""
 
+  prometheus-pushgateway: &prometheus-pushgateway 
+    repository: quay.io/prometheus/pushgateway
+    tag: v1.10.0
+    digest: ""
+
   grafana: &grafana
     registry: docker.io
     repository: grafana/grafana
@@ -350,7 +355,8 @@ images: &images
 
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.3.0-RC
+    tag: 1.3.2-hudi-metrics
+
 
   opentelemetry-collector: &opentelemetry-collector
     repository: otel/opentelemetry-collector-contrib
@@ -467,6 +473,10 @@ internal: &internal
   prometheus-node-exporter:
     image:
       <<: *prometheus-node-exporter
+
+  prometheus-pushgateway: 
+    image:
+      <<: *prometheus-pushgateway
 
   keycloak:
     image:

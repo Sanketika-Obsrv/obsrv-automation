@@ -636,7 +636,21 @@ kube-prometheus-stack:
               - source_labels: [__param_target]
                 target_label: instance
               - target_label: __address__
-                replacement: redis-exporter.redis.svc.cluster.local:9121  
+                replacement: redis-exporter.redis.svc.cluster.local:9121 
+                
+        - job_name: 'pushgateway'
+          static_configs:
+            - targets: ['monitoring-prometheus-pushgateway.monitoring.svc.cluster.local:9091']
+          metrics_path: /metrics
+          honor_labels: true
+          relabel_configs:
+              - source_labels: [__address__]
+                target_label: __param_target
+              - source_labels: [__param_target]
+                target_label: instance
+              - target_label: __address__
+                replacement: monitoring-prometheus-pushgateway.monitoring.svc.cluster.local:9091 
+               
 
 
   kube-state-metrics:
