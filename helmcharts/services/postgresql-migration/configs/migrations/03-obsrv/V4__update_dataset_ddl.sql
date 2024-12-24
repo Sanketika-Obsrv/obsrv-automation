@@ -17,13 +17,13 @@ ALTER TABLE datasets_draft
   ADD COLUMN transformations_config JSON default '{}',
   ADD COLUMN connectors_config JSON default '{}',
   ADD COLUMN sample_data JSON default '{}',
-  ADD COLUMN entry_topic TEXT NOT NULL default '{{ .Values.global.env }}.ingest';
+  ADD COLUMN entry_topic TEXT NOT NULL default 'ingest';
 
 ALTER TABLE datasets
   ADD COLUMN api_version VARCHAR(255) NOT NULL default 'v1',
   ADD COLUMN version INTEGER NOT NULL default 1,
   ADD COLUMN sample_data JSON default '{}',
-  ADD COLUMN entry_topic TEXT NOT NULL default '{{ .Values.global.env }}.ingest';
+  ADD COLUMN entry_topic TEXT NOT NULL default 'ingest';
 
 UPDATE datasets_draft SET status = 'ReadyToPublish' WHERE status = 'Publish';
 UPDATE datasets_draft SET type = 'event' WHERE type = 'dataset';
