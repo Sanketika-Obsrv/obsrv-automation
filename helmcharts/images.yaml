@@ -185,8 +185,8 @@ images: &images
   prometheus-pushgateway: &prometheus-pushgateway 
     repository: quay.io/prometheus/pushgateway
     tag: v1.10.0
-    digest: ""
-
+    digest: "" 
+    
   grafana: &grafana
     registry: docker.io
     repository: grafana/grafana
