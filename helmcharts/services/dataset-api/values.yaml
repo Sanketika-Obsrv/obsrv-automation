@@ -178,5 +178,3 @@ env:
   masterdata_processor_job_manager_url: "http://master-data-processor-ext-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   prometheus_url: "{{ .Values.global.prometheus.url }}"
   default_task_duration: "PT4H"
-  user_token_public_key: |-
-    {{ .Values.global.user_token_public_key }}
