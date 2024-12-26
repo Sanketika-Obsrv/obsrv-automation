@@ -22,9 +22,9 @@ esac
 cp -rf ../{global-values.yaml,global-resource-values.yaml,images.yaml} ./
 
 if [ "$2" == "template" ]; then
-    cmd="template"
+    cmd="template ${@: 3}"
 else
-    cmd="upgrade -i "
+    cmd="upgrade -i ${@: 2}"
 fi
 
 case "$1" in
@@ -121,17 +121,17 @@ additional)
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 all)
-    bash $0 bootstrap
-    bash $0 coredb
-    bash $0 migrations
-    bash $0 monitoring
-    bash $0 coreinfra
-    bash $0 obsrvapis
-    bash $0 hudi
-    # bash $0 otel
-    bash $0 oauth
-    bash $0 obsrvtools
-    bash $0 additional
+    bash $0 bootstrap ${@: 2}
+    bash $0 coredb ${@: 2}
+    bash $0 migrations ${@: 2}
+    bash $0 monitoring ${@: 2}
+    bash $0 coreinfra ${@: 2}
+    bash $0 obsrvapis ${@: 2}
+    bash $0 hudi ${@: 2}
+    # bash $0 otel ${@: 2}
+    bash $0 oauth ${@: 2}
+    bash $0 obsrvtools ${@: 2}
+    bash $0 additional ${@: 2}
 
     ;;
 reset)
