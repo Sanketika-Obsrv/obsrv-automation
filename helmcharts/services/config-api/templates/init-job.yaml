@@ -49,7 +49,7 @@ spec:
       serviceAccountName: {{ include "common.names.fullname" . }}-grafana-token-job-sa
       containers:
         - name: {{ include "common.names.fullname" . }}-create-token
-          image: bitnami/kubectl:latest
+          image: sanketikahub/kubectl:1.32.0-r0
           command: ["/bin/sh"]
           args:
             - -c
