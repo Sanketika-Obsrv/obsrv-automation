@@ -84,7 +84,7 @@ defaults:
 
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
 
-  user_token_public_key: &user_token_public_key |+
+  user_token_public_key: &user_token_public_key |
     -----BEGIN PUBLIC KEY-----
     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7I2wYeaG/bIvCwuB/DE0
     4/8U5CspE5h/1R4Uscb4tqPYT7+oG93y/RzUKSjbm1kWILyD8QwnNFjYqQ3Ls/Bm
@@ -95,7 +95,7 @@ defaults:
     RQIDAQAB
     -----END PUBLIC KEY-----
 
-  user_token_private_key: &user_token_private_key |-
+  user_token_private_key: &user_token_private_key |
     -----BEGIN RSA PRIVATE KEY-----
     MIIEowIBAAKCAQEA7I2wYeaG/bIvCwuB/DE04/8U5CspE5h/1R4Uscb4tqPYT7+o
     G93y/RzUKSjbm1kWILyD8QwnNFjYqQ3Ls/Bm9cksA7Fo1hpaNkuYzo5AN3tG3n6L
@@ -123,9 +123,6 @@ defaults:
     zVgxIqWDZMtAGtQdZ4C+eeXHle9WWTLEVB144M5puRnAKD0kByGNtPs2NztvZzh0
     qAS+vHjbBdrtZDa0nNsBgP5aS8NAn7n6FMsQVipPqrKoLyxN43ad
     -----END RSA PRIVATE KEY-----
-
-
-
 
 #coredb-charts/
 kafka: &kafka
