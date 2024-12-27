@@ -199,5 +199,4 @@ env:
   KEYCLOAK_CLIENT_ID: "webConsole"
   KEYCLOAK_PUBLIC_CLIENT: "true"
   KEYCLOAK_SSL_REQUIRED: "external"
-  USER_TOKEN_PRIVATE_KEY: "{{ .Values.global.user_token_private_key | quote }}"
 
