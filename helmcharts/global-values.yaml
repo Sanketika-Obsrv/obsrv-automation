@@ -56,12 +56,12 @@ defaults:
     grafana_url: &grafana-url "http://grafana.monitoring.svc.cluster.local"
 
   kafka-topics:
-    ingestTopic: &ingestTopic "dev.ingest"
-    system_stats_topic: &system_stats_topic "dev.stats"
-    masterdata_system_stats_topic: &masterdata_system_stats_topic "dev.masterdata.stats"
-    masterdataIngestTopic: &masterdataIngestTopic "dev.masterdata.ingest"
+    ingestTopic: &ingestTopic "ingest"
+    system_stats_topic: &system_stats_topic "stats"
+    masterdata_system_stats_topic: &masterdata_system_stats_topic "masterdata.stats"
+    masterdataIngestTopic: &masterdataIngestTopic "masterdata.ingest"
     telemetryEventsTopic: &telemetryEventsTopic "system.telemetry.events"
-    hudiConnectorTopic: &hudiConnectorTopic "dev.hudi.connector.in"
+    hudiConnectorTopic: &hudiConnectorTopic "hudi.connector.in"
     connectorsMetricTopic: &connectorsMetricTopic "obsrv-connectors-metrics"
     connectorsFailedTopic: &connectorsFailedTopic "connectors.failed"
 
@@ -81,7 +81,6 @@ defaults:
   redirection_auth_path: &redirection_auth_path ""
   domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
   keycloak_domain: &keycloak-domain "https://keycloak.<fill-value>.sslip.io" # Update with the Allocation ID of the Elastic IP
-  
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
 
   user_token_public_key: &user_token_public_key "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7I2wYeaG/bIvCwuB/DE04/8U5CspE5h/1R4Uscb4tqPYT7+oG93y/RzUKSjbm1kWILyD8QwnNFjYqQ3Ls/Bm9cksA7Fo1hpaNkuYzo5AN3tG3n6LD/IdYuoWtfgM6VXwfkpjqRu6ST+pXN3nED6xRXsSXgktlzyNPBWKDxRPQRM72hYPprODfWvJBfFP5sC8sZL/jWepI2c0gIsWH1T9JPFz/aVKBml/1z2JdSwUCXwID1Zq4joaXX/uB8zUTVImAQo79x4AE2sGOY+hZ/DFy8ULRaQjA1BpbWLdfxGDe+01ZLPPyyfu66MXOcCl1+ZMKHoaJdQ9+Ughl9dvAr3sRQIDAQAB\n-----END PUBLIC KEY-----\n"
@@ -302,8 +301,8 @@ redis-exporter:
       - url: redis://redis-denorm-headless.redis.svc.cluster.local
         name: denorm-redis
       - url: redis://redis-dedup-headless.redis.svc.cluster.local
-        name: dedup-redis 
-  
+        name: dedup-redis
+
 flink: &flink
   namespace: *flink_namespace
   host: "flink-headless.flink.svc.cluster.local"
@@ -399,7 +398,7 @@ postgresql-exporter:
 
 prometheus-pushgateway:
   namespace: *monitoring-namespace
-    
+
 
 
 spark: &spark
@@ -433,10 +432,7 @@ dataset-api: &dataset-api
   namespace: *dataset-api-namespace
   host: *dataset-service-url
   env:
-    GRAFANA_AUTH_TOKEN: *grafana-auth-token
-    GRAFANA_ADMIN_URL: *grafana-url
     otel_collector_endpoint: *otel_collector_endpoint
-    user_token_public_key: *user_token_public_key
     is_RBAC_enabled: "false"
     keycloak_audience: ""
     otel_enable: *otel_enable
@@ -466,10 +462,7 @@ system-rules-ingestor:
 web-console:
   namespace: *web-console-namesapce
   env:
-    GRAFANA_AUTH_TOKEN: *grafana-auth-token
-    GRAFANA_ADMIN_URL: *grafana-url
     KEYCLOAK_SERVER_URL: *keycloak-domain
-    USER_TOKEN_PRIVATE_KEY:  *user_token_private_key
 
 
 #additional-charts/

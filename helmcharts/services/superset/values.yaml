@@ -458,7 +458,7 @@ configOverrides:
   sql_alchemy_config: |
     SQLALCHEMY_DATABASE_URI = 'postgresql://{{ tpl .Values.postgresql.db_username . }}:{{ tpl .Values.postgresql.db_password . }}@{{ tpl .Values.global.postgresql.host . }}:{{ tpl (.Values.global.postgresql.port | toString) . }}/{{ tpl .Values.postgresql.db_name . }}'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SECRET_KEY = 'thisISaSECRET_1234'
+    SECRET_KEY = 'xCHEuo3xQNLdqgvM7GAR4Gf9kjyQzFzIrGi1maZdb0xibHu47o5hIyAX'
 
   # map_box_key: |
   #  MAPBOX_API_KEY=''
@@ -487,14 +487,14 @@ configOverrides:
            'access_token_headers':{
                'Authorization': 'Basic {{ .Values.oauth.auth_token }}'
            },
-           'api_base_url':'https://{{ .Values.global.domain }}',
-           'access_token_url':'https://{{ .Values.global.domain }}/console/api/oauth/v1/token',
+           'api_base_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}',
+           'access_token_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token',
            'authorize_url':'/console/api/oauth/v1/authorize'
         }
       }
     ]
     AUTH_USER_REGISTRATION = True
-    AUTH_OAUTH_REDIRECT_URI='https://{{ .Values.global.domain }}/oauth-authorized/obsrv'
+    AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
     ENABLE_PROXY_FIX = True
 

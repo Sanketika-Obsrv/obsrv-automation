@@ -51,10 +51,11 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   spark: &spark_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-  velero: &velero_sa_annotation 
+  velero: &velero_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
 
- 
+
+
 redis-service-account: &redis-service-account
   serviceAccount:
     create: *create_sa
@@ -146,7 +147,7 @@ velero-backup: &velero-backup
       create: *create_sa
       name: velero-backup-sa
       annotations:
-        <<: *velero_sa_annotation 
+        <<: *velero_sa_annotation
       labels:
   credentials:
     useSecret: false

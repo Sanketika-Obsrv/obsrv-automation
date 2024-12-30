@@ -10,7 +10,6 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "loki.singleBinaryFullname" . }}
-  namespace: {{ (include "base.namespace" $) | quote }}
   labels:
     {{- include "loki.singleBinaryLabels" . | nindent 4 }}
 spec:
