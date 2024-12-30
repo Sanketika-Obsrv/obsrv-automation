@@ -210,13 +210,6 @@ druid-raw-cluster:
   gcs_bucket: *cloud_storage_bucket
   <<: *druid-raw-service-account
 
-loki:
-  storage:
-    type: *storage_class
-  compactor:
-    retention_enabled: true
-    working_directory: /var/loki/compactor/retention
-
 postgresql-backup:
   <<: *postgres-backup-service-account
   GS_BACKUP_BUCKET: *backups_bucket

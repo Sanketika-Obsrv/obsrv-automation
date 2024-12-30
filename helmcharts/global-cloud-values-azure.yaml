@@ -174,7 +174,7 @@ dataset-api-service-account: &dataset-api-service-account
 config-api-service-account: &config-api-service-account
   serviceAccount:
     create: *create_sa
-    annotations: {}  
+    annotations: {}
 
 dataset-api:
   <<: *dataset-api-service-account
@@ -245,13 +245,6 @@ kong:
   proxy:
     annotations: {}
     type: LoadBalancer
-
-loki:
-  storage:
-    type: *storage_class_name
-  compactor:
-    retention_enabled: true
-    working_directory: /var/loki/compactor/retention
 
 postgres-backup-service-account: &postgres-backup-service-account
   serviceAccount:

@@ -17,7 +17,7 @@ global:
     '{"identity":"name","credential":"key","region":"region-name"}'
 
   spark_cloud_bucket: ""
-  storage_class_name: &storage_class_name "gp2"
+  storage_class_name: &storage_class_name "gp3"
   spark_service_account_arn: ""
   secor_backup_bucket: &secor_backup_bucket "<fill-value>" # Update with secor bucket name
   checkpoint_bucket: &checkpoint_bucket "s3://<fill-value>" # Update with checkpoint bucket name
@@ -147,18 +147,20 @@ velero-backup: &velero-backup
       create: *create_sa
       name: velero-backup-sa
       annotations:
-        eks.amazonaws.com/role-arn: *velero_sa_annotation
+        <<: *velero_sa_annotation
       labels:
   credentials:
     useSecret: false
   configuration:
     provider: *cloud_storage_provider
     backupStorageLocation:
+      provider: *cloud_storage_provider
       bucket: *velero_backup_cloud_bucket
       config:
         region: *cloud_storage_region
     volumeSnapshotLocation:
       name: default
+      namespace: velero
       config:
         region: *cloud_storage_region
   initContainers:
@@ -259,13 +261,6 @@ druid-raw-cluster:
   s3_access_key: ""
   s3_secret_key: ""
   <<: *druid-raw-service-account
-
-loki:
-  storage:
-    type: *storage_class_name
-  compactor:
-    retention_enabled: true
-    working_directory: /var/loki/compactor/retention
 
 lakehouse-connector:
   hadoop_core_site:
