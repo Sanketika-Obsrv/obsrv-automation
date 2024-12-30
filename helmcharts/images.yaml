@@ -70,7 +70,7 @@ images: &images
 
   postgresql-backup: &postgresql-backup # registry: ""
     repository: postgresql-backup
-    tag: "1.0.5-GA"
+    tag: "17.2-r0"
     digest: ""
 
   postgresql: &postgresql
