@@ -61,6 +61,12 @@ spec:
               name: {{ include "common.names.fullname" . }}-env
           - secretRef:
               name: {{ .Values.namespace }}-grafana-secret
+          env:
+          - name: user_token_public_key
+            valueFrom:
+              secretKeyRef:
+                name: openssl-secrets
+                key: public.pem
           {{- if .Values.configmap.enabled }}
           volumeMounts:
           - name: config

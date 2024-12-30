@@ -177,12 +177,6 @@ env:
   SESSION_SECRET: "backend-session"
   POSTGRES_CONNECTION_STRING: "postgres://{{.Values.global.postgresql.obsrv.user}}:{{.Values.global.postgresql.obsrv.password}}@{{.Values.global.postgresql.host}}:{{.Values.global.postgresql.port}}/{{.Values.global.postgresql.obsrv.name}}"
   OAUTH_WEB_CONSOLE_URL: "{{.Values.global.domain}}/console"
-  AUTH_KEYCLOAK_REALM: "MyKeyCloakRealm"
-  AUTH_KEYCLOAK_PUBLIC_CLIENT: "false"
-  AUTH_KEYCLOAK_SSL_REQUIRED: "external"
-  AUTH_KEYCLOAK_CLIENT_ID: "myOauthClient"
-  AUTH_KEYCLOAK_CLIENT_SECRET: "SCWHeF9HgtJ5BjmJFruk2IW15a5auueq"
-  AUTH_KEYCLOAK_SERVER_URL: "http://localhost:8080/auth"
   AUTH_GOOGLE_CLIENT_ID: "52913780720-2ldmrn41mbhciscjkenepcm76e0g6mh3.apps.googleusercontent.com"
   AUTH_GOOGLE_CLIENT_SECRET: "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"
   HTTPS: "false"
@@ -200,13 +194,9 @@ env:
   AUTH_OIDC_CLIENT_ID: "oidctestclient"
   AUTH_OIDC_CLIENT_SECRET: "CsfLrFQwdRjZXhKr0t806BGVTWnN7M4k"
   AUTH_TOKEN: "YWRtaW46cHJvbS1vcGVyYXRvcg=="
-  USER_TOKEN_PRIVATE_KEY: |-
-  AUTHENTICATION_TYPE: "basic"  
-  KEYCLOAK_REALM: ""
-  KEYCLOAK_CLIENT_ID: ""
-  KEYCLOAK_PUBLIC_CLIENT: ""
-  KEYCLOAK_SSL_REQUIRED: ""
-    
-# Seems to be unused
-# grafana_secret_allowed_namespaces: "dataset-api,web-console"
-# grafana_secret_name: "grafana-secret"
+  AUTHENTICATION_TYPE: "basic"
+  KEYCLOAK_REALM: "obsrvWebConsole"
+  KEYCLOAK_CLIENT_ID: "webConsole"
+  KEYCLOAK_PUBLIC_CLIENT: "true"
+  KEYCLOAK_SSL_REQUIRED: "external"
+

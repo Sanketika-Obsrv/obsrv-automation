@@ -64,48 +64,6 @@ variable "cluster_logs_enabled" {
   default     = true
 }
 
-variable "kubernetes_storage_class" {
-  type        = string
-  description = "Storage class name for the Kubernetes cluster"
-  default     = "gp2"
-}
-variable "monitoring_grafana_oauth_configs" {
-  type        = map(any)
-  description = "Grafana oauth related variables. See below commented code for values that need to be passed"
-}
-
-# web console variables start
-variable "web_console_configs" {
-  type        = map(any)
-  description = "Web console config variables. See below commented code for values that need to be passed"
-}
-
-variable "web_console_image_repository" {
-  type        = string
-  description = "Container registry. For example docker.io/obsrv"
-  default     = "sanketikahub/obsrv-web-console"
-}
-
-variable "docker_registry_secret_dockerconfigjson" {
-  type        = string
-  description = "The dockerconfigjson encoded in base64 format."
-}
-
-variable "docker_registry_secret_name" {
-  type        = string
-  description = "The name of the secret. This will be sent back as an output which can be used in other modules"
-  default     = "docker-registry-secret"
-}
-
-variable "oauth_configs" {
-  type        = map(any)
-  description = "Superset config variables. See the below commented code to know values to be passed "
-}
-
-variable "web_console_credentials" {
-  type        = map(any)
-  description = "web console login credentials"
-}
 
 variable "flowlogs_enabled" {
   type        = bool
@@ -119,20 +77,6 @@ variable "flowlogs_retention_in_days" {
   default     = 7
 }
 
-variable "kong_loadbalancer_annotations" {
-  type        = string
-  description = "Kong ingress loadbalancer annotations."
-  default     = <<EOF
-service.beta.kubernetes.io/aws-load-balancer-type: nlb
-service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-EOF
-}
-
-variable "kong_ingress_domain" {
-  type        = string
-  description = "Kong ingress domain. Leave it empty if you dont have a domain name. If you have a domain, provide value such as obsrv.ai"
-  default     = ""
-}
 variable "eks_node_group_scaling_config" {
   type        = map(number)
   description = "EKS node group auto scaling configuration."

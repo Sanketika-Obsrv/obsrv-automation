@@ -28,12 +28,12 @@ spec:
   commonName: {{ default $.Values.global.domain $.Values.domain }}
   dnsNames:
     - {{ default $.Values.global.domain $.Values.domain }}
+    - {{ printf "keycloak.%s" (default $.Values.global.domain $.Values.domain) }}
   issuerRef:
     name: {{ $.Values.cert_issuer_name }}
     kind: {{ $.Values.cert_issuer_type }}
   secretTemplate:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "{{ .Values.reflection_namespaces }}"
-      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "{{ .Values.reflection_namespaces }}"
