@@ -397,6 +397,10 @@ postgresql-exporter:
       user: *pguser
       password: *pgpassword
 
+prometheus-pushgateway:
+  namespace: *monitoring-namespace
+    
+
 
 spark: &spark
   namespace: *spark-namespace

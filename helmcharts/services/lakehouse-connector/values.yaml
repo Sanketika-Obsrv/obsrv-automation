@@ -177,6 +177,9 @@ base_config: |
     port = "{{ .Values.global.cassandra.port }}"
   }
 
+  metrics.reporter.type: "PROMETHEUS_PUSHGATEWAY"
+  metrics.reporter.host: "monitoring-prometheus-pushgateway.monitoring.svc.cluster.local"
+  metrics.reporter.port: 9091
 
 serviceAccount:
   # Specifies whether a service account should be created
