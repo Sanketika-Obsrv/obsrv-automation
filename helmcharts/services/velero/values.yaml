@@ -603,14 +603,22 @@ nodeAgent:
 
 # Backup schedules to create.
 # Eg:
-schedules:
-  obsrv-daily-backup:
-    disabled: false
-    schedule: "* * * * *" # Everyday midnight
-    useOwnerReferencesInBackup: false
-    template:
-      ttl: "240h"
-      includedNamespaces: []   
+# Backup schedules to create.
+# Eg:
+# schedules:
+#   mybackup:
+#     disabled: false
+#     labels:
+#       myenv: foo
+#     annotations:
+#       myenv: foo
+#     schedule: "0 0 * * *"
+#     useOwnerReferencesInBackup: false
+#     paused: false
+#     template:
+#       ttl: "240h"
+#       storageLocation: default
+#       includedNamespaces:  
 #       - foo
 #       # See: https://velero.io/docs/v1.14/resource-filtering/#excludes
 #       excludedNamespaceScopedResources:
