@@ -107,7 +107,6 @@ spec:
       containers:
       - name: {{ .Chart.Name }}-jobmanager # Main container to start job-manager
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        # image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         resources:
           requests:
@@ -117,7 +116,7 @@ spec:
             cpu: "{{ .Values.jobmanager.cpu_limits }}"
             memory: "{{ .Values.jobmanager.memory_limits }}"
         workingDir: /opt/flink
-        command: ["/opt/flink/bin/standalone-job.sh"]   
+        command: ["/opt/flink/bin/standalone-job.sh"]
         args: ["start-foreground",
 {{- if eq .Values.global.cloud_storage_provider "azure" }}
 - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
@@ -169,7 +168,7 @@ spec:
           subPath: log4j-console.properties
         - name: flink-config-volume
           mountPath: /opt/hadoop/etc/hadoop/core-site.xml
-          subPath: core-site.xml     
+          subPath: core-site.xml
 ---
 apiVersion: apps/v1
 kind: Deployment

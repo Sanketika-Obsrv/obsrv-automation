@@ -17,7 +17,7 @@ global:
     '{"identity":"name","credential":"key","region":"region-name"}'
 
   spark_cloud_bucket: ""
-  storage_class_name: &storage_class_name "gp2"
+  storage_class_name: &storage_class_name "gp3"
   spark_service_account_arn: ""
   secor_backup_bucket: &secor_backup_bucket "<fill-value>" # Update with secor bucket name
   checkpoint_bucket: &checkpoint_bucket "s3://<fill-value>" # Update with checkpoint bucket name
@@ -51,10 +51,10 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   spark: &spark_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-  velero: &velero_sa_annotation 
+  velero: &velero_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
 
- 
+
 redis-service-account: &redis-service-account
   serviceAccount:
     create: *create_sa
@@ -146,29 +146,27 @@ velero-backup: &velero-backup
       create: *create_sa
       name: velero-backup-sa
       annotations:
-        <<: *velero_sa_annotation 
+        <<: *velero_sa_annotation
       labels:
   credentials:
     useSecret: false
   configuration:
     backupStorageLocation:
-    - name:
       provider: *cloud_storage_provider
       bucket: *velero_backup_cloud_bucket
       config:
         region: *cloud_storage_region
     volumeSnapshotLocation:
-      - name:
-        provider: *cloud_storage_provider
-        config:
-          region: *cloud_storage_region
+      name: default
+      namespace: velero
+      config:
+        region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-aws
       image: velero/velero-plugin-for-aws
       volumeMounts:
         - name: plugins
           mountPath: /target
-
 
 spark:
   persistence:
@@ -261,13 +259,6 @@ druid-raw-cluster:
   s3_access_key: ""
   s3_secret_key: ""
   <<: *druid-raw-service-account
-
-loki:
-  storage:
-    type: *storage_class_name
-  compactor:
-    retention_enabled: true
-    working_directory: /var/loki/compactor/retention
 
 lakehouse-connector:
   hadoop_core_site:

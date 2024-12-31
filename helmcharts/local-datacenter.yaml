@@ -39,12 +39,24 @@ service-account-disable: &service-account-disable
     enabled: false
     create: false
 
-loki:
-  storage:
-    type: *storage_class
-  compactor:
-    retention_enabled: true
-    working_directory: /var/loki/compactor/retention
+### Enable to Write to MinIO: WIP
+# loki:
+#   loki:
+#     storage:
+#       type: s3
+#       bucketNames:
+#         chunks: "loki-logs"
+#         ruler: "loki-logs"
+#         admin: "loki-logs"
+#       s3:
+#         endpoint: *s3-endpoint-url
+#         region: *s3-signing-region
+#         secretAccessKey: *s3-secret-access-key
+#         accessKeyId: *s3-access-key
+#         s3ForcePathStyle: true
+#         insecure: true
+#     compactor:
+#       delete_request_store: *cloud_store_provider
 
 druid-raw-cluster:
   <<: *service-account-disable
@@ -188,6 +200,7 @@ system-rules-ingestor:
   <<: *service-account-disable
 
 flink:
+  s3_auth_type: "credentials"
   serviceMonitor:
     enabled: true
   s3_auth_type: ""
@@ -205,6 +218,8 @@ command-api:
 
 web-console:
   imagePullPolicy: Always
+  env:
+    AUTHENTICATION_TYPE: basic
 
 dataset-api:
   <<: *service-account-disable
@@ -223,6 +238,9 @@ secor:
   s3_region: *region
   s3_endpoint: *s3-endpoint-url
   s3_path_style_access: *s3-path-style-access
+
+superset:
+  oauth_enabled: false
 
 letsencrypt-ssl:
   enabled: *ssl_enabled
@@ -253,6 +271,11 @@ kong:
     type: NodePort
   livenessProbe: ### For Dev Only
   readinessProbe: ### For Dev Only
+
+kong-ingress-routes:
+  ingress:
+    keycloak:
+      enabled: *ssl_enabled
 
 lakehouse-connector:
   enable_lakehouse: *enable_lakehouse
