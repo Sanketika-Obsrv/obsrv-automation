@@ -51,9 +51,9 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   spark: &spark_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-  velero: &velero_sa_annotation
+  velero: &velero_sa_annotation 
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-
+  
 
 
 redis-service-account: &redis-service-account

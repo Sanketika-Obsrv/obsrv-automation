@@ -353,7 +353,3 @@ resource "aws_iam_role_policy" "velero_backup_permissions" {
     ]
   })
 }
-
-
-
-
