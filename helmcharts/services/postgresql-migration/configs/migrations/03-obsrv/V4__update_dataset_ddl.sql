@@ -102,3 +102,6 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
 ALTER TABLE oauth_users ADD COLUMN roles TEXT[] DEFAULT ARRAY['viewer'];
 ALTER TABLE oauth_users ADD COLUMN status VARCHAR(255) DEFAULT 'active';
 ALTER TABLE oauth_users ADD CONSTRAINT oauth_users_user_name_key UNIQUE (user_name);
+
+ALTER TABLE oauth_users ADD COLUMN is_owner BOOLEAN DEFAULT FALSE;
+UPDATE oauth_users SET is_owner=true WHERE user_name ='obsrv_admin';
