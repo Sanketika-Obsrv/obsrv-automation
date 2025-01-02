@@ -160,7 +160,7 @@ env:
   dedup_redis_port: "{{ .Values.global.redis_dedup.port }}"
   cloud_storage_provider: "{{ .Values.global.cloud_storage_provider }}"
   cloud_storage_region: "{{ .Values.global.cloud_storage_region }}"
-  container: "{{ .Values.global.dataset_api_cloud_bucket }}"
+  container: "{{ .Values.global.dataset_api_container}}"
   container_prefix: "connector-registry"
   storage_url_expiry: "3600"
   exhaust_query_range: "31" # In Days
@@ -175,6 +175,6 @@ env:
   grafana_url: "http://grafana.monitoring.svc"
   GRAFANA_ADMIN_URL: http://grafana.monitoring.svc.cluster.local
   pipeline_merged_job_manager_url: "http://unified-pipeline-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
-  masterdata_processor_job_manager_url: "http://master-data-processor-ext-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
+  masterdata_processor_job_manager_url: "http://cache-indexer-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   prometheus_url: "{{ .Values.global.prometheus.url }}"
   storage_type: "druid,lakehouse"

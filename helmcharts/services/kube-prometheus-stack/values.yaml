@@ -24,7 +24,7 @@ fullnameOverride: ""
 
 ## Labels to apply to all resources
 ##
-commonLabels: 
+commonLabels:
 system.monitoring: "true"
 
 

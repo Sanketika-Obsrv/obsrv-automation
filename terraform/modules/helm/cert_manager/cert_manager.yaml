@@ -8,7 +8,7 @@ resources:
 global:
   commonLabels:
     system.api: "true"
-installCRDs: true
+installCRDs: false
 prometheus:
   enabled: true
   servicemonitor:

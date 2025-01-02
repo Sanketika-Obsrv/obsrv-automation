@@ -2,9 +2,9 @@ global:
   image:
     registry: &global_registry "sanketikahub"
     dockerRegistrySecretName: &dockerSecretName "registry-secret-name"
-    #<fill-value>: Replace the dockerConfigJson below for the private images
+     #Replace the dockerConfigJson below for the private images
     dockerConfigJson: |-
-      {"auths": {"http://<registry.your-domain.io>": {"auth": "<base64-encoded REGISTRY_USER:REGISTRY_PASSWORD>"}}}  
+      {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
 
 
 
@@ -21,7 +21,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.2.0-RC"
+    tag: "1.3.1-RC"
     digest: ""
 
   # dataset-api: #open source
@@ -32,29 +32,28 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.2.0-RC"
+    tag: "1.3.1-RC"
     digest: ""
 
   config-api: &config-api # registry: ""
     repository: config-service-ext
     tag: "1.2.0-RC"
-    digest: ""  
+    digest: ""
 
-  
   web-console: &web-console # registry: ""
     repository: "obsrv-web-console"
-    tag: "1.2.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   ## PIPELINE ENTERPRISE
   unified-pipeline: &unified-pipeline # registry: ""
     repository: unified-pipeline
-    tag: "1.1.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   cache-indexer: &cache-indexer # registry: ""
     repository: cache-indexer
-    tag: "1.1.0-RC"
+    tag: "1.3.0-RC"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
@@ -71,19 +70,19 @@ images: &images
 
   postgresql-backup: &postgresql-backup # registry: ""
     repository: postgresql-backup
-    tag: "1.0.5-GA"
+    tag: "17.2-r0"
     digest: ""
 
   postgresql: &postgresql
     registry: "docker.io"
     repository: "bitnami/postgresql"
-    tag: "16.1.0-debian-11-r19"
+    tag: "17.2.0"
     digest: ""
 
   postgresql-exporter: &postgresql-exporter
     registry: "quay.io"
     repository: "prometheuscommunity/postgres-exporter"
-    tag: "v0.11.1"
+    tag: "v0.16.0"
     digest: ""
 
   postgresql-migration: &postgresql-migration
@@ -108,13 +107,13 @@ images: &images
   promtail: &promtail
     registry: "docker.io"
     repository: "grafana/promtail"
-    tag: "2.7.4"
+    tag: "3.2.2"
     digest: ""
 
   redis: &redis
     registry: "docker.io"
     repository: "bitnami/redis"
-    tag: "7.0.11-debian-11-r15"
+    tag: "7.4-debian-12"
     digest: ""
     pullSecrets:
       - *dockerSecretName
@@ -133,13 +132,13 @@ images: &images
   loki: &loki
     registry: "docker.io"
     repository: "grafana/loki"
-    tag: "2.9.3"
+    tag: "3.3.2"
     digest: ""
 
   loki-gateway: &loki-gateway
     registry: "docker.io"
     repository: "nginxinc/nginx-unprivileged"
-    tag: "1.24-alpine"
+    tag: "1.27-alpine"
     digest: ""
 
   kubernetes-reflector: &kubernetes-reflector
@@ -151,7 +150,7 @@ images: &images
   alertmanager: &alertmanager
     registry: quay.io
     repository: prometheus/alertmanager
-    tag: v0.25.0
+    tag: v0.28.0-rc.0
     digest: ""
 
   prometheus-operator-webhook: &prometheus-operator-webhook
@@ -163,14 +162,14 @@ images: &images
   prometheus-operator: &prometheus-operator
     registry: quay.io
     repository: prometheus-operator/prometheus-operator
-    tag: "v0.65.1"
+    tag: "v0.78.2"
     digest: ""
 
   prometheus-config-reloader: &prometheus-config-reloader
     registry: "quay.io"
     repository: prometheus-operator/prometheus-config-reloader
     # if not set appVersion field from Chart.yaml is used
-    tag: "v0.65.1"
+    tag: "v0.79.0"
     digest: ""
 
   prometheus: &prometheus
@@ -182,13 +181,13 @@ images: &images
   grafana: &grafana
     registry: docker.io
     repository: grafana/grafana
-    tag: "9.5.2"
+    tag: "11.4.0"
     digest: ""
 
   grafana-test-framework: &grafana-test-framework
     registry: "docker.io"
     repository: bats/bats
-    tag: "v1.4.1"
+    tag: "1.11.1"
     digest: ""
 
   grafana-download-dashboards: &grafana-download-dashboards
@@ -212,24 +211,24 @@ images: &images
   kube-state-metrics: &kube-state-metrics
     registry: "registry.k8s.io"
     repository: "kube-state-metrics/kube-state-metrics"
-    tag: "v2.8.2"
+    tag: "v2.14.0"
     digest: ""
 
   prometheus-node-exporter: &prometheus-node-exporter
     registry: quay.io
     repository: prometheus/node-exporter
-    tag: "v1.5.0"
+    tag: "v1.8.2"
     digest: ""
 
   velero: &velero
     registry: "docker.io"
     repository: "velero/velero"
-    tag: "v1.10.2"
+    tag: "v1.15.0"
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
   superset: &superset # registry: ""
     repository: "sanketikahub/superset"
-    tag: "3.0.2"
+    tag: "4.1.1"
     digest: ""
 
   secor: &secor # registry: ""
@@ -245,18 +244,18 @@ images: &images
   cert_manager_cainjector: &cert_manager_cainjector
     registry: quay.io/jetstack
     repository: jetstack/cert-manager-cainjector
-    tag: v1
+    tag: v1.16.2
     digest: ""
 
   cert_manager_webhook: &cert_manager_webhook # registry: ""
     repository: cert-manager-webhook
-    tag: v1.12.2
+    tag: v1.16.2
     digest: ""
 
   cert_manager_controller: &cert_manager_controller
     registry: quay.io/jetstack
     repository: cert-manager-controller
-    tag: v1
+    tag: v1.16.2
     digest: ""
 
   cert_manager_ctl: &cert_manager_ctl
@@ -276,6 +275,12 @@ images: &images
     tag: 3.6.0
     digest: ""
 
+  minio: &minio
+    registry: docker.io
+    repository: bitnami/minio
+    tag: 2024.11.7-debian-12-r0
+    digest: ""
+
   # kafka-connector: &kafka-connector
   #   # registry: ""
   #   # repository: kafka-connector
@@ -290,32 +295,37 @@ images: &images
 
   kafka-message-exporter: &kafka-message-exporter # registry: ""
     repository: kafka-message-exporter
-    tag: 1.0.3-GA
+    tag: 1.2.0-RC
     digest: ""
 
   druid_operator: &druid_operator
     registry: "docker.io/druidio"
     repository: druidio/druid-operator
-    tag: "latest"
+    tag: "0.0.9"
     digest: ""
 
   druid-raw-cluster: &druid-raw-cluster
     registry: "docker.io/druidio"
     repository: docker.io/apache
-    tag: "latest"
+    tag: "28.0.1"
     digest: ""
 
   druid_exporter: &druid_exporter
-    registry: "quay.io"
-    repository: opstree/druid-exporter
+    registry: "docker.io"
+    repository: sanketikahub/druid-exporter
     tag: "v0.11"
     digest: ""
 
   keycloak: &keycloak
-    registry: "registry-1.docker.io"
-    repository: bitnami/keycloak
-    tag: "23.0.6-debian-11-r18"
+    registry: docker.io
+    repository:  bitnami/keycloak
+    tag: "26.0.5-debian-12-r2"
     digest: ""
+
+  keycloakConfigCli: &keycloakConfigCli
+    registry: docker.io
+    repository: bitnami/keycloak-config-cli
+    tag: 6.2.0-debian-12-r0
 
   hms: &hms
     # registry: ""
@@ -336,12 +346,12 @@ images: &images
 
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.1-RC
+    tag: 1.3.0-RC
 
-  nlq-api: &nlq-api
-    repository: text2sql
-    tag: 0.1.0
-
+  opentelemetry-collector: &opentelemetry-collector
+    repository: otel/opentelemetry-collector-contrib
+    tag: "latest"
+    digest: ""
 # Public charts like bitnami etc
 # Modyfying these charts involves many changes
 # Hence we are keeping their original desgin
@@ -362,10 +372,6 @@ internal: &internal
 
   config-api:
     <<: *config-api
-    imagePullSecrets: *imagePullSecrets   
-
-  nlq-api:
-    <<: *nlq-api
     imagePullSecrets: *imagePullSecrets
 
   postgresql:
@@ -457,6 +463,10 @@ internal: &internal
     image:
       <<: *keycloak
 
+    keycloakConfigCli:
+      image:
+        <<: *keycloakConfigCli
+
   druid_exporter:
     image:
       <<: *druid_exporter
@@ -545,6 +555,18 @@ internal: &internal
   lakehouse-connector:
     image:
       <<: *lakehouse-connector
+
+  minio:
+    image:
+      <<: *minio
+
+  opentelemetry-collector:
+    image:
+    <<: *opentelemetry-collector
+
+  opentelemetry-collector:
+    <<: *opentelemetry-collector
+    imagePullSecrets: *imagePullSecrets
 
 
 ## Sourcing internal as root element,

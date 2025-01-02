@@ -121,7 +121,6 @@ log4j_console_properties: |
 
 base_config: |
   job {
-    env = "{{ .Values.global.env }}"
     enable.distributed.checkpointing = {{ .Values.checkpointing.enabled }}
     statebackend {
       base.url = "{{ .Values.checkpointing.statebackend }}"
@@ -138,8 +137,8 @@ base_config: |
       linger.ms = 10
       compression = "snappy"
     }
-    output.system.event.topic = ${job.env}".system.events"
-    output.failed.topic = ${job.env}".failed"
+    output.system.event.topic = "system.events"
+    output.failed.topic = "failed"
   }
 
   redis.connection.timeout = 100
@@ -193,11 +192,11 @@ lakehouse-connector:
   lakehouse-connector: |+
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
-      input.topic = ${job.env}".hudi.connector.in"
-      output.topic = ${job.env}".hudi.connector.out"
-      output.invalid.topic = ${job.env}".failed"
+      input.topic = "hudi.connector.in"
+      output.topic = "hudi.connector.out"
+      output.invalid.topic = "failed"
       event.max.size = "1048576" # Max is only 1MB
-      groupId = ${job.env}"-hudi-writer-group"
+      groupId = "hudi-writer-group"
       producer {
         max-request-size = 5242880
       }

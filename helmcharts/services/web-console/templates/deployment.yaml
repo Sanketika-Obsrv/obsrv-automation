@@ -63,6 +63,11 @@ spec:
               secretKeyRef:
                 name: {{ .Values.namespace }}-grafana-secret
                 key: bearer_token
+          - name: USER_TOKEN_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: openssl-secrets
+                key: private.pem
           {{- if .Values.configmap.enabled }}
           volumeMounts:
           - name: config

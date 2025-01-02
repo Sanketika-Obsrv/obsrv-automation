@@ -76,6 +76,8 @@ spec:
     druid.storage.baseKey={{ .Values.druid_storage_baseKey }}
     druid.s3.endpoint.url={{ .Values.druid_s3_endpoint_url }}
     druid.s3.endpoint.signingRegion={{ .Values.druid_s3_endpoint_signingRegion }}
+    druid.s3.protocol={{ .Values.druid_s3_protocol }}
+    druid.s3.enablePathStyleAccess={{ .Values.druid_s3_path_style_access }}
     # Azure
     druid.azure.account = {{ .Values.global.azure_storage_account_name }}
     druid.azure.key = {{ .Values.global.azure_storage_account_key }}
@@ -128,7 +130,7 @@ spec:
     druid.request.logging.type={{ .Values.druid_request_logging_type }}
     druid.request.logging.dir={{ .Values.druid_request_logging_dir }}
     druid.javascript.enabled=true
-    druid.sql.enable={{ .Values.druid_sql_enable }}
+    druid.sql.enable={{ .Values.druid_sql_enable }} 
   env:
     - name: POD_NAME
       valueFrom:
@@ -152,7 +154,6 @@ spec:
       runtime.properties: |
         druid.service={{ .Values.druid_broker_service }}
         # HTTP server threads
-        #testing
         druid.broker.http.numConnections={{ .Values.druid_broker_http_numConnections }}
         druid.server.http.numThreads={{ .Values.druid_broker_http_numThreads }}
         # Processing threads and buffers
@@ -212,7 +213,6 @@ spec:
       extra.jvm.options: |-
         -Xms{{ .Values.druid_coordinator_min_heap_size }}
         -Xmx{{ .Values.druid_coordinator_max_heap_size }}
-
       readinessProbe:
         httpGet:
           path: /status/health

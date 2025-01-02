@@ -1,4 +1,5 @@
 global:
+  ssl_enabled: &ssl_enabled true
   cloud_storage_provider: &cloud_storage_provider "azure"
   cloud_store_provider: &cloud_store_provider "azure"
   cloud_storage_region: &cloud_storage_region "eastus2"
@@ -171,9 +172,9 @@ dataset-api-service-account: &dataset-api-service-account
     annotations: {}
 
 config-api-service-account: &config-api-service-account
-serviceAccount:
-  create: *create_sa
-  annotations: {}  
+  serviceAccount:
+    create: *create_sa
+    annotations: {}
 
 dataset-api:
   <<: *dataset-api-service-account
@@ -243,13 +244,7 @@ spark:
 kong:
   proxy:
     annotations: {}
-
-loki:
-  storage:
-    type: *storage_class_name
-  compactor:
-    retention_enabled: true
-    working_directory: /var/loki/compactor/retention
+    type: LoadBalancer
 
 postgres-backup-service-account: &postgres-backup-service-account
   serviceAccount:
@@ -288,15 +283,15 @@ hadoop_core_site: &hadoop_core_site
   fs.azure.account.key.obsrvdevsa.blob.core.windows.net: *azure_storage_account_key
 
 lakehouse-connector:
-  hadoop_core_site: 
+  hadoop_core_site:
       <<: *hadoop_core_site
-  serviceAccount: 
+  serviceAccount:
     <<: *lakehouse-connector-service-account
   checkpointing:
     <<: *flink-checkpointing
-    
+
 trino:
-  additionalCatalogs: 
+  additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
       hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
@@ -313,3 +308,6 @@ hms:
     fs.azure.account.key.obsrvdevsa.blob.core.windows.net: *azure_storage_account_key
     fs.azure.account.keyprovider.obsrvdevsa.blob.core.windows.net: "org.apache.hadoop.fs.azure.SimpleKeyProvider"
     hive.metastore.warehouse.dir: *hudi_metadata_bucket
+
+letsencrypt-ssl:
+  enabled: *ssl_enabled

@@ -154,7 +154,6 @@ serviceConfig:
       - name: "Flink-Hudi-Connector"
         release_name: lakehouse-connector
         job_manager_url: "lakehouse-connector-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
-    
 
   commands:
     PUBLISH_DATASET:
@@ -271,7 +270,7 @@ serviceConfig:
     brokers: "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
     telemetry:
       topic: "system.telemetry.events"
-    replication_factor: 1 
+    replication_factor: 1
     no_of_partitions: 1
 
   helm_charts_base_dir: /app/helm-charts
@@ -331,5 +330,5 @@ serviceConfig:
       namespace: spark
       base_helm_chart: spark-connector-cron
     flink:
-      namespace: flink
+      namespace: flink-connectors
       base_helm_chart: flink-connector

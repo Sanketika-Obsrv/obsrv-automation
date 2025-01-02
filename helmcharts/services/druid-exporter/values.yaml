@@ -49,7 +49,7 @@ security:
 serviceAccount:
   create: true
 
-serviceType: NodePort
+serviceType: ClusterIP
 
 serviceMonitor:
   enabled: true
