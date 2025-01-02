@@ -1,5 +1,3 @@
-{{- if .Values.configuration.provider -}}
-{{- $provider := .Values.configuration.provider -}}
 {{/* 'securityContext' got renamed to 'podSecurityContext', merge both dicts into one for backward compatibility */}}
 {{- $podSecurityContext := merge (.Values.podSecurityContext | default dict) (.Values.securityContext | default dict) -}}
 apiVersion: apps/v1
@@ -15,6 +13,7 @@ metadata:
     app.kubernetes.io/name: {{ include "velero.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
     helm.sh/chart: {{ include "velero.chart" . }}
     component: velero
     {{- with .Values.labels }}
@@ -22,6 +21,9 @@ metadata:
     {{- end }}
 spec:
   replicas: 1
+  {{- if .Values.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  {{- end }}
   strategy:
     type: Recreate
   selector:
@@ -35,17 +37,23 @@ spec:
         app.kubernetes.io/name: {{ include "velero.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
         helm.sh/chart: {{ include "velero.chart" . }}
         {{- if .Values.podLabels }}
           {{- toYaml .Values.podLabels | nindent 8 }}
         {{- end }}
-    {{- if or .Values.podAnnotations .Values.metrics.enabled }}
+    {{- if or .Values.podAnnotations .Values.metrics.enabled (and .Values.credentials.useSecret (not .Values.credentials.existingSecret)) }}
       annotations:
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.metrics.podAnnotations }}
-        {{- toYaml . | nindent 8 }}
+      {{- if and (.Values.metrics.enabled) (not .Values.metrics.serviceMonitor.enabled) }}
+        {{- with .Values.metrics.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- if and .Values.credentials.useSecret (not .Values.credentials.existingSecret) }}
+        checksum/secret: {{ template "chart.config-checksum" . }}
       {{- end }}
     {{- end }}
     spec:
@@ -64,9 +72,9 @@ spec:
       containers:
         - name: velero
       {{- if .Values.image.digest }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
       {{- else }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
       {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.metrics.enabled }}
@@ -80,7 +88,7 @@ spec:
             - server
             ### Flags
           {{- with .Values.configuration }}
-            - --uploader-type={{ default "restic" .uploaderType }}
+            - --uploader-type={{ default "kopia" .uploaderType }}
             {{- with .backupSyncPeriod }}
             - --backup-sync-period={{ . }}
             {{- end }}
@@ -102,6 +110,9 @@ spec:
             {{- with .defaultBackupTTL }}
             - --default-backup-ttl={{ . }}
             {{- end }}
+            {{- with .defaultItemOperationTimeout }}
+            - --default-item-operation-timeout={{ . }}
+            {{- end }}
             {{- with .defaultVolumeSnapshotLocations }}
             - --default-volume-snapshot-locations={{ . }}
             {{- end }}
@@ -113,6 +124,9 @@ spec:
             {{- end }}
             {{- with .disableControllers }}
             - --disable-controllers={{ . }}
+            {{- end }}
+            {{- with .disableInformerCache }}
+            - --disable-informer-cache={{ . }}
             {{- end }}
             {{- with .garbageCollectionFrequency }}
             - --garbage-collection-frequency={{ . }}
@@ -144,6 +158,9 @@ spec:
             {{- with .terminatingResourceTimeout }}
             - --terminating-resource-timeout={{ . }}
             {{- end }}
+            {{- with .defaultSnapshotMoveData }}
+            - --default-snapshot-move-data={{ . }}
+            {{- end }}
             ### Global Flags
             {{- with .features }}
             - --features={{ . }}
@@ -151,10 +168,43 @@ spec:
             {{- with .namespace }}
             - --namespace={{ . }}
             {{- end }}
+            {{- with .repositoryMaintenanceJob }}
+            {{- with .requests }}
+            {{- with .cpu }}
+            - --maintenance-job-cpu-request={{ . }}
+            {{- end }}
+            {{- with .memory }}
+            - --maintenance-job-mem-request={{ . }}
+            {{- end }}
+            {{- end }}
+            {{- with .limits }}
+            {{- with .cpu }}
+            - --maintenance-job-cpu-limit={{ . }}
+            {{- end }}
+            {{- with .memory }}
+            - --maintenance-job-mem-limit={{ . }}
+            {{- end }}
+            {{- end }}
+            {{- with .latestJobsCount }}
+            - --keep-latest-maintenance-jobs={{ . }}
+            {{- end }}
+            {{- end }}
+            {{- with .extraArgs }}
+            ### User-supplied overwrite flags
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- end }}
           {{- with .Values.containerSecurityContext }}
           securityContext:
@@ -192,24 +242,19 @@ spec:
             - name: LD_LIBRARY_PATH
               value: /plugins
           {{- if .Values.credentials.useSecret }}
-            {{- if eq $provider "aws" }}
             - name: AWS_SHARED_CREDENTIALS_FILE
               value: /credentials/cloud
-            {{- else if eq $provider "gcp"}}
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /credentials/cloud
-            {{- else if eq $provider "azure" }}
             - name: AZURE_CREDENTIALS_FILE
               value: /credentials/cloud
-            {{- else if eq $provider "alibabacloud" }}
             - name: ALIBABA_CLOUD_CREDENTIALS_FILE
               value: /credentials/cloud
-            {{- end }}
           {{- end }}
           {{- with .Values.configuration.extraEnvVars }}
           {{- range $key, $value := . }}
             - name: {{ default "none" $key }}
-              value: {{ default "none" $value | quote }}
+              value: {{ tpl (default "none" $value) $ | quote }}
           {{- end }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
@@ -270,4 +315,3 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-{{- end -}}

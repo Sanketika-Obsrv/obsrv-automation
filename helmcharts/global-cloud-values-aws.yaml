@@ -51,9 +51,8 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   spark: &spark_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-  velero: &velero_sa_annotation 
+  velero: &velero_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-   
 
 
 redis-service-account: &redis-service-account
@@ -152,7 +151,6 @@ velero-backup: &velero-backup
   credentials:
     useSecret: false
   configuration:
-    provider: *cloud_storage_provider
     backupStorageLocation:
       provider: *cloud_storage_provider
       bucket: *velero_backup_cloud_bucket

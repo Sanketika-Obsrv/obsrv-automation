@@ -200,4 +200,3 @@ env:
   KEYCLOAK_PUBLIC_CLIENT: "true"
   KEYCLOAK_SSL_REQUIRED: "external"
   STORAGE_TYPES: "druid,datalake"
-
