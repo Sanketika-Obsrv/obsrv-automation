@@ -233,7 +233,14 @@ spec:
           mountPath: /opt/hadoop/etc/hadoop/core-site.xml
           subPath: core-site.xml
         workingDir: /opt/flink
-        args: ["taskmanager"]
+        args: ["taskmanager",
+               "-Dweb.submit.enable=false",
+               "-Dmetrics.reporter.prom.factory.class=org.apache.flink.metrics.prometheus.PrometheusReporterFactory",
+               "-Dmetrics.reporter.prom.port={{ .Values.taskmanager.prom_port }}",
+               "-Djobmanager.rpc.address={{ .Chart.Name }}-taskmanager",
+               "-Djobmanager.rpc.port={{ .Values.taskmanager.rpc_port }}",
+               "-Dparallelism.default=1",
+               "-Dblob.server.port={{ .Values.taskmanager.blob_port }}"]
         env:
         - name: HADOOP_CONF_DIR
           value: "/opt/hadoop/etc/hadoop"
