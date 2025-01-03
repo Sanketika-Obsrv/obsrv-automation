@@ -1,15 +1,18 @@
----
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Values.namespace | default "flink" }}  # Default to 'flink' if not provided
   name: {{ .Chart.Name }}-jobmanager
-  namespace: flink
   labels:
-    app: flink
+    {{- include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" .) | nindent 4 }}
     component: {{ .Chart.Name }}-jobmanager
-    system.processing: "true"
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" .) | nindent 4 }}
+  {{- end }}
 spec:
   type: ClusterIP
+  clusterIP: None
   ports:
     - name: rpc
       port: {{ .Values.jobmanager.rpc_port }}
@@ -22,45 +25,29 @@ spec:
     - name: prom
       port: {{ .Values.jobmanager.prom_port }}
   selector:
-    app: flink
-    component: {{ .Chart.Name }}-jobmanager
-    system.processing: "true"
+    app.kubernetes.io/component: {{ .Chart.Name }}-jobmanager
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Chart.Name }}-jobmanager-webui
-  namespace: flink
-spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - name: rest
-      port: {{ .Values.rest_port }}
-      protocol: TCP
-      targetPort: {{ .Values.resttcp_port }}
-  selector:
-    app: flink
-    component: {{ .Chart.Name }}-jobmanager
-
----
-apiVersion: v1
-kind: Service
-metadata:
+  namespace: {{ .Values.namespace | default "flink" }}  # Default to 'flink' if not provided
   name: {{ .Chart.Name }}-taskmanager
-  namespace: flink
   labels:
-    app: flink
+    {{- include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" .) | nindent 4 }}
     component: {{ .Chart.Name }}-taskmanager
-    system.processing: "true"
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" .) | nindent 4 }}
+  {{- end }}
 spec:
   type: ClusterIP
+  clusterIP: None
   ports:
     - name: prom
       port: {{ .Values.taskmanager.prom_port }}
   selector:
-    app: flink
-    component: {{ .Chart.Name }}-taskmanager
+    app.kubernetes.io/component: {{ .Chart.Name }}-taskmanager
 
 ---
 apiVersion: apps/v1
@@ -68,20 +55,23 @@ kind: Deployment
 metadata:
   name: {{ .Chart.Name }}-jobmanager
   namespace: flink
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  annotations:
+  {{- if .Values.commonAnnotations }}
+    {{ include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
-      app: flink
-      component: {{ .Chart.Name }}-jobmanager
+      app.kubernetes.io/name: {{ include "common.names.name" . }}
+      app.kubernetes.io/component: {{ .Chart.Name }}-jobmanager
   template:
     metadata:
       labels:
-        app: flink
+        app.kubernetes.io/name: {{ include "common.names.name" . }}
+        app.kubernetes.io/component: {{ .Chart.Name }}-jobmanager
         component: {{ .Chart.Name }}-jobmanager
-        system.processing: "true"
-      annotations:
-        prometheus.io/scrape: 'true'
-        prometheus.io/port: "{{ .Values.jobmanager.prom_port }}"
+        app: flink
     spec:
       # imagePullSecrets:
       # - name: {{ .Values.image.imagePullSecrets }}
@@ -107,7 +97,6 @@ spec:
       containers:
       - name: {{ .Chart.Name }}-jobmanager # Main container to start job-manager
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        # image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         resources:
           requests:
@@ -176,18 +165,24 @@ kind: Deployment
 metadata:
   name: {{ .Chart.Name }}-taskmanager
   namespace: flink
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  annotations:
+  {{- if .Values.commonAnnotations }}
+    {{ include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.taskmanager.replicas }}
   selector:
     matchLabels:
-      app: flink
-      component: {{ .Chart.Name }}-taskmanager
+      app.kubernetes.io/name: {{ include "common.names.name" . }}
+      app.kubernetes.io/component: {{ .Chart.Name }}-taskmanager
   template:
     metadata:
       labels:
-        system.processing: "true"
         app: flink
         component: {{ .Chart.Name }}-taskmanager
+        app.kubernetes.io/name: {{ include "common.names.name" . }}
+        app.kubernetes.io/component: {{ .Chart.Name }}-taskmanager
     spec:
       # imagePullSecrets:
       # - name: {{ .Values.image.imagePullSecrets }}
@@ -222,21 +217,17 @@ spec:
             cpu: "{{ .Values.taskmanager.cpu_limits }}"
             memory: "{{ .Values.taskmanager.memory_limits }}"
         volumeMounts:
-          - name: flink-config-volume
-            mountPath: /opt/flink/conf/log4j-console.properties
-            subPath: log4j-console.properties
-        volumeMounts:
-        - mountPath: /opt/flink/conf/flink-conf.yaml
-          name: flink-config-volume
+        - name: flink-config-volume
+          mountPath: /opt/flink/conf/flink-conf.yaml
           subPath: flink-conf.yaml
-        - mountPath: /data/flink/conf/baseconfig.conf
-          name: flink-config-volume
+        - name: flink-config-volume
+          mountPath: /data/flink/conf/baseconfig.conf
           subPath: base-config.conf
-        - mountPath: /data/flink/conf/{{ .Chart.Name }}.conf
-          name: flink-config-volume
+        - name: flink-config-volume
+          mountPath: /data/flink/conf/{{ .Chart.Name }}.conf
           subPath: {{ .Chart.Name }}.conf
-        - mountPath: /opt/flink/conf/log4j-console.properties
-          name: flink-config-volume
+        - name: flink-config-volume
+          mountPath: /opt/flink/conf/log4j-console.properties
           subPath: log4j-console.properties
         - name: flink-config-volume
           mountPath: /opt/hadoop/etc/hadoop/core-site.xml
@@ -248,7 +239,7 @@ spec:
           value: "/opt/hadoop/etc/hadoop"
         - name: FLINK_PROPERTIES
           value: |+
-            jobmanager.rpc.address: {{ .Chart.Name }}-jobmanager
+            jobmanager.rpc.address: {{ .Chart.Name }}-taskmanager
             taskmanager.rpc.port=6122
             taskmanager.numberOfTaskSlots: 1
             metrics.reporters: prom

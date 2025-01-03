@@ -4,9 +4,31 @@ image:
   registry: sanketikahub
   repository: lakehouse-connector
   tag: 1.0.8
+# serviceMonitor:
+#   enabled: true
+# replicaCount: 1
 serviceMonitor:
-  enabled: false
-replicaCount: 1
+  jobmanager:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {} # additional labels e.g. release: prometheus
+    honorLabels: true
+    jobLabel: "app.kubernetes.io/name"
+    port: prom
+  taskmanager:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {} # additional labels e.g. release: prometheus
+    honorLabels: true
+    jobLabel: "app.kubernetes.io/name"
+    port: prom
+commonLabels:
+  system.processing: "true"
+  release: monitoring
+  app: flink
+
 
 jobmanager:
   rpc_port: 6123
@@ -177,6 +199,9 @@ base_config: |
     port = "{{ .Values.global.cassandra.port }}"
   }
 
+  metrics.reporter.type: "PROMETHEUS_PUSHGATEWAY"
+  metrics.reporter.host: "prometheus-pushgateway.monitoring.svc.cluster.local"
+  metrics.reporter.port: 9091
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -187,6 +212,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+commonAnnotations:
+  reloader.stakater.com/auto: "true"
 hadoop_core_site: {}
 
 lakehouse-connector:
