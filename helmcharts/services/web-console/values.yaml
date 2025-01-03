@@ -199,4 +199,4 @@ env:
   KEYCLOAK_CLIENT_ID: "webConsole"
   KEYCLOAK_PUBLIC_CLIENT: "true"
   KEYCLOAK_SSL_REQUIRED: "external"
-  STORAGE_TYPES: "druid,datalake"
+  STORAGE_TYPES: '{"lake_house":true,"realtime_store":true}'
