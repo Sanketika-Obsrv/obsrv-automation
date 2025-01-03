@@ -1,3 +1,0 @@
-1. Changed all yamls to support namespaces
-2. Changes single-binary and gateway deployment to support image digest
-3. Removed grafana agent operator and minio subcharts

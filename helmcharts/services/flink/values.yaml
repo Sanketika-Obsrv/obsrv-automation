@@ -133,7 +133,7 @@ taskmanager:
 checkpoint_store_type: null
 
 # AWS S3 Details
-s3_auth_type: ""
+s3_auth_type: "serviceAccount"
 s3_access_key: ""
 s3_secret_key: ""
 s3_endpoint: ""
@@ -306,12 +306,11 @@ baseconfig: |
       linger.ms = 10
       compression = "snappy"
     }
-    output.system.event.topic = ${job.env}".system.events"
+    output.system.event.topic = "system.events"
 
-    output.failed.topic = ${job.env}".failed"
+    output.failed.topic = "failed"
   }
   job {
-    env = "{{ .Values.global.env }}"
     enable.distributed.checkpointing = {{ .Values.checkpointing.enabled }}
     statebackend {
       base.url = "{{ .Values.checkpointing.statebackend }}"
@@ -352,7 +351,7 @@ baseconfig: |
     host = "{{ .Values.global.cassandra.host }}"
     port = "{{ .Values.global.cassandra.port }}"
   }
-  
+
   otel.collector.endpoint="http://opentelemetry-collector.otel.svc.cluster.local:4317"
   otel.enable = true
 
@@ -384,26 +383,26 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: org.sunbird.obsrv.pipeline.task.UnifiedPipelineStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
       include file("/data/flink/conf/baseconfig.conf")
       kafka {
-        input.topic = ${job.env}".ingest"
-        output.raw.topic = ${job.env}".raw"
-        output.extractor.duplicate.topic = ${job.env}".failed"
-        output.batch.failed.topic = ${job.env}".failed"
+        input.topic = "ingest"
+        output.raw.topic = "raw"
+        output.extractor.duplicate.topic = "failed"
+        output.batch.failed.topic = "failed"
         event.max.size = "1048576" # Max is only 1MB
-        output.invalid.topic = ${job.env}".failed"
-        output.unique.topic = ${job.env}".unique"
-        output.duplicate.topic = ${job.env}".failed"
-        output.denorm.topic = ${job.env}".denorm"
-        output.denorm.failed.topic = ${job.env}".failed"
-        output.transform.topic = ${job.env}".transform"
-        output.transform.failed.topic = ${job.env}".transform.failed"
-        stats.topic = ${job.env}".stats"
-        groupId = ${job.env}"-unified-pipeline-group"
+        output.invalid.topic = "failed"
+        output.unique.topic = "unique"
+        output.duplicate.topic = "failed"
+        output.denorm.topic = "denorm"
+        output.denorm.failed.topic = "failed"
+        output.transform.topic = "transform"
+        output.transform.failed.topic = "transform.failed"
+        stats.topic = "stats"
+        groupId = "unified-pipeline-group"
         producer {
           max-request-size = 5242880
         }
@@ -427,7 +426,7 @@ flink_jobs:
     flink-conf: |+
       jobmanager.memory.flink.size: 1024m
       taskmanager.memory.flink.size: 1024m
-      taskmanager.numberOfTaskSlots:1
+      taskmanager.numberOfTaskSlots: 1
       jobmanager.numberOfTaskSlots: 1
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
@@ -446,16 +445,16 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: in.sanketika.obsrv.transformer.task.TransformerStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
       include file("/data/flink/conf/baseconfig.conf")
       kafka {
-        input.topic = ${job.env}".denorm"
-        output.transform.topic = ${job.env}".transform"
-        output.transform.failed.topic = ${job.env}".transform.failed"
-        groupId = ${job.env}"-transformer-group"
+        input.topic = "denorm"
+        output.transform.topic = "transform"
+        output.transform.failed.topic = "transform.failed"
+        groupId = "transformer-group"
         producer {
           max-request-size = 5242880
         }
@@ -468,7 +467,7 @@ flink_jobs:
     flink-conf: |+
       jobmanager.memory.flink.size: 1024m
       taskmanager.memory.flink.size: 1024m
-      taskmanager.numberOfTaskSlots:1
+      taskmanager.numberOfTaskSlots: 1
       jobmanager.numberOfTaskSlots: 1
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
@@ -487,26 +486,26 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: in.sanketika.obsrv.pipeline.task.MasterDataProcessorStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
       include file("/data/flink/conf/baseconfig.conf")
       kafka {
-        input.topic = ${job.env}".masterdata.ingest"
-        output.raw.topic = ${job.env}".masterdata.raw"
-        output.extractor.duplicate.topic = ${job.env}".masterdata.failed"
-        output.failed.topic = ${job.env}".masterdata.failed"
-        output.batch.failed.topic = ${job.env}".masterdata.failed"
+        input.topic = "masterdata.ingest"
+        output.raw.topic = "masterdata.raw"
+        output.extractor.duplicate.topic = "masterdata.failed"
+        output.failed.topic = "masterdata.failed"
+        output.batch.failed.topic = "masterdata.failed"
         event.max.size = "1048576" # Max is only 1MB
-        output.invalid.topic = ${job.env}".masterdata.failed"
-        output.unique.topic = ${job.env}".masterdata.unique"
-        output.duplicate.topic = ${job.env}".masterdata.failed"
-        output.denorm.topic = ${job.env}".masterdata.denorm"
-        output.transform.topic = ${job.env}".masterdata.transform"
-        output.transform.failed.topic = ${job.env}".masterdata.transform.failed"
-        stats.topic = ${job.env}".masterdata.stats"
-        groupId = ${job.env}"-masterdata-pipeline-group"
+        output.invalid.topic = "masterdata.failed"
+        output.unique.topic = "masterdata.unique"
+        output.duplicate.topic = "masterdata.failed"
+        output.denorm.topic = "masterdata.denorm"
+        output.transform.topic = "masterdata.transform"
+        output.transform.failed.topic = "masterdata.transform.failed"
+        stats.topic = "masterdata.stats"
+        groupId = "masterdata-pipeline-group"
 
         producer {
           max-request-size = 5242880
@@ -552,26 +551,26 @@ flink_jobs:
     imagePullSecrets: []
 
     job_classname: org.sunbird.obsrv.streaming.CacheIndexerStreamTask
-    
+
     serviceMonitor: *serviceMonitor
 
     config: |+
       include file("/data/flink/conf/baseconfig.conf")
       kafka {
-        input.topic = ${job.env}".masterdata.ingest"
-        output.raw.topic = ${job.env}".masterdata.raw"
-        output.extractor.duplicate.topic = ${job.env}".masterdata.failed"
-        output.failed.topic = ${job.env}".masterdata.failed"
-        output.batch.failed.topic = ${job.env}".masterdata.failed"
+        input.topic = "masterdata.ingest"
+        output.raw.topic = "masterdata.raw"
+        output.extractor.duplicate.topic = "masterdata.failed"
+        output.failed.topic = "masterdata.failed"
+        output.batch.failed.topic = "masterdata.failed"
         event.max.size = "1048576" # Max is only 1MB
-        output.invalid.topic = ${job.env}".masterdata.failed"
-        output.unique.topic = ${job.env}".masterdata.unique"
-        output.duplicate.topic = ${job.env}".masterdata.failed"
-        output.denorm.topic = ${job.env}".masterdata.denorm"
-        output.transform.topic = ${job.env}".masterdata.transform"
-        output.transform.failed.topic = ${job.env}".masterdata.transform.failed"
-        stats.topic = ${job.env}".masterdata.stats"
-        groupId = ${job.env}"-masterdata-pipeline-group"
+        output.invalid.topic = "masterdata.failed"
+        output.unique.topic = "masterdata.unique"
+        output.duplicate.topic = "masterdata.failed"
+        output.denorm.topic = "masterdata.denorm"
+        output.transform.topic = "masterdata.transform"
+        output.transform.failed.topic = "masterdata.transform.failed"
+        stats.topic = "masterdata.stats"
+        groupId = "masterdata-pipeline-group"
 
         producer {
           max-request-size = 5242880

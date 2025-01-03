@@ -68,55 +68,55 @@ base_config: &base_config
 secor_jobs:
   ingest-backup:
     <<: *base_config
-    topic: "{{.Values.global.env}}.ingest"
+    topic: "ingest"
     service_name: "ingest-backup"
-    consumer_group: "{{.Values.global.env}}.ingest"
+    consumer_group: "ingest"
     base_path: "{{ .Values.base_path }}/ingest"
     timestamp_key: "syncts"
   raw-backup:
     <<: *base_config
     enabled: true
-    topic: "{{.Values.global.env}}.raw"
+    topic: "raw"
     service_name: "raw-backup"
-    consumer_group: "{{.Values.global.env}}.raw"
+    consumer_group: "raw"
     base_path: "{{ .Values.base_path }}/raw"
     timestamp_key: "obsrv_meta.syncts"
   unique-backup:
     <<: *base_config
     enabled: true
-    topic: "{{.Values.global.env}}.unique"
+    topic: "unique"
     service_name: "unique-backup"
-    consumer_group: "{{.Values.global.env}}.unique"
+    consumer_group: "unique"
     base_path: "{{ .Values.base_path }}/unique"
     timestamp_key: "obsrv_meta.syncts"
   denorm-backup:
     <<: *base_config
     enabled: true
-    topic: "{{.Values.global.env}}.denorm"
+    topic: "denorm"
     service_name: "denorm-backup"
-    consumer_group: "{{.Values.global.env}}.denorm"
+    consumer_group: "denorm"
     base_path: "{{ .Values.base_path }}/denorm"
     timestamp_key: "obsrv_meta.syncts"
   transform-backup:
     <<: *base_config
     enabled: true
-    topic: "{{.Values.global.env}}.transform"
+    topic: "transform"
     service_name: "transform-backup"
-    consumer_group: "{{.Values.global.env}}.transform"
+    consumer_group: "transform"
     base_path: "{{ .Values.base_path }}/transform"
     timestamp_key: "obsrv_meta.syncts"
   failed-backup:
     <<: *base_config
-    topic: "{{.Values.global.env}}.failed"
+    topic: "failed"
     service_name: "failed-backup"
-    consumer_group: "{{.Values.global.env}}.failed"
+    consumer_group: "failed"
     base_path: "{{ .Values.base_path }}/failed"
     timestamp_key: "obsrv_meta.syncts"
   system-events-backup:
     <<: *base_config
-    topic: "{{.Values.global.env}}.system.events"
+    topic: "system.events"
     service_name: "system-events-backup"
-    consumer_group: "{{.Values.global.env}}.system-events"
+    consumer_group: "system-events"
     base_path: "{{ .Values.base_path }}/system-events"
     timestamp_key: "obsrv_meta.syncts"
   system-telemetry-backup:
@@ -129,9 +129,9 @@ secor_jobs:
   masterdata-ingest-backup:
     <<: *base_config
     enabled: false
-    topic: "{{.Values.global.env}}.masterdata.ingest"
+    topic: "masterdata.ingest"
     service_name: "masterdata-ingest-backup"
-    consumer_group: "{{.Values.global.env}}.masterdata-ingest"
+    consumer_group: "masterdata-ingest"
     base_path: "{{ .Values.base_path }}/masterdata-ingest"
     timestamp_key: "syncts"
 
