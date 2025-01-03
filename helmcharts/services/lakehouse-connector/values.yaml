@@ -199,7 +199,7 @@ base_config: |
   }
 
   metrics.reporter.type: "PROMETHEUS_PUSHGATEWAY"
-  metrics.reporter.host: "monitoring-prometheus-pushgateway.monitoring.svc.cluster.local"
+  metrics.reporter.host: "prometheus-pushgateway.monitoring.svc.cluster.local"
   metrics.reporter.port: 9091
 
 serviceAccount:
