@@ -313,5 +313,43 @@ resource "aws_iam_role" "velero_backup_sa_iam_role" {
   var.additional_tags)
 }
 
+resource "aws_iam_role_policy" "velero_backup_permissions" {
+  name   = "${var.env}-${var.building_block}-${var.velero_backup_sa_iam_role_name}-permissions"
+  role   = aws_iam_role.velero_backup_sa_iam_role.name
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        "Resource": [
+          "arn:aws:s3:::*",
+          "arn:aws:s3:::*/*"
+        ]
 
-
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ec2:CreateSnapshot",
+          "ec2:DeleteSnapshot",
+          "ec2:CreateTags",
+          "ec2:DeleteTags",
+          "ec2:DescribeVolumes",
+          "ec2:DescribeSnapshots"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": "iam:PassRole",
+        "Resource": "*"
+      }
+    ]
+  })
+}

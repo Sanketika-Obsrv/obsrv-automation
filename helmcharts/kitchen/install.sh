@@ -59,7 +59,7 @@ migrations)
 monitoring)
     rm -rf monitoring
     cp -rf ../obsrv monitoring
-    cp -rf ../services/{promtail,loki,kube-prometheus-stack,kafka-message-exporter,alert-rules} monitoring/charts/
+    cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,alert-rules} monitoring/charts/
     helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name
     ;;
 coreinfra)
@@ -106,7 +106,7 @@ obsrvtools)
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
-    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
+    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,redis-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
 
     # copy cloud specific helm charts
     case $cloud_env in
