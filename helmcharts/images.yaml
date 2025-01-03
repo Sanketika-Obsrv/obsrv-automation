@@ -48,24 +48,24 @@ images: &images
   ## PIPELINE ENTERPRISE
   unified-pipeline: &unified-pipeline # registry: ""
     repository: unified-pipeline
-    tag: "1.3.0-RC"
+    tag: "1.4.0"
     digest: ""
 
   cache-indexer: &cache-indexer # registry: ""
     repository: cache-indexer
-    tag: "1.3.0-RC"
+    tag: "1.4.0"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
   ## TODO: Add every component here
   transformer-ext: &transforer-ext # registry: ""
     repository: transformer-ext
-    tag: "1.0.6-GA"
+    tag: "1.4.0"
     digest: ""
 
   master-data-processor: &master-data-processor # registry: ""
     repository: master-data-processor
-    tag: "1.0.6-GA"
+    tag: "1.4.0"
     digest: ""
 
   postgresql-backup: &postgresql-backup # registry: ""
@@ -355,7 +355,7 @@ images: &images
 
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.3.2-hudi-metrics
+    tag: 1.4.0
 
 
   opentelemetry-collector: &opentelemetry-collector
