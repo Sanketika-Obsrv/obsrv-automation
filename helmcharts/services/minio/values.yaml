@@ -1222,6 +1222,8 @@ metrics:
     paths:
       - /minio/v2/metrics/cluster
       - /minio/v2/metrics/node
+      - /minio/v2/metrics/bucket
+      - /minio/v2/metrics/resource
     ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
     ##
     interval: 30s
