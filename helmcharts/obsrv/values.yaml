@@ -2712,6 +2712,29 @@ kube-prometheus-stack:
               service: "minio"
           scrape_interval: 5m
           scrape_timeout: 30s
+                - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql
+        - job_name: 'redis_exporter_targets'
+          static_configs:
+            - targets:
+                - redis://valkey-denorm-headless.redis.svc.cluster:6379
+                - redis://valkey-dedup-headless.redis.svc.cluster:6379
+          metrics_path: /metrics
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: 'redis://valkey-denorm-headless.redis.svc.cluster:6379'
+              target_label: __address__
+              replacement: valkey-denorm-metrics.redis.svc.cluster.local:9121
+            - source_labels: [__address__]
+              regex: 'redis://valkey-dedup-headless.redis.svc.cluster:6379'
+              target_label: __address__
+              replacement: valkey-dedup-metrics.redis.svc.cluster.local:9121
+            - source_labels: [__address__]
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
+
+                     
+
       retention: 90d
       storageSpec:
         volumeClaimTemplate:
@@ -2882,151 +2905,6 @@ promtail:
     labels:
       release: monitoring
       system.monitoring: "true"
-
-redis-dedup:
-  architecture: standalone
-  auth:
-    enabled: false
-  commonConfiguration: |-
-    # Enable RDB persistence
-    save 300 100
-  commonLabels:
-    system.processing: "true"
-    system.storage: "true"
-  fullnameOverride: redis-dedup
-  master:
-    configuration: ""
-    containerPorts:
-      redis: 6379
-    count: 1
-    disableCommands:
-      - FLUSHALL
-    extraFlags:
-      - --maxmemory 512mb
-      - --maxmemory-policy volatile-ttl
-    persistence:
-      accessModes:
-        - ReadWriteOnce
-      enabled: true
-      labels:
-        system.processing: "true"
-        system.storage: "true"
-      path: /data
-      size: 1Gi
-      storageClass: ""
-      subPath: ""
-      subPathExpr: ""
-    podLabels:
-      system.processing: "true"
-      system.storage: "true"
-    resources:
-      limits:
-        cpu: 0.5
-        memory: 512Mi
-      requests:
-        cpu: 0.5
-        memory: 512Mi
-  replica:
-    configuration: ""
-    containerPorts:
-      redis: 6379
-    disableCommands:
-      - FLUSHALL
-    extraFlags:
-      - --maxmemory 512mb
-      - --maxmemory-policy volatile-ttl
-    persistence:
-      accessModes:
-        - ReadWriteOnce
-      enabled: true
-      labels:
-        system.processing: "true"
-        system.storage: "true"
-      path: /data
-      size: 1Gi
-      storageClass: ""
-      subPath: ""
-      subPathExpr: ""
-    podLabels:
-      system.processing: "true"
-      system.storage: "true"
-    replicaCount: 1
-    serviceAccount:
-      create: true
-
-redis-denorm:
-  architecture: standalone
-  auth:
-    enabled: false
-  commonConfiguration: |-
-    # Enable RDB persistence
-     save 300 100
-  commonLabels:
-    system.processing: "true"
-    system.storage: "true"
-  fullnameOverride: redis-denorm
-  master:
-    configuration: ""
-    containerPorts:
-      redis: 6379
-    count: 1
-    disableCommands:
-      - FLUSHALL
-    extraFlags:
-      - --maxmemory 1024mb
-      - --maxmemory-policy noeviction
-    persistence:
-      accessModes:
-        - ReadWriteOnce
-      enabled: true
-      labels:
-        system.processing: "true"
-        system.storage: "true"
-      path: /data
-      size: 2Gi
-      storageClass: ""
-      subPath: ""
-      subPathExpr: ""
-    podLabels:
-      system.processing: "true"
-      system.storage: "true"
-    resources:
-      limits:
-        cpu: 0.5
-        memory: 2Gi
-      requests:
-        cpu: 0.5
-        memory: 1Gi
-  nameOverride: redis-denorm
-  replica:
-    configuration: ""
-    containerPorts:
-      redis: 6379
-    disableCommands:
-      - FLUSHALL
-    extraFlags:
-      - --maxmemory 1024mb
-      - --maxmemory-policy noeviction
-    persistence:
-      accessModes:
-        - ReadWriteOnce
-      enabled: true
-      labels:
-        system.processing: "true"
-        system.storage: "true"
-      path: /data
-      size: 2Gi
-      storageClass: ""
-      subPath: ""
-      subPathExpr: ""
-    podLabels:
-      system.processing: "true"
-      system.storage: "true"
-    replicaCount: 1
-    serviceAccount:
-      create: false
-  serviceAccount:
-    create: false
 
 spark:
   appdata:

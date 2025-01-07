@@ -7,7 +7,7 @@ global:
     host: "postgresql-hl.postgresql.svc.cluster.local"
     port: 5432
   redis_dedup:
-    host: redis-dedup.redis.svc.cluster.local
+    host: valkey-dedup.redis.svc.cluster.local
     port: 6379
 
 postgresql:
@@ -450,7 +450,7 @@ configOverrides:
       'CACHE_TYPE': 'redis',
       'CACHE_DEFAULT_TIMEOUT': 600,
       'CACHE_KEY_PREFIX': 'superset_',
-      'CACHE_REDIS_URL': 'redis://{{ tpl .Values.global.redis_dedup.host . }}:{{ tpl (.Values.global.redis_dedup.port | toString) . }}/{{ tpl (toString .Values.redis.db_index) $ }}'
+      'CACHE_REDIS_URL': 'redis://{{ tpl .Values.global.valkey_dedup.host . }}:{{ tpl (.Values.global.valkey_dedup.port | toString) . }}/{{ tpl (toString .Values.redis.db_index) $ }}'
     }
 
   sql_alchemy_config: |
@@ -552,8 +552,8 @@ resources:
 ## Superset node configuration
 supersetNode:
   connections:
-    redis_host: "{{ .Values.global.redis_dedup.host }}"
-    redis_port: "{{ .Values.global.redis_dedup.port }}"
+    redis_host: "{{ .Values.global.valkey_dedup.host }}"
+    redis_port: "{{ .Values.global.valkey_dedup.port }}"
     db_host: "{{ .Values.global.postgresql.host }}"
     db_port: "{{ .Values.global.postgresql.port }}"
     db_user: "{{ .Values.postgresql.db_username }}"

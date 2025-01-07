@@ -46,7 +46,7 @@ prerequisites)
 coredb)
     rm -rf coredb
     cp -rf ../obsrv coredb
-    cp -rf ../services/{kafka,postgresql,redis-denorm,redis-dedup,kong,druid-operator} coredb/charts/
+    cp -rf ../services/{kafka,postgresql,kong,druid-operator,valkey-dedup,valkey-denorm} coredb/charts/
 
     ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
     if [ "$ssl_enabled" == "true" ]; then
@@ -75,6 +75,8 @@ coreinfra)
 
     helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
+
+    
 obsrvapis)
     rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
@@ -112,7 +114,7 @@ obsrvtools)
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
-    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,redis-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
+    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
 
     # copy cloud specific helm charts
     case $cloud_env in
