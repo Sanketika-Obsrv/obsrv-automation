@@ -12,3 +12,5 @@ UPDATE oauth_users SET is_owner=true WHERE user_name ='obsrv_admin';
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
+
+UPDATE oauth_users SET roles='{admin}' WHERE user_name ='obsrv_admin';
