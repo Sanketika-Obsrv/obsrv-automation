@@ -205,7 +205,9 @@ primary:
   ##  - "--maxmemory-policy volatile-ttl"
   ##  - "--repl-backlog-size 1024mb"
   ##
-  extraFlags: []
+  extraFlags:
+      - --maxmemory 1024mb
+      - --maxmemory-policy noeviction
   ## @param primary.extraEnvVars Array with extra environment variables to add to Valkey primary nodes
   ## e.g:
   ## extraEnvVars:
