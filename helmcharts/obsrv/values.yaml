@@ -2867,6 +2867,79 @@ promtail:
       release: monitoring
       system.monitoring: "true"
 
+valkey-dedup:
+  architecture: standalone
+  auth:
+    enabled: false
+  commonConfiguration: |-
+    # Enable RDB persistence
+    save 300 100
+  commonLabels:
+    system.processing: "true"
+    system.storage: "true"
+  primary:
+    configuration: ""
+    containerPorts:
+      redis: 6379
+    count: 1
+    disableCommands:
+      - FLUSHALL
+    extraFlags:
+      - --maxmemory 512mb
+      - --maxmemory-policy volatile-ttl
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      enabled: true
+      labels:
+        system.processing: "true"
+        system.storage: "true"
+      path: /data
+      size: 1Gi
+      storageClass: ""
+      subPath: ""
+      subPathExpr: ""
+    podLabels:
+      system.processing: "true"
+      system.storage: "true"
+
+valkey-denorm:
+  architecture: standalone
+  auth:
+    enabled: false
+  commonConfiguration: |-
+    # Enable RDB persistence
+     save 300 100
+  commonLabels:
+    system.processing: "true"
+    system.storage: "true"
+  primary:
+    configuration: ""
+    containerPorts:
+      redis: 6379
+    count: 1
+    disableCommands:
+      - FLUSHALL
+    extraFlags:
+      - --maxmemory 1024mb
+      - --maxmemory-policy noeviction
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      enabled: true
+      labels:
+        system.processing: "true"
+        system.storage: "true"
+      path: /data
+      size: 2Gi
+      storageClass: ""
+      subPath: ""
+      subPathExpr: ""
+    podLabels:
+      system.processing: "true"
+      system.storage: "true"
+
+
 spark:
   appdata:
     spark-defaults:
