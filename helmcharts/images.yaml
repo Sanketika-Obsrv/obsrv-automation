@@ -110,18 +110,15 @@ images: &images
     tag: "3.2.2"
     digest: ""
 
-  redis: &redis
+  valkey: &valkey
     registry: "docker.io"
-    repository: "bitnami/redis"
-    tag: "7.4-debian-12"
+    repository: "bitnami/valkey"
+    tag: "8.0.1-debian-12-r3"
     digest: ""
     pullSecrets:
       - *dockerSecretName
 
-  redis-exporter: &redis-exporter
-    repository: oliver006/redis_exporter
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "v1.66.0"
+
   # submit-ingestion: &submit-ingestion
   #   registry: "docker.io"
   #   repository: "ubuntu"
@@ -242,7 +239,7 @@ images: &images
 
   secor: &secor # registry: ""
     repository: "secor"
-    tag: "1.0.1"
+    tag: "0.32"
     digest: ""
 
   spark: &spark # registry: ""
@@ -407,17 +404,15 @@ internal: &internal
     image:
       <<: *velero
 
-  redis-dedup:
+  valkey-dedup:
     image:
-      <<: *redis
+      <<: *valkey
 
-  redis-denorm:
+  valkey-denorm:
     image:
-      <<: *redis
+      <<: *valkey
 
-  redis-exporter: 
-     image:
-       <<: *redis-exporter    
+
 
 
   loki:
