@@ -165,16 +165,16 @@ velero-backup: &velero-backup
         aws_access_key_id="minioadmin"
         aws_secret_access_key="198CImxTlly79Dx9ZCDJ"
   configuration:
-    provider: *storage_provider
     backupStorageLocation:
-      provider: *storage_provider
+    - provider: *storage_provider
       bucket: *velero_backup_cloud_bucket
       config:
         region: *region
         s3ForcePathStyle: true
         s3Url: *s3-endpoint-url
     volumeSnapshotLocation:
-      name: default
+    - name:
+      provider: *storage_provider
       namespace: velero
       config:
         region: *region

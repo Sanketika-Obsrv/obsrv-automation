@@ -33,6 +33,16 @@ bootstrap)
     cp -rf ../bootstrapper ./bootstrapper
     helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace
     ;;
+prerequisites)
+    rm -rf prerequisites
+    cp -rf ../obsrv prerequisites
+
+    if [ -z "$cloud_env" ]; then
+        cp -rf ../services/minio prerequisites/charts/
+    fi
+
+    helm $cmd prerequisites ./prerequisites -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    ;;
 coredb)
     rm -rf coredb
     cp -rf ../obsrv coredb
@@ -49,10 +59,6 @@ migrations)
     rm -rf migrations
     cp -rf ../obsrv migrations
     cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
-
-    if [ -z "$cloud_env" ]; then
-        cp -rf ../services/minio migrations/charts/
-    fi
 
     helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
@@ -148,6 +154,7 @@ reset)
     helm uninstall opentelemetry-collector -n obsrv
     helm uninstall oauth -n obsrv
     helm uninstall obsrv-bootstrap -n obsrv
+    helm uninstall prerequisites -n obsrv
 
     ;;
 *)

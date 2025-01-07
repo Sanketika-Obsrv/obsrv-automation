@@ -864,7 +864,7 @@ keycloak:
                 "clientId": "webConsole",
                 "name": "webConsole",
                 "description": "",
-                "rootUrl": "https://{{.Values.global.domain}}",
+                "rootUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
                 "adminUrl": "",
                 "baseUrl": "",
                 "surrogateAuthRequired": false,
@@ -873,15 +873,15 @@ keycloak:
                 "clientAuthenticatorType": "client-secret",
                 "redirectUris": [
                   "",
-                  "https://{{.Values.global.domain}}/console",
-                  "https://{{.Values.global.domain}}/*",
-                  "https://{{.Values.global.domain}}/console?auth_callback=1",
+                  "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console",
+                  "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*",
+                  "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console?auth_callback=1",
                   "https://keycloak.{{.Values.global.domain}}/*",
                   "http://{{.Values.global.domain}}/*"
                 ],
                 "webOrigins": [
-                  "https://{{.Values.global.domain}}/console",
-                  "https://{{.Values.global.domain}}/*",
+                  "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console",
+                  "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*",
                   "*"
                 ],
                 "notBefore": 0,
@@ -897,7 +897,7 @@ keycloak:
                 "attributes": {
                   "client.introspection.response.allow.jwt.claim.enabled": "false",
                   "login_theme": "keycloak",
-                  "post.logout.redirect.uris": "+##https://{{.Values.global.domain}}/*##https://{{.Values.global.domain}}/console##*https://{{.Values.global.domain}}/console/*##https://{{.Values.global.domain}}##",
+                  "post.logout.redirect.uris": "+##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console##*http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}##",
                   "oauth2.device.authorization.grant.enabled": "false",
                   "backchannel.logout.revoke.offline.tokens": "false",
                   "use.refresh.tokens": "true",
@@ -2584,7 +2584,7 @@ kube-prometheus-stack:
       GF_AUTH_SKIP_ORG_ROLE_SYNC: true
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SERVER_DOMAIN: '{{ .Values.global.domain }}'
-      GF_SERVER_ROOT_URL: https://{{ .Values.global.domain }}/grafana
+      GF_SERVER_ROOT_URL: http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana
       GF_SERVER_SERVE_FROM_SUBPATH: true
     extraLabels:
       system.monitoring: "true"
