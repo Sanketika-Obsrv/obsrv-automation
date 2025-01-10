@@ -74,7 +74,7 @@ postgres:
 
 global:
   redis:
-    host: redis-denorm.redis.svc.cluster.local
+    host: valkey-denorm.redis.svc.cluster.local
     port: 6379
   cassandra:
     host: localhost
@@ -165,13 +165,13 @@ base_config: |
 
   redis.connection.timeout = 100
   redis {
-    host = "{{ .Values.global.redis_dedup.host }}"
-    port = {{ .Values.global.redis_dedup.port }}
+    host = "{{ .Values.global.valkey_dedup.host }}"
+    port = {{ .Values.global.valkey_dedup.port }}
   }
 
   redis-meta {
-    host = "{{ .Values.global.redis_denorm.host }}"
-    port = {{ .Values.global.redis_denorm.port }}
+    host = "{{ .Values.global.valkey_denorm.host }}"
+    port = {{ .Values.global.valkey_denorm.port }}
   }
 
   task {
