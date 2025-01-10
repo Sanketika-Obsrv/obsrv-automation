@@ -2638,9 +2638,7 @@ kube-prometheus-stack:
     commonMetaLabels:
       system.monitoring: "true"
     prometheusSpec:
-      additional
-      
-      Configs:
+      additionalScrapeConfigs:
         - job_name: s3-common-backups
           metrics_path: /probe
           relabel_configs:
