@@ -121,9 +121,9 @@ secor_jobs:
     timestamp_key: "obsrv_meta.syncts"
   system-telemetry-backup:
     <<: *base_config
-    topic: "{{.Values.global.env}}.system-telemetry"
+    topic: "system.telemetry.events"
     service_name: "system-telemetry-backup"
-    consumer_group: "{{.Values.global.env}}.system-telemetry-events"
+    consumer_group: "system-telemetry-events"
     base_path: "{{ .Values.base_path }}/system-telemetry"
     timestamp_key: "ets"
   masterdata-ingest-backup:

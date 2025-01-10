@@ -543,7 +543,7 @@ global:
   postgresql: *postgresql
   flink: *flink
   valkey_denorm: *valkey_denorm
-  valkey_denorm: *valkey_denorm
+  valkey_dedup: *valkey_dedup
   druid-raw-cluster: *druid-raw-cluster
   spark: *spark
   cert-manager: *cert-manager

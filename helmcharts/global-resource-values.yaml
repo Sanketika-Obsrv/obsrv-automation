@@ -145,11 +145,11 @@ druid-operator:
 postgresql-migration:
   resources:
     limits:
-      cpu: 100m
-      memory: 712Mi
+      cpu: 500m
+      memory: 1024Mi
     requests:
-      cpu: 100m
-      memory: 711Mi
+      cpu: 250m
+      memory: 768Mi
       #issue running helm templete
 
 cert-manager:
