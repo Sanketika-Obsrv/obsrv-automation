@@ -487,14 +487,14 @@ configOverrides:
            },
            'api_base_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}',
            'access_token_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token',
-           'authorize_url':'/console/api/oauth/v1/authorize'
+           'authorize_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/authorize'
         }
       }
     ]
     AUTH_USER_REGISTRATION = True
     AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
-    ENABLE_PROXY_FIX = True
+    ENABLE_PROXY_FIX = False
 
     from custom_sso_security_manager import CustomSsoSecurityManager
     CUSTOM_SECURITY_MANAGER = CustomSsoSecurityManager

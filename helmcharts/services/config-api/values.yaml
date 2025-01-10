@@ -177,3 +177,4 @@ env:
   pipeline_merged_job_manager_url: "http://unified-pipeline-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   masterdata_processor_job_manager_url: "http://master-data-processor-ext-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   prometheus_url: "{{ .Values.global.prometheus.url }}"
+  telemetry_dataset: "system.telemetry.events"

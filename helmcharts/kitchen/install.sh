@@ -34,14 +34,12 @@ bootstrap)
     helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace
     ;;
 prerequisites)
-    rm -rf prerequisites
-    cp -rf ../obsrv prerequisites
-
     if [ -z "$cloud_env" ]; then
+        rm -rf prerequisites
+        cp -rf ../obsrv prerequisites
         cp -rf ../services/minio prerequisites/charts/
+        helm $cmd prerequisites ./prerequisites -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     fi
-
-    helm $cmd prerequisites ./prerequisites -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 coredb)
     rm -rf coredb
@@ -129,6 +127,7 @@ additional)
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 all)
+    bash $0 prerequisites ${@: 2}
     bash $0 bootstrap ${@: 2}
     bash $0 coredb ${@: 2}
     bash $0 migrations ${@: 2}

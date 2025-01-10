@@ -178,3 +178,4 @@ env:
   masterdata_processor_job_manager_url: "http://cache-indexer-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   prometheus_url: "{{ .Values.global.prometheus.url }}"
   storage_types: '{"lake_house":true,"realtime_store":true}'
+  telemetry_dataset: "system.telemetry.events"
