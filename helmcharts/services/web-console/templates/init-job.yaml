@@ -70,13 +70,13 @@ spec:
                       echo "unable to find the token for the service account. Please manually delete the service account and rerun this job."
                       exit 1
                   else
-                      if ! kubectl get secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
-                          echo "secret '{{ .Values.namespace }}-grafana-secret' does not exists..creating..."
+                      if ! kubectl get secret {{ .Values.namespace }}-{{ include "common.names.fullname" . }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
+                          echo "secret '{{ .Values.namespace }}-{{ include "common.names.fullname" . }}-grafana-secret' does not exists..creating..."
                       else
-                          echo "secret '{{ .Values.namespace }}-grafana-secret' already exists..deleting and recreating..."
-                          kubectl delete secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }}
+                          echo "secret '{{ .Values.namespace }}-{{ include "common.names.fullname" . }}-grafana-secret' already exists..deleting and recreating..."
+                          kubectl delete secret {{ .Values.namespace }}-{{ include "common.names.fullname" . }}-grafana-secret -n {{ .Values.namespace }}
                       fi
-                      kubectl create secret generic {{ .Values.namespace }}-grafana-secret --from-literal=bearer_token="Bearer $auth_token" -n {{ .Values.namespace }}
+                      kubectl create secret generic {{ .Values.namespace }}-{{ include "common.names.fullname" . }}-grafana-secret --from-literal=grafana_token="Bearer $auth_token" -n {{ .Values.namespace }}
                   fi
               }
 
@@ -109,8 +109,8 @@ spec:
               else
                   echo "Service account already exists. The ID of the service account 'grafana-{{ .Values.namespace }}-sa' is: $id"
 
-                  if ! kubectl get secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
-                      echo "secret '{{ .Values.namespace }}-grafana-secret' does not exists..creating..."
+                  if ! kubectl get secret {{ .Values.namespace }}-{{ include "common.names.fullname" . }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
+                      echo "secret '{{ .Values.namespace }}-{{ include "common.names.fullname" . }}-grafana-secret' does not exists..creating..."
                   fi
 
                   curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
