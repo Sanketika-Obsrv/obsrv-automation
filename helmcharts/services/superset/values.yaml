@@ -84,7 +84,7 @@ extraConfigs:
       allow_ctas: true
       allow_cvas: true
       database_name: obsrv
-      sqlalchemy_uri: druid://dataset-api.dataset-api.svc.cluster.local:3000/v2/obsrv/data/sql-query
+      sqlalchemy_uri: druid://druid-raw-brokers.druid-raw.svc.cluster.local:8082/druid/v2/sql
       uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
       version: 1.0.0
       tables:

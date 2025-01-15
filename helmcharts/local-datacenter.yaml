@@ -173,9 +173,7 @@ velero-backup: &velero-backup
         s3ForcePathStyle: true
         s3Url: *s3-endpoint-url
     volumeSnapshotLocation:
-    - name:
-      provider: *storage_provider
-      namespace: velero
+    - provider: *storage_provider
       config:
         region: *region
   initContainers:
