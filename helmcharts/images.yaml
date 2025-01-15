@@ -239,7 +239,7 @@ images: &images
 
   secor: &secor # registry: ""
     repository: "secor"
-    tag: "0.32"
+    tag: "0.29.1"
     digest: ""
 
   spark: &spark # registry: ""
