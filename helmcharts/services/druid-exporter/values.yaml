@@ -9,7 +9,7 @@ image:
 
 annotations: {}
 
-druidURL: http://druid-raw-routers.druid-raw.svc:8888
+druidURL: http://druid-raw-routers.druid-raw.svc.cluster.local:8888
 logLevel: info
 logFormat: json
 noHistogram: false

@@ -1,8 +1,9 @@
-{{- range .Values.namespaces }}
+{{- range $namespace := .Values.namespaces }}
+{{- if ne $namespace $.Release.Namespace }}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{.}}
+  name: {{ $namespace }}
 {{- end }}
-
+{{- end }}

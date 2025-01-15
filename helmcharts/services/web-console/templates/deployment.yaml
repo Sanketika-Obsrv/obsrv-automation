@@ -61,8 +61,8 @@ spec:
           - name: GF_BEARER_TOKEN
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.namespace }}-grafana-secret
-                key: bearer_token
+                name: {{ include "common.names.fullname" . }}-grafana-secret
+                key: grafana_token
           - name: USER_TOKEN_PRIVATE_KEY
             valueFrom:
               secretKeyRef:

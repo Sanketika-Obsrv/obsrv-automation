@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: lakehouse-connector-config
-  namespace: {{ .Values.namespace }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: flink
     system.processing: "true"
