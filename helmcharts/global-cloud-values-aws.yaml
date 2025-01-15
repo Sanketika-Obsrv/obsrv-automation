@@ -7,7 +7,6 @@ global:
   dataset_api_container: "<fill-value>"  # Update the dataset APIs bucket name
   config_api_container: "<fill-value>"   # Update the config APIs bucket name
   postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name
-  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "<fill-value>" # Update with the backup bucket name
   velero_backup_cloud_bucket: &velero_backup_cloud_bucket "<fill-value>" # Update with velero backup  bucket name
   cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the name of cloud storage bucket
   hudi_metadata_bucket: &hudi_metadata_bucket "s3a://<fill-value>/hudi" # Update with hudi bucket name
@@ -45,92 +44,12 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   postgresql_backup: &postgresql_backup_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-  redis_backup: &redis_backup_sa_annotation
-    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   s3_exporter: &s3_exporter_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   spark: &spark_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   velero: &velero_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
-
-
-redis-service-account: &redis-service-account
-  serviceAccount:
-    create: *create_sa
-    name: redis-backup-sa
-    annotations:
-      <<: *redis_backup_sa_annotation
-
-redis_dedup_backup_sidecar: &redis_dedup_backup_sidecar
-  master:
-    sidecars:
-      - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.6-GA
-        volumeMounts:
-          - mountPath: "/data"
-            name: redis-data
-        env:
-          - name: REDIS_BACKUP_CRON_SCHEDULE
-            value: "00 00 * * *"
-          - name: CLOUD_SERVICE
-            value: *cloud_store_provider
-          - name: S3_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: GCS_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: REDIS_RDB_FILE_PATH
-            value: "/data"
-          - name: REDIS_REPLICATION_MODE
-            value: master
-          - name: AZURE_STORAGE_ACCOUNT_NAME
-            value: "name"
-          - name: AZURE_STORAGE_ACCOUNT_KEY
-            value: "key"
-          - name: AZURE_BACKUP_BUCKET
-            value: "backup"
-          - name: BACKUP_PREFIX
-            value: dedup-redis
-        resources:
-          limits:
-            cpu: 0.2
-            memory: 100Mi
-    <<: *redis-service-account
-
-redis_denorm_backup_sidecar: &redis_denorm_backup_sidecar
-  master:
-    sidecars:
-      - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.6-GA
-        volumeMounts:
-          - mountPath: "/data"
-            name: redis-data
-        env:
-          - name: REDIS_BACKUP_CRON_SCHEDULE
-            value: "00 00 * * *"
-          - name: CLOUD_SERVICE
-            value: *cloud_store_provider
-          - name: S3_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: GCS_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: REDIS_RDB_FILE_PATH
-            value: "/data"
-          - name: REDIS_REPLICATION_MODE
-            value: master
-          - name: AZURE_STORAGE_ACCOUNT_NAME
-            value: "name"
-          - name: AZURE_STORAGE_ACCOUNT_KEY
-            value: "key"
-          - name: AZURE_BACKUP_BUCKET
-            value: "backup"
-          - name: BACKUP_PREFIX
-            value: denorm-redis
-        resources:
-          limits:
-            cpu: 0.2
-            memory: 100Mi
-    <<: *redis-service-account
 
 s3-exporter-service-account: &s3-exporter-service-account
   s3_region: *cloud_storage_region
@@ -146,21 +65,22 @@ velero-backup: &velero-backup
       create: *create_sa
       name: velero-backup-sa
       annotations:
-        <<: *velero_sa_annotation
+        <<: *velero_sa_annotation 
       labels:
   credentials:
     useSecret: false
   configuration:
     backupStorageLocation:
+    - name:
       provider: *cloud_storage_provider
       bucket: *velero_backup_cloud_bucket
       config:
         region: *cloud_storage_region
     volumeSnapshotLocation:
-      name: default
-      namespace: velero
-      config:
-        region: *cloud_storage_region
+      - name:
+        provider: *cloud_storage_provider
+        config:
+          region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-aws
       image: velero/velero-plugin-for-aws
@@ -184,12 +104,6 @@ dataset-api-service-account: &dataset-api-service-account
   serviceAccount:
     create: *create_sa
     annotations: {}
-
-redis-denorm:
-  << : *redis_denorm_backup_sidecar
-
-redis-dedup:
-  << : *redis_dedup_backup_sidecar
 
 velero:
   <<: *velero-backup

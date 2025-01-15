@@ -6,7 +6,7 @@ defaults:
     kafka_namespace: &kafka-namespace "kafka"
     postgresql_namespace: &postgresql-namespace "postgresql"
     druid_namespace: &druid-namespace "druid-raw"
-    redis_namespace: &redis-namespace "redis"
+    valkey_namespace: &valkey-namespace "redis"
     flink_namespace: &flink_namespace "flink"
     loki_namespace: &loki-namespace "loki"
     monitoring_namespace: &monitoring-namespace "monitoring"
@@ -247,27 +247,17 @@ keycloak:
   obsrvpassword: enDoPvTAxFSd
 
 
-redis-denorm: &redis_denorm
-  namespace: *redis-namespace
-  host: redis-denorm-headless.redis.svc.cluster.local
+valkey-denorm: &valkey_denorm
+  namespace: *valkey-namespace
+  fullnameOverride: valkey-denorm
+  host: valkey-denorm-headless.redis.svc.cluster.local
   port: 6379
 
-redis-dedup: &redis_dedup
-  namespaceOverride: *redis-namespace #TODO: check why namespace  doesn't work here
-  host: &redis-url redis-dedup-headless.redis.svc.cluster.local
+valkey-dedup: &valkey_dedup
+  namespace: *valkey-namespace
+  fullnameOverride: valkey-dedup
+  host: &redis-url valkey-dedup-headless.redis.svc.cluster.local
   port: 6379
-
-redis-exporter:
-  namespace: *redis-namespace
-  fullnameOverride: redis-exporter
-  serviceMonitor:
-    enabled: true
-    multipleTarget: true
-    targets:
-      - url: redis://redis-denorm-headless.redis.svc.cluster.local
-        name: denorm-redis
-      - url: redis://redis-dedup-headless.redis.svc.cluster.local
-        name: dedup-redis
 
 flink: &flink
   namespace: *flink_namespace
@@ -552,8 +542,8 @@ global:
   druid: *druid
   postgresql: *postgresql
   flink: *flink
-  redis_denorm: *redis_denorm
-  redis_dedup: *redis_dedup
+  valkey_denorm: *valkey_denorm
+  valkey_dedup: *valkey_dedup
   druid-raw-cluster: *druid-raw-cluster
   spark: *spark
   cert-manager: *cert-manager
@@ -562,5 +552,5 @@ global:
   dataset_api: *dataset-api
   storageClass: ""
   # This redis is used by flink
-  redis: *redis_denorm
+  redis: *valkey_denorm
   prometheus: *prometheus

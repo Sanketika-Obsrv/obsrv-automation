@@ -4,9 +4,31 @@ image:
   registry: sanketikahub
   repository: lakehouse-connector
   tag: 1.0.8
+# serviceMonitor:
+#   enabled: true
+# replicaCount: 1
 serviceMonitor:
-  enabled: false
-replicaCount: 1
+  jobmanager:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {} # additional labels e.g. release: prometheus
+    honorLabels: true
+    jobLabel: "app.kubernetes.io/name"
+    port: prom
+  taskmanager:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {} # additional labels e.g. release: prometheus
+    honorLabels: true
+    jobLabel: "app.kubernetes.io/name"
+    port: prom
+commonLabels:
+  system.processing: "true"
+  release: monitoring
+  app: flink
+
 
 jobmanager:
   rpc_port: 6123
@@ -52,7 +74,7 @@ postgres:
 
 global:
   redis:
-    host: redis-denorm.redis.svc.cluster.local
+    host: valkey-denorm.redis.svc.cluster.local
     port: 6379
   cassandra:
     host: localhost
@@ -143,13 +165,13 @@ base_config: |
 
   redis.connection.timeout = 100
   redis {
-    host = "{{ .Values.global.redis_dedup.host }}"
-    port = {{ .Values.global.redis_dedup.port }}
+    host = "{{ .Values.global.valkey_dedup.host }}"
+    port = {{ .Values.global.valkey_dedup.port }}
   }
 
   redis-meta {
-    host = "{{ .Values.global.redis_denorm.host }}"
-    port = {{ .Values.global.redis_denorm.port }}
+    host = "{{ .Values.global.valkey_denorm.host }}"
+    port = {{ .Values.global.valkey_denorm.port }}
   }
 
   task {
@@ -189,6 +211,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+commonAnnotations:
+  reloader.stakater.com/auto: "true"
 hadoop_core_site: {}
 
 lakehouse-connector:

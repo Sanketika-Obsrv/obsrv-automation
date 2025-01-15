@@ -75,8 +75,8 @@ postgresql:
         system.querying: "true"
         system.api: "true"
 
-redis-denorm:
-  master:
+valkey-denorm:
+  primary:
     resources:
       limits:
         cpu: 0.5
@@ -99,8 +99,8 @@ redis-denorm:
         - ReadWriteOnce
       size: 2Gi
 
-redis-dedup:
-  master:
+valkey-dedup:
+  primary:
     resources:
       limits:
         cpu: 0.5
@@ -145,11 +145,11 @@ druid-operator:
 postgresql-migration:
   resources:
     limits:
-      cpu: 100m
-      memory: 712Mi
+      cpu: 500m
+      memory: 1024Mi
     requests:
-      cpu: 100m
-      memory: 711Mi
+      cpu: 250m
+      memory: 768Mi
       #issue running helm templete
 
 cert-manager:

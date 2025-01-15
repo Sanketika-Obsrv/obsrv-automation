@@ -33,10 +33,18 @@ bootstrap)
     cp -rf ../bootstrapper ./bootstrapper
     helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace
     ;;
+prerequisites)
+    if [ -z "$cloud_env" ]; then
+        rm -rf prerequisites
+        cp -rf ../obsrv prerequisites
+        cp -rf ../services/minio prerequisites/charts/
+        helm $cmd prerequisites ./prerequisites -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    fi
+    ;;
 coredb)
     rm -rf coredb
     cp -rf ../obsrv coredb
-    cp -rf ../services/{kafka,postgresql,redis-denorm,redis-dedup,kong,druid-operator} coredb/charts/
+    cp -rf ../services/{kafka,postgresql,kong,druid-operator,valkey-dedup,valkey-denorm} coredb/charts/
 
     ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
     if [ "$ssl_enabled" == "true" ]; then
@@ -49,10 +57,6 @@ migrations)
     rm -rf migrations
     cp -rf ../obsrv migrations
     cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
-
-    if [ -z "$cloud_env" ]; then
-        cp -rf ../services/minio migrations/charts/
-    fi
 
     helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
@@ -69,6 +73,8 @@ coreinfra)
 
     helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
+
+    
 obsrvapis)
     rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
@@ -106,7 +112,7 @@ obsrvtools)
 additional)
     rm -rf additional
     cp -rf ../obsrv additional
-    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,redis-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
+    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
 
     # copy cloud specific helm charts
     case $cloud_env in
@@ -121,6 +127,7 @@ additional)
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     ;;
 all)
+    bash $0 prerequisites ${@: 2}
     bash $0 bootstrap ${@: 2}
     bash $0 coredb ${@: 2}
     bash $0 migrations ${@: 2}
@@ -148,6 +155,7 @@ reset)
     helm uninstall opentelemetry-collector -n obsrv
     helm uninstall oauth -n obsrv
     helm uninstall obsrv-bootstrap -n obsrv
+    helm uninstall prerequisites -n obsrv
 
     ;;
 *)

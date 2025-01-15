@@ -2673,9 +2673,62 @@ kube-prometheus-stack:
           scrape_timeout: 30s
           static_configs:
             - targets:
-                - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql;
-                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=dedup-redis;
-                - bucket={{ .Values.global.redis_backup_cloud_bucket }};prefix=denorm-redis;
+                - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql
+        - job_name: minio-job-cluster
+          static_configs:
+            - targets: "minio.minio.svc.cluster.local:9000"
+              labels:
+                service: "minio"
+          metrics_path: "/minio/v2/metrics/cluster" # Endpoint for MinIO metrics
+          scheme: "http" # Use "https" if MinIO is running with SSL
+          scrape_interval: 5m
+          scrape_timeout: 30s
+        - job_name: minio-job-node
+          metrics_path: /minio/v2/metrics/node
+          scheme: http
+          static_configs:
+          - targets: "minio.minio.svc.cluster.local:9000"
+            labels:
+              service: "minio"
+          scrape_interval: 5m
+          scrape_timeout: 30s
+        - job_name: minio-job-bucket
+          metrics_path: /minio/v2/metrics/bucket
+          scheme: http
+          static_configs:
+          - targets: "minio.minio.svc.cluster.local:9000"
+            labels:
+              service: "minio"
+          scrape_interval: 5m
+          scrape_timeout: 30s
+        - job_name: minio-job-resource
+          metrics_path: /minio/v2/metrics/resource
+          scheme: http
+          static_configs:
+          - targets: "minio.minio.svc.cluster.local:9000"
+            labels:
+              service: "minio"
+          scrape_interval: 5m
+          scrape_timeout: 30s
+        - job_name: 'redis_exporter_targets'
+          static_configs:
+            - targets:
+                - redis://valkey-denorm-headless.redis.svc.cluster:6379
+                - redis://valkey-dedup-headless.redis.svc.cluster:6379
+          metrics_path: /metrics
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: 'redis://valkey-denorm-headless.redis.svc.cluster:6379'
+              target_label: __address__
+              replacement: valkey-denorm-metrics.redis.svc.cluster.local:9121
+            - source_labels: [__address__]
+              regex: 'redis://valkey-dedup-headless.redis.svc.cluster:6379'
+              target_label: __address__
+              replacement: valkey-dedup-metrics.redis.svc.cluster.local:9121
+            - source_labels: [__address__]
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
       retention: 90d
       storageSpec:
         volumeClaimTemplate:
@@ -2847,7 +2900,7 @@ promtail:
       release: monitoring
       system.monitoring: "true"
 
-redis-dedup:
+valkey-dedup:
   architecture: standalone
   auth:
     enabled: false
@@ -2857,8 +2910,7 @@ redis-dedup:
   commonLabels:
     system.processing: "true"
     system.storage: "true"
-  fullnameOverride: redis-dedup
-  master:
+  primary:
     configuration: ""
     containerPorts:
       redis: 6379
@@ -2883,42 +2935,8 @@ redis-dedup:
     podLabels:
       system.processing: "true"
       system.storage: "true"
-    resources:
-      limits:
-        cpu: 0.5
-        memory: 512Mi
-      requests:
-        cpu: 0.5
-        memory: 512Mi
-  replica:
-    configuration: ""
-    containerPorts:
-      redis: 6379
-    disableCommands:
-      - FLUSHALL
-    extraFlags:
-      - --maxmemory 512mb
-      - --maxmemory-policy volatile-ttl
-    persistence:
-      accessModes:
-        - ReadWriteOnce
-      enabled: true
-      labels:
-        system.processing: "true"
-        system.storage: "true"
-      path: /data
-      size: 1Gi
-      storageClass: ""
-      subPath: ""
-      subPathExpr: ""
-    podLabels:
-      system.processing: "true"
-      system.storage: "true"
-    replicaCount: 1
-    serviceAccount:
-      create: true
 
-redis-denorm:
+valkey-denorm:
   architecture: standalone
   auth:
     enabled: false
@@ -2928,8 +2946,7 @@ redis-denorm:
   commonLabels:
     system.processing: "true"
     system.storage: "true"
-  fullnameOverride: redis-denorm
-  master:
+  primary:
     configuration: ""
     containerPorts:
       redis: 6379
@@ -2954,43 +2971,7 @@ redis-denorm:
     podLabels:
       system.processing: "true"
       system.storage: "true"
-    resources:
-      limits:
-        cpu: 0.5
-        memory: 2Gi
-      requests:
-        cpu: 0.5
-        memory: 1Gi
-  nameOverride: redis-denorm
-  replica:
-    configuration: ""
-    containerPorts:
-      redis: 6379
-    disableCommands:
-      - FLUSHALL
-    extraFlags:
-      - --maxmemory 1024mb
-      - --maxmemory-policy noeviction
-    persistence:
-      accessModes:
-        - ReadWriteOnce
-      enabled: true
-      labels:
-        system.processing: "true"
-        system.storage: "true"
-      path: /data
-      size: 2Gi
-      storageClass: ""
-      subPath: ""
-      subPathExpr: ""
-    podLabels:
-      system.processing: "true"
-      system.storage: "true"
-    replicaCount: 1
-    serviceAccount:
-      create: false
-  serviceAccount:
-    create: false
+
 
 spark:
   appdata:

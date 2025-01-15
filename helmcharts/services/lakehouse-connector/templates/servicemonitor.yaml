@@ -1,0 +1,57 @@
+{{- $currentScope := .}}
+
+{{- if .Values.serviceMonitor.jobmanager.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Chart.Name }}-jobmanager
+  namespace: flink
+  labels:
+    {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    component: {{ .Chart.Name }}-jobmanager
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  jobLabel: {{ .Values.serviceMonitor.jobmanager.jobLabel }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 6 }}
+      component: {{ .Chart.Name }}-jobmanager
+  endpoints:
+    - port: {{ .Values.serviceMonitor.jobmanager.port }} # the name of the port in your service
+      interval: {{ .Values.serviceMonitor.jobmanager.interval }}
+      scrapeTimeout: {{ .Values.serviceMonitor.jobmanager.scrapeTimeout }}
+      honorLabels: {{ .Values.serviceMonitor.jobmanager.honorLabels }}
+  
+{{- end }}
+
+{{- if .Values.serviceMonitor.taskmanager.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Chart.Name }}-taskmanager
+  namespace: flink
+  labels:
+    {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    component: {{ .Chart.Name }}-taskmanager
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  jobLabel: {{ .Values.serviceMonitor.taskmanager.jobLabel }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 6 }}
+      component: {{ .Chart.Name }}-taskmanager 
+  endpoints:
+    - port: {{ .Values.serviceMonitor.taskmanager.port }} # the name of the port in your service
+      interval: {{ .Values.serviceMonitor.taskmanager.interval }}
+      scrapeTimeout: {{ .Values.serviceMonitor.taskmanager.scrapeTimeout }}
+      honorLabels: {{ .Values.serviceMonitor.taskmanager.honorLabels }}
+  
+{{- end }}

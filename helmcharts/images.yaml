@@ -21,7 +21,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.3.1-RC"
+    tag: "1.4.0"
     digest: ""
 
   # dataset-api: #open source
@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.3.1-RC"
+    tag: "1.4.0"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -42,30 +42,30 @@ images: &images
 
   web-console: &web-console # registry: ""
     repository: "obsrv-web-console"
-    tag: "1.3.0-RC"
+    tag: "1.4.0"
     digest: ""
 
   ## PIPELINE ENTERPRISE
   unified-pipeline: &unified-pipeline # registry: ""
     repository: unified-pipeline
-    tag: "1.3.0-RC"
+    tag: "1.4.0"
     digest: ""
 
   cache-indexer: &cache-indexer # registry: ""
     repository: cache-indexer
-    tag: "1.3.0-RC"
+    tag: "1.4.0"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
   ## TODO: Add every component here
   transformer-ext: &transforer-ext # registry: ""
     repository: transformer-ext
-    tag: "1.0.6-GA"
+    tag: "1.4.0"
     digest: ""
 
   master-data-processor: &master-data-processor # registry: ""
     repository: master-data-processor
-    tag: "1.0.6-GA"
+    tag: "1.4.0"
     digest: ""
 
   postgresql-backup: &postgresql-backup # registry: ""
@@ -110,18 +110,15 @@ images: &images
     tag: "3.2.2"
     digest: ""
 
-  redis: &redis
+  valkey: &valkey
     registry: "docker.io"
-    repository: "bitnami/redis"
-    tag: "7.4-debian-12"
+    repository: "bitnami/valkey"
+    tag: "8.0.1-debian-12-r3"
     digest: ""
     pullSecrets:
       - *dockerSecretName
 
-  redis-exporter: &redis-exporter
-    repository: oliver006/redis_exporter
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "v1.66.0"
+
   # submit-ingestion: &submit-ingestion
   #   registry: "docker.io"
   #   repository: "ubuntu"
@@ -242,7 +239,7 @@ images: &images
 
   secor: &secor # registry: ""
     repository: "secor"
-    tag: "1.0.1"
+    tag: "0.29.1"
     digest: ""
 
   spark: &spark # registry: ""
@@ -355,7 +352,7 @@ images: &images
 
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.3.2-hudi-metrics
+    tag: 1.4.0
 
 
   opentelemetry-collector: &opentelemetry-collector
@@ -407,17 +404,15 @@ internal: &internal
     image:
       <<: *velero
 
-  redis-dedup:
+  valkey-dedup:
     image:
-      <<: *redis
+      <<: *valkey
 
-  redis-denorm:
+  valkey-denorm:
     image:
-      <<: *redis
+      <<: *valkey
 
-  redis-exporter: 
-     image:
-       <<: *redis-exporter    
+
 
 
   loki:
