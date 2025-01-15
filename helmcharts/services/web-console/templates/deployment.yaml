@@ -62,7 +62,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ include "common.names.fullname" . }}-grafana-secret
-                key: bearer_token
+                key: grafana_token
           - name: USER_TOKEN_PRIVATE_KEY
             valueFrom:
               secretKeyRef:

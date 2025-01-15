@@ -111,28 +111,28 @@ spec:
 
                   if ! kubectl get secret {{ include "common.names.fullname" . }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
                       echo "secret '{{ include "common.names.fullname" . }}-grafana-secret' does not exists..creating..."
-                  fi
 
-                  curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
-                      -H 'Accept: application/json' \
-                      -H 'Content-type: application/json' \
-                      -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}"
+                      curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
+                          -H 'Accept: application/json' \
+                          -H 'Content-type: application/json' \
+                          -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}"
 
-                  response=$(curl -Ss -X POST "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts" \
-                      -H 'Accept: application/json' \
-                      -H 'Content-type: application/json' \
-                      -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
-                      -d '{"name": "grafana-{{ include "common.names.fullname" . }}-sa","role": "Admin","isDisabled": false}')
+                      response=$(curl -Ss -X POST "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts" \
+                          -H 'Accept: application/json' \
+                          -H 'Content-type: application/json' \
+                          -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
+                          -d '{"name": "grafana-{{ include "common.names.fullname" . }}-sa","role": "Admin","isDisabled": false}')
 
-                  echo "SA creation response:"
-                  echo $response
-                  service_account_id=$(echo "$response" | jq -r '.id')
+                      echo "SA creation response:"
+                      echo $response
+                      service_account_id=$(echo "$response" | jq -r '.id')
 
-                  if [ -z "$service_account_id" ]; then
-                      echo "failed to create service account"
-                      exit 1;
-                  else
-                      generate_token_and_create_secret $service_account_id
+                      if [ -z "$service_account_id" ]; then
+                          echo "failed to create service account"
+                          exit 1;
+                      else
+                          generate_token_and_create_secret $service_account_id
+                      fi
                   fi
                   exit 0
               fi
