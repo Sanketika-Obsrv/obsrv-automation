@@ -49,10 +49,8 @@ flink:
 
 kafka:
   fullnameOverride: kafka
-  namespace: &kafkans kafka
   zookeeper:
     fullnameOverride: kafka-zookeeper
-    namespace: *kafkans
 
 kafka-exporter:
   fullnameOverride: kafka-exporter
@@ -2884,7 +2882,6 @@ promitor-agent-scraper:
 
 promtail:
   fullnameOverride: promtail
-  namespace: loki
   podLabels:
     system.monitoring: "true"
   resources:

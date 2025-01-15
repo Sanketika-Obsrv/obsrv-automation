@@ -287,6 +287,8 @@ prometheus: &prometheus
 loki:
   namespace: *loki-namespace
 
+promtail:
+  namespace: *loki-namespace
 
 druid-raw-cluster: &druid-raw-cluster
   namespace: *druid-namespace
