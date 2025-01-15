@@ -2,7 +2,7 @@ defaults:
   env: &env "dev"
   building-block: &building-block "obsrv"
   encryption_key: &encryption-key "strong_encryption_key_to_encrypt"
-  namespaces:
+  namespaces: &namespaces
     kafka_namespace: &kafka-namespace "kafka"
     postgresql_namespace: &postgresql-namespace "postgresql"
     druid_namespace: &druid-namespace "druid-raw"
@@ -30,6 +30,9 @@ defaults:
     minio_namespace: &minio_namespace "minio"
     opentelemetry-collector: &opentelemetry-collector "otel"
     keycloak_namespace: &keycloak_namespace "keycloak"
+    connector_namespaces:
+      spark: *spark-namespace
+      flink: &flink_connector_namespace "flink_connectors"
 
   postgres:
     pghost: &pghost "postgresql-hl.postgresql.svc.cluster.local"
@@ -126,7 +129,6 @@ kafka: &kafka
       - name: *connectorsFailedTopic
         partitions: 4
         replicationFactor: 1
-
 
 zookeeper: &zookeeper
   namespace: *kafka-namespace
@@ -348,6 +350,7 @@ postgresql-backup:
   initContainers: {}
 
 postgresql-exporter:
+  namespace: *postgresql-namespace
   config:
     datasource:
       host: *pghost
@@ -464,7 +467,14 @@ kong-ingress-routes:
   namespace: *kong-ingress-namespace
   domain: *domain
   ingress:
+    webconsole:
+      namespace: *web-console-namesapce
+    superset:
+      namespace: *superset-namespace
+    grafana:
+      namespace: *monitoring-namespace
     keycloak:
+      namespace: *keycloak_namespace
       domains:
         - *keycloak-domain
 
@@ -535,6 +545,7 @@ minio:
 
 global:
   env: *env
+  namespaces: *namespaces
   building_block: *building-block
   encryption_key: *encryption-key
   domain: *domain

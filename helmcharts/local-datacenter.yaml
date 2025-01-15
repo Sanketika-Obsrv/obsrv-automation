@@ -257,18 +257,6 @@ postgresql-exporter:
 velero:
   <<: *velero-backup
 
-redis-denorm:
-  namespaceOverride: *redis-namespace
-  host: redis-denorm-master.redis.svc.cluster.local
-  port: 6379
-  << : *redis_denorm_backup_sidecar
-
-redis-dedup:
-  namespace: *redis-namespace
-  host: redis-dedup-master.redis.svc.cluster.local
-  port: 6379
-  << : *redis_dedup_backup_sidecar
-
 kong:
   proxy:
     type: NodePort
@@ -282,7 +270,6 @@ kong-ingress-routes:
 
 lakehouse-connector:
   enable_lakehouse: *enable_lakehouse
-  namespace: flink
   s3_access_key: *s3-access-key
   s3_secret_key: *s3-secret-access-key
   s3_endpoint: *s3-endpoint-url
@@ -300,7 +287,6 @@ lakehouse-connector:
 
 trino:
   enabled: *enable_lakehouse
-  namespace: trino
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
@@ -313,7 +299,6 @@ trino:
 
 hms:
   enabled: *enable_lakehouse
-  namespace: hms
   envVars:
     DATABASE_HOST: postgresql-hl.postgresql.svc.cluster.local
     WAREHOUSE_DIR: *hudi_metadata_bucket
