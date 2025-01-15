@@ -60,7 +60,7 @@ spec:
           - configMapRef:
               name: {{ include "common.names.fullname" . }}-env
           - secretRef:
-              name: {{ .Values.namespace }}-grafana-secret
+              name: {{ include "common.names.fullname" . }}-grafana-secret
           {{- if .Values.configmap.enabled }}
           volumeMounts:
           - name: config
