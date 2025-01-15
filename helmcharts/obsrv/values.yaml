@@ -2674,42 +2674,42 @@ kube-prometheus-stack:
           static_configs:
             - targets:
                 - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql
-        - job_name: minio-job-cluster
-          static_configs:
-            - targets: "minio.minio.svc.cluster.local:9000"
-              labels:
-                service: "minio"
-          metrics_path: "/minio/v2/metrics/cluster" # Endpoint for MinIO metrics
-          scheme: "http" # Use "https" if MinIO is running with SSL
-          scrape_interval: 5m
-          scrape_timeout: 30s
-        - job_name: minio-job-node
-          metrics_path: /minio/v2/metrics/node
-          scheme: http
-          static_configs:
-          - targets: "minio.minio.svc.cluster.local:9000"
-            labels:
-              service: "minio"
-          scrape_interval: 5m
-          scrape_timeout: 30s
-        - job_name: minio-job-bucket
-          metrics_path: /minio/v2/metrics/bucket
-          scheme: http
-          static_configs:
-          - targets: "minio.minio.svc.cluster.local:9000"
-            labels:
-              service: "minio"
-          scrape_interval: 5m
-          scrape_timeout: 30s
-        - job_name: minio-job-resource
-          metrics_path: /minio/v2/metrics/resource
-          scheme: http
-          static_configs:
-          - targets: "minio.minio.svc.cluster.local:9000"
-            labels:
-              service: "minio"
-          scrape_interval: 5m
-          scrape_timeout: 30s
+        # - job_name: minio-job-cluster
+        #   static_configs:
+        #     - targets: "minio.minio.svc.cluster.local:9000"
+        #       labels:
+        #         service: "minio"
+        #   metrics_path: "/minio/v2/metrics/cluster" # Endpoint for MinIO metrics
+        #   scheme: "http" # Use "https" if MinIO is running with SSL
+        #   scrape_interval: 5m
+        #   scrape_timeout: 30s
+        # - job_name: minio-job-node
+        #   metrics_path: /minio/v2/metrics/node
+        #   scheme: http
+        #   static_configs:
+        #   - targets: "minio.minio.svc.cluster.local:9000"
+        #     labels:
+        #       service: "minio"
+        #   scrape_interval: 5m
+        #   scrape_timeout: 30s
+        # - job_name: minio-job-bucket
+        #   metrics_path: /minio/v2/metrics/bucket
+        #   scheme: http
+        #   static_configs:
+        #   - targets: "minio.minio.svc.cluster.local:9000"
+        #     labels:
+        #       service: "minio"
+        #   scrape_interval: 5m
+        #   scrape_timeout: 30s
+        # - job_name: minio-job-resource
+        #   metrics_path: /minio/v2/metrics/resource
+        #   scheme: http
+        #   static_configs:
+        #   - targets: "minio.minio.svc.cluster.local:9000"
+        #     labels:
+        #       service: "minio"
+        #   scrape_interval: 5m
+        #   scrape_timeout: 30s
         - job_name: 'redis_exporter_targets'
           static_configs:
             - targets:

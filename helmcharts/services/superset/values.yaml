@@ -494,7 +494,7 @@ configOverrides:
     AUTH_USER_REGISTRATION = True
     AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
-    ENABLE_PROXY_FIX = False
+    ENABLE_PROXY_FIX = {{ if .Values.global.ssl_enabled }}True{{ else }}False{{ end }}
 
     from custom_sso_security_manager import CustomSsoSecurityManager
     CUSTOM_SECURITY_MANAGER = CustomSsoSecurityManager
