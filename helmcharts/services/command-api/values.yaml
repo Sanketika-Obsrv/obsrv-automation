@@ -175,7 +175,7 @@ serviceConfig:
   alert_manager:
     metrics:
       - flink:
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_failed_event_count[1h]))"
+        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_extractor_failed_count[1h]))"
           alias: "Number of Failed Extraction Events"
           description: "This alert tracks how many events failed the extraction stage"
           frequency: 5m
@@ -203,14 +203,14 @@ serviceConfig:
           interval: 5m
           operator: "gt"
           threshold: 100
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_DenormalizerJob_dataset_id_denorm_failed[1h]))"
+        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_DenormalizerJob_dataset_id_denorm_failed[1h])) + sum(sum_over_time(flink_taskmanager_job_task_operator_DenormalizerJob_dataset_id_denorm_partial_success[1h]))"
           alias: "Number of Failed Denorm Events"
           description: "This alert tracks how many events failed the denorm stage"
           frequency: 5m
           interval: 5m
           operator: "gt"
           threshold: 100
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_TransformerJob_dataset_id_failed_event_count[1h]))"
+        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_TransformerJob_dataset_id_transform_failed_count[1h])) + sum(sum_over_time(flink_taskmanager_job_task_operator_TransformerJob_dataset_id_transform_partial_count[1h]))"
           alias: "Number of Failed Transformer Events"
           description: "This alert tracks how many events failed the transformation stage"
           frequency: 5m
