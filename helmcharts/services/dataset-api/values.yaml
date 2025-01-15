@@ -179,7 +179,9 @@ env:
   prometheus_url: "{{ .Values.global.prometheus.url }}"
   storage_types: '{"lake_house":true,"realtime_store":true}'
   telemetry_dataset: "system.telemetry.events"
-  default_task_duration: "PT4H"
-  default_freshness_threshold: "5" # in minutes
-  data_out_query_time_period: "1d" # one day
-  default_query_time_period: "7" # In Days
+  default_task_duration: "PT4H" # Druid Supervisor task default duration value
+
+  ## Below metrics are used for data observability
+  default_freshness_threshold: "5" # In Minutes, default freshness threshold for data observability
+  data_out_query_time_period: "1d" # In Days, default query time period for data out generally to identify number of api calls are happened with in one or configured value day and used only in the prometheus query
+  default_query_time_period: "7" # In Days, For any metrics the default query time period is 7 days in the druid
