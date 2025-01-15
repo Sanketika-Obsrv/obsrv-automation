@@ -180,6 +180,6 @@ env:
   storage_types: '{"lake_house":true,"realtime_store":true}'
   telemetry_dataset: "system.telemetry.events"
   default_task_duration: "PT4H"
-  default_freshness_threshold: "5"
-  data_out_query_time_period: "1d"
+  default_freshness_threshold: "5" # in minutes
+  data_out_query_time_period: "1d" # one day
   default_query_time_period: "7" # In Days
