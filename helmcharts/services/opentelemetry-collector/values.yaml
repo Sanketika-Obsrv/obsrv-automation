@@ -103,7 +103,7 @@ config:
       sampling_initial: 5
       sampling_thereafter: 200  
     otlphttp:
-      endpoint: http://loki-test-gateway.loki-telemetry.svc.cluster.local/otlp
+      endpoint: http://loki-gateway.loki.svc.cluster.local/otlp
       tls:
         insecure: true
     loki:

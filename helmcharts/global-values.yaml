@@ -70,7 +70,7 @@ defaults:
 
   # config_service_host: &config-service-host "http://command-api.command-api.svc.cluster.local"
   # druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
-  druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc:8888"
+  druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc.cluster.local:8888"
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
   config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
   otel_collector_endpoint: &otel_collector_endpoint "http://opentelemetry-collector.otel.svc.cluster.local:4317"
@@ -263,8 +263,6 @@ valkey-dedup: &valkey_dedup
 
 flink: &flink
   namespace: *flink_namespace
-  host: "flink-headless.flink.svc.cluster.local"
-  port: 8081
 
 #migrations/charts/
 postgresql-migration:
