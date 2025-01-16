@@ -288,7 +288,7 @@ trino:
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
-      hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
+      hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
       hive.s3.aws-access-key=minioadmin
       hive.s3.aws-secret-key=198CImxTlly79Dx9ZCDJ
       hive.s3.endpoint=http://minio.minio.svc.cluster.local:9000

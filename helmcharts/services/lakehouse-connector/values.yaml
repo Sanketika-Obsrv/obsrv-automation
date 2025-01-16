@@ -243,7 +243,7 @@ lakehouse-connector:
     hudi {
       hms {
         enabled = true
-        uri = "thrift://hudi-hms.hms.svc:9083"
+        uri = "thrift://hudi-hms.hms.svc.cluster.local:9083"
         database {
           name = "hms"
           username = "hms"
