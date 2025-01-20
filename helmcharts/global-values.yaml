@@ -130,10 +130,10 @@ kafka: &kafka
         partitions: 4
         replicationFactor: 1
 
-zookeeper: &zookeeper
-  namespace: *kafka-namespace
-  host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
-  port: 2181
+  zookeeper: &zookeeper
+    namespace: *kafka-namespace
+    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
+    port: 2181
 
 postgresql: &postgresql
   namespace: *postgresql-namespace

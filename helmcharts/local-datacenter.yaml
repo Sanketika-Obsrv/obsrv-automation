@@ -316,3 +316,8 @@ minio:
   defaultBuckets: "backups-obsrv-local, velero-obsrv-local, checkpoint-obsrv-local, storage-obsrv-local"
   service:
     type: NodePort
+
+s3-exporter:
+  s3_access_key: *s3-access-key
+  s3_secret_key: *s3-secret-access-key
+  s3_region: *s3-signing-region
