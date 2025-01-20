@@ -357,6 +357,8 @@ postgresql-exporter:
 
 prometheus-pushgateway:
   namespace: *monitoring-namespace
+  serviceMonitor:
+    namespace: *monitoring-namespace
 
 spark: &spark
   namespace: *spark-namespace

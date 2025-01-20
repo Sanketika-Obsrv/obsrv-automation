@@ -119,6 +119,12 @@ additional)
     "azure")
         cp -rf ../services/azure-exporter additional/charts/
         ;;
+    "gcp")
+        echo "no additional charts for gcp"
+        ;;
+    *)
+        cp -rf ../services/s3-exporter additional/charts/
+        ;;
     esac
 
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
