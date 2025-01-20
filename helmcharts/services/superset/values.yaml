@@ -411,7 +411,17 @@ extraConfigs:
           extra: null
         version: 1.0.0
         database_uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
-
+    - allow_csv_upload: false
+      allow_ctas: false
+      allow_cvas: false
+      allow_run_async: false
+      allow_dml: false
+      expose_in_sqllab: true
+      database_name: lakehouse
+      sqlalchemy_uri: trino://trino@hudi-trino.trino.svc.cluster.local/lakehouse/hms
+      uuid: a5abc507-1743-41ef-9fc7-256dfde8d497
+      version: 1.0.0
+        
 extraSecrets:
   custom_sso_security_manager.py: |
     import logging
