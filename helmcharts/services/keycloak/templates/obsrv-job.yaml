@@ -23,7 +23,7 @@ spec:
           apt-get update && apt-get install -y curl jq postgresql-client
 
           echo "Waiting for Keycloak to be ready..."
-          until curl --insecure -s -o /dev/null -w "%{http_code}" http://keycloak:80/realms/obsrvWebConsole/ > /dev/null; do
+          until curl --insecure -s -o /dev/null -w "%{http_code}" http://keycloak:80/auth/realms/obsrv/ > /dev/null; do
             sleep 5
           done
 
@@ -31,7 +31,7 @@ spec:
 
           # Obtain admin access token using admin credentials
           echo "Getting access token for admin user..."
-          access_token=$(curl --insecure -s -X POST http://keycloak:80/realms/master/protocol/openid-connect/token \
+          access_token=$(curl --insecure -s -X POST http://keycloak:80/auth/realms/master/protocol/openid-connect/token \
             -H "Content-Type: application/x-www-form-urlencoded" \
             --data-urlencode "client_id=admin-cli" \
             --data-urlencode "username={{ .Values.auth.adminUser }}" \
@@ -45,10 +45,10 @@ spec:
 
           echo "Access token retrieved successfully."
 
-          # Create a new user in the obsrvWebConsole realm
+          # Create a new user in the obsrv realm
           echo "Creating new Keycloak user..."
           create_user_response=$(curl --insecure -s -o response.json -w "%{http_code}" \
-            -X POST http://keycloak:80/admin/realms/obsrvWebConsole/users \
+            -X POST http://keycloak:80/auth/admin/realms/obsrv/users \
             -H "Authorization: Bearer $access_token" \
             -H "Content-Type: application/json" \
             -d '{
@@ -64,9 +64,9 @@ spec:
                 }')
 
           if [ "$create_user_response" -eq 201 ]; then
-            echo "Keycloak user 'obsrv_admin' created successfully in realm 'obsrvWebConsole'."
+            echo "Keycloak user 'obsrv_admin' created successfully in realm 'obsrv'."
           elif [ "$create_user_response" -eq 409 ]; then
-            echo "User 'obsrv_admin' already exists in realm 'obsrvWebConsole'."
+            echo "User 'obsrv_admin' already exists in realm 'obsrv'."
           else
             echo "Failed to create user. HTTP status: $create_user_response"
             cat response.json
@@ -75,7 +75,7 @@ spec:
 
           # Fetch user details to get the user ID
           echo "Fetching user details to get the user ID..."
-          user_details_response=$(curl --insecure -s -X GET http://keycloak:80/admin/realms/obsrvWebConsole/users \
+          user_details_response=$(curl --insecure -s -X GET http://keycloak:80/auth/admin/realms/obsrv/users \
             -H "Authorization: Bearer $access_token" \
             -G --data-urlencode "username=obsrv_admin")
 
