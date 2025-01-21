@@ -28,10 +28,6 @@ namespaces:
 - config-api
 - otel
 
-refection_namespaces:
-- dataset-api 
-- web-console
-
 global:
   image:
     dockerRegistrySecretName: obsrv-docker-secret

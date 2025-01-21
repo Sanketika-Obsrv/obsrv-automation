@@ -486,10 +486,6 @@ letsencrypt-ssl:
   # letsencrypt_server_url: "https://acme-staging-v02.api.letsencrypt.org/directory"
   domain: *domain
   domain_admin_email: *domain_admin_email
-  reflection_namespaces: 
-    - *superset-namespace
-    - *monitoring-namespace
-    - *keycloak_namespace
 
 velero:
   namespace: *velero-namespace
