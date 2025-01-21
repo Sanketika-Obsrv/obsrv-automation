@@ -49,10 +49,8 @@ flink:
 
 kafka:
   fullnameOverride: kafka
-  namespace: &kafkans kafka
   zookeeper:
     fullnameOverride: kafka-zookeeper
-    namespace: *kafkans
 
 kafka-exporter:
   fullnameOverride: kafka-exporter
@@ -2674,55 +2672,19 @@ kube-prometheus-stack:
           static_configs:
             - targets:
                 - bucket={{ .Values.global.postgresql_backup_cloud_bucket }};prefix=postgresql
-        - job_name: minio-job-cluster
-          static_configs:
-            - targets: "minio.minio.svc.cluster.local:9000"
-              labels:
-                service: "minio"
-          metrics_path: "/minio/v2/metrics/cluster" # Endpoint for MinIO metrics
-          scheme: "http" # Use "https" if MinIO is running with SSL
-          scrape_interval: 5m
-          scrape_timeout: 30s
-        - job_name: minio-job-node
-          metrics_path: /minio/v2/metrics/node
-          scheme: http
-          static_configs:
-          - targets: "minio.minio.svc.cluster.local:9000"
-            labels:
-              service: "minio"
-          scrape_interval: 5m
-          scrape_timeout: 30s
-        - job_name: minio-job-bucket
-          metrics_path: /minio/v2/metrics/bucket
-          scheme: http
-          static_configs:
-          - targets: "minio.minio.svc.cluster.local:9000"
-            labels:
-              service: "minio"
-          scrape_interval: 5m
-          scrape_timeout: 30s
-        - job_name: minio-job-resource
-          metrics_path: /minio/v2/metrics/resource
-          scheme: http
-          static_configs:
-          - targets: "minio.minio.svc.cluster.local:9000"
-            labels:
-              service: "minio"
-          scrape_interval: 5m
-          scrape_timeout: 30s
         - job_name: 'redis_exporter_targets'
           static_configs:
             - targets:
-                - redis://valkey-denorm-headless.redis.svc.cluster:6379
-                - redis://valkey-dedup-headless.redis.svc.cluster:6379
+                - redis://valkey-denorm-headless.redis.svc.cluster.local:6379
+                - redis://valkey-dedup-headless.redis.svc.cluster.local:6379
           metrics_path: /metrics
           relabel_configs:
             - source_labels: [__address__]
-              regex: 'redis://valkey-denorm-headless.redis.svc.cluster:6379'
+              regex: 'redis://valkey-denorm-headless.redis.svc.cluster.local:6379'
               target_label: __address__
               replacement: valkey-denorm-metrics.redis.svc.cluster.local:9121
             - source_labels: [__address__]
-              regex: 'redis://valkey-dedup-headless.redis.svc.cluster:6379'
+              regex: 'redis://valkey-dedup-headless.redis.svc.cluster.local:6379'
               target_label: __address__
               replacement: valkey-dedup-metrics.redis.svc.cluster.local:9121
             - source_labels: [__address__]
@@ -2884,7 +2846,6 @@ promitor-agent-scraper:
 
 promtail:
   fullnameOverride: promtail
-  namespace: loki
   podLabels:
     system.monitoring: "true"
   resources:

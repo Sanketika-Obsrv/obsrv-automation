@@ -21,7 +21,7 @@ kafkaExporter:
   kafka:
     servers: ["kafka-headless:9093"]
   zookeeper:
-    servers: ["kafka-zookeeper-headless.svc.cluster.local:2181"]
+    servers: ["kafka-zookeeper-headless.kafka.svc.cluster.local:2181"]
   additionalFlags: []
     # - --use.consumelag.zookeeper
 

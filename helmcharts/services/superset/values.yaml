@@ -7,7 +7,7 @@ global:
     host: "postgresql-hl.postgresql.svc.cluster.local"
     port: 5432
   redis_dedup:
-    host: valkey-dedup.redis.svc.cluster.local
+    host: valkey-dedup-headless.redis.svc.cluster.local
     port: 6379
 
 postgresql:
@@ -84,7 +84,7 @@ extraConfigs:
       allow_ctas: true
       allow_cvas: true
       database_name: obsrv
-      sqlalchemy_uri: druid://dataset-api.dataset-api.svc.cluster.local:3000/v2/obsrv/data/sql-query
+      sqlalchemy_uri: druid://druid-raw-brokers.druid-raw.svc.cluster.local:8082/druid/v2/sql
       uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
       version: 1.0.0
       tables:
@@ -411,7 +411,17 @@ extraConfigs:
           extra: null
         version: 1.0.0
         database_uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
-
+    - allow_csv_upload: false
+      allow_ctas: false
+      allow_cvas: false
+      allow_run_async: false
+      allow_dml: false
+      expose_in_sqllab: true
+      database_name: lakehouse
+      sqlalchemy_uri: trino://trino@hudi-trino.trino.svc.cluster.local/lakehouse/hms
+      uuid: a5abc507-1743-41ef-9fc7-256dfde8d497
+      version: 1.0.0
+        
 extraSecrets:
   custom_sso_security_manager.py: |
     import logging
@@ -494,7 +504,7 @@ configOverrides:
     AUTH_USER_REGISTRATION = True
     AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
-    ENABLE_PROXY_FIX = False
+    ENABLE_PROXY_FIX = {{ if .Values.global.ssl_enabled }}True{{ else }}False{{ end }}
 
     from custom_sso_security_manager import CustomSsoSecurityManager
     CUSTOM_SECURITY_MANAGER = CustomSsoSecurityManager

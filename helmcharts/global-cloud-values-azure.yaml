@@ -294,7 +294,7 @@ trino:
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
-      hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
+      hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
       hive.azure.wasb-storage-account:{{ .Values.global.azure_storage_account_name }}
       hive.azure.wasb-access-key:{{ .Values.global.azure_storage_account_key }}
 

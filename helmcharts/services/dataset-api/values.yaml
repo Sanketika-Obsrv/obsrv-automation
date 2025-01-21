@@ -170,9 +170,9 @@ env:
   exclude_datasource_validation: "system-stats,failed-events-summary,masterdata-system-stats,system-events"
   object_key: authenticationMechanism
   encryption_key: "{{ .Values.global.encryption_key }}"
-  command_service_host: "http://command-api.command-api.svc"
+  command_service_host: "http://command-api.command-api.svc.cluster.local"
   command_service_port: "8000"
-  grafana_url: "http://grafana.monitoring.svc"
+  grafana_url: "http://grafana.monitoring.svc.cluster.local"
   GRAFANA_ADMIN_URL: http://grafana.monitoring.svc.cluster.local
   pipeline_merged_job_manager_url: "http://unified-pipeline-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   masterdata_processor_job_manager_url: "http://cache-indexer-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
