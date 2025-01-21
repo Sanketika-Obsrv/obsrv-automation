@@ -44,6 +44,7 @@ ingress:
     service_port: 80
     paths:
       - path: "/grafana"
+  
   keycloak:
     enabled: true
     name: keycloak
@@ -54,4 +55,4 @@ ingress:
     annotations: {}
     service_port: 80
     paths:
-      - path: "/"
+      - path: "/auth"

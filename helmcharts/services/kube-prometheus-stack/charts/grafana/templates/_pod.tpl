@@ -1084,10 +1084,19 @@ containers:
         valueFrom:
           {{- tpl (toYaml $value) $ | nindent 10 }}
       {{- end }}
-      {{- range $key, $value := .Values.env }}
+      {{- if eq .Values.authentication_type "keycloak" }}
+      {{- range $key, $value := .Values.env.KEYCLOAK }}
       - name: "{{ tpl $key $ }}"
         value: "{{ tpl (print $value) $ }}"
       {{- end }}
+    {{- else }}
+      {{- range $key, $value := .Values.env.OBSRV }}
+      - name: "{{ tpl $key $ }}"
+        value: "{{ tpl (print $value) $ }}"
+      {{- end }}
+    {{- end }}
+
+     
     {{- if or .Values.envFromSecret (or .Values.envRenderSecret .Values.envFromSecrets) .Values.envFromConfigMaps }}
     envFrom:
       {{- if .Values.envFromSecret }}
