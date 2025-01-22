@@ -1198,13 +1198,13 @@ metrics:
   prometheusAuthType: public
   ## @param metrics.enabled Enable the export of Prometheus metrics
   ##
-  enabled: true
+  enabled: false
   ## Prometheus Operator ServiceMonitor configuration
   ##
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled If the operator is installed in your cluster, set to true to create a Service Monitor Entry
     ##
-    enabled: true
+    enabled: false
     ## @param metrics.serviceMonitor.namespace Namespace which Prometheus is running in
     ##
     namespace: ""
@@ -1219,11 +1219,7 @@ metrics:
     ## path: /minio/v2/metrics/cluster
     ## @param metrics.serviceMonitor.paths HTTP paths to scrape for metrics
     ##
-    paths:
-      - /minio/v2/metrics/cluster
-      - /minio/v2/metrics/node
-      - /minio/v2/metrics/bucket
-      - /minio/v2/metrics/resource
+    paths: []
     ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
     ##
     interval: 30s

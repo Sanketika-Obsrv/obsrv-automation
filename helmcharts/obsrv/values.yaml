@@ -49,10 +49,8 @@ flink:
 
 kafka:
   fullnameOverride: kafka
-  namespace: &kafkans kafka
   zookeeper:
     fullnameOverride: kafka-zookeeper
-    namespace: *kafkans
 
 kafka-exporter:
   fullnameOverride: kafka-exporter
@@ -5231,16 +5229,16 @@ kube-prometheus-stack:
         - job_name: 'redis_exporter_targets'
           static_configs:
             - targets:
-                - redis://valkey-denorm-headless.redis.svc.cluster:6379
-                - redis://valkey-dedup-headless.redis.svc.cluster:6379
+                - redis://valkey-denorm-headless.redis.svc.cluster.local:6379
+                - redis://valkey-dedup-headless.redis.svc.cluster.local:6379
           metrics_path: /metrics
           relabel_configs:
             - source_labels: [__address__]
-              regex: 'redis://valkey-denorm-headless.redis.svc.cluster:6379'
+              regex: 'redis://valkey-denorm-headless.redis.svc.cluster.local:6379'
               target_label: __address__
               replacement: valkey-denorm-metrics.redis.svc.cluster.local:9121
             - source_labels: [__address__]
-              regex: 'redis://valkey-dedup-headless.redis.svc.cluster:6379'
+              regex: 'redis://valkey-dedup-headless.redis.svc.cluster.local:6379'
               target_label: __address__
               replacement: valkey-dedup-metrics.redis.svc.cluster.local:9121
             - source_labels: [__address__]
@@ -5405,7 +5403,6 @@ promitor-agent-scraper:
 
 promtail:
   fullnameOverride: promtail
-  namespace: loki
   podLabels:
     system.monitoring: "true"
   resources:

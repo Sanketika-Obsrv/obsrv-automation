@@ -45,6 +45,15 @@ spec:
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           {{- end }}
+          {{- if .Values.global.s3_endpoint_url }}
+          command:
+            - /bin/s3-exporter
+          args: [
+            "--s3.endpoint-url={{.Values.global.s3_endpoint_url}}",
+            "--s3.disable-ssl",
+            "--s3.force-path-style",
+          ]
+          {{- end }}
           ports:
             {{- range .Values.service.ports }}
             - name: {{ .name }}

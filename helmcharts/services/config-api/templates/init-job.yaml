@@ -55,12 +55,12 @@ spec:
             - -c
             - |
               generate_token_and_create_secret() {
-                  echo "generating token for 'grafana-{{ .Values.namespace }}-sa': $1"
+                  echo "generating token for 'grafana-{{ include "common.names.fullname" . }}-sa': $1"
                   response=$(curl -Ss "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$1/tokens" \
                   -H 'Accept: application/json' \
                   -H 'Content-type: application/json' \
                   -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
-                  -d '{"name": "grafana-{{ .Values.namespace }}-sa"}')
+                  -d '{"name": "grafana-{{ include "common.names.fullname" . }}-sa"}')
 
                   echo "token response:"
                   echo $response
@@ -70,13 +70,13 @@ spec:
                       echo "unable to find the token for the service account. Please manually delete the service account and rerun this job."
                       exit 1
                   else
-                      if ! kubectl get secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
-                          echo "secret '{{ .Values.namespace }}-grafana-secret' does not exists..creating..."
+                      if ! kubectl get secret {{ include "common.names.fullname" . }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
+                          echo "secret '{{ include "common.names.fullname" . }}-grafana-secret' does not exists..creating..."
                       else
-                          echo "secret '{{ .Values.namespace }}-grafana-secret' already exists..deleting and recreating..."
-                          kubectl delete secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }}
+                          echo "secret '{{ include "common.names.fullname" . }}-grafana-secret' already exists..deleting and recreating..."
+                          kubectl delete secret {{ include "common.names.fullname" . }}-grafana-secret -n {{ .Values.namespace }}
                       fi
-                      kubectl create secret generic {{ .Values.namespace }}-grafana-secret --from-literal=grafana_token="Bearer $auth_token" -n {{ .Values.namespace }}
+                      kubectl create secret generic {{ include "common.names.fullname" . }}-grafana-secret --from-literal=grafana_token="Bearer $auth_token" -n {{ .Values.namespace }}
                   fi
               }
 
@@ -84,17 +84,17 @@ spec:
                   -H 'Accept: application/json' \
                   -H 'Content-type: application/json' \
                   -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}")
-              id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ .Values.namespace }}-sa") | .id')
+              id=$(echo "$response" | jq -r '.serviceAccounts[] | select(.name == "grafana-{{ include "common.names.fullname" . }}-sa") | .id')
 
               # Check if the service account already exists or not
               if [ -z "$id" ]; then
-                  echo "The ID for the service account 'grafana-{{ .Values.namespace }}-sa' could not be found. Creating new service account."
+                  echo "The ID for the service account 'grafana-{{ include "common.names.fullname" . }}-sa' could not be found. Creating new service account."
 
                   response=$(curl -Ss -X POST "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts" \
                       -H 'Accept: application/json' \
                       -H 'Content-type: application/json' \
                       -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
-                      -d '{"name": "grafana-{{ .Values.namespace }}-sa","role": "Admin","isDisabled": false}')
+                      -d '{"name": "grafana-{{ include "common.names.fullname" . }}-sa","role": "Admin","isDisabled": false}')
 
                   echo "SA creation response:"
                   echo $response
@@ -107,32 +107,32 @@ spec:
                       generate_token_and_create_secret $service_account_id
                   fi
               else
-                  echo "Service account already exists. The ID of the service account 'grafana-{{ .Values.namespace }}-sa' is: $id"
+                  echo "Service account already exists. The ID of the service account 'grafana-{{ include "common.names.fullname" . }}-sa' is: $id"
 
-                  if ! kubectl get secret {{ .Values.namespace }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
-                      echo "secret '{{ .Values.namespace }}-grafana-secret' does not exists..creating..."
-                  fi
+                  if ! kubectl get secret {{ include "common.names.fullname" . }}-grafana-secret -n {{ .Values.namespace }} > /dev/null 2>&1; then
+                      echo "secret '{{ include "common.names.fullname" . }}-grafana-secret' does not exists..creating..."
 
-                  curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
-                      -H 'Accept: application/json' \
-                      -H 'Content-type: application/json' \
-                      -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}"
+                      curl -X DELETE "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts/$id" \
+                          -H 'Accept: application/json' \
+                          -H 'Content-type: application/json' \
+                          -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}"
 
-                  response=$(curl -Ss -X POST "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts" \
-                      -H 'Accept: application/json' \
-                      -H 'Content-type: application/json' \
-                      -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
-                      -d '{"name": "grafana-{{ .Values.namespace }}-sa","role": "Admin","isDisabled": false}')
+                      response=$(curl -Ss -X POST "{{ .Values.global.grafana.grafana_url }}/api/serviceaccounts" \
+                          -H 'Accept: application/json' \
+                          -H 'Content-type: application/json' \
+                          -H "Authorization: Basic {{ .Values.global.grafana.grafana_auth_token }}" \
+                          -d '{"name": "grafana-{{ include "common.names.fullname" . }}-sa","role": "Admin","isDisabled": false}')
 
-                  echo "SA creation response:"
-                  echo $response
-                  service_account_id=$(echo "$response" | jq -r '.id')
+                      echo "SA creation response:"
+                      echo $response
+                      service_account_id=$(echo "$response" | jq -r '.id')
 
-                  if [ -z "$service_account_id" ]; then
-                      echo "failed to create service account"
-                      exit 1;
-                  else
-                      generate_token_and_create_secret $service_account_id
+                      if [ -z "$service_account_id" ]; then
+                          echo "failed to create service account"
+                          exit 1;
+                      else
+                          generate_token_and_create_secret $service_account_id
+                      fi
                   fi
                   exit 0
               fi

@@ -22,7 +22,7 @@ imagePullSecrets: []
 ## Databases
 global:
   redis:
-    host: valkey-denorm.svc.cluster.local
+    host: valkey-denorm-headless.redis.svc.cluster.local
     port: 6379
   cassandra:
     host: localhost
@@ -31,7 +31,7 @@ global:
     host: "kafka-headless.kafka.svc.cluster.local"
     port: 9092
   zookeeper:
-    host: "zookeeper-headless.kafka.svc.cluster.local"
+    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
     port: 2181
   image:
     registry: ""

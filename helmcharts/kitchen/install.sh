@@ -29,20 +29,19 @@ fi
 
 case "$1" in
 bootstrap)
-    rm -rf bootstrapper
     cp -rf ../bootstrapper ./bootstrapper
     helm $cmd obsrv-bootstrap ./bootstrapper -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name --create-namespace
+    rm -rf bootstrapper
     ;;
 prerequisites)
     if [ -z "$cloud_env" ]; then
-        rm -rf prerequisites
         cp -rf ../obsrv prerequisites
         cp -rf ../services/minio prerequisites/charts/
         helm $cmd prerequisites ./prerequisites -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+        rm -rf prerequisites
     fi
     ;;
 coredb)
-    rm -rf coredb
     cp -rf ../obsrv coredb
     cp -rf ../services/{kafka,postgresql,kong,druid-operator,valkey-dedup,valkey-denorm} coredb/charts/
 
@@ -52,65 +51,63 @@ coredb)
     fi
 
     helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf coredb
     ;;
 migrations)
-    rm -rf migrations
     cp -rf ../obsrv migrations
     cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
 
     helm $cmd migrations ./migrations -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf migrations
     ;;
 monitoring)
-    rm -rf monitoring
     cp -rf ../obsrv monitoring
     cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,alert-rules} monitoring/charts/
     helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name
+    rm -rf monitoring
     ;;
 coreinfra)
-    rm -rf coreinfra
     cp -rf ../obsrv coreinfra
     cp -rf ../services/{druid-raw-cluster,flink,superset} coreinfra/charts/
 
     helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf coreinfra
     ;;
-
-    
 obsrvapis)
-    rm -rf obsrvapis
     cp -rf ../obsrv obsrvapis
     cp -rf ../services/{command-api,dataset-api,config-api} obsrvapis/charts/
     helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name
+    rm -rf obsrvapis
     ;;
 hudi)
-    rm -rf hudi
     cp -rf ../obsrv hudi
     cp -rf ../services/{hms,trino,lakehouse-connector} hudi/charts/
     helm $cmd hudi ./hudi -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf hudi
     ;;
 otel)
-    rm -rf opentelemetry-collector
     cp -rf ../obsrv opentelemetry-collector
     cp -rf ../services/opentelemetry-collector opentelemetry-collector/charts/
     helm $cmd opentelemetry-collector ./opentelemetry-collector -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf opentelemetry-collector
     ;;
 oauth)
     if [ -z "$cloud_env" ]; then
         echo "oauth not yet supported for local datacenter"
     else
-        rm -rf oauth
         cp -rf ../obsrv oauth
         cp -rf ../services/keycloak oauth/charts/
         helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+        rm -rf oauth
     fi
     ;;
 obsrvtools)
-    rm -rf obsrvtools
     cp -rf ../obsrv obsrvtools
     cp -rf ../services/{web-console,submit-ingestion} obsrvtools/charts/
     helm $cmd obsrvtools ./obsrvtools -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf obsrvtools
     ;;
 additional)
-    rm -rf additional
     cp -rf ../obsrv additional
     cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
 
@@ -122,9 +119,16 @@ additional)
     "azure")
         cp -rf ../services/azure-exporter additional/charts/
         ;;
+    "gcp")
+        echo "no additional charts for gcp"
+        ;;
+    *)
+        cp -rf ../services/s3-exporter additional/charts/
+        ;;
     esac
 
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf additional
     ;;
 all)
     bash $0 prerequisites ${@: 2}
@@ -169,3 +173,7 @@ reset)
     rm -rf ./$1-ind
     ;;
 esac
+
+
+rm -rf $cloud_file_name
+rm -rf {global-values.yaml,global-resource-values.yaml,images.yaml}

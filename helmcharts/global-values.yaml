@@ -2,7 +2,7 @@ defaults:
   env: &env "dev"
   building-block: &building-block "obsrv"
   encryption_key: &encryption-key "strong_encryption_key_to_encrypt"
-  namespaces:
+  namespaces: &namespaces
     kafka_namespace: &kafka-namespace "kafka"
     postgresql_namespace: &postgresql-namespace "postgresql"
     druid_namespace: &druid-namespace "druid-raw"
@@ -30,6 +30,9 @@ defaults:
     minio_namespace: &minio_namespace "minio"
     opentelemetry-collector: &opentelemetry-collector "otel"
     keycloak_namespace: &keycloak_namespace "keycloak"
+    connector_namespaces:
+      spark: *spark-namespace
+      flink: &flink_connector_namespace "flink_connectors"
 
   postgres:
     pghost: &pghost "postgresql-hl.postgresql.svc.cluster.local"
@@ -67,7 +70,7 @@ defaults:
 
   # config_service_host: &config-service-host "http://command-api.command-api.svc.cluster.local"
   # druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
-  druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc:8888"
+  druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc.cluster.local:8888"
   dataset_service_url: &dataset-service-url "http://dataset-api.dataset-api.svc.cluster.local:3000"
   config_service_url: &config-service-url "http://config-api.config-api.svc.cluster.local:4000"
   otel_collector_endpoint: &otel_collector_endpoint "http://opentelemetry-collector.otel.svc.cluster.local:4317"
@@ -128,11 +131,10 @@ kafka: &kafka
         partitions: 4
         replicationFactor: 1
 
-
-zookeeper: &zookeeper
-  namespace: *kafka-namespace
-  host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
-  port: 2181
+  zookeeper: &zookeeper
+    namespace: *kafka-namespace
+    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
+    port: 2181
 
 postgresql: &postgresql
   namespace: *postgresql-namespace
@@ -264,8 +266,6 @@ valkey-dedup: &valkey_dedup
 
 flink: &flink
   namespace: *flink_namespace
-  host: "flink-headless.flink.svc.cluster.local"
-  port: 8081
 
 #migrations/charts/
 postgresql-migration:
@@ -290,6 +290,8 @@ prometheus: &prometheus
 loki:
   namespace: *loki-namespace
 
+promtail:
+  namespace: *loki-namespace
 
 druid-raw-cluster: &druid-raw-cluster
   namespace: *druid-namespace
@@ -357,6 +359,7 @@ postgresql-backup:
   initContainers: {}
 
 postgresql-exporter:
+  namespace: *postgresql-namespace
   config:
     datasource:
       host: *pghost
@@ -365,6 +368,8 @@ postgresql-exporter:
 
 prometheus-pushgateway:
   namespace: *monitoring-namespace
+  serviceMonitor:
+    namespace: *monitoring-namespace
 
 spark: &spark
   namespace: *spark-namespace
@@ -474,6 +479,19 @@ kong-ingress-routes:
   namespace: *kong-ingress-namespace
   domain: *domain
   
+
+  ingress:
+    webconsole:
+      namespace: *web-console-namesapce
+    superset:
+      namespace: *superset-namespace
+    grafana:
+      namespace: *monitoring-namespace
+    keycloak:
+      namespace: *keycloak_namespace
+      domains:
+        - *keycloak-domain
+
 letsencrypt-ssl:
   namespace: *web-console-namesapce
   cert_issuer_name: "letsencrypt-prod"
@@ -541,6 +559,7 @@ minio:
 
 global:
   env: *env
+  namespaces: *namespaces
   building_block: *building-block
   encryption_key: *encryption-key
   domain: *domain
