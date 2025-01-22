@@ -82,6 +82,7 @@ defaults:
   domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
   keycloak_domain: &keycloak-domain "https://<fill-value>.sslip.io/auth" # Update with the Allocation ID of the Elastic IP
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
+  authentication_type: &authentication-type "basic"
 
 #coredb-charts/
 kafka: &kafka
@@ -245,6 +246,8 @@ keycloak:
     password: *psql-keycloak-pwd
   obsrvuser: obsrv_admin
   obsrvpassword: enDoPvTAxFSd
+  grafanauser: admin
+  grafanapassword: adminpassword
 
 
 valkey-denorm: &valkey_denorm
@@ -316,9 +319,17 @@ kube-prometheus-stack:
   grafana:
     fullnameOverride: "grafana"
     namespaceOverride: *monitoring-namespace
+    authentication_type: *authentication-type
     env:
       GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
       GF_SECURITY_ADMIN_USER: *grafana-admin-user
+      KEYCLOAK:
+        GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
+        GF_SECURITY_ADMIN_USER: *grafana-admin-user
+      OBSRV:  
+        GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
+        GF_SECURITY_ADMIN_USER: *grafana-admin-user
+       
     grafana.ini:
       smtp:
         enabled: true
@@ -416,7 +427,8 @@ system-rules-ingestor:
 web-console:
   namespace: *web-console-namesapce
   env:
-    KEYCLOAK_SERVER_URL: *keycloak-domain
+   AUTHENTICATION_TYPE: *authentication-type
+   KEYCLOAK_SERVER_URL: *keycloak-domain
 
 
 #additional-charts/
