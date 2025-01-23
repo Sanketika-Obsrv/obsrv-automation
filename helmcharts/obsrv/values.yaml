@@ -3254,7 +3254,7 @@ keycloak:
               "enabled": true,
               "alwaysDisplayInConsole": false,
               "clientAuthenticatorType": "client-secret",
-              "secret": "**********",
+              "secret": "grafana-obsrv@123",
               "redirectUris": [
                 "https://{{.Values.global.domain}}/grafana/login/generic_oauth"
               ],
