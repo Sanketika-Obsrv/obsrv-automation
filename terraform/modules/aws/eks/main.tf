@@ -132,7 +132,7 @@ resource "aws_eks_node_group" "eks_nodes" {
   ami_type        = var.eks_node_group_ami_type
   instance_types  = var.eks_node_group_instance_type
   capacity_type   = var.eks_node_group_capacity_type
-  disk_size       = var.eks_node_disk_size
+  # disk_size       = var.eks_node_disk_size
 
   tags = merge(
     {
@@ -150,6 +150,40 @@ resource "aws_eks_node_group" "eks_nodes" {
   depends_on = [
     aws_iam_role_policy_attachment.eks_node_policy_attachment
   ]
+  launch_template {
+    id      = aws_launch_template.eks_launch_template.id
+    version = "$Latest"
+  }
+}
+
+resource "aws_launch_template" "eks_launch_template" {
+  name_prefix = "${var.building_block}-${var.env}-eks-nodes-launch-template"
+  user_data = base64encode(<<-EOT
+    MIME-Version: 1.0
+    Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+
+    --==MYBOUNDARY==
+    Content-Type: text/x-shellscript; charset="us-ascii"
+
+    #!/bin/bash
+    KUBELET_CONFIG=/etc/kubernetes/kubelet/kubelet-config.json
+    echo "$(jq ".imageGCHighThresholdPercent=75" $KUBELET_CONFIG)" > $KUBELET_CONFIG
+    echo "$(jq ".imageGCLowThresholdPercent=70" $KUBELET_CONFIG)" > $KUBELET_CONFIG
+    echo "$(jq ".imageMinimumGCAge=\"2m\"" $KUBELET_CONFIG)" > $KUBELET_CONFIG
+    echo "$(jq ".imageMaximumGCAge=\"168h\"" $KUBELET_CONFIG)" > $KUBELET_CONFIG
+
+    --==MYBOUNDARY==--
+  EOT
+  )
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = var.eks_node_disk_size
+      volume_type = "gp3"
+      delete_on_termination = true
+    }
+  }
 }
 
 resource "aws_eks_addon" "addons" {
