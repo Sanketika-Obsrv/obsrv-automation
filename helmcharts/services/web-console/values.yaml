@@ -199,4 +199,5 @@ env:
   KEYCLOAK_CLIENT_ID: "webConsole"
   KEYCLOAK_PUBLIC_CLIENT: "true"
   KEYCLOAK_SSL_REQUIRED: "external"
+  KEYCLOAK_SERVER_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth"
   STORAGE_TYPES: '{"lake_house":true,"realtime_store":true}'

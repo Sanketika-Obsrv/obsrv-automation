@@ -83,7 +83,6 @@ defaults:
 
   redirection_auth_path: &redirection_auth_path ""
   domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
-  keycloak_domain: &keycloak-domain "https://<fill-value>.sslip.io/auth" # Update with the Allocation ID of the Elastic IP
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
   authentication_type: &authentication-type "basic"
 
@@ -239,7 +238,7 @@ keycloak:
     keystoreFilename: "tls.key"
   extraEnvVars:
     - name: KC_HOSTNAME
-      value: *keycloak-domain
+      value: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth"
   externalDatabase:
     host: *pghost
     port: 5432
@@ -328,10 +327,10 @@ kube-prometheus-stack:
       KEYCLOAK:
         GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
         GF_SECURITY_ADMIN_USER: *grafana-admin-user
-      OBSRV:  
+      OBSRV:
         GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
         GF_SECURITY_ADMIN_USER: *grafana-admin-user
-       
+
     grafana.ini:
       smtp:
         enabled: true
@@ -432,8 +431,7 @@ system-rules-ingestor:
 web-console:
   namespace: *web-console-namesapce
   env:
-   AUTHENTICATION_TYPE: *authentication-type
-   KEYCLOAK_SERVER_URL: *keycloak-domain
+    AUTHENTICATION_TYPE: *authentication-type
 
 
 #additional-charts/
@@ -478,8 +476,6 @@ kong:
 kong-ingress-routes:
   namespace: *kong-ingress-namespace
   domain: *domain
-  
-
   ingress:
     webconsole:
       namespace: *web-console-namesapce
@@ -489,8 +485,6 @@ kong-ingress-routes:
       namespace: *monitoring-namespace
     keycloak:
       namespace: *keycloak_namespace
-      domains:
-        - *keycloak-domain
 
 letsencrypt-ssl:
   namespace: *web-console-namesapce
