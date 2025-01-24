@@ -13,3 +13,9 @@ variable "additional_tags" {
   description = "Additional tags for the resources. These tags will be applied to all the resources."
   default     = {}
 }
+
+variable "create_kong_ingress_ip" {
+  description = "Whether to create the Kong Ingress EIP"
+  type        = bool
+  default = false
+}

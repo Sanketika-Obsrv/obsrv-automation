@@ -3,7 +3,6 @@ env                          = "test"
 region                       = "us-east-2"
 availability_zones           = ["us-east-2a", "us-east-2b", "us-east-2c"]
 timezone                     = "UTC"
-create_kong_ingress          = "true"
 create_vpc                   = "true"
 create_velero_user           = "true"
 vpc_id                       = ""
@@ -30,3 +29,5 @@ s3_buckets = {
   "checkpoint_storage_bucket" = "",
   "s3_backups_bucket"         = ""
 }
+
+create_kong_ingress_ip = "true" 

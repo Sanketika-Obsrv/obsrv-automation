@@ -127,3 +127,8 @@ variable "storage_provider" {
   default     = "aws"
 }
 
+variable "create_kong_ingress_ip" {
+  description = "Whether to create the Kong Ingress EIP"
+  type        = bool  # This is expected to be a boolean
+}
+
