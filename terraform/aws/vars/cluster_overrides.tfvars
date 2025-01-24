@@ -21,7 +21,7 @@ eks_node_group_scaling_config = {
   min_size     = 1
 }
 # Disk node size in gb
-eks_node_disk_size = 30
+eks_node_disk_size = 100
 
 create_s3_buckets = true
 s3_buckets = {
