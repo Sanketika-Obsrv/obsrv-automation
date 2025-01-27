@@ -421,14 +421,22 @@ extraConfigs:
       sqlalchemy_uri: trino://trino@hudi-trino.trino.svc.cluster.local/lakehouse/hms
       uuid: a5abc507-1743-41ef-9fc7-256dfde8d497
       version: 1.0.0
-        
+
 extraSecrets:
   custom_sso_security_manager.py: |
     import logging
     import json
     from superset.security import SupersetSecurityManager
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+
+    logging.info("Loading custom_sso_security_manager.py")
 
     class CustomSsoSecurityManager(SupersetSecurityManager):
+      def __init__(self, appbuilder):
+        super(CustomSsoSecurityManager, self).__init__(appbuilder)
+        app = self.appbuilder.get_app
+        app.config.setdefault("AUTH_ROLES_MAPPING", {})
+        app.config.setdefault("AUTH_TYPE", AUTH_OAUTH)
 
       def oauth_user_info(self, provider, response=None):
         print("Oauth2 provider:", provider)
@@ -443,6 +451,23 @@ extraSecrets:
           name = data['name']
           email = data['email']
           return { 'name' :name, 'email' : email, 'id' : id, 'username' : name, 'first_name':'', 'last_name':''}
+        elif provider == "obsrv-keycloak":
+          logging.info("Keycloak response received : {0}".format(response))
+          logging.info("ID Token: %s", response["id_token"])
+          me = self.appbuilder.sm.oauth_remotes[provider].get(
+              f'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/protocol/openid-connect/userinfo'
+          )
+          me.raise_for_status()
+          data = me.json()
+          logging.info("User info from Keycloak: %s", data)
+          return {
+            "name": data["name"],
+            "email": data["email"],
+            "first_name": data["given_name"],
+            "last_name": data["family_name"],
+            "id": data["preferred_username"],
+            "username": data["preferred_username"]
+          }
 
 # A dictionary of overrides to append at the end of superset_config.py - the name does not matter
 # WARNING: the order is not guaranteed
@@ -478,6 +503,27 @@ configOverrides:
 
     OAUTH_PROVIDERS = [
       {
+        'name': 'obsrv-keycloak',
+        'token_key': 'access_token',
+        'icon': 'fa-key',
+        'remote_app': {
+            'client_id': 'superset',
+            'client_secret': 'SY7fZe9YO8q68qEgehUcf6qnUWqHzQho',
+            'server_metadata_url': 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/.well-known/openid-configuration',
+            'client_kwargs': {
+                'scope': 'openid email profile'
+            },
+            'access_token_method':'POST',    # HTTP Method to call access_token_url
+            'access_token_params':{        # Additional parameters for calls to access_token_url
+                'client_id':'superset'
+            },
+            'jwks_uri': 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/protocol/openid-connect/certs',
+            'api_base_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth',
+            'access_token_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/protocol/openid-connect/token',
+            'authorize_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/protocol/openid-connect/auth'
+        }
+      },
+      {
         'name':'obsrv',
         'token_key':'access_token',
         'icon':'fa-address-card',
@@ -502,7 +548,8 @@ configOverrides:
       }
     ]
     AUTH_USER_REGISTRATION = True
-    AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
+    # AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
+    AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv-keycloak'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
     ENABLE_PROXY_FIX = {{ if .Values.global.ssl_enabled }}True{{ else }}False{{ end }}
 

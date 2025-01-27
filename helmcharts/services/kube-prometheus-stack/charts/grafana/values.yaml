@@ -236,7 +236,7 @@ service:
     # targetPort: 4181 To be used with a proxy extraContainer
   ## Service annotations. Can be templated.
   annotations: {}
-  labels: 
+  labels:
     system.monitoring: "true"
 
   portName: service
@@ -250,7 +250,7 @@ serviceMonitor:
   enabled: false
   path: /metrics
   #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
-  labels: 
+  labels:
     system.monitoring: "true"
 
 
@@ -282,7 +282,7 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  labels: 
+  labels:
     system.monitoring: "true"
 
   path: /
@@ -492,7 +492,7 @@ admin:
 ## 6. uncomment the annotation section in the serviceAccount: above
 ## make sure to replace arn:aws:iam::123456789000:role/iam-role-name-here with your role arn
 
-env: 
+env:
   GF_AUTH_GENERIC_OAUTH_AUTH_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/authorize"
   GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token"
   GF_AUTH_GENERIC_OAUTH_API_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/userinfo"
@@ -810,20 +810,20 @@ grafana.ini:
     root_url: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana"
     serve_from_sub_path: true
   auth.generic_oauth:
-    enabled: true 
+    enabled: true
     name: obsrv
     allow_sign_up:  true
     client_id: grafana-oauth
-    client_secret: grafana-obsrv@123 
+    client_secret: 95H3LjWVDyKw6MOAL5vmvdoN3bNz45a6
     scopes: openid email profile offline_access roles
     email_attribute_path: email
     login_attribute_path: obsrv
     name_attribute_path: admin
-    auth_url: https://{{ .Values.global.domain }}/auth/realms/grafana-oauth/protocol/openid-connect/auth
-    token_url: https://{{ .Values.global.domain }}/auth/realms/grafana-oauth/protocol/openid-connect/token
-    api_url: https://{{ .Values.global.domain }}/auth/realms/grafana-oauth/protocol/openid-connect/userinfo
+    auth_url: https://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/protocol/openid-connect/auth
+    token_url: https://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/protocol/openid-connect/token
+    api_url: https://{{ .Values.global.domain }}/auth/realms/obsrvWebConsole/protocol/openid-connect/userinfo
     signout_redirect_url: https://{{ .Values.global.domain }}/grafana/login
-    role_attribute_path: contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer' 
+    role_attribute_path: contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'
 
 ## Grafana's LDAP configuration
 ## Templated by the template in _helpers.tpl
@@ -1235,7 +1235,7 @@ imageRenderer:
     enabled: false
     path: /metrics
     #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
-    labels: 
+    labels:
       system.monitoring: "true"
 
     interval: 1m
