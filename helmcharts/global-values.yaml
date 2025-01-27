@@ -247,8 +247,6 @@ keycloak:
     password: *psql-keycloak-pwd
   obsrvuser: obsrv_admin
   obsrvpassword: enDoPvTAxFSd
-  grafanauser: admin
-  grafanapassword: adminpassword
 
 
 valkey-denorm: &valkey_denorm
