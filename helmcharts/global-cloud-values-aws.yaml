@@ -210,3 +210,9 @@ hms:
 
 letsencrypt-ssl:
   enabled: *ssl_enabled
+
+keycloak:
+  ingress:
+    tls: *ssl_enabled
+  tls:
+    enabled: *ssl_enabled  
