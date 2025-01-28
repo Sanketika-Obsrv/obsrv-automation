@@ -266,6 +266,8 @@ module "eip" {
   source         = "../modules/aws/eip"
   env            = var.env
   building_block = var.building_block
+  create_kong_ingress_ip = var.create_kong_ingress_ip  
+  count = var.create_kong_ingress_ip ? 1 : 0  
 }
 
 # module "kong_ingress" {
