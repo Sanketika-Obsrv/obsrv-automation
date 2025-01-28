@@ -28,7 +28,6 @@ spec:
   commonName: {{ default $.Values.global.domain $.Values.domain }}
   dnsNames:
     - {{ default $.Values.global.domain $.Values.domain }}
-    - {{ printf "keycloak.%s" (default $.Values.global.domain $.Values.domain) }}
   issuerRef:
     name: {{ $.Values.cert_issuer_name }}
     kind: {{ $.Values.cert_issuer_type }}

@@ -566,13 +566,13 @@ keycloak:
               "clientId": "account",
               "name": "${client_account}",
               "rootUrl": "${authBaseUrl}",
-              "baseUrl": "/realms/obsrvWebConsole/account/",
+              "baseUrl": "/realms/obsrv/account/",
               "surrogateAuthRequired": false,
               "enabled": true,
               "alwaysDisplayInConsole": false,
               "clientAuthenticatorType": "client-secret",
               "redirectUris": [
-                "/realm/obsrvWebConsole/account/*"
+                "/realm/obsrv/account/*"
               ],
               "webOrigins": [],
               "notBefore": 0,
@@ -612,13 +612,13 @@ keycloak:
               "clientId": "account-console",
               "name": "${client_account-console}",
               "rootUrl": "${authBaseUrl}",
-              "baseUrl": "/realms/obsrvWebConsole/account/",
+              "baseUrl": "/realms/obsrv/account/",
               "surrogateAuthRequired": false,
               "enabled": true,
               "alwaysDisplayInConsole": false,
               "clientAuthenticatorType": "client-secret",
               "redirectUris": [
-                "/realms/obsrvWebConsole/account/*"
+                "/realms/obsrv/account/*"
               ],
               "webOrigins": [],
               "notBefore": 0,
@@ -764,7 +764,7 @@ keycloak:
               "redirectUris": [
                 "",
                 "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*",
-                "http://13.200.158.240.sslip.io/*",
+                "http://{{ .Values.global.domain }}/*",
                 "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console",
                 "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console?auth_callback=1"
               ],
@@ -983,13 +983,13 @@ keycloak:
               "clientId": "security-admin-console",
               "name": "${client_security-admin-console}",
               "rootUrl": "${authAdminUrl}",
-              "baseUrl": "/admin/obsrvWebConsole/console/",
+              "baseUrl": "/admin/obsrv/console/",
               "surrogateAuthRequired": false,
               "enabled": true,
               "alwaysDisplayInConsole": false,
               "clientAuthenticatorType": "client-secret",
               "redirectUris": [
-                "/admin/obsrvWebConsole/console/*"
+                "/admin/obsrv/console/*"
               ],
               "webOrigins": [
                 "+"

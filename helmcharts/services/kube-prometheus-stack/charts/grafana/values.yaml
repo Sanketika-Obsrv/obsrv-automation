@@ -837,8 +837,8 @@ grafana.ini:
     enabled: true
     name: obsrv
     allow_sign_up:  true
-    client_id: {{ .Values.global.oauth_configs.grafana_client_id }}
-    client_secret: {{ .Values.global.oauth_configs.grafana_client_secret }}
+    client_id: "{{ .Values.global.oauth_configs.grafana_client_id }}"
+    client_secret: "{{ .Values.global.oauth_configs.grafana_client_secret }}"
     scopes: openid email profile offline_access roles
     email_attribute_path: email
     login_attribute_path: obsrv
