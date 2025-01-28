@@ -751,8 +751,8 @@ keycloak:
             },
             {
               "id": "37d65a90-ae57-40bd-b15c-2d76dd1acaea",
-              "clientId": "obsrv-console",
-              "name": "webConsole",
+              "clientId": "{{ .Values.global.oauth_configs.web_console_client_id }}",
+              "name": "Obsrv Console",
               "description": "",
               "rootUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
               "adminUrl": "",
@@ -823,8 +823,8 @@ keycloak:
             },
             {
               "id": "43317ab1-c6be-4540-8822-cd561673844c",
-              "clientId": "obsrv-grafana",
-              "name": "",
+              "clientId": "{{ .Values.global.oauth_configs.grafana_client_id }}",
+              "name": "Obsrv Grafana",
               "description": "",
               "rootUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana",
               "adminUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana",
@@ -833,7 +833,7 @@ keycloak:
               "enabled": true,
               "alwaysDisplayInConsole": false,
               "clientAuthenticatorType": "client-secret",
-              "secret": "grafanaobsrv@123",
+              "secret": "{{ .Values.global.oauth_configs.grafana_client_secret }}",
               "redirectUris": [
                 "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana/login/generic_oauth"
               ],
@@ -880,8 +880,8 @@ keycloak:
             },
             {
               "id": "81c087e8-0683-41e6-a171-0242dcbce71c",
-              "clientId": "obsrv-superset",
-              "name": "superset obsrv",
+              "clientId": "{{ .Values.global.oauth_configs.superset_client_id }}",
+              "name": "Obsrv Superset",
               "description": "",
               "rootUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
               "adminUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
@@ -890,7 +890,7 @@ keycloak:
               "enabled": true,
               "alwaysDisplayInConsole": false,
               "clientAuthenticatorType": "client-secret",
-              "secret": "supersetobsrv@123",
+              "secret": "{{ .Values.global.oauth_configs.superset_client_secret }}",
               "redirectUris": [
                 "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv"
               ],

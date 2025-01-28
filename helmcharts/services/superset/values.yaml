@@ -496,15 +496,15 @@ configOverrides:
         'token_key': 'access_token',
         'icon': 'fa-key',
         'remote_app': {
-            'client_id': '{{ .Values.global.superset_client_id }}',
-            'client_secret': '{{ .Values.global.superset_client_secret }}',
+            'client_id': '{{ .Values.global.oauth_configs.superset_client_id }}',
+            'client_secret': '{{ .Values.global.oauth_configs.superset_client_secret }}',
             'server_metadata_url': 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/.well-known/openid-configuration',
             'client_kwargs': {
                 'scope': 'openid email profile'
             },
             'access_token_method':'POST',    # HTTP Method to call access_token_url
             'access_token_params':{        # Additional parameters for calls to access_token_url
-                'client_id':'{{ .Values.global.superset_client_id }}'
+                'client_id':'{{ .Values.global.oauth_configs.superset_client_id }}'
             },
             'jwks_uri': 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/certs',
             'api_base_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth',

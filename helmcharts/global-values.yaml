@@ -85,11 +85,12 @@ defaults:
   domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
 
-  oauth:
+  oauth: &oauth_configs
     superset_client_id: &superset_client_id "obsrv-superset"
     superset_client_secret: &superset_client_secret "supersetobsrv@123"
     grafana_client_id: &grafana_client_id "obsrv-grafana"
     grafana_client_secret: &grafana_client_secret "grafanaobsrv@123" 
+    web_console_client_id: "obsrv-console"
 
 
 #coredb-charts/
@@ -567,9 +568,4 @@ global:
   # This redis is used by flink
   redis: *valkey_denorm
   prometheus: *prometheus
-  superset_client_id: *superset_client_id 
-  superset_client_secret: *superset_client_secret 
-  grafana_client_id: *grafana_client_id 
-  grafana_client_secret: *grafana_client_secret 
-   
-  
+  oauth_configs: *oauth_configs
