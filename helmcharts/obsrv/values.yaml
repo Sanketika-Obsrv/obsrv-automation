@@ -2685,31 +2685,9 @@ kube-prometheus-stack:
       storage.yaml:
         file: alerting/storage.yaml
     env:
-        KEYCLOAK:
-          GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
-          GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
-          GF_AUTH_GENERIC_OAUTH_NAME: obsrv-keycloak
-        OBSRV:
-          GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
-          GF_AUTH_GENERIC_OAUTH_AUTH_HTTP_METHOD: POST
-          GF_AUTH_GENERIC_OAUTH_CLIENT_ID: 528806583-dev.oauth.obsrv.ai
-          GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: el642dcXd1P3v6i+hODnGrUKx9ZSWAlmXWZaEoZQI7/R3NUGQlLTnNCV
-          GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
-          GF_AUTH_GENERIC_OAUTH_NAME: obsrv
-          GF_AUTH_GENERIC_OAUTH_SCOPES: read
-          GF_AUTH_GENERIC_OAUTH_USERNAME_FIELD: email
-          GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP: true
-          GF_AUTH_SKIP_ORG_ROLE_SYNC: "true"
-          GF_SECURITY_ALLOW_EMBEDDING: "true"
-          GF_SERVER_DOMAIN: '{{ .Values.global.domain }}'
-          GF_SERVER_ROOT_URL: https://{{ .Values.global.domain }}/grafana
-          GF_SERVER_SERVE_FROM_SUBPATH: true
-          GF_AUTH_GENERIC_OAUTH_AUTH_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/authorize"
-          GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token"
-          GF_AUTH_GENERIC_OAUTH_API_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/userinfo"
-
-
-
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: obsrv
     extraLabels:
       system.monitoring: "true"
     namespaceOverride: monitoring

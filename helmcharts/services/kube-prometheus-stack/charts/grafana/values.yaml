@@ -492,12 +492,8 @@ admin:
 ## 6. uncomment the annotation section in the serviceAccount: above
 ## make sure to replace arn:aws:iam::123456789000:role/iam-role-name-here with your role arn
 
-env:
-  GF_AUTH_GENERIC_OAUTH_AUTH_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/authorize"
-  GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token"
-  GF_AUTH_GENERIC_OAUTH_API_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/userinfo"
-
-## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
+env: {}
+  ## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
 ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#envvarsource-v1-core
 ## Renders in container spec as:
 ##   env:
