@@ -15,7 +15,6 @@ global:
   #   - pullSecret1
   #   - pullSecret2
   imagePullSecrets: []
-
 rbac:
   create: true
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
@@ -237,7 +236,7 @@ service:
     # targetPort: 4181 To be used with a proxy extraContainer
   ## Service annotations. Can be templated.
   annotations: {}
-  labels: 
+  labels:
     system.monitoring: "true"
 
   portName: service
@@ -251,7 +250,7 @@ serviceMonitor:
   enabled: false
   path: /metrics
   #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
-  labels: 
+  labels:
     system.monitoring: "true"
 
 
@@ -283,7 +282,7 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  labels: 
+  labels:
     system.monitoring: "true"
 
   path: /
@@ -493,14 +492,8 @@ admin:
 ## 6. uncomment the annotation section in the serviceAccount: above
 ## make sure to replace arn:aws:iam::123456789000:role/iam-role-name-here with your role arn
 
-env: 
-  GF_AUTH_GENERIC_OAUTH_AUTH_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/authorize"
-
-  GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token"
-
-  GF_AUTH_GENERIC_OAUTH_API_URL: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/userinfo"
-
-## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
+env: {}
+  ## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
 ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#envvarsource-v1-core
 ## Renders in container spec as:
 ##   env:
@@ -812,28 +805,49 @@ grafana.ini:
     domain: "{{ if (and .Values.ingress.enabled .Values.ingress.hosts) }}{{ .Values.ingress.hosts | first }}{{ else }}''{{ end }}"
     root_url: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana"
     serve_from_sub_path: true
-## grafana Authentication can be enabled with the following values on grafana.ini
- # server:
-      # The full public facing url you use in browser, used for redirects and emails
- #    root_url:
- # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
- # auth.github:
- #    enabled: false
- #    allow_sign_up: false
- #    scopes: user:email,read:org
- #    auth_url: https://github.com/login/oauth/authorize
- #    token_url: https://github.com/login/oauth/access_token
- #    api_url: https://api.github.com/user
- #    team_ids:
- #    allowed_organizations:
- #    client_id:
- #    client_secret:
-## LDAP Authentication can be enabled with the following values on grafana.ini
-## NOTE: Grafana will fail to start if the value for ldap.toml is invalid
-  # auth.ldap:
-  #   enabled: true
-  #   allow_sign_up: true
-  #   config_file: /etc/grafana/ldap.toml
+  ## grafana Authentication can be enabled with the following values on grafana.ini
+  # server:
+        # The full public facing url you use in browser, used for redirects and emails
+  #    root_url:
+  # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
+  # auth.github:
+  #    enabled: false
+  #    allow_sign_up: false
+  #    scopes: user:email,read:org
+  #    auth_url: https://github.com/login/oauth/authorize
+  #    token_url: https://github.com/login/oauth/access_token
+  #    api_url: https://api.github.com/user
+  #    team_ids:
+  #    allowed_organizations:
+  #    client_id:
+  #    client_secret:
+  ## LDAP Authentication can be enabled with the following values on grafana.ini
+  ## NOTE: Grafana will fail to start if the value for ldap.toml is invalid
+    # auth.ldap:
+    #   enabled: true
+    #   allow_sign_up: true
+    #   config_file: /etc/grafana/ldap.toml
+
+  ## Grafana's LDAP configuration
+  ## Templated by the template in _helpers.tpl
+  ## NOTE: To enable the grafana.ini must be configured with auth.ldap.enabled
+  ## ref: http://docs.grafana.org/installation/configuration/#auth-ldap
+  ## ref: http://docs.grafana.org/installation/ldap/#configuration
+  auth.generic_oauth:
+    enabled: true
+    name: obsrv
+    allow_sign_up:  true
+    client_id: {{ .Values.global.oauth_configs.grafana_client_id }}
+    client_secret: {{ .Values.global.oauth_configs.grafana_client_secret }}
+    scopes: openid email profile offline_access roles
+    email_attribute_path: email
+    login_attribute_path: obsrv
+    name_attribute_path: admin
+    auth_url: http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/auth
+    token_url: http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/token
+    api_url: http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/userinfo
+    signout_redirect_url: http://{{ .Values.global.domain }}/grafana/login
+    role_attribute_path: contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'
 
 ## Grafana's LDAP configuration
 ## Templated by the template in _helpers.tpl
@@ -1245,7 +1259,7 @@ imageRenderer:
     enabled: false
     path: /metrics
     #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
-    labels: 
+    labels:
       system.monitoring: "true"
 
     interval: 1m

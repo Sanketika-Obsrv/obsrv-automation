@@ -421,28 +421,42 @@ extraConfigs:
       sqlalchemy_uri: trino://trino@hudi-trino.trino.svc.cluster.local/lakehouse/hms
       uuid: a5abc507-1743-41ef-9fc7-256dfde8d497
       version: 1.0.0
-        
+
 extraSecrets:
   custom_sso_security_manager.py: |
     import logging
     import json
     from superset.security import SupersetSecurityManager
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+
+    logging.info("Loading custom_sso_security_manager.py")
 
     class CustomSsoSecurityManager(SupersetSecurityManager):
+      def __init__(self, appbuilder):
+        super(CustomSsoSecurityManager, self).__init__(appbuilder)
+        app = self.appbuilder.get_app
+        app.config.setdefault("AUTH_ROLES_MAPPING", {})
+        app.config.setdefault("AUTH_TYPE", AUTH_OAUTH)
 
       def oauth_user_info(self, provider, response=None):
         print("Oauth2 provider:", provider)
         if provider == 'obsrv':
           # As example, this line request a GET to base_url + '/' + userDetails with Bearer  Authentication,
           # and expects that authorization server checks the token, and response with user details
-          response = self.appbuilder.sm.oauth_remotes[provider].get('console/api/oauth/v1/userinfo').__dict__
-          content = response['_content'].decode('utf-8')
-          data = json.loads(content)
-          print("Oauth2 User Data:", data)
-          id = data['id']
-          name = data['name']
-          email = data['email']
-          return { 'name' :name, 'email' : email, 'id' : id, 'username' : name, 'first_name':'', 'last_name':''}
+          me = self.appbuilder.sm.oauth_remotes[provider].get(
+              f'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/userinfo'
+          )
+          me.raise_for_status()
+          data = me.json()
+          logging.info("User info from Keycloak: %s", data)
+          return {
+            "name": data["name"],
+            "email": data["email"],
+            "first_name": data["given_name"],
+            "last_name": data["family_name"],
+            "id": data["preferred_username"],
+            "username": data["preferred_username"]
+          }
 
 # A dictionary of overrides to append at the end of superset_config.py - the name does not matter
 # WARNING: the order is not guaranteed
@@ -478,30 +492,29 @@ configOverrides:
 
     OAUTH_PROVIDERS = [
       {
-        'name':'obsrv',
-        'token_key':'access_token',
-        'icon':'fa-address-card',
+        'name': 'obsrv',
+        'token_key': 'access_token',
+        'icon': 'fa-key',
         'remote_app': {
-           'client_id':'{{ .Values.oauth.client_id }}',
-           'client_secret':'{{ .Values.oauth.client_secret }}',
-           'client_kwargs':{
-               'scope': 'read'
-           },
-           'access_token_method':'POST',
-           'access_token_params':{
-               'client_id':'{{ .Values.oauth.client_id }}',
-               'client_secret':'{{ .Values.oauth.client_secret }}'
-           },
-           'access_token_headers':{
-               'Authorization': 'Basic {{ .Values.oauth.auth_token }}'
-           },
-           'api_base_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}',
-           'access_token_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/token',
-           'authorize_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/api/oauth/v1/authorize'
+            'client_id': '{{ .Values.global.oauth_configs.superset_client_id }}',
+            'client_secret': '{{ .Values.global.oauth_configs.superset_client_secret }}',
+            'server_metadata_url': 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/.well-known/openid-configuration',
+            'client_kwargs': {
+                'scope': 'openid email profile'
+            },
+            'access_token_method':'POST',    # HTTP Method to call access_token_url
+            'access_token_params':{        # Additional parameters for calls to access_token_url
+                'client_id':'{{ .Values.global.oauth_configs.superset_client_id }}'
+            },
+            'jwks_uri': 'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/certs',
+            'api_base_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth',
+            'access_token_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/token',
+            'authorize_url':'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/auth'
         }
       }
     ]
     AUTH_USER_REGISTRATION = True
+    # AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
     ENABLE_PROXY_FIX = {{ if .Values.global.ssl_enabled }}True{{ else }}False{{ end }}

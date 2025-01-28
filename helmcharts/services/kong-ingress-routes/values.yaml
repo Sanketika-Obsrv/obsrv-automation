@@ -54,4 +54,4 @@ ingress:
     annotations: {}
     service_port: 80
     paths:
-      - path: "/"
+      - path: "/auth"

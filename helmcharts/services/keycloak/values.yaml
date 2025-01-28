@@ -226,7 +226,7 @@ proxy: ""
 ## @param httpRelativePath Set the path relative to '/' for serving resources. Useful if you are migrating from older version which were using '/auth/'
 ## ref: https://www.keycloak.org/migration/migrating-to-quarkus#_default_context_path_changed
 ##
-httpRelativePath: "/"
+httpRelativePath: "/auth"
 ## Keycloak Service Discovery settings
 ## ref: https://github.com/bitnami/containers/tree/main/bitnami/keycloak#cluster-configuration
 ##
@@ -385,7 +385,7 @@ livenessProbe:
 ## @param readinessProbe.successThreshold Success threshold for readinessProbe
 ##
 readinessProbe:
-  enabled: true
+  enabled: false
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 1
