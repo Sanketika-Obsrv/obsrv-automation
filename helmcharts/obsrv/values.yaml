@@ -754,7 +754,7 @@ keycloak:
               "clientId": "obsrv-console",
               "name": "webConsole",
               "description": "",
-              "rootUrl": "https://{{ .Values.global.domain }}",
+              "rootUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
               "adminUrl": "",
               "baseUrl": "",
               "surrogateAuthRequired": false,
@@ -763,14 +763,14 @@ keycloak:
               "clientAuthenticatorType": "client-secret",
               "redirectUris": [
                 "",
-                "https://{{ .Values.global.domain }}/*",
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*",
                 "http://13.200.158.240.sslip.io/*",
-                "https://{{ .Values.global.domain }}/console",
-                "https://{{ .Values.global.domain }}/console?auth_callback=1"
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console",
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console?auth_callback=1"
               ],
               "webOrigins": [
-                "https://{{ .Values.global.domain }}/*",
-                "https://{{ .Values.global.domain }}/console",
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*",
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console",
                 "*"
               ],
               "notBefore": 0,
@@ -786,7 +786,7 @@ keycloak:
               "attributes": {
                 "client.introspection.response.allow.jwt.claim.enabled": "false",
                 "login_theme": "keycloak",
-                "post.logout.redirect.uris": "+##https://{{ .Values.global.domain }}/*##https://{{ .Values.global.domain }}/console##*https://{{ .Values.global.domain }}/console/*##https://{{ .Values.global.domain }}##,https://{{ .Values.global.domain }}/auth",
+                "post.logout.redirect.uris": "+##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console##*http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}##,http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth",
                 "oauth2.device.authorization.grant.enabled": "false",
                 "backchannel.logout.revoke.offline.tokens": "false",
                 "use.refresh.tokens": "true",
@@ -826,8 +826,8 @@ keycloak:
               "clientId": "obsrv-grafana",
               "name": "",
               "description": "",
-              "rootUrl": "https://{{ .Values.global.domain }}/grafana",
-              "adminUrl": "https://{{ .Values.global.domain }}/grafana",
+              "rootUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana",
+              "adminUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana",
               "baseUrl": "",
               "surrogateAuthRequired": false,
               "enabled": true,
@@ -835,10 +835,10 @@ keycloak:
               "clientAuthenticatorType": "client-secret",
               "secret": "grafanaobsrv@123",
               "redirectUris": [
-                "https://{{ .Values.global.domain }}/grafana/login/generic_oauth"
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana/login/generic_oauth"
               ],
               "webOrigins": [
-                "https://{{ .Values.global.domain }}/grafana"
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana"
               ],
               "notBefore": 0,
               "bearerOnly": false,
@@ -855,7 +855,7 @@ keycloak:
                 "oidc.ciba.grant.enabled": "false",
                 "client.secret.creation.time": "1737970791",
                 "backchannel.logout.session.required": "true",
-                "post.logout.redirect.uris": "https://{{ .Values.global.domain }}/grafana",
+                "post.logout.redirect.uris": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/grafana",
                 "oauth2.device.authorization.grant.enabled": "false",
                 "display.on.consent.screen": "false",
                 "backchannel.logout.revoke.offline.tokens": "false"
@@ -883,8 +883,8 @@ keycloak:
               "clientId": "obsrv-superset",
               "name": "superset obsrv",
               "description": "",
-              "rootUrl": "https://{{ .Values.global.domain }}",
-              "adminUrl": "https://{{ .Values.global.domain }}",
+              "rootUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
+              "adminUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
               "baseUrl": "",
               "surrogateAuthRequired": false,
               "enabled": true,
@@ -892,10 +892,10 @@ keycloak:
               "clientAuthenticatorType": "client-secret",
               "secret": "supersetobsrv@123",
               "redirectUris": [
-                "https://{{ .Values.global.domain }}/oauth-authorized/obsrv"
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv"
               ],
               "webOrigins": [
-                "https://{{ .Values.global.domain }}"
+                "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}"
               ],
               "notBefore": 0,
               "bearerOnly": false,
@@ -912,7 +912,7 @@ keycloak:
                 "oidc.ciba.grant.enabled": "false",
                 "client.secret.creation.time": "1737971597",
                 "backchannel.logout.session.required": "true",
-                "post.logout.redirect.uris": "https://{{ .Values.global.domain }}",
+                "post.logout.redirect.uris": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}",
                 "oauth2.device.authorization.grant.enabled": "false",
                 "display.on.consent.screen": "false",
                 "use.jwks.url": "false",
@@ -2622,7 +2622,7 @@ keycloak:
             "cibaExpiresIn": "120",
             "de.adorsys.keycloak.config.state-default-roles-client-admin-cli-0": "[]",
             "de.adorsys.keycloak.config.state-default-roles-client-security-admin-console-0": "[]",
-            "frontendUrl": "https://{{ .Values.global.domain }}/auth",
+            "frontendUrl": "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth",
             "organizationsEnabled": "false",
             "de.adorsys.keycloak.config.state-default-components-1": "12\",\"aes-generated\"]",
             "de.adorsys.keycloak.config.state-default-components-0": "[\"Allowed Client Scopes\",\"Consent Required\",\"Full Scope Disabled\",\"Allowed Client Scopes\",\"Max Clients Limit\",\"Allowed Protocol Mapper Types\",\"Trusted Hosts\",\"Allowed Protocol Mapper Types\",null,\"rsa-enc-generated\",\"rsa-generated\",\"hmac-generated-hs5",

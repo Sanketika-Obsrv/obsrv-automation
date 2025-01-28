@@ -44,20 +44,6 @@ spec:
           fi
 
           echo "Access token retrieved successfully."
-
-          # Check if the user already exists in the obsrv realm
-          echo "Checking if user exists..."
-          user_check_response=$(curl --insecure -s -X GET http://keycloak:80/auth/admin/realms/obsrv/users \
-            -H "Authorization: Bearer $access_token" \
-            -G --data-urlencode "username={{ .Values.obsrvuser }}")
-
-          user_count=$(echo $user_check_response | jq length)
-
-          if [ "$user_count" -gt 0 ]; then
-            echo "User '{{ .Values.obsrvuser }}' already exists in realm 'obsrv'."
-            exit 0
-          fi
-
           # Create a new user in the obsrv realm
           echo "Creating new Keycloak user..."
           create_user_response=$(curl --insecure -s -o response.json -w "%{http_code}" \
