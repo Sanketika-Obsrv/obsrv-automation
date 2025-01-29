@@ -21,11 +21,6 @@ variable "timezone" {
   description = "Timezone property to backup the data. Example UTC (in upper case)"
 }
 
-variable "create_kong_ingress" {
-  type        = bool
-  description = "Set this value to true/false to enable/disable kong ingress creation"
-}
-
 variable "create_vpc" {
   type        = bool
   description = "Set this value to true/false to enable/disable new vpc creation"
