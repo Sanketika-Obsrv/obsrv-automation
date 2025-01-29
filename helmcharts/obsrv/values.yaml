@@ -2795,6 +2795,10 @@ kube-prometheus-stack:
               target_label: __param_target
             - source_labels: [__param_target]
               target_label: instance
+        - job_name: 'pushgateway'
+          scrape_interval: 15s
+          static_configs:
+            - targets: ['monitoring-prometheus-pushgateway.monitoring.svc.cluster.local:9091']      
 
                      
 
