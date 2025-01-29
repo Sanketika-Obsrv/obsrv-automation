@@ -786,7 +786,7 @@ keycloak:
               "attributes": {
                 "client.introspection.response.allow.jwt.claim.enabled": "false",
                 "login_theme": "keycloak",
-                "post.logout.redirect.uris": "+##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console##*http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}##,http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth",
+                "post.logout.redirect.uris": "+##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/console/*##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}##http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth",
                 "oauth2.device.authorization.grant.enabled": "false",
                 "backchannel.logout.revoke.offline.tokens": "false",
                 "use.refresh.tokens": "true",
