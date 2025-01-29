@@ -125,7 +125,7 @@ spec:
     
     # {{- if .Values.druid_monitoring -}}
     # druid.emitter.graphite.port={{ .Values.druid_emitter_graphite_port }}
-    # druid.emitter.graphite.hstname={{ .Values.druid_emitter_graphite_hostname }}
+    # druid.emitter.graphite.hostname={{ .Values.druid_emitter_graphite_hostname }}
     # druid.emitter.graphite.protocol={{ .Values.druid_emitter_graphite_protocol }}
     # druid.emitter.graphite.eventConverter={{ .Values.druid_emitter_graphite_eventConverter }}
     # {{- end -}}
