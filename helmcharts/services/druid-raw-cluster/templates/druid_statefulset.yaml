@@ -114,9 +114,9 @@ spec:
     druid.selectors.coordinator.serviceName={{ .Values.druid_selectors_coordinator_serviceName }}
     
     # Monitoring
-    druid.emitter.prometheus.pushGatewayAddress= monitoring-prometheus-pushgateway.monitoring.svc.cluster.local:9091
-    druid.emitter.prometheus.strategy=pushgateway
-    druid.emitter=prometheus
+    druid.emitter.prometheus.pushGatewayAddress={{ .Values.druid_emitter_prometheus_pushGatewayAddress }}
+    druid.emitter.prometheus.strategy={{ .Values.druid_emitter_prometheus_strategy }}
+    druid.emitter={{ .Values.druid_emitter }}
     druid.emitter.logging.logLevel={{ .Values.druid_emitter_logging_logLevel }}
     
     # druid.monitoring.monitors=[{{ .Values.druid_monitoring_monitors }}]

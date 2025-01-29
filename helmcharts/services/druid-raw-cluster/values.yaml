@@ -64,9 +64,11 @@ druid_selectors_coordinator_serviceName: druid/coordinator
 
 # Monitoring
 druid_monitoring_monitors: '"com.metamx.metrics.JvmMonitor","org.apache.druid.java.util.metrics.JvmMonitor"'
-druid_emitter: composing
+druid_emitter: "prometheus"
+druid_emitter_prometheus_strategy: "pushgateway"
 druid_emitter_composing_emitters: '"logging"'
-druid_emitter_logging_logLevel: DEBUG
+druid_emitter_logging_logLevel: INFO
+druid_emitter_prometheus_pushGatewayAddress: "monitoring-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
 
 # Storage type of double columns
 # ommiting this will lead to index double as float at the storage layer
