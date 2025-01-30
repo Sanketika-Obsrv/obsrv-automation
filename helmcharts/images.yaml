@@ -42,7 +42,7 @@ images: &images
 
   web-console: &web-console # registry: ""
     repository: "obsrv-web-console"
-    tag: "1.4.0"
+    tag: "1.4.1"
     digest: ""
 
   ## PIPELINE ENTERPRISE
