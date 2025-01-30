@@ -52,6 +52,9 @@ spec:
             -H "Content-Type: application/json" \
             -d '{
                   "username": "{{ .Values.obsrvuser }}",
+                  "email": "admin@obsrv.in",
+                  "firstName": "obsrv",
+                  "lastName": "admin",
                   "enabled": true,
                   "credentials": [
                     {

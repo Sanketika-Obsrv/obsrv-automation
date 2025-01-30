@@ -219,8 +219,6 @@ command-api:
 
 web-console:
   imagePullPolicy: Always
-  env:
-    AUTHENTICATION_TYPE: basic
 
 dataset-api:
   <<: *service-account-disable
