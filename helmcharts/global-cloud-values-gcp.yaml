@@ -1,263 +1,189 @@
 global:
+  cloud_storage_provider: &cloud_storage_provider gcp
+  cloud_storage_region: &cloud_storage_region <replace_with_region>
+  cloud_store_provider: &cloud_store_provider gcs
+  deep_store_type: &deep_store_type google
+  project_id: &project_id <replace_with_project_id>
   ssl_enabled: &ssl_enabled true
-  project_id: &project_id "obsrv-installation"
-  deep_store_type: &deep_store_type "google"
-  cloud_storage_provider: &cloud_storage_provider "gcp"
-  cloud_store_provider: &cloud_store_provider "gcs"
-  storage_provider: &storage_provider "gcloud"
-  cloud_storage_config: &cloud_storage_config |+
-    '{"identity":"test","credential":"test","projectId":"obsrv-installation"}'
-  cloud_storage_region: &cloud_storage_region "us-central1"
-  cloud_storage_bucket: &cloud_storage_bucket "obsrv-dev-31381366265"
-  postgresql_backup_cloud_bucket: &backups_bucket "backups-obsrv-dev-31381366265"
-  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "backups-obsrv-dev-31381366265"
-  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "velero-obsrv-dev-31381366265"
-  checkpoint_bucket: &checkpoint_bucket "gs://checkpoint-obsrv-dev-31381366265/flink/checkpoints"
+  storageClass: &storage_class standard
+  storage_provider: &storage_provider gcloud
+
   checkpoint_store_type: *cloud_store_provider
-  storageClass: &storage_class "standard"
-  dataset_api_container: ""
-  config_api_container: ""
-  serviceAccounts:
-    enabled: &create_sa true
-    redis: &redis-sa-annotations obsrv-redis-backup-sa@obsrv-installation.iam.gserviceaccount.com
-    velero: &velero-sa-annotations obsrv-velero-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
-    dataset-api: &dataset-api-sa-annotations obsrv-dataset-api-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
-    config-api: &config-api-sa-annotations obsrv-config-api-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
-    druid-raw: &druid-raw-sa-annotations obsrv-druid-raw-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
-    flink-sa: &flink-sa-annotations obsrv-flink-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
-    spark: &spark-sa-annotations obsrv-spark-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
-    secor: &secor-sa-annotations obsrv-secor-sa-iam-role@obsrv-installation.iam.gserviceaccount.com
-    postgres: &postgres-sa-annotations obsrv-psql-backup-sa@obsrv-installation.iam.gserviceaccount.com
-#  spark_cloud_bucket: &spark_cloud_bucket ""
+  checkpoint_bucket: &checkpoint_bucket gs://checkpoint-<replace_with_building_block>-<replace_with_env>-<replace_with_project_num>/flink/checkpoints
 
-# redis_backup_sidecar: &redis_backup_sidecar
-#   master:
-#     sidecars:
+  cloud_storage_bucket: &cloud_storage_bucket <replace_with_building_block>-<replace_with_env>-<replace_with_project_num>
+  cloud_storage_config: &cloud_storage_config |
+    '{"identity":"<replace_with_client_email>","credential":"<replace_with_private_key>","projectId":"<replace_with_project_id>"}'
+  config_api_container: *cloud_storage_bucket
+  dataset_api_container: *cloud_storage_bucket
+  postgresql_backup_cloud_bucket: &backups_bucket backups-<replace_with_building_block>-<replace_with_env>-<replace_with_project_num>
+  spark_cloud_bucket: *cloud_storage_bucket
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket velero-<replace_with_building_block>-<replace_with_env>-<replace_with_project_num>
 
-
-velero-backup: &velero-backup
-  serviceAccount:
-    server:
-      create: *create_sa
-      name: "velero-sa"
-      annotations:
-        iam.gke.io/gcp-service-account: *velero-sa-annotations
-      labels:
-  credentials:
-    useSecret: false
-  configuration:
-    provider: *cloud_storage_provider
-    backupStorageLocation:
-      bucket: *velero_backup_cloud_bucket
-      config:
-        serviceAccount: ""
-    volumeSnapshotLocation:
-      name: default
-      config:
-        project: *project_id
-        region: *cloud_storage_region
-    backupSyncPeriod: 15m
-  podAnnotations: {}
-  initContainers:
-    - name: velero-plugin-for-gcp
-      image: velero/velero-plugin-for-gcp
-      volumeMounts:
-        - name: plugins
-          mountPath: /target
-  schedules:
-    obsrv-daily-backup:
-      disabled: false
-
-dataset-api-service-account: &dataset-api-service-account
-  serviceAccount:
-    create: *create_sa
-    name: dataset-api-sa
-    annotations:
-      iam.gke.io/gcp-service-account: *dataset-api-sa-annotations
+service_accounts:
+  enabled: &create_sa true
+  config-api: &config-api-sa-annotations <replace_with_building_block>-config-api-sa-iam-role@<replace_with_project_id>.iam.gserviceaccount.com
+  dataset-api: &dataset-api-sa-annotations <replace_with_building_block>-dataset-api-sa-iam-role@<replace_with_project_id>.iam.gserviceaccount.com
+  druid-raw: &druid-raw-sa-annotations <replace_with_building_block>-druid-raw-sa-iam-role@<replace_with_project_id>.iam.gserviceaccount.com
+  flink-sa: &flink-sa-annotations <replace_with_building_block>-flink-sa-iam-role@<replace_with_project_id>.iam.gserviceaccount.com
+  postgres: &postgres-sa-annotations <replace_with_building_block>-psql-backup-sa@<replace_with_project_id>.iam.gserviceaccount.com
+  secor: &secor-sa-annotations <replace_with_building_block>-secor-sa-iam-role@<replace_with_project_id>.iam.gserviceaccount.com
+  spark: &spark-sa-annotations <replace_with_building_block>-spark-sa-iam-role@<replace_with_project_id>.iam.gserviceaccount.com
+  velero: &velero-sa-annotations <replace_with_building_block>-velero-sa-iam-role@<replace_with_project_id>.iam.gserviceaccount.com
 
 config-api-service-account: &config-api-service-account
   serviceAccount:
-    create: *create_sa
-    name: config-api-sa
     annotations:
       iam.gke.io/gcp-service-account: *config-api-sa-annotations
-
-postgres-backup-service-account: &postgres-backup-service-account
-  serviceAccount:
     create: *create_sa
-    name: postgresql-backup-sa
+    name: config-api-sa
+
+dataset-api-service-account: &dataset-api-service-account
+  serviceAccount:
     annotations:
-      iam.gke.io/gcp-service-account: *postgres-sa-annotations
+      iam.gke.io/gcp-service-account: *dataset-api-sa-annotations
+    create: *create_sa
+    name: dataset-api-sa
 
 druid-raw-service-account: &druid-raw-service-account
   serviceAccount:
-    create: *create_sa
-    name: druid-raw-sa
     annotations:
       iam.gke.io/gcp-service-account: *druid-raw-sa-annotations
-
-spark-service-account: &spark-service-account
-  serviceAccount:
     create: *create_sa
-    name: spark-sa
-    annotations:
-      iam.gke.io/gcp-service-account: *spark-sa-annotations
-    automountServiceAccountToken: true
-
-secor-service-account: &secor-service-account
-  serviceAccount:
-    create: *create_sa
-    name: secor-sa
-    annotations:
-      iam.gke.io/gcp-service-account: *secor-sa-annotations
+    name: druid-raw-sa
 
 flink-service-account: &flink-service-account
   serviceAccount:
-    create: *create_sa
-    name: flink-sa
     annotations:
       iam.gke.io/gcp-service-account: *flink-sa-annotations
+    create: *create_sa
+    name: flink-sa
 
-redis-denorm:
-  # <<: *redis_backup_sidecar
-  master:
-    sidecars:
-      - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.4-GA
-        volumeMounts:
-          - mountPath: "/data"
-            name: redis-data
-        resources:
-          requests:
-            cpu: 0.1
-            memory: 256Mi
-          limits:
-            cpu: 0.5
-            memory: 512Mi
-        env:
-          - name: REDIS_BACKUP_CRON_SCHEDULE
-            value: "00 * * * *"
-          - name: CLOUD_SERVICE
-            value: *cloud_store_provider
-          - name: GCS_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: REDIS_RDB_FILE_PATH
-            value: "/data"
-          - name: REDIS_REPLICATION_MODE
-            value: master
-          - name: BACKUP_PREFIX
-            value: denorm-redis
-    serviceAccount:
-      create: *create_sa
-      name: "redis-backup-sa"
+postgres-backup-service-account: &postgres-backup-service-account
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: *postgres-sa-annotations
+    create: *create_sa
+    name: postgresql-backup-sa
+
+secor-service-account: &secor-service-account
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: *secor-sa-annotations
+    create: *create_sa
+    name: secor-sa
+
+spark-service-account: &spark-service-account
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: *spark-sa-annotations
+    automountServiceAccountToken: true
+    create: *create_sa
+    name: spark-sa
+
+velero-service-account: &velero-service-account
+  serviceAccount:
+    server:
       annotations:
-        iam.gke.io/gcp-service-account: *redis-sa-annotations
-
-
-redis-dedup:
-  # <<: *redis_backup_sidecar
-  master:
-    sidecars:
-      - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.4-GA
-        volumeMounts:
-          - mountPath: "/data"
-            name: redis-data
-        resources:
-          requests:
-            cpu: 0.1
-            memory: 256Mi
-          limits:
-            cpu: 0.5
-            memory: 512Mi
-        env:
-          - name: REDIS_BACKUP_CRON_SCHEDULE
-            value: "00 * * * *"
-          - name: CLOUD_SERVICE
-            value: *cloud_store_provider
-          - name: GCS_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: REDIS_RDB_FILE_PATH
-            value: "/data"
-          - name: REDIS_REPLICATION_MODE
-            value: master
-          - name: BACKUP_PREFIX
-            value: dedup-redis
-    serviceAccount:
+        iam.gke.io/gcp-service-account: *velero-sa-annotations
       create: *create_sa
-      name: "redis-backup-sa"
-      annotations:
-        iam.gke.io/gcp-service-account: *redis-sa-annotations
-
-velero:
-  <<: *velero-backup
-
-dataset-api:
-  <<: *dataset-api-service-account
-  exhaust_service:
-    CLOUD_STORAGE_PROVIDER: *storage_provider
-    CONTAINER_PREFIX: "telemetry-data"
+      labels:
+      name: velero-sa
 
 config-api:
-  <<: *config-api-service-account
+  !!merge <<: *config-api-service-account
   exhaust_service:
     CLOUD_STORAGE_PROVIDER: *storage_provider
-    CONTAINER_PREFIX: "telemetry-data"
+    CONTAINER_PREFIX: telemetry-data
+
+dataset-api:
+  !!merge <<: *dataset-api-service-account
+  exhaust_service:
+    CLOUD_STORAGE_PROVIDER: *storage_provider
+    CONTAINER_PREFIX: telemetry-data
 
 druid-raw-cluster:
+  !!merge <<: *druid-raw-service-account
   druid_deepstorage_type: *deep_store_type
   druid_indexer_logs_type: *deep_store_type
   gcs_bucket: *cloud_storage_bucket
-  <<: *druid-raw-service-account
-
-postgresql-backup:
-  <<: *postgres-backup-service-account
-  GS_BACKUP_BUCKET: *backups_bucket
-
-spark:
-  <<: *spark-service-account
-  persistence:
-    masterTmp:
-      name: spark-master-tmp
-      storageClassName: *storage_class
-      storage:
-        size: 2Gi
-    workerTmp:
-      name: spark-worker-tmp
-      storageClassName: *storage_class
-      storage:
-        size: 2Gi
-    masterMetadata:
-      name: spark-master-metadata
-      storageClassName: *storage_class
-      storage:
-        size: 2Gi
-    workerMetadata:
-      name: spark-worker-metadata
-      storageClassName: *storage_class
-      storage:
-        size: 2Gi
-
-#obsrvtools
-system-rules-ingestor:
-  serviceAccount:
-    name: system-rules-ingestor
-
-secor:
-  storage_type: *cloud_store_provider
-  gcp_bucket_name: *backups_bucket
-  <<: *secor-service-account
 
 flink:
-  <<: *flink-service-account
+  !!merge <<: *flink-service-account
   checkpoint_store_type: *cloud_store_provider
   checkpointing:
     enabled: true
     statebackend: *checkpoint_bucket
 
-letsencrypt-ssl:
-  enabled: *ssl_enabled
+keycloak:
+  ingress:
+    tls: *ssl_enabled
+  tls:
+    enabled: *ssl_enabled
 
 kong:
   proxy:
     type: LoadBalancer
+
+letsencrypt-ssl:
+  enabled: *ssl_enabled
+
+postgresql-backup:
+  !!merge <<: *postgres-backup-service-account
+  GS_BACKUP_BUCKET: *backups_bucket
+
+secor:
+  !!merge <<: *secor-service-account
+  gcp_bucket_name: *backups_bucket
+  storage_type: *cloud_store_provider
+
+spark:
+  !!merge <<: *spark-service-account
+  persistence:
+    masterMetadata:
+      name: spark-master-metadata
+      storage:
+        size: 2Gi
+      storageClassName: *storage_class
+    masterTmp:
+      name: spark-master-tmp
+      storage:
+        size: 2Gi
+      storageClassName: *storage_class
+    workerMetadata:
+      name: spark-worker-metadata
+      storage:
+        size: 2Gi
+      storageClassName: *storage_class
+    workerTmp:
+      name: spark-worker-tmp
+      storage:
+        size: 2Gi
+      storageClassName: *storage_class
+
+velero:
+  !!merge <<: *velero-service-account
+  configuration:
+    backupStorageLocation:
+      bucket: *velero_backup_cloud_bucket
+      config:
+        serviceAccount: ""
+    backupSyncPeriod: 15m
+    provider: *cloud_storage_provider
+    volumeSnapshotLocation:
+      config:
+        project: *project_id
+        region: *cloud_storage_region
+      name: default
+  credentials:
+    useSecret: false
+  initContainers:
+    - image: velero/velero-plugin-for-gcp
+      name: velero-plugin-for-gcp
+      volumeMounts:
+        - mountPath: /target
+          name: plugins
+  podAnnotations: {}
+  schedules:
+    obsrv-daily-backup:
+      disabled: false

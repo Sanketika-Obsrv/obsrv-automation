@@ -134,8 +134,8 @@ module "gke_cluster" {
     },
   ]
 
-  gke_node_pool_network_tags = var.create_network ? [module.networking[0].public] : []
-  gke_node_default_disk_size_gb = var.gke_node_default_disk_size_gb
+  gke_node_pool_network_tags      = var.create_network ? [module.networking[0].public] : []
+  gke_node_default_disk_size_gb   = var.gke_node_default_disk_size_gb
 
   gke_node_pool_instance_type     = var.gke_node_pool_instance_type
   gke_node_pool_scaling_config    = var.gke_node_pool_scaling_config
@@ -154,7 +154,6 @@ resource "null_resource" "configure_kubectl" {
 
     command = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.zone} --project ${var.project}"
 
-
     # Use environment variables to allow custom kubectl config paths
     environment = {
       KUBECONFIG = var.kubectl_config_path != "" ? var.kubectl_config_path : "credentials/config-${var.building_block}-${var.env}.yaml"
@@ -164,18 +163,18 @@ resource "null_resource" "configure_kubectl" {
   depends_on = [ module.gke_cluster ]
 }
 
-module "command_service_sa_iam_role" {
-  source = "../modules/gcp/service-account"
-  name        = "${var.building_block}-${var.command_api_sa_iam_role_name}"
-  project     = var.project
-  description = "GCP SA bound to K8S SA ${var.project}[${var.command_api_namespace}-sa]"
-  service_account_roles = [
-    "roles/storage.objectAdmin"
-  ]
-  sa_namespace = var.command_api_namespace
-  sa_name = "${var.command_api_namespace}-sa"
-  depends_on = [ module.gke_cluster ]
-}
+# module "command_service_sa_iam_role" {
+#   source = "../modules/gcp/service-account"
+#   name        = "${var.building_block}-${var.command_api_sa_iam_role_name}"
+#   project     = var.project
+#   description = "GCP SA bound to K8S SA ${var.project}[${var.command_api_namespace}-sa]"
+#   service_account_roles = [
+#     "roles/storage.objectAdmin"
+#   ]
+#   sa_namespace = var.command_api_namespace
+#   sa_name = "${var.command_api_namespace}-sa"
+#   depends_on = [ module.gke_cluster ]
+# }
 
 module "dataset_api_sa_iam_role" {
   source = "../modules/gcp/service-account"
@@ -236,9 +235,7 @@ module "velero_sa_iam_role" {
   project     = var.project
   description = "GCP SA bound to K8S SA ${var.project}[${var.velero_namespace}-sa]"
   service_account_roles = [
-    "roles/compute.storageAdmin",
     "roles/storage.objectAdmin",
-    "roles/iam.serviceAccountTokenCreator"
   ]
   sa_namespace = var.velero_namespace
   sa_name = "${var.velero_namespace}-sa"
