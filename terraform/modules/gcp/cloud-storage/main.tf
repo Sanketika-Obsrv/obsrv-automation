@@ -15,6 +15,8 @@ resource "google_storage_bucket" "storage_bucket" {
   versioning {
     enabled = true
   }
+
+  uniform_bucket_level_access = var.uniform_bucket_level_access
 }
 
 resource "google_storage_bucket" "checkpoint_storage_bucket" {
@@ -26,7 +28,10 @@ resource "google_storage_bucket" "checkpoint_storage_bucket" {
   versioning {
     enabled = true
   }
+
+  uniform_bucket_level_access = var.uniform_bucket_level_access
 }
+
 
 resource "google_storage_bucket" "velero_storage_bucket" {
   project         = var.project
@@ -37,6 +42,8 @@ resource "google_storage_bucket" "velero_storage_bucket" {
   versioning {
     enabled = true
   }
+
+  uniform_bucket_level_access = var.uniform_bucket_level_access
 }
 
 resource "google_storage_bucket" "google_backups_bucket" {
@@ -48,4 +55,6 @@ resource "google_storage_bucket" "google_backups_bucket" {
   versioning {
     enabled = true
   }
+
+  uniform_bucket_level_access = var.uniform_bucket_level_access
 }

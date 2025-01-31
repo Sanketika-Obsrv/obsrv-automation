@@ -38,8 +38,43 @@ variable "zone" {
   default     = "us-central1-a"
 }
 
+variable "gke_node_default_disk_size_gb" {
+  description = "Default disk size for GKE nodes"
+  type        = number
+  default     = 30
+}
 
 ## VPC
+
+variable "create_network" {
+  description = "Create a new VPC network."
+  type        = bool
+  default     = true
+}
+
+variable "network" {
+  description = "The VPC network to use. If create_network is true, this will be the name of the new network."
+  type        = string
+  default     = ""
+}
+
+variable "subnetwork" {
+  description = "The subnetwork to use. If create_network is true, this will be the name of the new subnetwork."
+  type        = string
+  default     = ""
+}
+
+variable "cluster_secondary_range_name" {
+  description = "The name associated with the pod subnetwork secondary range, used when adding an alias IP range to a VM instance. The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the subnetwork."
+  type        = string
+  default     = ""
+}
+
+variable "services_secondary_range_name" {
+  description = "The name associated with the services subnetwork secondary range, used when adding an alias IP range to a VM instance. The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the subnetwork."
+  type        = string
+  default     = ""
+}
 
 variable "vpc_cidr_block" {
   type        = string
@@ -249,18 +284,6 @@ variable "postgresql_namespace" {
   type        = string
   description = "Postgresql backup namespace."
   default     = "postgresql"
-}
-
-variable "redis_backup_sa_iam_role_name" {
-  type        = string
-  description = "IAM role name for postgresql backup service account."
-  default     = "redis-backup-sa"
-}
-
-variable "redis_namespace" {
-  type        = string
-  description = "Redis backup namespace."
-  default     = "redis"
 }
 
 variable "spark_sa_iam_role_name" {
