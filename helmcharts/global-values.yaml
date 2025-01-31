@@ -30,12 +30,15 @@ defaults:
     minio_namespace: &minio_namespace "minio"
     opentelemetry-collector: &opentelemetry-collector "otel"
     keycloak_namespace: &keycloak_namespace "keycloak"
+    s3_exporter_namespace: &s3_exporter_namespace "s3-exporter"
     connector_namespaces:
       spark: *spark-namespace
       flink: &flink_connector_namespace "flink_connectors"
 
   postgres:
     pghost: &pghost "postgresql-hl.postgresql.svc.cluster.local"
+    pguser: &pguser "postgres"
+    pgpassword: &pgpassword "A1wWzZQ3ccOd"
     obsrv_username: &psql-obsrv-user "obsrv"
     obsrv_database: &psql-obsrv-db "obsrv"
     obsrv_user_password: &psql-obsrv-pwd "obsrv123"
@@ -55,7 +58,6 @@ defaults:
   grafana: &grafana
     grafana_admin_user: &grafana-admin-user "admin"
     grafana_admin_password: &grafana-admin-password "adminpassword"
-    grafana_auth_token: &grafana-auth-token "YWRtaW46YWRtaW5wYXNzd29yZA=="
     grafana_url: &grafana-url "http://grafana.monitoring.svc.cluster.local"
 
   kafka-topics:
@@ -67,6 +69,16 @@ defaults:
     hudiConnectorTopic: &hudiConnectorTopic "hudi.connector.in"
     connectorsMetricTopic: &connectorsMetricTopic "obsrv-connectors-metrics"
     connectorsFailedTopic: &connectorsFailedTopic "connectors.failed"
+
+  keycloak_users:
+    obsrv_admin: &obsrv_admin "obsrv_admin"
+    obsrv_password: &obsrv_password "enDoPvTAxFSd"
+    admin_user: &keycloak_admin_user "admin"
+    admin_password: &keycloak_admin_password "admin123"
+
+  superset_users:
+    admin_user: &superset_admin_user "admin"
+    admin_password: &superset_admin_password "admin123"
 
   # config_service_host: &config-service-host "http://command-api.command-api.svc.cluster.local"
   # druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
@@ -154,8 +166,8 @@ postgresql: &postgresql
   #################################################################
   # !!! If bitnami charts is used, **username should be postgres**.
   #################################################################
-  username: &pguser "postgres"
-  password: &pgpassword "postgres"
+  username: *pguser
+  password: *pgpassword
 
   obsrv:
     name: *psql-obsrv-db
@@ -249,8 +261,11 @@ keycloak:
     user: *psql-keycloak-user
     database: *psql-keycloak-db
     password: *psql-keycloak-pwd
-  obsrvuser: obsrv_admin
-  obsrvpassword: enDoPvTAxFSd
+  obsrvuser: *obsrv_admin
+  obsrvpassword: *obsrv_password
+  auth:
+    adminUser: *keycloak_admin_user
+    adminPassword: *keycloak_admin_password
 
 
 valkey-denorm: &valkey_denorm
@@ -388,6 +403,9 @@ superset:
       db_password: *psql-superset-pwd
   oauth:
     <<: *superset_oauth
+  adminUser:
+    username: *superset_admin_user
+    password: *superset_admin_password
 
 command-api: &command-api
   namespace: *command-api-namespace
@@ -406,7 +424,6 @@ config-api: &config-api
   namespace: *config-api-namespace
   host: *config-service-url
   env:
-    GRAFANA_AUTH_TOKEN: *grafana-auth-token
     GRAFANA_ADMIN_URL: *grafana-url
 
 
@@ -543,6 +560,9 @@ lakehouse-connector:
 minio:
   namespace: *minio_namespace
   fullnameOverride: "minio"
+
+s3-exporter:
+  namespace: *s3_exporter_namespace
 
 global:
   env: *env
