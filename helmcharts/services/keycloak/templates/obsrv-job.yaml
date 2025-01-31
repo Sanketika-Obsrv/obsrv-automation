@@ -94,7 +94,7 @@ spec:
           # Update PostgreSQL with the new user ID in the existing table
           echo "Updating PostgreSQL table with the new user ID..."
 
-          PGPASSWORD=postgres psql -h postgresql-hl.postgresql.svc.cluster.local -U postgres -d obsrv -c "
+          PGPASSWORD={{ .Values.global.postgresql.password}} psql -h postgresql-hl.obsrv.svc.cluster.local -U postgres -d obsrv -c "
           UPDATE \"oauth_users\" SET
             \"id\" = '$user_id',
             \"last_updated_on\" = NOW()
