@@ -9,11 +9,7 @@ ENV_NAME=$1
 # Ensure ENV_NAME is set
 if [ -z "$ENV_NAME" ]; then
     echo "Error: ENV_NAME environment variable is not set."
-    exit 1
-fi
-
-if [ -z jq ]; then
-    echo "Error: jq is not installed. Please install jq."
+    echo "Usage: bash scramble_passwords.sh <ENV_NAME>"
     exit 1
 fi
 
