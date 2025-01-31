@@ -28,5 +28,5 @@ terraform/aws/global-values.yaml
 terraform/aws/private_key.pem
 terraform/aws/public_key.pem
 *.tfvars
-.env*
-env.*
+*.env
+.env
