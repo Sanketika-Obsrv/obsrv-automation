@@ -3018,7 +3018,7 @@ valkey-dedup:
     enabled: false
   commonConfiguration: |-
     # Enable AOF https://valkey.io/docs/topics/persistence.html
-    appendonly yes
+    # appendonly yes
     # Enable RDB persistence
     save 60 100
   commonLabels:
@@ -3053,7 +3053,7 @@ valkey-denorm:
     enabled: false
   commonConfiguration: |-
     # Enable AOF https://valkey.io/docs/topics/persistence.html
-    appendonly yes
+    # appendonly yes
     # Enable RDB persistence
     save 60 100
   commonLabels:
