@@ -236,6 +236,7 @@ module "velero_sa_iam_role" {
   description = "GCP SA bound to K8S SA ${var.project}[${var.velero_namespace}-sa]"
   service_account_roles = [
     "roles/storage.objectAdmin",
+    "roles/iam.serviceAccountTokenCreator"
   ]
   sa_namespace = var.velero_namespace
   sa_name = "${var.velero_namespace}-sa"
