@@ -85,7 +85,7 @@ valkey-denorm:
         cpu: 0.5
         memory: 1Gi
     extraFlags:
-      - --maxmemory 1Gi
+      - --maxmemory 1024mb
       - --maxmemory-policy volatile-ttl
     # sidecars:
     #   resources:
@@ -111,7 +111,7 @@ valkey-dedup:
       requests:
         cpu: 0.5
         memory: 512Mi
-      extraFlags:
+    extraFlags:
       - --maxmemory 512mb
       - --maxmemory-policy volatile-ttl
     # sidecars:

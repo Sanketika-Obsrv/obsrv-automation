@@ -165,16 +165,18 @@ velero:
   !!merge <<: *velero-service-account
   configuration:
     backupStorageLocation:
+    - name: default
+      provider: *cloud_storage_provider
       bucket: *velero_backup_cloud_bucket
       config:
-        serviceAccount: ""
+        serviceAccount: *velero-sa-annotations
     backupSyncPeriod: 15m
-    provider: *cloud_storage_provider
     volumeSnapshotLocation:
+    - name: default
+      provider: *cloud_storage_provider
       config:
         project: *project_id
         region: *cloud_storage_region
-      name: default
   credentials:
     useSecret: false
   initContainers:
