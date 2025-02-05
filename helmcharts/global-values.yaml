@@ -291,10 +291,11 @@ postgresql-migration:
   kong_ingress_domain: *domain
   gf_auth_generic_oauth_client_id: "528806583-dev.oauth.obsrv.ai"
   gf_auth_generic_oauth_client_secret: "el642dcXd1P3v6i+hODnGrUKx9ZSWAlmXWZaEoZQI7/R3NUGQlLTnNCV"
-  web_console_password: "$2a$10$bG9R7ioA4/pfw8m0GPcWTOZMhc2sNN4wEkKV.j50RvQW5iUki/4Za"
+  web_console_user: *obsrv_admin
+  web_console_password: *obsrv_password
   web_console_login: "admin@obsrv.in"
   system_settings:
-    encryption_key: "strong_encryption_key_to_encrypt"
+    encryption_key: *encryption-key
     default_dataset_id: "ALL"
     max_event_size: 1048576
     dedup_period: 604800 # In seconds (7 days)
