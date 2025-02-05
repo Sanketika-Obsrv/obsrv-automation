@@ -244,12 +244,6 @@ superset:
 letsencrypt-ssl:
   enabled: *ssl_enabled
 
-postgresql-exporter:
-  config:
-    datasource:
-      user: postgres
-      password: postgres
-
 velero:
   <<: *velero-backup
 

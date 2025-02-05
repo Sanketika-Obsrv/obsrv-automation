@@ -25,8 +25,8 @@ resource "google_container_cluster" "cluster" {
   network    = var.network
   subnetwork = var.subnetwork
 
-  # logging_service    = var.logging_service
-  # monitoring_service = var.monitoring_service
+  logging_service    = "none"
+  monitoring_service = "none"
   min_master_version = local.kubernetes_version
   deletion_protection = var.deletion_protection
 
@@ -41,22 +41,56 @@ resource "google_container_cluster" "cluster" {
   # with no node pools.
   remove_default_node_pool = true
 
-  initial_node_count = 1
+  # initial_node_count = 1 ## Uncomment of node_pool is not defined
 
-  # If we have an alternative default service account to use, set on the node_config so that the default node pool can
-  # be created successfully.
-  dynamic "node_config" {
-    # Ideally we can do `for_each = var.alternative_default_service_account != null ? [object] : []`, but due to a
-    # terraform bug, this doesn't work. See https://github.com/hashicorp/terraform/issues/21465. So we simulate it using
-    # a for expression.
-    for_each = [
-      for x in [var.alternative_default_service_account] : x if var.alternative_default_service_account != null
-    ]
 
-    content {
-      service_account = node_config.value
+  node_pool {
+    name = "default-pool"
+    initial_node_count = 1
+
+    node_config {
+      image_type   = "COS_CONTAINERD"
+      machine_type = var.gke_node_pool_instance_type
+
+      tags = var.gke_node_pool_network_tags
+
+      disk_size_gb = var.gke_node_default_disk_size_gb
+      disk_type    = var.kubernetes_storage_class
+      preemptible  = var.gke_node_pool_preemptible
+
+      service_account = var.alternative_default_service_account
+
+      oauth_scopes = [
+        "https://www.googleapis.com/auth/cloud-platform",
+      ]
+
+      confidential_nodes {
+        enabled = true
+      }
+
+      shielded_instance_config {
+        enable_secure_boot          = true
+        enable_integrity_monitoring = true
+      }
     }
   }
+
+  ## Uncomment of node_pool is not defined
+  # If we have an alternative default service account to use, set on the node_config so that the default node pool can
+  # be created successfully.
+  # dynamic "node_config" {
+
+  #   # Ideally we can do `for_each = var.alternative_default_service_account != null ? [object] : []`, but due to a
+  #   # terraform bug, this doesn't work. See https://github.com/hashicorp/terraform/issues/21465. So we simulate it using
+  #   # a for expression.
+  #   for_each = [
+  #     for x in [var.alternative_default_service_account] : x if var.alternative_default_service_account != null
+  #   ]
+
+  #   content {
+  #     service_account = node_config.value
+  #   }
+  # }
 
   # ip_allocation_policy.use_ip_aliases defaults to true, since we define the block `ip_allocation_policy`
   ip_allocation_policy {
@@ -134,7 +168,7 @@ resource "google_container_cluster" "cluster" {
     ignore_changes = [
       # Since we provide `remove_default_node_pool = true`, the `node_config` is only relevant for a valid construction of
       # the GKE cluster in the initial creation. As such, any changes to the `node_config` should be ignored.
-      node_config,
+      node_config,node_pool
     ]
   }
 
@@ -198,7 +232,7 @@ resource "google_container_node_pool" "node_pool" {
 
     tags = var.gke_node_pool_network_tags
 
-    disk_size_gb = "60"
+    disk_size_gb = var.gke_node_default_disk_size_gb
     disk_type    = var.kubernetes_storage_class
     preemptible  = var.gke_node_pool_preemptible
 
@@ -207,6 +241,15 @@ resource "google_container_node_pool" "node_pool" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform",
     ]
+
+    confidential_nodes {
+      enabled = true
+    }
+
+    shielded_instance_config {
+      enable_secure_boot          = true
+      enable_integrity_monitoring = true
+    }
   }
 
   lifecycle {

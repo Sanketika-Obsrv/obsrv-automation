@@ -92,14 +92,10 @@ otel)
     rm -rf opentelemetry-collector
     ;;
 oauth)
-    if [ -z "$cloud_env" ]; then
-        echo "oauth not yet supported for local datacenter"
-    else
-        cp -rf ../obsrv oauth
-        cp -rf ../services/keycloak oauth/charts/
-        helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
-        rm -rf oauth
-    fi
+    cp -rf ../obsrv oauth
+    cp -rf ../services/keycloak oauth/charts/
+    helm $cmd oauth ./oauth -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    rm -rf oauth
     ;;
 obsrvtools)
     cp -rf ../obsrv obsrvtools

@@ -47,7 +47,7 @@ spec:
           {{- end }}
           {{- if .Values.global.s3_endpoint_url }}
           command:
-            - /bin/s3-exporter
+            - ./s3_exporter
           args: [
             "--s3.endpoint-url={{.Values.global.s3_endpoint_url}}",
             "--s3.disable-ssl",

@@ -3,7 +3,7 @@
 .idea
 .classpath
 *.DS_Store
-*.terrahelpbkp 
+*.terrahelpbkp
 **/.terraform/*
 automation-scripts/infra-setup/awscliv2.zip
 automation-scripts/infra-setup/aws/dist
@@ -27,3 +27,6 @@ Ignore the global-key-values.yaml file as it is automatically created by Terrafo
 terraform/aws/global-values.yaml
 terraform/aws/private_key.pem
 terraform/aws/public_key.pem
+*.tfvars
+*.env
+.env

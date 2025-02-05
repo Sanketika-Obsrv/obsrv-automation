@@ -478,7 +478,7 @@ configOverrides:
     }
 
   sql_alchemy_config: |
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{{ tpl .Values.postgresql.db_username . }}:{{ tpl .Values.postgresql.db_password . }}@{{ tpl .Values.global.postgresql.host . }}:{{ tpl (.Values.global.postgresql.port | toString) . }}/{{ tpl .Values.postgresql.db_name . }}'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{{ tpl .Values.global.postgresql.superset.name . }}:{{ tpl .Values.global.postgresql.superset.password . }}@{{ tpl .Values.global.postgresql.host . }}:{{ tpl (.Values.global.postgresql.port | toString) . }}/{{ tpl .Values.global.postgresql.superset.name . }}'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SECRET_KEY = 'xCHEuo3xQNLdqgvM7GAR4Gf9kjyQzFzIrGi1maZdb0xibHu47o5hIyAX'
 
@@ -579,9 +579,9 @@ supersetNode:
     redis_port: "{{ .Values.global.valkey_dedup.port }}"
     db_host: "{{ .Values.global.postgresql.host }}"
     db_port: "{{ .Values.global.postgresql.port }}"
-    db_user: "{{ .Values.postgresql.db_username }}"
-    db_pass: "{{ .Values.postgresql.db_password }}"
-    db_name: "{{ .Values.postgresql.db_name }}"
+    db_user: "{{ .Values.global.postgresql.superset.user }}"
+    db_pass: "{{ .Values.global.postgresql.superset.password }}"
+    db_name: "{{ .Values.global.postgresql.superset.name }}"
   forceReload: false # If true, forces deployment to reload on each upgrade
   # initContainers:
   #   - name: wait-for-postgres

@@ -352,13 +352,14 @@ CREATE TABLE IF NOT EXISTS "silences" (
 );
 
 CREATE SEQUENCE redis_db_index START 3;
+CREATE EXTENSION pgcrypto;
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
 
 INSERT INTO "oauth_users" ("id", "user_name", "password", "first_name", "last_name", "email_address", "created_on", "last_updated_on")
-VALUES ('1', 'obsrv_admin', '{{ .Values.web_console_password }}', 'obsrv', 'admin', '{{ .Values.web_console_login }}', NOW(), NOW())
+VALUES ('1', '{{.Values.web_console_user}}', crypt('{{ .Values.web_console_password }}', gen_salt('bf', 12)), 'obsrv', 'admin', '{{ .Values.web_console_login }}', NOW(), NOW())
 ON CONFLICT(id) DO
   UPDATE SET
-  password = '{{ .Values.web_console_password }}',
+  password = crypt('{{ .Values.web_console_password }}', gen_salt('bf', 12)),
   email_address = '{{ .Values.web_console_login }}';

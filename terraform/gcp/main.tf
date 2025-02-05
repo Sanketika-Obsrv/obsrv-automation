@@ -4,12 +4,12 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.28.0"
+      version = "~> 6.18.1"
     }
 
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 5.28.0"
+      version = "~> 6.18.1"
     }
     # local = {
     #   source = "hashicorp/local"
@@ -55,7 +55,8 @@ provider "google-beta" {
 }
 
 module "networking" {
-  source = "../modules/gcp/vpc-network"
+  count                 = var.create_network ? 1 : 0
+  source                = "../modules/gcp/vpc-network"
 
   name_prefix           = "${var.building_block}-${var.env}"
   project               = var.project
@@ -83,7 +84,7 @@ module "cloud_storage" {
 }
 
 module "gke_service_account"{
-  source = "../modules/gcp/service-account"
+  source      = "../modules/gcp/service-account"
   name        = "${var.building_block}-${var.cluster_service_account_name}"
   project     = var.project
   description = var.cluster_service_account_description
@@ -105,11 +106,11 @@ module "gke_cluster" {
   project                       = var.project
   location                      = var.zone # can also specify a region here
   zone                          = var.zone # has to be a zone, else one instance per zone will be created in the region.
-  network                       = module.networking.network
+  network                       = var.create_network ? module.networking[0].network : var.network
 
-  subnetwork                    = module.networking.public_subnetwork
-  cluster_secondary_range_name  = module.networking.public_subnetwork_secondary_range_name
-  services_secondary_range_name = module.networking.public_services_secondary_range_name
+  subnetwork                    = var.create_network ? module.networking[0].public_subnetwork : var.subnetwork
+  cluster_secondary_range_name  = var.create_network ? module.networking[0].public_subnetwork_secondary_range_name : var.cluster_secondary_range_name
+  services_secondary_range_name = var.create_network ? module.networking[0].public_services_secondary_range_name : var.services_secondary_range_name
 
   # When creating a private cluster, the 'master_ipv4_cidr_block' has to be defined and the size must be /28
   master_ipv4_cidr_block        = var.gke_master_ipv4_cidr_block
@@ -133,9 +134,8 @@ module "gke_cluster" {
     },
   ]
 
-  gke_node_pool_network_tags = [
-    module.networking.public
-  ]
+  gke_node_pool_network_tags      = var.create_network ? [module.networking[0].public] : []
+  gke_node_default_disk_size_gb   = var.gke_node_default_disk_size_gb
 
   gke_node_pool_instance_type     = var.gke_node_pool_instance_type
   gke_node_pool_scaling_config    = var.gke_node_pool_scaling_config
@@ -154,7 +154,6 @@ resource "null_resource" "configure_kubectl" {
 
     command = "gcloud container clusters get-credentials ${module.gke_cluster.name} --region ${var.zone} --project ${var.project}"
 
-
     # Use environment variables to allow custom kubectl config paths
     environment = {
       KUBECONFIG = var.kubectl_config_path != "" ? var.kubectl_config_path : "credentials/config-${var.building_block}-${var.env}.yaml"
@@ -164,18 +163,18 @@ resource "null_resource" "configure_kubectl" {
   depends_on = [ module.gke_cluster ]
 }
 
-module "command_service_sa_iam_role" {
-  source = "../modules/gcp/service-account"
-  name        = "${var.building_block}-${var.command_api_sa_iam_role_name}"
-  project     = var.project
-  description = "GCP SA bound to K8S SA ${var.project}[${var.command_api_namespace}-sa]"
-  service_account_roles = [
-    "roles/storage.objectAdmin"
-  ]
-  sa_namespace = var.command_api_namespace
-  sa_name = "${var.command_api_namespace}-sa"
-  depends_on = [ module.gke_cluster ]
-}
+# module "command_service_sa_iam_role" {
+#   source = "../modules/gcp/service-account"
+#   name        = "${var.building_block}-${var.command_api_sa_iam_role_name}"
+#   project     = var.project
+#   description = "GCP SA bound to K8S SA ${var.project}[${var.command_api_namespace}-sa]"
+#   service_account_roles = [
+#     "roles/storage.objectAdmin"
+#   ]
+#   sa_namespace = var.command_api_namespace
+#   sa_name = "${var.command_api_namespace}-sa"
+#   depends_on = [ module.gke_cluster ]
+# }
 
 module "dataset_api_sa_iam_role" {
   source = "../modules/gcp/service-account"
@@ -236,7 +235,6 @@ module "velero_sa_iam_role" {
   project     = var.project
   description = "GCP SA bound to K8S SA ${var.project}[${var.velero_namespace}-sa]"
   service_account_roles = [
-    "roles/compute.storageAdmin",
     "roles/storage.objectAdmin",
     "roles/iam.serviceAccountTokenCreator"
   ]
@@ -258,19 +256,6 @@ module "postgresql_backup_sa_iam_role" {
   depends_on = [ module.gke_cluster ]
 }
 
-module "redis_backup_sa_iam_role" {
-  source = "../modules/gcp/service-account"
-  name        = "${var.building_block}-${var.redis_backup_sa_iam_role_name}"
-  project     = var.project
-  description = "GCP SA bound to K8S SA ${var.project}[${var.redis_namespace}-sa]"
-  service_account_roles = [
-    "roles/storage.objectAdmin"
-  ]
-  sa_namespace = var.redis_namespace
-  sa_name = "${var.redis_namespace}-backup-sa"
-  depends_on = [ module.gke_cluster ]
-}
-
 module "spark_sa_iam_role" {
   source = "../modules/gcp/service-account"
   name        = "${var.building_block}-${var.spark_sa_iam_role_name}"
@@ -284,18 +269,25 @@ module "spark_sa_iam_role" {
   depends_on = [ module.gke_cluster ]
 }
 
-# resource "google_storage_bucket_object" "kubeconfig" {
-#   name   = "kubeconfig/config-${var.building_block}-${var.env}.yaml"
-#   source = var.kubectl_config_path != "" ? var.kubectl_config_path : ""
-#   bucket = "${var.project}-${var.env}-configs"
-#   depends_on = [ null_resource.configure_kubectl ]
-# }
-
 # We use this data provider to expose an access token for communicating with the GKE cluster.
 data "google_client_config" "client" {}
 
 # # Use this datasource to access the Terraform account's email for Kubernetes permissions.
 data "google_client_openid_userinfo" "terraform_user" {}
+
+provider "kubernetes" {
+  host                   = module.gke_cluster.endpoint
+  token                  = data.google_client_config.client.access_token
+  cluster_ca_certificate = module.gke_cluster.cluster_ca_certificate
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.gke_cluster.endpoint
+    token                  = data.google_client_config.client.access_token
+    cluster_ca_certificate = module.gke_cluster.cluster_ca_certificate
+  }
+}
 
 # # resource "kubernetes_cluster_role_binding" "user" {
 # #   metadata {
@@ -321,19 +313,29 @@ data "google_client_openid_userinfo" "terraform_user" {}
 # #   }
 # # }
 
-provider "kubernetes" {
-  host                   = module.gke_cluster.endpoint
-  token                  = data.google_client_config.client.access_token
-  cluster_ca_certificate = module.gke_cluster.cluster_ca_certificate
-}
+# module "redis_backup_sa_iam_role" {
+#   source = "../modules/gcp/service-account"
+#   name        = "${var.building_block}-${var.redis_backup_sa_iam_role_name}"
+#   project     = var.project
+#   description = "GCP SA bound to K8S SA ${var.project}[${var.redis_namespace}-sa]"
+#   service_account_roles = [
+#     "roles/storage.objectAdmin"
+#   ]
+#   sa_namespace = var.redis_namespace
+#   sa_name = "${var.redis_namespace}-backup-sa"
+#   depends_on = [ module.gke_cluster ]
+# }
 
-provider "helm" {
-  kubernetes {
-    host                   = module.gke_cluster.endpoint
-    token                  = data.google_client_config.client.access_token
-    cluster_ca_certificate = module.gke_cluster.cluster_ca_certificate
-  }
-}
+
+
+# resource "google_storage_bucket_object" "kubeconfig" {
+#   name   = "kubeconfig/config-${var.building_block}-${var.env}.yaml"
+#   source = var.kubectl_config_path != "" ? var.kubectl_config_path : ""
+#   bucket = "${var.project}-${var.env}-configs"
+#   depends_on = [ null_resource.configure_kubectl ]
+# }
+
+
 
 # data "templatefile" "gke_host_endpoint" {
 #   template = module.gke_cluster.endpoint

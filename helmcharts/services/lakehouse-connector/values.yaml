@@ -245,9 +245,9 @@ lakehouse-connector:
         enabled = true
         uri = "thrift://hudi-hms.hms.svc.cluster.local:9083"
         database {
-          name = "hms"
-          username = "hms"
-          password = "hms123"
+          name = "{{ .Values.global.postgresql.hms.name }}"
+          username = "{{ .Values.global.postgresql.hms.user }}"
+          password = "{{ .Values.global.postgresql.hms.password }}"
         }
       }
       table {
