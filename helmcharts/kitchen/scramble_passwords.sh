@@ -23,7 +23,7 @@ generate_password() {
         length=$(( ( RANDOM % 21 ) + 12 ))
     fi
     # echo "Generating password of length $length"
-    LC_ALL=C tr -dc 'A-Za-z0-9@#+' < /dev/urandom | head -c "$length"
+    LC_ALL=C tr -dc 'A-Za-z0-9#!' < /dev/urandom | head -c "$length"
 }
 
 # Path for the environment-specific password file

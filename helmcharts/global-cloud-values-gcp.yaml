@@ -6,7 +6,6 @@ global:
   project_id: &project_id <replace_with_project_id>
   ssl_enabled: &ssl_enabled true
   storageClass: &storage_class standard
-  storage_provider: &storage_provider gcloud
 
   checkpoint_store_type: *cloud_store_provider
   checkpoint_bucket: &checkpoint_bucket gs://checkpoint-<replace_with_building_block>-<replace_with_env>-<replace_with_project_num>/flink/checkpoints
