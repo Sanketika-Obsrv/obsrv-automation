@@ -13,7 +13,7 @@ global:
 
   cloud_storage_bucket: &cloud_storage_bucket <replace_with_building_block>-<replace_with_env>-<replace_with_project_num>
   cloud_storage_config: &cloud_storage_config |
-    '{"identity":"<replace_with_client_email>","credential":"<replace_with_private_key>","projectId":"<replace_with_project_id>"}'
+    '{"identity":"<replace_with_client_email>","credential":<replace_with_private_key>,"projectId":"<replace_with_project_id>"}'
   config_api_container: *cloud_storage_bucket
   dataset_api_container: *cloud_storage_bucket
   postgresql_backup_cloud_bucket: &backups_bucket backups-<replace_with_building_block>-<replace_with_env>-<replace_with_project_num>
