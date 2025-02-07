@@ -222,9 +222,6 @@ web-console:
 
 dataset-api:
   <<: *service-account-disable
-  exhaust_service:
-    CLOUD_STORAGE_PROVIDER: *storage-type
-    CONTAINER_PREFIX: "telemetry-data"
   imagePullPolicy: Always
 
 secor:
