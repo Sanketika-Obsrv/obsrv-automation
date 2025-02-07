@@ -104,7 +104,6 @@ defaults:
     grafana_client_secret: &grafana_client_secret "grafanaobsrv@123" 
     web_console_client_id: "obsrv-console"
 
-
 #coredb-charts/
 kafka: &kafka
   namespace: *kafka-namespace
