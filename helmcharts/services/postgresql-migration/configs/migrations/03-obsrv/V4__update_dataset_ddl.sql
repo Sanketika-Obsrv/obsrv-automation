@@ -33,8 +33,17 @@ UPDATE datasets SET type = 'master' WHERE type = 'master-dataset';
 
 DELETE FROM dataset_transformations_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
 DELETE FROM dataset_source_config_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
-DELETE FROM datasources_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
-DELETE FROM datasets_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
+DELETE FROM datasources_draft where dataset_id in (SELECT CONCAT(dataset_id, '.', '1') 
+    FROM datasets 
+    WHERE status = 'Live');
+DELETE FROM dataset_source_config_draft WHERE dataset_id IN (
+    SELECT CONCAT(dataset_id, '.', '1') 
+    FROM datasets 
+    WHERE status = 'Live'
+);
+DELETE FROM datasets_draft WHERE id IN (SELECT CONCAT(dataset_id, '.', '1') 
+    FROM datasets 
+    WHERE status = 'Live');
 
 ALTER TABLE dataset_source_config_draft ALTER COLUMN published_date DROP NOT NULL;
 ALTER TABLE datasets_draft ALTER COLUMN published_date DROP NOT NULL;
