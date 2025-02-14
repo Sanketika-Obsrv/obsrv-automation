@@ -141,6 +141,7 @@ superset_oauth_client_secret: ""
 kong_ingress_domain: ""
 gf_auth_generic_oauth_client_id: ""
 gf_auth_generic_oauth_client_secret: ""
+web_console_user: ""
 web_console_password: ""
 web_console_login: ""
 system_settings:

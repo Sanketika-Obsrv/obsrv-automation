@@ -17,3 +17,9 @@ variable "region" {
   description = "The region for cloud storage bucket"
   type        = string
 }
+
+variable "uniform_bucket_level_access" {
+  description = "Enable uniform bucket level access"
+  type        = bool
+  default     = true
+}

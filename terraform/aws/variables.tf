@@ -21,11 +21,6 @@ variable "timezone" {
   description = "Timezone property to backup the data. Example UTC (in upper case)"
 }
 
-variable "create_kong_ingress" {
-  type        = bool
-  description = "Set this value to true/false to enable/disable kong ingress creation"
-}
-
 variable "create_vpc" {
   type        = bool
   description = "Set this value to true/false to enable/disable new vpc creation"
@@ -125,5 +120,10 @@ variable "storage_provider" {
   type        = string
   description = "storage provider name e.g: aws, azure, gcp"
   default     = "aws"
+}
+
+variable "create_kong_ingress_ip" {
+  description = "Whether to create the Kong Ingress EIP"
+  type        = bool  # This is expected to be a boolean
 }
 

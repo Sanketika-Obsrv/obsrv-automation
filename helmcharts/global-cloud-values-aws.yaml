@@ -18,7 +18,6 @@ global:
   spark_cloud_bucket: ""
   storage_class_name: &storage_class_name "gp3"
   spark_service_account_arn: ""
-  secor_backup_bucket: &secor_backup_bucket "<fill-value>" # Update with secor bucket name
   checkpoint_bucket: &checkpoint_bucket "s3://<fill-value>" # Update with checkpoint bucket name
   deep_store_type: &deep_store_type "s3"
   s3_access_key: &s3-access-key "<fill-value>" # Update with the AWS access key
@@ -192,7 +191,7 @@ trino:
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
-      hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
+      hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
       hive.s3.aws-access-key=<fill-value>
       hive.s3.aws-secret-key=<fill-value>
       hive.s3.ssl.enabled=false
@@ -211,3 +210,9 @@ hms:
 
 letsencrypt-ssl:
   enabled: *ssl_enabled
+
+keycloak:
+  ingress:
+    tls: *ssl_enabled
+  tls:
+    enabled: *ssl_enabled  

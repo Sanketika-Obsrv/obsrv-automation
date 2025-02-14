@@ -112,17 +112,23 @@ spec:
     # Service discovery
     druid.selectors.indexing.serviceName={{ .Values.druid_selectors_indexing_serviceName }}
     druid.selectors.coordinator.serviceName={{ .Values.druid_selectors_coordinator_serviceName }}
+    
     # Monitoring
+    druid.emitter.prometheus.pushGatewayAddress={{ .Values.druid_emitter_prometheus_pushGatewayAddress }}
+    druid.emitter.prometheus.strategy={{ .Values.druid_emitter_prometheus_strategy }}
+    druid.emitter={{ .Values.druid_emitter }}
+    druid.emitter.logging.logLevel={{ .Values.druid_emitter_logging_logLevel }}
+    
     # druid.monitoring.monitors=[{{ .Values.druid_monitoring_monitors }}]
     # druid.emitter=composing
     # druid.emitter.composing.emitters=[{{ .Values.druid_emitter_composing_emitters }}]
-    # druid.emitter.logging.logLevel={{ .Values.druid_emitter_logging_logLevel }}
-    {{- if .Values.druid_monitoring -}}
-    druid.emitter.graphite.port={{ .Values.druid_emitter_graphite_port }}
-    druid.emitter.graphite.hostname={{ .Values.druid_emitter_graphite_hostname }}
-    druid.emitter.graphite.protocol={{ .Values.druid_emitter_graphite_protocol }}
-    druid.emitter.graphite.eventConverter={{ .Values.druid_emitter_graphite_eventConverter }}
-    {{- end -}}
+    
+    # {{- if .Values.druid_monitoring -}}
+    # druid.emitter.graphite.port={{ .Values.druid_emitter_graphite_port }}
+    # druid.emitter.graphite.hostname={{ .Values.druid_emitter_graphite_hostname }}
+    # druid.emitter.graphite.protocol={{ .Values.druid_emitter_graphite_protocol }}
+    # druid.emitter.graphite.eventConverter={{ .Values.druid_emitter_graphite_eventConverter }}
+    # {{- end -}}
     # Storage type of double columns
     # ommiting this will lead to index double as float at the storage layer
     druid.indexing.doubleStorage={{ .Values.druid_indexing_doubleStorage }}

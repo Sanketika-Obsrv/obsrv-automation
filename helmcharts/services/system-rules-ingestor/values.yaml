@@ -121,7 +121,7 @@ sidecars: {}
   #   args: ["-c", "tail -f /var/log/app.log"] # Run a shell script that tails the log file
 
 env:
-  datasetServiceUrl: "http://dataset-api.dataset-api.svc:3000"
+  datasetServiceUrl: "http://dataset-api.dataset-api.svc.cluster.local:3000"
   delay: "5000"
   folder: "/opt/app/alerting"
   source: "system-rule-ingestor-job"

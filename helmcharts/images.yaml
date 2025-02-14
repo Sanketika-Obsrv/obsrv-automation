@@ -21,7 +21,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.4.0"
+    tag: "1.4.1"
     digest: ""
 
   # dataset-api: #open source
@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.4.0"
+    tag: "1.4.1"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -42,7 +42,7 @@ images: &images
 
   web-console: &web-console # registry: ""
     repository: "obsrv-web-console"
-    tag: "1.4.0"
+    tag: "1.4.1"
     digest: ""
 
   ## PIPELINE ENTERPRISE
@@ -80,8 +80,8 @@ images: &images
     digest: ""
 
   postgresql-exporter: &postgresql-exporter
-    registry: "quay.io"
-    repository: "prometheuscommunity/postgres-exporter"
+    registry: "docker.io"
+    repository: "sanketikahub/postgres-exporter"
     tag: "v0.16.0"
     digest: ""
 
@@ -149,38 +149,38 @@ images: &images
     digest: ""
 
   alertmanager: &alertmanager
-    registry: quay.io
-    repository: prometheus/alertmanager
+    registry: "sanketikahub"
+    repository: alertmanager
     tag: v0.28.0-rc.0
     digest: ""
 
   prometheus-operator-webhook: &prometheus-operator-webhook
-    registry: registry.k8s.io
-    repository: ingress-nginx/kube-webhook-certgen
+    registry: "sanketikahub"
+    repository: kube-webhook-certgen
     tag: v20221220-controller-v1.5.1-58-g787ea74b6
     digest: ""
 
   prometheus-operator: &prometheus-operator
-    registry: quay.io
-    repository: prometheus-operator/prometheus-operator
+    registry: "sanketikahub"
+    repository: prometheus-operator
     tag: "v0.78.2"
     digest: ""
 
   prometheus-config-reloader: &prometheus-config-reloader
-    registry: "quay.io"
-    repository: prometheus-operator/prometheus-config-reloader
+    registry: "sanketikahub"
+    repository: prometheus-config-reloader
     # if not set appVersion field from Chart.yaml is used
     tag: "v0.79.0"
     digest: ""
 
   prometheus: &prometheus
-    registry: "quay.io"
-    repository: prometheus/prometheus
+    registry: "sanketikahub"
+    repository: prometheus
     tag: v2.44.0
     digest: ""
 
   prometheus-pushgateway: &prometheus-pushgateway 
-    repository: quay.io/prometheus/pushgateway
+    repository: sanketikahub/pushgateway
     tag: v1.10.0
     digest: "" 
     
@@ -209,20 +209,20 @@ images: &images
     digest: ""
 
   grafana-side-car: &grafana-side-car
-    registry: quay.io
-    repository: kiwigrid/k8s-sidecar
-    tag: 1.24.3
+    registry: "sanketikahub"
+    repository: k8s-sidecar
+    tag: 1.27.4
     digest: ""
 
   kube-state-metrics: &kube-state-metrics
-    registry: "registry.k8s.io"
-    repository: "kube-state-metrics/kube-state-metrics"
-    tag: "v2.14.0"
+    registry: "sanketikahub"
+    repository: "kube-state-metrics"
+    tag: "v2.13.0"
     digest: ""
 
   prometheus-node-exporter: &prometheus-node-exporter
-    registry: quay.io
-    repository: prometheus/node-exporter
+    registry: "sanketikahub"
+    repository: "node-exporter"
     tag: "v1.8.2"
     digest: ""
 
@@ -248,26 +248,28 @@ images: &images
     digest: ""
 
   cert_manager_cainjector: &cert_manager_cainjector
-    registry: quay.io/jetstack
-    repository: jetstack/cert-manager-cainjector
-    tag: v1.16.2
+    repository: sanketikahub/cert-manager-cainjector
+    tag: v1.12.2
     digest: ""
 
   cert_manager_webhook: &cert_manager_webhook # registry: ""
-    repository: cert-manager-webhook
-    tag: v1.16.2
+    repository: sanketikahub/cert-manager-webhook
+    tag: v1.12.2
     digest: ""
 
   cert_manager_controller: &cert_manager_controller
-    registry: quay.io/jetstack
-    repository: cert-manager-controller
-    tag: v1.16.2
+    repository: sanketikahub/cert-manager-controller
+    tag: v1.12.2
     digest: ""
 
   cert_manager_ctl: &cert_manager_ctl
-    registry: quay.io/jetstac
-    repository: cert-manager-ctl
-    tag: v1
+    repository: sanketikahub/cert-manager-ctl
+    tag: v1.12.2
+    digest: ""
+
+  cert_manager_acmesolver: &cert_manager_acmesolver
+    repository: sanketikahub/cert-manager-acmesolver
+    tag: v1.12.2
     digest: ""
 
   kong: &kong # registry: ""
@@ -317,8 +319,8 @@ images: &images
     digest: ""
 
   druid_exporter: &druid_exporter
-    registry: "docker.io"
-    repository: sanketikahub/druid-exporter
+    # registry: "docker.io"
+    name: sanketikahub/druid-exporter
     tag: "v0.11"
     digest: ""
 
@@ -397,6 +399,9 @@ internal: &internal
     <<: *postgresql-backup
     imagePullSecrets: *imagePullSecrets
 
+  postgresql-exporter:
+    <<: *postgresql-exporter
+
   s3-exporter:
     <<: *s3-exporter
 
@@ -427,10 +432,6 @@ internal: &internal
     image:
       <<: *kubernetes-reflector
 
-  kube-state-metrics:
-    image:
-      <<: *kube-state-metrics
-
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
@@ -450,24 +451,25 @@ internal: &internal
       prometheusConfigReloader:
         image:
           <<: *prometheus-config-reloader
-
-  grafana:
-    image:
-      <<: *grafana
-    testFramework:
-      <<: *grafana-test-framework
-    downloadDashboardsImage:
-      <<: *grafana-download-dashboards
-    initChownData:
+    grafana:
       image:
-        <<: *grafana-init-chown-data
-    sidecar:
+        <<: *grafana
+      testFramework:
+        <<: *grafana-test-framework
+      downloadDashboardsImage:
+        <<: *grafana-download-dashboards
+      initChownData:
+        image:
+          <<: *grafana-init-chown-data
+      sidecar:
+        image:
+          <<: *grafana-side-car
+    kube-state-metrics:
       image:
-        <<: *grafana-side-car
-
-  prometheus-node-exporter:
-    image:
-      <<: *prometheus-node-exporter
+        <<: *kube-state-metrics
+    prometheus-node-exporter:
+      image:
+        <<: *prometheus-node-exporter
 
   prometheus-pushgateway: 
     image:
@@ -481,7 +483,7 @@ internal: &internal
       image:
         <<: *keycloakConfigCli
 
-  druid_exporter:
+  druid-exporter:
     image:
       <<: *druid_exporter
 
@@ -513,21 +515,22 @@ internal: &internal
     image:
       <<: *kong
 
-  cert_manager_ctl:
-    image:
-      <<: *cert_manager_ctl
-
-  cert_manager_controller:
+  cert-manager:
+    imagePullSecrets: *imagePullSecrets
     image:
       <<: *cert_manager_controller
-
-  cert_manager_webhook:
-    image:
-      <<: *cert_manager_webhook
-
-  cert_manager_cainjector:
-    image:
-      <<: *cert_manager_cainjector
+    startupapicheck:
+      image:
+        <<: *cert_manager_ctl
+    webhook:
+      image:
+        <<: *cert_manager_webhook
+    cainjector:
+      image:
+        <<: *cert_manager_cainjector
+    acmesolver:
+      image:
+        <<: *cert_manager_acmesolver
 
   spark:
     image:
@@ -551,9 +554,6 @@ internal: &internal
       cache-indexer:
         enabled: true
         <<: *cache-indexer
-
-  cert-manager:
-    imagePullSecrets: *imagePullSecrets
 
   system-rules-ingestor:
     <<: *system-rules-ingestor

@@ -5,7 +5,7 @@ global:
   cloud_storage_region: &cloud_storage_region "us-east-1"
   cloud_storage_config: &cloud_storage_config |+
     '{"identity":"minioadmin","credential":"198CImxTlly79Dx9ZCDJ","region":"us-east-1","endpoint": "http://s3.172.16.0.2.sslip.io", "s3ForcePathStyle": true}'
-  storageClass: &storage_class "standard"
+  storageClass: &storage_class "csi-hostpath-sc"
   storage_provider: &storage_provider "aws"
   redis_namespace: &redis-namespace "redis"
   dataset_api_container: "storage-obsrv-local"
@@ -173,9 +173,7 @@ velero-backup: &velero-backup
         s3ForcePathStyle: true
         s3Url: *s3-endpoint-url
     volumeSnapshotLocation:
-    - name:
-      provider: *storage_provider
-      namespace: velero
+    - provider: *storage_provider
       config:
         region: *region
   initContainers:
@@ -221,14 +219,9 @@ command-api:
 
 web-console:
   imagePullPolicy: Always
-  env:
-    AUTHENTICATION_TYPE: basic
 
 dataset-api:
   <<: *service-account-disable
-  exhaust_service:
-    CLOUD_STORAGE_PROVIDER: *storage-type
-    CONTAINER_PREFIX: "telemetry-data"
   imagePullPolicy: Always
 
 secor:
@@ -248,26 +241,8 @@ superset:
 letsencrypt-ssl:
   enabled: *ssl_enabled
 
-postgresql-exporter:
-  config:
-    datasource:
-      user: postgres
-      password: postgres
-
 velero:
   <<: *velero-backup
-
-redis-denorm:
-  namespaceOverride: *redis-namespace
-  host: redis-denorm-master.redis.svc.cluster.local
-  port: 6379
-  << : *redis_denorm_backup_sidecar
-
-redis-dedup:
-  namespace: *redis-namespace
-  host: redis-dedup-master.redis.svc.cluster.local
-  port: 6379
-  << : *redis_dedup_backup_sidecar
 
 kong:
   proxy:
@@ -275,14 +250,8 @@ kong:
   livenessProbe: ### For Dev Only
   readinessProbe: ### For Dev Only
 
-kong-ingress-routes:
-  ingress:
-    keycloak:
-      enabled: *ssl_enabled
-
 lakehouse-connector:
   enable_lakehouse: *enable_lakehouse
-  namespace: flink
   s3_access_key: *s3-access-key
   s3_secret_key: *s3-secret-access-key
   s3_endpoint: *s3-endpoint-url
@@ -300,11 +269,10 @@ lakehouse-connector:
 
 trino:
   enabled: *enable_lakehouse
-  namespace: trino
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
-      hive.metastore.uri=thrift://hudi-hms.hms.svc:9083
+      hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
       hive.s3.aws-access-key=minioadmin
       hive.s3.aws-secret-key=198CImxTlly79Dx9ZCDJ
       hive.s3.endpoint=http://minio.minio.svc.cluster.local:9000
@@ -313,7 +281,6 @@ trino:
 
 hms:
   enabled: *enable_lakehouse
-  namespace: hms
   envVars:
     DATABASE_HOST: postgresql-hl.postgresql.svc.cluster.local
     WAREHOUSE_DIR: *hudi_metadata_bucket
@@ -333,3 +300,8 @@ minio:
   defaultBuckets: "backups-obsrv-local, velero-obsrv-local, checkpoint-obsrv-local, storage-obsrv-local"
   service:
     type: NodePort
+
+s3-exporter:
+  s3_access_key: *s3-access-key
+  s3_secret_key: *s3-secret-access-key
+  s3_region: *s3-signing-region

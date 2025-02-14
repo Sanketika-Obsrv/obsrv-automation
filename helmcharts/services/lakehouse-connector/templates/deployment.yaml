@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Values.namespace | default "flink" }}  # Default to 'flink' if not provided
+  namespace: {{ include "base.namespace" . }}
   name: {{ .Chart.Name }}-jobmanager
   labels:
     {{- include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" .) | nindent 4 }}
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Values.namespace | default "flink" }}  # Default to 'flink' if not provided
+  namespace: {{ include "base.namespace" . }}
   name: {{ .Chart.Name }}-taskmanager
   labels:
     {{- include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" .) | nindent 4 }}
@@ -54,7 +54,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Chart.Name }}-jobmanager
-  namespace: flink
+  namespace: {{ include "base.namespace" . }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
   annotations:
   {{- if .Values.commonAnnotations }}
@@ -108,15 +108,15 @@ spec:
         workingDir: /opt/flink
         command: ["/opt/flink/bin/standalone-job.sh"]
         args: ["start-foreground",
-{{- if eq .Values.global.cloud_storage_provider "azure" }}
+{{- if eq .Values.global.checkpoint_store_type "azure" }}
 - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
 {{- end }}
-{{- if eq .Values.global.cloud_storage_provider "aws" }}
+{{- if eq .Values.global.checkpoint_store_type "s3" }}
           "-Ds3.access.key={{ .Values.global.s3_access_key }}",
           "-Ds3.secret.key={{ .Values.global.s3_secret_key }}",
           "-Ds3.endpoint={{ .Values.global.s3_endpoint_url }}",
 {{- end }}
-{{- if eq .Values.global.cloud_storage_provider "gcs" }}
+{{- if eq .Values.global.checkpoint_store_type "gcs" }}
           "-Dgoogle.cloud.auth.service.account.enable=true",
 {{- end }}
 {{- $release_name := .Chart.Name }}
@@ -164,7 +164,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Chart.Name }}-taskmanager
-  namespace: flink
+  namespace: {{ include "base.namespace" . }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
   annotations:
   {{- if .Values.commonAnnotations }}
@@ -236,7 +236,7 @@ spec:
         args: ["taskmanager",
                "-Dweb.submit.enable=false",
                "-Dmetrics.reporter.prom.factory.class=org.apache.flink.metrics.prometheus.PrometheusReporterFactory",
-               "-Dmetrics.reporter.prom.port={{ .Values.taskmanager.prom_port }}",               
+               "-Dmetrics.reporter.prom.port={{ .Values.taskmanager.prom_port }}",
                "-Dparallelism.default=1"]
         env:
         - name: HADOOP_CONF_DIR

@@ -6,6 +6,8 @@ metadata:
   annotations:
     deployment_version: "v2"
 spec:
+  completions: 1
+  parallelism: 1
   template:
     metadata:
       labels:
@@ -14,16 +16,14 @@ spec:
       restartPolicy: Never
       containers:
       - name: create-obsrv-user
-        image: debian:bullseye-slim
+        image: sanketikahub/kubectl:1.32.0-r1
         command:
         - sh
         - -c
         - |
           echo "Updating package repositories and installing required tools..."
-          apt-get update && apt-get install -y curl jq postgresql-client
-
-          echo "Waiting for Keycloak to be ready..."
-          until curl --insecure -s -o /dev/null -w "%{http_code}" http://keycloak:80/realms/obsrvWebConsole/ > /dev/null; do
+          until curl --insecure -s -o /dev/null -w "%{http_code}" http://keycloak:80/auth/realms/obsrv/ > /dev/null; do
+            echo "Waiting for Keycloak to be ready..."
             sleep 5
           done
 
@@ -31,7 +31,7 @@ spec:
 
           # Obtain admin access token using admin credentials
           echo "Getting access token for admin user..."
-          access_token=$(curl --insecure -s -X POST http://keycloak:80/realms/master/protocol/openid-connect/token \
+          access_token=$(curl --insecure -s -X POST http://keycloak:80/auth/realms/master/protocol/openid-connect/token \
             -H "Content-Type: application/x-www-form-urlencoded" \
             --data-urlencode "client_id=admin-cli" \
             --data-urlencode "username={{ .Values.auth.adminUser }}" \
@@ -44,29 +44,32 @@ spec:
           fi
 
           echo "Access token retrieved successfully."
-
-          # Create a new user in the obsrvWebConsole realm
+          # Create a new user in the obsrv realm
           echo "Creating new Keycloak user..."
           create_user_response=$(curl --insecure -s -o response.json -w "%{http_code}" \
-            -X POST http://keycloak:80/admin/realms/obsrvWebConsole/users \
+            -X POST http://keycloak:80/auth/admin/realms/obsrv/users \
             -H "Authorization: Bearer $access_token" \
             -H "Content-Type: application/json" \
             -d '{
                   "username": "{{ .Values.obsrvuser }}",
+                  "email": "admin@obsrv.in",
+                  "firstName": "obsrv",
+                  "lastName": "admin",
                   "enabled": true,
                   "credentials": [
                     {
                       "type": "password",
-                      "value": "{{ .Values.obsrvpassword}}",
+                      "value": "{{ .Values.obsrvpassword }}",
                       "temporary": false
                     }
                   ]
                 }')
 
           if [ "$create_user_response" -eq 201 ]; then
-            echo "Keycloak user 'obsrv_admin' created successfully in realm 'obsrvWebConsole'."
+            echo "Keycloak user '{{ .Values.obsrvuser }}' created successfully in realm 'obsrv'."
           elif [ "$create_user_response" -eq 409 ]; then
-            echo "User 'obsrv_admin' already exists in realm 'obsrvWebConsole'."
+            echo "User '{{ .Values.obsrvuser }}' already exists in realm 'obsrv'."
+            exit 0
           else
             echo "Failed to create user. HTTP status: $create_user_response"
             cat response.json
@@ -75,11 +78,10 @@ spec:
 
           # Fetch user details to get the user ID
           echo "Fetching user details to get the user ID..."
-          user_details_response=$(curl --insecure -s -X GET http://keycloak:80/admin/realms/obsrvWebConsole/users \
+          user_details_response=$(curl --insecure -s -X GET http://keycloak:80/auth/admin/realms/obsrv/users \
             -H "Authorization: Bearer $access_token" \
-            -G --data-urlencode "username=obsrv_admin")
+            -G --data-urlencode "username={{ .Values.obsrvuser }}")
 
-          # Extract the user ID from the response
           user_id=$(echo $user_details_response | jq -r '.[0].id')
 
           if [ -z "$user_id" ]; then
@@ -92,11 +94,11 @@ spec:
           # Update PostgreSQL with the new user ID in the existing table
           echo "Updating PostgreSQL table with the new user ID..."
 
-          PGPASSWORD=postgres psql -h postgresql-hl.postgresql.svc.cluster.local -U postgres -d obsrv -c "
+          PGPASSWORD={{ .Values.global.postgresql.password}} psql -h postgresql-hl.postgresql.svc.cluster.local -U postgres -d obsrv -c "
           UPDATE \"oauth_users\" SET
             \"id\" = '$user_id',
             \"last_updated_on\" = NOW()
-          WHERE \"user_name\" = 'obsrv_admin';
+          WHERE \"user_name\" = '{{ .Values.obsrvuser }}';
           "
 
           if [ $? -eq 0 ]; then

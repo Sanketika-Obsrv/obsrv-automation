@@ -320,7 +320,7 @@ serviceConfig:
     host: "{{ .Values.global.prometheus.url }}"
     backup_prefix: "/prometheus_backups"
     pod: "prometheus-kube-prometheus-stack-prometheus-0"
-    namespace: "monitoring"
+    namespace: "{{ .Values.global.namespaces.monitoring_namespace }}"
     endpoint: "/api/v1/admin/tsdb/snapshot"
 
   dataset_api:
@@ -334,8 +334,8 @@ serviceConfig:
 
   connector_jobs:
     spark:
-      namespace: spark
+      namespace: "{{ .Values.global.namespaces.connector_namespaces.spark }}"
       base_helm_chart: spark-connector-cron
     flink:
-      namespace: flink-connectors
+      namespace: "{{ .Values.global.namespaces.connector_namespaces.flink }}"
       base_helm_chart: flink-connector

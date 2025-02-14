@@ -185,7 +185,7 @@ if [[ "$install_dependencies" == "true" ]]; then
 fi
 
 # Proceed with the specified action
-cd ../../terraform/aws
+cd ../terraform/aws
 case "$action" in
     install)
         install_obsrv
