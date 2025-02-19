@@ -533,8 +533,8 @@ spec:
       resources:
         {{- toYaml .Values.druid_router.resources | nindent 8 }}
         # requests:
-        #   memory: {{ .Values.druid_router.resources.requests.memory }}
-        #   cpu: {{ .Values.druid_router.resources.requests.cpu }}
+        #   memory: {{ .Values.druid_router_pod_memory_request }}
+        #   cpu: {{ .Values.druid_router_pod_cpu_request }}
         # limits:
-        #   memory: {{ .Values.druid_router.resources.limits.memory }}
-        #   cpu: {{ .Values.druid_router.resources.limits.cpu }}
+        #   memory: {{ .Values.druid_router_pod_memory_limit }}
+        #   cpu: {{ .Values.druid_router_pod_cpu_limit 
