@@ -1356,6 +1356,7 @@ singleBinary:
     selector: null
     # -- Annotations for volume claim
     annotations: {}
+    existingClaim: ""
 ######################################################################################################################
 #
 # Simple Scalable Deployment (SSD) Mode

@@ -7,7 +7,7 @@ metadata:
   name: "{{ .Values.druid_cluster_type }}"
   namespace: {{ include "base.namespace" . }}
 spec:
-  image: "{{- include "base.image" . }}"
+  image: {{ include "base.image" . }}
   {{- if .Values.serviceAccount.create}}
   serviceAccount: "{{ include "druid-cluster.serviceAccountName" . }}"
   {{- end}}
@@ -16,6 +16,8 @@ spec:
   #   release: alpha
   # podAnnotations:
   #   dummykey: dummyval
+  nodeSelector:
+    envpoc: druid
   readinessProbe:
     httpGet:
       path: /status/health
@@ -112,7 +114,6 @@ spec:
     # Service discovery
     druid.selectors.indexing.serviceName={{ .Values.druid_selectors_indexing_serviceName }}
     druid.selectors.coordinator.serviceName={{ .Values.druid_selectors_coordinator_serviceName }}
-    
     # Monitoring
     druid.emitter.prometheus.pushGatewayAddress={{ .Values.druid_emitter_prometheus_pushGatewayAddress }}
     druid.emitter.prometheus.strategy={{ .Values.druid_emitter_prometheus_strategy }}
@@ -176,7 +177,6 @@ spec:
         httpGet:
           path: /status/health
           port: {{ .Values.druid_broker_port }}
-
       # hpAutoscaler:
       #   maxReplicas: 2
       #   minReplicas: 1
@@ -193,7 +193,7 @@ spec:
       #          averageUtilization: 50
 
       resources:
-      {{- toYaml .Values.druid_brokers.resources | nindent 8 }}
+        {{- toYaml .Values.druid_brokers.resources | nindent 8 }}
         # requests:
         #   memory: {{ .Values.druid_broker_pod_memory_request }}
         #   cpu: {{ .Values.druid_broker_pod_cpu_request }}
@@ -252,7 +252,6 @@ spec:
       extra.jvm.options: |-
         -Xms{{ .Values.druid_overlord_min_heap_size }}
         -Xmx{{ .Values.druid_overlord_max_heap_size }}
-
       readinessProbe:
         httpGet:
           path: /status/health
@@ -307,6 +306,12 @@ spec:
       volumeMounts:
         - mountPath: {{ .Values.mount_path }}
           name: historical-volume
+      {{- if .Values.druid_historical.persistence.existingClaim }}
+      volumes:
+        - name: historical-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.druid_historical.persistence.existingClaim }}
+      {{- else }}
       volumeClaimTemplates:
         - metadata:
             name: historical-volume
@@ -321,7 +326,7 @@ spec:
             resources:
               requests:
                 storage: {{ .Values.druid_historical.persistence.size }}
-
+      {{- end }}
       resources:
         {{- toYaml .Values.druid_historical.resources | nindent 8 }}
         # requests:
@@ -436,6 +441,12 @@ spec:
       volumeMounts:
         - mountPath: {{ .Values.mount_path }}
           name: indexer-volume
+      {{- if .Values.druid_indexer.persistence.existingClaim }}
+      volumes:
+        - name: indexer-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.druid_indexer.persistence.existingClaim }}
+      {{- else }}
       volumeClaimTemplates:
         - metadata:
             name: indexer-volume
@@ -450,6 +461,7 @@ spec:
             resources:
               requests:
                 storage: {{ .Values.druid_indexer.persistence.size }}
+      {{- end}}
       resources:
         {{- toYaml .Values.druid_indexer.resources | nindent 8 }}
         # requests:
@@ -523,8 +535,8 @@ spec:
       resources:
         {{- toYaml .Values.druid_router.resources | nindent 8 }}
         # requests:
-        #   memory: {{ .Values.druid_router_pod_memory_request }}
-        #   cpu: {{ .Values.druid_router_pod_cpu_request }}
+        #   memory: {{ .Values.druid_router.resources.requests.memory }}
+        #   cpu: {{ .Values.druid_router.resources.requests.cpu }}
         # limits:
-        #   memory: {{ .Values.druid_router_pod_memory_limit }}
-        #   cpu: {{ .Values.druid_router_pod_cpu_limit }}
+        #   memory: {{ .Values.druid_router.resources.limits.memory }}
+        #   cpu: {{ .Values.druid_router.resources.limits.cpu }}
