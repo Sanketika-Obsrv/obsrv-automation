@@ -33,12 +33,12 @@ defaults:
     s3_exporter_namespace: &s3_exporter_namespace "s3-exporter"
     connector_namespaces:
       spark: *spark-namespace
-      flink: &flink_connector_namespace "flink_connectors"
+      flink: &flink_connector_namespace "flink-connectors"
 
   postgres:
     pghost: &pghost "postgresql-hl.postgresql.svc.cluster.local"
     pguser: &pguser "postgres"
-    pgpassword: &pgpassword "A1wWzZQ3ccOd"
+    pgpassword: &pgpassword "postgres"
     obsrv_username: &psql-obsrv-user "obsrv"
     obsrv_database: &psql-obsrv-db "obsrv"
     obsrv_user_password: &psql-obsrv-pwd "obsrv123"
@@ -103,7 +103,6 @@ defaults:
     grafana_client_id: &grafana_client_id "obsrv-grafana"
     grafana_client_secret: &grafana_client_secret "grafanaobsrv@123" 
     web_console_client_id: "obsrv-console"
-
 
 #coredb-charts/
 kafka: &kafka

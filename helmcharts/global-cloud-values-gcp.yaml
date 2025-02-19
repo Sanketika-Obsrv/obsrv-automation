@@ -91,15 +91,11 @@ velero-service-account: &velero-service-account
 
 config-api:
   !!merge <<: *config-api-service-account
-  exhaust_service:
-    CLOUD_STORAGE_PROVIDER: *storage_provider
-    CONTAINER_PREFIX: telemetry-data
+  env:
+    cloud_storage_provider: "gcloud"
 
 dataset-api:
   !!merge <<: *dataset-api-service-account
-  exhaust_service:
-    CLOUD_STORAGE_PROVIDER: *storage_provider
-    CONTAINER_PREFIX: telemetry-data
 
 druid-raw-cluster:
   !!merge <<: *druid-raw-service-account

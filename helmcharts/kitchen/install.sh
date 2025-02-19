@@ -127,16 +127,16 @@ additional)
     rm -rf additional
     ;;
 all)
-    bash $0 prerequisites ${@: 2}
     bash $0 bootstrap ${@: 2}
+    bash $0 prerequisites ${@: 2}
     bash $0 coredb ${@: 2}
     bash $0 migrations ${@: 2}
     bash $0 monitoring ${@: 2}
+    bash $0 oauth ${@: 2}
     bash $0 coreinfra ${@: 2}
     bash $0 obsrvapis ${@: 2}
-    bash $0 hudi ${@: 2}
+    # bash $0 hudi ${@: 2}
     # bash $0 otel ${@: 2}
-    bash $0 oauth ${@: 2}
     bash $0 obsrvtools ${@: 2}
     bash $0 additional ${@: 2}
 
@@ -144,18 +144,16 @@ all)
 reset)
     helm uninstall additional -n obsrv
     helm uninstall obsrvtools -n obsrv
-    helm uninstall oauth -n obsrv
     helm uninstall otel -n obsrv
     helm uninstall hudi -n obsrv
     helm uninstall obsrvapis -n obsrv
     helm uninstall coreinfra -n obsrv
+    helm uninstall oauth -n obsrv
     helm uninstall monitoring -n obsrv
     helm uninstall migrations -n obsrv
     helm uninstall coredb -n obsrv
-    helm uninstall opentelemetry-collector -n obsrv
-    helm uninstall oauth -n obsrv
-    helm uninstall obsrv-bootstrap -n obsrv
     helm uninstall prerequisites -n obsrv
+    helm uninstall obsrv-bootstrap -n obsrv
 
     ;;
 *)
