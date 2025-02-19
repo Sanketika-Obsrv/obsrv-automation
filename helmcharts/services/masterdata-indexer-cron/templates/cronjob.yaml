@@ -1,0 +1,82 @@
+{{- if .Values.cronjob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spark-masterdata-indexer
+  namespace: {{ include "base.namespace" . }}
+  labels:
+    {{- include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) | nindent 4 }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "{{ .Values.cronjob.cronSchedule }}"
+  jobTemplate:
+    metadata:
+      name: spark-masterdata-indexer-job
+    spec:
+      template:
+        metadata:
+          annotations:
+            {{- if .Values.podAnnotations }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.podAnnotations "context" $) | nindent 12 }}
+            {{- end }}
+          labels:
+            {{- include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) | nindent 12 }}
+        spec:
+          serviceAccountName: {{ .Values.serviceAccount.name }}
+          restartPolicy: {{ .Values.restartPolicy }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.initContainers }}
+          initContainers:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: {{ .Chart.Name }}
+              image: "{{- include "base.image" .}}"
+              imagePullPolicy: {{ .Values.imagePullPolicy }}
+              {{- if .Values.livenessProbe }}
+              livenessProbe:
+                {{- toYaml .Values.livenessProbe | nindent 16 }}
+              {{- end }}
+              {{- if .Values.readinessProbe }}
+              readinessProbe:
+                {{- toYaml .Values.readinessProbe | nindent 16 }}
+              {{- end }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              {{- if .Values.configmap.enabled }}
+              envFrom:
+                - configMapRef:
+                    name: {{ include "common.names.fullname" . }}-env
+              volumeMounts:
+                - name: config
+                  mountPath: {{ .Values.configmap.mountPath }}
+              {{- end }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Wait for the Spark pod to be ready
+                  SPARK_POD=$(kubectl get pods -n spark -l app.kubernetes.io/name=spark,app.kubernetes.io/component=master -o jsonpath='{.items[0].metadata.name}')
+                  kubectl exec -it $SPARK_POD -- bash -c "/opt/bitnami/spark/bin/spark-submit --master={{ .Values.spark.master.host }} --class org.sunbird.obsrv.dataproducts.MasterDataProcessorIndexer --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem --conf spark.hadoop.fs.s3a.aws.credentials.provider=org.apache.hadoop.fs.s3a.auth.AssumedRoleCredentialProvider --conf spark.hadoop.fs.s3a.assumed.role.credentials.provider=com.amazonaws.auth.InstanceProfileCredentialsProvider --conf spark.hadoop.fs.s3a.assumed.role.arn={{ .Values.serviceAccountRoleArn }} {{ .Values.dataproductsJar }}"
+              {{- with .Values.sidecars }}
+              {{- toYaml . | nindent 12 }}
+              {{- end }}
+          {{- if .Values.configmap.enabled }}
+          volumes:
+            - name: config
+              configMap:
+                name: {{ include "common.names.fullname" . }}
+          {{- end }}
+{{- end }}
+
