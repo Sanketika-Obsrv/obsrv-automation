@@ -537,4 +537,4 @@ spec:
         #   cpu: {{ .Values.druid_router_pod_cpu_request }}
         # limits:
         #   memory: {{ .Values.druid_router_pod_memory_limit }}
-        #   cpu: {{ .Values.druid_router_pod_cpu_limit 
+        #   cpu: {{ .Values.druid_router_pod_cpu_limit }}
