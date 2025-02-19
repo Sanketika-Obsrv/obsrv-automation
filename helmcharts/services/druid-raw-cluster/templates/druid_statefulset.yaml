@@ -16,8 +16,6 @@ spec:
   #   release: alpha
   # podAnnotations:
   #   dummykey: dummyval
-  nodeSelector:
-    envpoc: druid
   readinessProbe:
     httpGet:
       path: /status/health
@@ -193,7 +191,7 @@ spec:
       #          averageUtilization: 50
 
       resources:
-        {{- toYaml .Values.druid_brokers.resources | nindent 8 }}
+      {{- toYaml .Values.druid_brokers.resources | nindent 8 }}
         # requests:
         #   memory: {{ .Values.druid_broker_pod_memory_request }}
         #   cpu: {{ .Values.druid_broker_pod_cpu_request }}
