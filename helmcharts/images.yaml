@@ -21,7 +21,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.4.1"
+    tag: "1.5.1"
     digest: ""
 
   # dataset-api: #open source
@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.4.1"
+    tag: "1.5.1"
     digest: ""
 
   config-api: &config-api # registry: ""

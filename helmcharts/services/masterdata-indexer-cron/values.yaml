@@ -1,0 +1,144 @@
+nameOverride: ""
+fullnameOverride: ""
+namespace: "spark"
+
+replicaCount: 1
+
+global:
+  image:
+    registry: "sanketikahub"
+
+registry: "bitnami"
+repository: "kubectl"
+tag: "latest"
+digest: ""
+
+imagePullPolicy: IfNotPresent
+imagePullSecrets: []
+
+commonLabels: {}
+
+commonAnnotations: {}
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+
+securityContext: {}
+  # readOnlyRootFilesystem: false
+  # capabilities:
+  #   drop:
+  #   - ALL
+
+# This block is an interface for k8s service spec.
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - paths:
+      - /
+      # host: chart-example.local
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+livenessProbe: {}
+  # httpGet:
+  #   path: "/healthz"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+readinessProbe: {}
+  # httpGet:
+  #   path: "/ready"
+  #   port: 8080
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+configmap:
+  enabled: false
+  mountPath: /config
+
+serviceAccount:
+  name: spark-sa
+
+serviceMonitor:
+  enabled: false
+  selectorLabels:
+    release: monitoring
+  endpoints: []
+  # - port: http # the name of the port in your service, assuming the primary service port is named 'http' in this example.
+  #   path: /metrics
+  #   interval: 30s
+  #   scrapeTimeout: 10s
+  #   honorLabels: true
+
+# Example values.yaml structure
+initContainers: {}
+  # - name: init-myservice
+  #   image: busybox:1.28
+  #   command: ['sh', '-c', "until nslookup kubernetes.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
+
+sidecars: {}
+  # - name: log-reader # Sidecar container
+  #   image: busybox # Use another busybox image
+  #   command: ["/bin/sh"] # Override the default command
+  #   args: ["-c", "tail -f /var/log/app.log"] # Run a shell script that tails the log file
+
+### NOTE: This section isn't to be changed and must be in sync with the spark helm chart
+######## Spark Configuration Start ########
+## Defaults taken from Bitnami Spark Helm Chart
+python_path: /opt/bitnami/python/bin/python
+
+spark:
+  host: http://spark-master-svc.spark.svc.cluster.local:8998/batches/
+  master:
+    host: spark://spark-master-0.spark-headless.spark.svc.cluster.local:7077
+    port: 7077
+  driver:
+    extraJavaOptions: -Dlog4j.configuration=file:/opt/bitnami/spark/conf/log4j.properties
+  executor:
+    extraJavaOptions: -Dlog4j.configuration=file:/opt/bitnami/spark/conf/log4j.properties
+######## Spark Configuration End ########
+# serviceAccount role arn 
+serviceAccountRoleArn: ""
+# dataproducts-jar
+dataproductsJar: ""
+
+cronjob:
+ enabled: false
+# The schedule in cron format
+ cronSchedule: 0 0 1 * * # Every month
+restartPolicy: OnFailure
