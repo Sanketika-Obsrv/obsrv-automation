@@ -14,7 +14,7 @@ metadata:
 spec:
   serviceName: {{ printf "%s-headless" (include "common.names.fullname" .) }}
   replicas: {{ .Values.worker.replicaCount }}
-  {{- if .Values.persistence.enabled }}
+  {{- if not .Values.persistence.worker.existingClaim }}
   volumeClaimTemplates:
   - metadata:
       name: {{ .Values.persistence.workerTmp.name }}
@@ -227,8 +227,13 @@ spec:
             - name: certs
               mountPath: /certs
             {{- end }}
-            {{- if .Values.worker.extraVolumeMounts }}
-            {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- if .Values.persistence.worker.existingClaim }}
+            {{- range .Values.worker.extraVolumeMounts}}
+            - name: spark-worker-volume
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- else if .Values.worker.extraVolumeMounts }}
+              {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
             {{- if .Values.initScripts }}
             - name: custom-init-scripts
@@ -408,4 +413,9 @@ spec:
           secret:
             secretName: {{ template ".Values.initScriptsSecret" . }}
             defaultMode: 0755
+        {{- end }}
+        {{- if .Values.persistence.worker.existingClaim }}
+        - name: spark-worker-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.worker.existingClaim }}
         {{- end }}
