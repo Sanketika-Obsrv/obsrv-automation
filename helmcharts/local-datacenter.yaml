@@ -22,7 +22,7 @@ global:
   s3_secret_key: &s3-secret-access-key "198CImxTlly79Dx9ZCDJ"
   region: &region "us-east-1"
   s3_endpoint_url: &s3-endpoint-url "http://minio.minio.svc.cluster.local:9000"
-  s3_path_style_access: &s3-path-style-access "true"
+  s3_path_style_access: &s3-path-style-access true
   s3_protocol: &s3-protocol "http"
   s3_signing_region: &s3-signing-region "us-east-1"
   backup_bucket: &backup_bucket ""
@@ -40,23 +40,66 @@ service-account-disable: &service-account-disable
     create: false
 
 ### Enable to Write to MinIO: WIP
-# loki:
-#   loki:
-#     storage:
-#       type: s3
-#       bucketNames:
-#         chunks: "loki-logs"
-#         ruler: "loki-logs"
-#         admin: "loki-logs"
-#       s3:
-#         endpoint: *s3-endpoint-url
-#         region: *s3-signing-region
-#         secretAccessKey: *s3-secret-access-key
-#         accessKeyId: *s3-access-key
-#         s3ForcePathStyle: true
-#         insecure: true
-#     compactor:
-#       delete_request_store: *cloud_store_provider
+loki:
+  <<: *service-account-disable
+  deploymentMode: SimpleScalable
+  loki:
+    limits_config:
+      reject_old_samples: true
+      reject_old_samples_max_age: "168h"
+      max_cache_freshness_per_query: "10m"
+      split_queries_by_interval: "15m"
+    schemaConfig:
+      configs:
+        - from: "2023-01-01"  
+          index:
+            period: 24h
+            prefix: index_
+          object_store: s3
+          schema: v13
+          store: tsdb
+    storage:
+      type: s3
+      bucketNames:
+        chunks: "loki-logs"
+        ruler: "loki-logs"
+        admin: "loki-logs"
+      s3:
+        s3: s3://minioadmin:198CImxTlly79Dx9ZCDJ@minio.minio.svc.cluster.local:9000/loki-logs
+        endpoint: *s3-endpoint-url
+        region: *region
+        secretAccessKey: *s3-secret-access-key
+        accessKeyId: *s3-access-key
+        s3ForcePathStyle: *s3-path-style-access
+        insecure: false
+    storage_config:
+      aws:
+        s3: s3://minioadmin:198CImxTlly79Dx9ZCDJ@minio.minio.svc.cluster.local:9000/loki-logs
+        endpoint: *s3-endpoint-url
+        access_key_id: *s3-access-key
+        secret_access_key: *s3-secret-access-key
+        insecure: true
+        s3forcepathstyle: *s3-path-style-access
+        region: *region
+    compactor:
+      delete_request_store: *cloud_store_provider
+  minio:
+    enabled: false
+    service:
+      port: 9000
+  gateway:
+    enabled: True
+    replicas: 1
+    service:
+      type: ClusterIP
+  write:
+    replicas: 1
+    persistence:
+      storageClass: *storage_class
+  read: 
+    replicas: 1
+  backend:
+    replicas: 1
 
 druid-raw-cluster:
   <<: *service-account-disable
@@ -294,10 +337,11 @@ hms:
 
 minio:
   enabled: true
+  mode: standalone
   auth:
     rootUser: *s3-access-key
     rootPassword: *s3-secret-access-key
-  defaultBuckets: "backups-obsrv-local, velero-obsrv-local, checkpoint-obsrv-local, storage-obsrv-local"
+  defaultBuckets: "backups-obsrv-local, velero-obsrv-local, checkpoint-obsrv-local, storage-obsrv-local, loki-logs"
   service:
     type: NodePort
 
