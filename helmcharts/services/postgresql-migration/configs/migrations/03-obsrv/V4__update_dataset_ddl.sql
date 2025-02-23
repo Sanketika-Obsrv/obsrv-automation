@@ -94,16 +94,12 @@ CREATE TABLE IF NOT EXISTS connector_instances (
 ALTER TABLE datasources_draft
 DROP CONSTRAINT IF EXISTS datasources_draft_dataset_id_datasource_key;
 
-ALTER TABLE datasources_draft
-ADD CONSTRAINT datasources_draft_dataset_id_datasource_type_key
-UNIQUE (dataset_id, datasource, type);
+ALTER TABLE datasources_draft ADD CONSTRAINT unique_datasource UNIQUE(datasource);
 
 ALTER TABLE datasources
 DROP CONSTRAINT IF EXISTS datasources_dataset_id_datasource_key;
 
-ALTER TABLE datasources
-ADD CONSTRAINT datasources_dataset_id_datasource_type_key
-UNIQUE (dataset_id, datasource, type);
+ALTER TABLE datasources ADD CONSTRAINT unique_datasource UNIQUE(datasource);
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
