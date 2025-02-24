@@ -14,6 +14,10 @@ metadata:
     app: secor
     system.storage: "true"
 spec:
+  {{- if .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml .Values.nodeSelector | nindent 4 }}
+  {{- end }}
   serviceName: secor
   updateStrategy:
     type: RollingUpdate
@@ -75,7 +79,12 @@ spec:
         - configMap:
             name: {{ $jobName }}-config
           name: secor-config
-
+        {{- if .Values.persistence.existingClaim }}
+        - name: data-path
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
+        {{- end }}
+  {{- if not .Values.persistence.existingClaim }}
   volumeClaimTemplates:
     - metadata:
         name: data-path
@@ -91,6 +100,7 @@ spec:
         resources:
           requests:
             storage: {{ $jobData.storage.size }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

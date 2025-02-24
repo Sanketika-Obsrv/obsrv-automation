@@ -165,3 +165,8 @@ secor_alertrule:
 
 commonAnnotations:
     "helm.sh/hook-weight": "-5"
+
+persistence:
+  existingClaim: ""
+
+nodeSelector:

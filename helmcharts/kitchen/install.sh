@@ -75,7 +75,7 @@ coreinfra)
     ;;
 obsrvapis)
     cp -rf ../obsrv obsrvapis
-    cp -rf ../services/{command-api,dataset-api,config-api} obsrvapis/charts/
+    cp -rf ../services/{command-api,dataset-api} obsrvapis/charts/
     helm $cmd obsrvapis ./obsrvapis -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name
     rm -rf obsrvapis
     ;;
@@ -105,8 +105,7 @@ obsrvtools)
     ;;
 additional)
     cp -rf ../obsrv additional
-    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler} additional/charts/
-
+    cp -rf ../services/{spark,system-rules-ingestor,secor,druid-exporter,postgresql-exporter,postgresql-backup,kong-ingress-routes,velero,volume-autoscaler,masterdata-indexer-cron} additional/charts/
     # copy cloud specific helm charts
     case $cloud_env in
     "aws")
