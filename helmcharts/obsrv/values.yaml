@@ -596,7 +596,7 @@ keycloak:
                 "web-origins",
                 "acr",
                 "profile",
-                "roles",
+                "api-gw-audience",
                 "basic",
                 "email"
               ],
@@ -1323,10 +1323,39 @@ keycloak:
                     "access.token.claim": "true",
                     "claim.name": "groups",
                     "jsonType.label": "String"
+                    
                   }
                 }
               ]
             },
+            {
+              "id": "53cbb90c-ee11-4e7f-b5ce-1c6b89338bec",
+              "name": "api-gw-audience",
+              "description": "",
+              "protocol": "openid-connect",
+              "attributes": {
+                "include.in.token.scope": "false",
+                "display.on.consent.screen": "false",
+                "gui.order": "",
+                "consent.screen.text": ""
+              },
+              "protocolMappers": [
+                {
+                  "id": "ab522b7a-2bde-49c3-8cb6-cd3b31b9a985",
+                  "name": "webConsole",
+                  "protocol": "openid-connect",
+                  "protocolMapper": "oidc-audience-mapper",
+                  "consentRequired": false,
+                  "config": {
+                    "id.token.claim": "false",
+                    "lightweight.claim": "false",
+                    "access.token.claim": "true",
+                    "included.custom.audience": "webConsole",
+                    "introspection.token.claim": "true",
+                 }
+                }
+              ]
+            },   
             {
               "id": "77ca3ded-7d42-43a2-911e-9f886dc1f086",
               "name": "acr",

@@ -21,16 +21,13 @@ spec:
         - sh
         - -c
         - |
-          echo "Updating package repositories and installing required tools..."
+          # Section 1: User Creation and PostgreSQL Update
+          echo "Waiting for Keycloak to be ready..."
           until curl --insecure -s -o /dev/null -w "%{http_code}" http://keycloak:80/auth/realms/obsrv/ > /dev/null; do
-            echo "Waiting for Keycloak to be ready..."
             sleep 5
           done
 
-          echo "Keycloak is ready. Starting user creation..."
-
-          # Obtain admin access token using admin credentials
-          echo "Getting access token for admin user..."
+          echo "Keycloak is ready. Obtaining admin access token..."
           access_token=$(curl --insecure -s -X POST http://keycloak:80/auth/realms/master/protocol/openid-connect/token \
             -H "Content-Type: application/x-www-form-urlencoded" \
             --data-urlencode "client_id=admin-cli" \
@@ -39,12 +36,10 @@ spec:
             --data-urlencode "grant_type=password" | jq -r '.access_token')
 
           if [ -z "$access_token" ]; then
-            echo "Failed to get access token."
+            echo "Failed to obtain access token."
             exit 1
           fi
 
-          echo "Access token retrieved successfully."
-          # Create a new user in the obsrv realm
           echo "Creating new Keycloak user..."
           create_user_response=$(curl --insecure -s -o response.json -w "%{http_code}" \
             -X POST http://keycloak:80/auth/admin/realms/obsrv/users \
@@ -66,18 +61,16 @@ spec:
                 }')
 
           if [ "$create_user_response" -eq 201 ]; then
-            echo "Keycloak user '{{ .Values.obsrvuser }}' created successfully in realm 'obsrv'."
+            echo "User '{{ .Values.obsrvuser }}' created successfully."
           elif [ "$create_user_response" -eq 409 ]; then
-            echo "User '{{ .Values.obsrvuser }}' already exists in realm 'obsrv'."
-            exit 0
+            echo "User '{{ .Values.obsrvuser }}' already exists."
           else
             echo "Failed to create user. HTTP status: $create_user_response"
             cat response.json
             exit 1
           fi
 
-          # Fetch user details to get the user ID
-          echo "Fetching user details to get the user ID..."
+          echo "Retrieving user ID..."
           user_details_response=$(curl --insecure -s -X GET http://keycloak:80/auth/admin/realms/obsrv/users \
             -H "Authorization: Bearer $access_token" \
             -G --data-urlencode "username={{ .Values.obsrvuser }}")
@@ -85,16 +78,12 @@ spec:
           user_id=$(echo $user_details_response | jq -r '.[0].id')
 
           if [ -z "$user_id" ]; then
-            echo "Failed to extract user ID from the response."
+            echo "Failed to retrieve user ID."
             exit 1
           fi
 
-          echo "User ID: $user_id"
-
-          # Update PostgreSQL with the new user ID in the existing table
-          echo "Updating PostgreSQL table with the new user ID..."
-
-          PGPASSWORD={{ .Values.global.postgresql.password}} psql -h postgresql-hl.postgresql.svc.cluster.local -U postgres -d obsrv -c "
+          echo "Updating PostgreSQL with new user ID..."
+          PGPASSWORD={{ .Values.global.postgresql.password }} psql -h postgresql-hl.postgresql.svc.cluster.local -U postgres -d obsrv -c "
           UPDATE \"oauth_users\" SET
             \"id\" = '$user_id',
             \"last_updated_on\" = NOW()
@@ -102,9 +91,36 @@ spec:
           "
 
           if [ $? -eq 0 ]; then
-            echo "PostgreSQL table updated successfully."
+            echo "PostgreSQL updated successfully."
           else
-            echo "Failed to update PostgreSQL table."
+            echo "Failed to update PostgreSQL."
+            exit 1
+          fi
+
+          # Section 2: Attaching Client Scope to Client
+          echo "Attaching 'api-gw-audience' client scope to 'obsrv-console' client..."
+
+          obsrv_console_client_id=$(curl --insecure -s -X GET http://keycloak:80/auth/admin/realms/obsrv/clients \
+            -H "Authorization: Bearer $access_token" | jq -r '.[] | select(.clientId=="obsrv-console") | .id')
+
+          api_gw_audience_scope_id=$(curl --insecure -s -X GET http://keycloak:80/auth/admin/realms/obsrv/client-scopes \
+            -H "Authorization: Bearer $access_token" | jq -r '.[] | select(.name=="api-gw-audience") | .id')
+
+          if [ -z "$obsrv_console_client_id" ] || [ -z "$api_gw_audience_scope_id" ]; then
+            echo "Failed to retrieve client or client scope ID."
+            exit 1
+          fi
+
+          attach_scope_response=$(curl --insecure -s -o attach_response.json -w "%{http_code}" \
+            -X PUT http://keycloak:80/auth/admin/realms/obsrv/clients/$obsrv_console_client_id/default-client-scopes/$api_gw_audience_scope_id \
+            -H "Authorization: Bearer $access_token" \
+            -H "Content-Type: application/json")
+
+          if [ "$attach_scope_response" -eq 204 ]; then
+            echo "Client scope 'api-gw-audience' attached successfully to 'obsrv-console'."
+          else
+            echo "Failed to attach client scope. HTTP status: $attach_scope_response"
+            cat attach_response.json
             exit 1
           fi
 
