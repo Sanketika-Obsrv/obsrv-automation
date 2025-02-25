@@ -260,7 +260,12 @@ spec:
         {{- with .Values.backend.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-  {{- if .Values.backend.persistence.volumeClaimsEnabled }}
+        {{- if .Values.backend.persistence.existingClaim}}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.backend.persistence.existingClaim }}
+        {{- end }}
+  {{- if and .Values.backend.persistence.volumeClaimsEnabled (not .Values.backend.persistence.existingClaim)}}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
