@@ -33,7 +33,7 @@ spec:
                 echo "Keycloak is ready. Obtaining admin access token..."
                 
                 # Fetch JWKS from Keycloak server
-                KEYCLOAK_JWKS_URL="https://3.132.223.10.sslip.io/auth/realms/obsrv/protocol/openid-connect/certs"
+                KEYCLOAK_JWKS_URL="http://keycloak:80/auth/realms/obsrv/protocol/openid-connect/certs"
                 echo "Fetching JWKS from $KEYCLOAK_JWKS_URL..."
                 JWKS_JSON=$(curl -s "$KEYCLOAK_JWKS_URL")
 
