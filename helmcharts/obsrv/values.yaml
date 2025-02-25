@@ -2874,7 +2874,7 @@ loki:
       replication_factor: 1
     compactor:
       compaction_interval: 10m
-      delete_request_store: filesystem
+      delete_request_store: s3
       retention_delete_delay: 1h
       retention_delete_worker_count: 150
       retention_enabled: true
@@ -2891,8 +2891,6 @@ loki:
           object_store: s3
           schema: v13
           store: tsdb
-    storage:
-      type: s3
     storage_config:
       tsdb_shipper:
         active_index_directory: /var/loki/tsdb-index

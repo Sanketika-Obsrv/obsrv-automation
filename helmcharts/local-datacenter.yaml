@@ -43,19 +43,8 @@ service-account-disable: &service-account-disable
 ### Enable to Write to MinIO: WIP
 loki:
   <<: *service-account-disable
-  deploymentMode: SimpleScalable
   loki:
-    schemaConfig:
-      configs:
-        - from: "2023-01-01"  
-          index:
-            period: 24h
-            prefix: index_
-          object_store: s3
-          schema: v13
-          store: tsdb
     storage:
-      type: s3
       bucketNames:
         chunks: *loki_logs_bucket
         ruler: *loki_logs_bucket
@@ -66,7 +55,7 @@ loki:
         secretAccessKey: *s3-secret-access-key
         accessKeyId: *s3-access-key
         s3ForcePathStyle: *s3-path-style-access
-        insecure: false
+        insecure: true
     storage_config:
       aws:
         endpoint: *s3-endpoint-url
@@ -75,13 +64,6 @@ loki:
         insecure: true
         s3forcepathstyle: *s3-path-style-access
         region: *region
-    compactor:
-      delete_request_store: *cloud_store_provider
-  gateway:
-    enabled: True
-    replicas: 1
-    service:
-      type: ClusterIP
   write:
     persistence:
       storageClass: *storage_class
