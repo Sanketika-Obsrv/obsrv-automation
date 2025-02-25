@@ -70,6 +70,8 @@ loki:
   backend:
     persistence:
       storageClass: *storage_class
+  minio:
+    enabled: false
 
 druid-raw-cluster:
   <<: *service-account-disable
