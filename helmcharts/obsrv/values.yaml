@@ -2866,7 +2866,7 @@ kube-prometheus-stack:
 loki:
   chunksCache:
     enabled: false
-  deploymentMode: SingleBinary
+  deploymentMode: SimpleScalable
   fullnameOverride: loki
   loki:
     auth_enabled: false
@@ -2888,20 +2888,21 @@ loki:
           index:
             period: 24h
             prefix: index_
-          object_store: filesystem
+          object_store: s3
           schema: v13
           store: tsdb
     storage:
-      type: filesystem
+      type: s3
     storage_config:
-      filesystem:
-        directory: /var/loki/chunks
       tsdb_shipper:
         active_index_directory: /var/loki/tsdb-index
         cache_location: /var/loki/tsdb-cache
         cache_ttl: 24h
   minio:
-    enabled: false
+    enabled: true
+    replicas: 1
+    rootUser: loki-logs-admin
+    rootPassword: NvCmV8L7ZPCLozNF30tcZKr9Q
   monitoring:
     dashboards:
       enabled: false
@@ -2926,10 +2927,12 @@ loki:
     rules:
       enabled: false
   singleBinary:
-    replicas: 1
+    replicas: 0
   test:
     enabled: false
   write:
+    replicas: 1
+  backend:
     replicas: 1
 
 postgresql:
