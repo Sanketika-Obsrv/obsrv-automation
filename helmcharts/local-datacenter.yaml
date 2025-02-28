@@ -16,6 +16,7 @@ global:
   cloud_storage_bucket: &cloud_storage_bucket "storage-obsrv-local" # Update with the name of cloud storage bucket
   # Should check wether we can create prefix directly for hudi
   hudi_metadata_bucket: &hudi_metadata_bucket "s3a://storage-obsrv-local/hudi" # Update with hudi bucket name
+  loki_logs_bucket: &loki_logs_bucket "loki-logs"
 
   s3_bucket: &s3-bucket "storage-obsrv-local"
   s3_access_key: &s3-access-key "minioadmin"
@@ -42,64 +43,35 @@ service-account-disable: &service-account-disable
 ### Enable to Write to MinIO: WIP
 loki:
   <<: *service-account-disable
-  deploymentMode: SimpleScalable
   loki:
-    limits_config:
-      reject_old_samples: true
-      reject_old_samples_max_age: "168h"
-      max_cache_freshness_per_query: "10m"
-      split_queries_by_interval: "15m"
-    schemaConfig:
-      configs:
-        - from: "2023-01-01"  
-          index:
-            period: 24h
-            prefix: index_
-          object_store: s3
-          schema: v13
-          store: tsdb
     storage:
-      type: s3
       bucketNames:
-        chunks: "loki-logs"
-        ruler: "loki-logs"
-        admin: "loki-logs"
+        chunks: *loki_logs_bucket
+        ruler: *loki_logs_bucket
+        admin: *loki_logs_bucket
       s3:
-        s3: s3://minioadmin:198CImxTlly79Dx9ZCDJ@minio.minio.svc.cluster.local:9000/loki-logs
         endpoint: *s3-endpoint-url
         region: *region
         secretAccessKey: *s3-secret-access-key
         accessKeyId: *s3-access-key
         s3ForcePathStyle: *s3-path-style-access
-        insecure: false
+        insecure: true
     storage_config:
       aws:
-        s3: s3://minioadmin:198CImxTlly79Dx9ZCDJ@minio.minio.svc.cluster.local:9000/loki-logs
         endpoint: *s3-endpoint-url
         access_key_id: *s3-access-key
         secret_access_key: *s3-secret-access-key
         insecure: true
         s3forcepathstyle: *s3-path-style-access
         region: *region
-    compactor:
-      delete_request_store: *cloud_store_provider
-  minio:
-    enabled: false
-    service:
-      port: 9000
-  gateway:
-    enabled: True
-    replicas: 1
-    service:
-      type: ClusterIP
   write:
-    replicas: 1
     persistence:
       storageClass: *storage_class
-  read: 
-    replicas: 1
   backend:
-    replicas: 1
+    persistence:
+      storageClass: *storage_class
+  minio:
+    enabled: false
 
 druid-raw-cluster:
   <<: *service-account-disable

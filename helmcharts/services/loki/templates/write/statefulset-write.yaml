@@ -187,7 +187,12 @@ spec:
         {{- with .Values.write.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-  {{- if .Values.write.persistence.volumeClaimsEnabled }}
+        {{- if .Values.write.persistence.existingClaim}}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.write.persistence.existingClaim }}
+        {{- end }}
+  {{- if and .Values.write.persistence.volumeClaimsEnabled (not .Values.write.persistence.existingClaim) }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
