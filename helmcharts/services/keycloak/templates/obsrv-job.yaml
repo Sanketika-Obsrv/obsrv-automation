@@ -136,4 +136,48 @@ spec:
                 exit 1
               fi
 
+              # Section 3: Assign Client Role to User (realm-management)
+              echo "Assigning client roles to the user for 'realm-management' client..."
+
+              # Fetch the client ID for 'realm-management' client
+              echo "Fetching client ID for 'realm-management'..."
+              client_id=$(curl --insecure -s -X GET http://keycloak:80/auth/admin/realms/obsrv/clients \
+                -H "Authorization: Bearer $access_token" | jq -r '.[] | select(.clientId=="realm-management") | .id')
+
+              if [ -z "$client_id" ]; then
+                echo "Client 'realm-management' not found."
+                exit 1
+              fi
+
+              echo "Client ID for 'realm-management' found: $client_id"
+
+              # Fetch the role ID for the desired role (e.g., 'manage-users')
+              echo "Fetching role ID for 'manage-users'..."
+              role_id=$(curl --insecure -s -X GET "http://keycloak:80/auth/admin/realms/obsrv/clients/$client_id/roles/manage-users" \
+                -H "Authorization: Bearer $access_token" | jq -r '.id')
+
+              if [ -z "$role_id" ]; then
+                echo "Role 'manage-users' not found in client '$client_id'."
+                exit 1
+              fi
+
+              echo "Role ID for 'manage-users' found: $role_id"
+
+              # Assign the client role to the user
+              echo "Assigning role 'manage-users' to user '$user_id' for client 'realm-management'..."
+              assign_role_response=$(curl --insecure -s -o assign_role_response.json -w "%{http_code}" \
+                -X POST "http://keycloak:80/auth/admin/realms/obsrv/users/$user_id/role-mappings/clients/$client_id" \
+                -H "Authorization: Bearer $access_token" \
+                -H "Content-Type: application/json" \
+                -d "[{\"id\": \"$role_id\", \"name\": \"manage-users\"}]")
+
+              # Check if the role assignment was successful
+              if [ "$assign_role_response" -eq 204 ]; then
+                echo "Role 'manage-users' assigned successfully to user '$user_id' for client 'realm-management'."
+              else
+                echo "Failed to assign role. HTTP status: $assign_role_response"
+                cat assign_role_response.json
+                exit 1
+              fi
+
               echo "All tasks completed successfully."

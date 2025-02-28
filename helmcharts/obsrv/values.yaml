@@ -68,9 +68,9 @@ keycloak:
           "defaultSignatureAlgorithm": "RS256",
           "revokeRefreshToken": false,
           "refreshTokenMaxReuse": 0,
-          "accessTokenLifespan": 300,
+          "accessTokenLifespan": 86400,
           "accessTokenLifespanForImplicitFlow": 900,
-          "ssoSessionIdleTimeout": 1800,
+          "ssoSessionIdleTimeout": 86400,
           "ssoSessionMaxLifespan": 36000,
           "ssoSessionIdleTimeoutRememberMe": 0,
           "ssoSessionMaxLifespanRememberMe": 0,
@@ -121,22 +121,6 @@ keycloak:
                     "uma_authorization"
                   ],
                   "client": {
-                    "realm-management": [
-                      "view-users",
-                      "manage-realm",
-                      "view-realm",
-                      "manage-authorization",
-                      "create-client",
-                      "query-users",
-                      "query-clients",
-                      "manage-users",
-                      "query-groups",
-                      "realm-admin",
-                      "view-clients",
-                      "manage-clients",
-                      "view-authorization",
-                      "query-realms"
-                    ],
                     "broker": [
                       "read-token"
                     ],
