@@ -382,7 +382,7 @@
   annotations: {}
   severity: warning 
 
-- name: Reporting System Recovery Update
+- name: Reporting System Recovery Update in Infra
   query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_infra='true'}))
   operator: within_range
   threshold: [1,3]
