@@ -1,0 +1,141 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keycloak-sa  # Name of the service account
+  namespace: keycloak  # Namespace where the service account is created
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+  name: keycloak-job-role  # The role name
+  namespace: keycloak  # Namespace where the role should be applied
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "delete", "patch"]  # Allows full access to secrets
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keycloak-secrets-access-binding
+  namespace: keycloak  # Ensure the RoleBinding is in the `keycloak` namespace
+subjects:
+  - kind: ServiceAccount
+    name: keycloak-sa  # Name of the service account
+    namespace: keycloak  # Namespace where the service account is located
+roleRef:
+  kind: Role
+  name: keycloak-job-role  # Role that grants access to secrets
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-public-key
+  namespace: keycloak
+  annotations:
+    deployment_version: "v2"
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: keycloak-public-key
+    spec:
+      serviceAccountName: keycloak-sa
+      restartPolicy: Never
+      containers:
+        - name: keycloak-public-key
+          image: sanketikahub/kubectl:1.32.0-r1
+          command:
+            - sh
+            - -c
+            - |
+                # Section 1: Keycloak Interaction
+                echo "Waiting for Keycloak to be ready..."
+                until curl --insecure -s -o /dev/null -w "%{http_code}" http://keycloak:80/auth/realms/obsrv/ > /dev/null; do
+                  sleep 5
+                done
+
+                echo "Keycloak is ready. Obtaining admin access token..."
+                
+                # Fetch JWKS from Keycloak server
+                KEYCLOAK_JWKS_URL="http://keycloak:80/auth/realms/obsrv/protocol/openid-connect/certs"
+                echo "Fetching JWKS from $KEYCLOAK_JWKS_URL..."
+                JWKS_JSON=$(curl -s "$KEYCLOAK_JWKS_URL")
+
+                if [ $? -ne 0 ]; then
+                    echo "Error: Failed to fetch JWKS from the URL."
+                    exit 1
+                fi
+
+                # Extract the x5c (certificate) from JWKS JSON
+                x5c=$(echo "$JWKS_JSON" | jq -r '.keys[] | select(.alg == "RS256") | .x5c[0]')
+
+                if [ -z "$x5c" ]; then
+                    echo "Error: x5c value not found for an RS256 key in the JWKS."
+                    exit 1
+                fi
+
+                # Convert the x5c value into a PEM certificate
+                echo "-----BEGIN CERTIFICATE-----" > certificate.pem
+                echo "$x5c" | fold -w 64 >> certificate.pem
+                echo "-----END CERTIFICATE-----" >> certificate.pem
+                echo "Certificate has been extracted and saved to 'certificate.pem'."
+
+                # Extract the public key from the certificate
+                openssl x509 -in certificate.pem -pubkey -noout > public.pem
+
+                if [ $? -ne 0 ]; then
+                    echo "Error: Failed to extract the public key from the certificate."
+                    exit 1
+                fi
+
+                echo "Public key has been extracted and saved to 'public.pem'."
+
+                # Define secret name and namespace
+                SECRET_NAME="keycloak-public-key"
+                NAMESPACE="keycloak"
+
+                # Check if the secret already exists
+                echo "Checking if secret '$SECRET_NAME' already exists in namespace '$NAMESPACE'..."
+                if kubectl get secret "$SECRET_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
+                    echo "Secret '$SECRET_NAME' already exists. Overriding..."
+                else
+                    echo "Secret '$SECRET_NAME' does not exist. Creating new one..."
+                fi
+
+                # Create or update the secret with the public key
+                kubectl create secret generic "$SECRET_NAME" \
+                    --from-file=public.pem \
+                    --namespace="$NAMESPACE" \
+                    --dry-run=client -o yaml | kubectl apply -f -
+
+                if [ $? -ne 0 ]; then
+                    echo "Error: Failed to create or update the Kubernetes secret in '$NAMESPACE'."
+                    exit 1
+                fi
+
+                echo "Secret '$SECRET_NAME' created/updated successfully in Keycloak namespace."
+
+                # Optionally, add annotations to the secret for reflection
+                DATASET_API_NAMESPACE="dataset-api"
+                echo "Adding annotations for reflection into $DATASET_API_NAMESPACE namespace..."
+                kubectl annotate secret "$SECRET_NAME" \
+                    --namespace "$NAMESPACE" \
+                    reflector.v1.k8s.emberstack.com/reflection-allowed=true \
+                    reflector.v1.k8s.emberstack.com/reflection-auto-enabled=true \
+                    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces="$DATASET_API_NAMESPACE" --overwrite
+
+                if [ $? -ne 0 ]; then
+                    echo "Error: Failed to annotate the Kubernetes secret."
+                    exit 1
+                fi
+
+                echo "Secret '$SECRET_NAME' annotated successfully for reflection into $DATASET_API_NAMESPACE namespace."
