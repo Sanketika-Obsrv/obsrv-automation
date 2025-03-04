@@ -177,5 +177,11 @@ env:
   pipeline_merged_job_manager_url: "http://unified-pipeline-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   masterdata_processor_job_manager_url: "http://cache-indexer-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   prometheus_url: "{{ .Values.global.prometheus.url }}"
-  storage_types: '{"lake_house":true,"realtime_store":true}'
+  storage_types: '{"lake_house":false,"realtime_store":true}'
   telemetry_dataset: "system.telemetry.events"
+  default_task_duration: "PT4H" # Druid Supervisor task default duration value
+
+  ## Below metrics are used for data observability
+  default_freshness_threshold: "5" # In Minutes, default freshness threshold for data observability
+  data_out_query_time_period: "1d" # In Days, default query time period for data out generally to identify number of api calls are happened with in one or configured value day and used only in the prometheus query
+  default_query_time_period: "7" # In Days, For any metrics the default query time period is 7 days in the druid

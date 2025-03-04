@@ -14,7 +14,7 @@ metadata:
 spec:
   serviceName: {{ printf "%s-headless" (include "common.names.fullname" .) }}
   replicas: 1
-  {{- if .Values.persistence.enabled }}
+  {{- if not .Values.persistence.master.existingClaim }}
   volumeClaimTemplates:
   - metadata:
       name: {{ .Values.persistence.masterTmp.name }}
@@ -234,8 +234,13 @@ spec:
               mountPath: /bitnami/spark/conf/certs
               readOnly: true
             {{- end }}
-            {{- if .Values.master.extraVolumeMounts }}
-            {{- include "common.tplvalues.render" (dict "value" .Values.master.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- if .Values.persistence.master.existingClaim }}
+            {{- range .Values.master.extraVolumeMounts}}
+            - name: spark-master-volume
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- else if .Values.master.extraVolumeMounts }}
+              {{- include "common.tplvalues.render" (dict "value" .Values.master.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
             {{- if .Values.initScripts }}
             - name: custom-init-scripts
@@ -401,4 +406,9 @@ spec:
           secret:
             secretName: {{ template ".Values.initScriptsSecret" . }}
             defaultMode: 0755
+        {{- end }}
+        {{- if .Values.persistence.master.existingClaim }}
+        - name: spark-master-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.master.existingClaim }}
         {{- end }}

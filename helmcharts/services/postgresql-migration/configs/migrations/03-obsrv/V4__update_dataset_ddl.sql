@@ -33,8 +33,17 @@ UPDATE datasets SET type = 'master' WHERE type = 'master-dataset';
 
 DELETE FROM dataset_transformations_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
 DELETE FROM dataset_source_config_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
-DELETE FROM datasources_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
-DELETE FROM datasets_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
+DELETE FROM datasources_draft where dataset_id in (SELECT CONCAT(dataset_id, '.', '1') 
+    FROM datasets 
+    WHERE status = 'Live');
+DELETE FROM dataset_source_config_draft WHERE dataset_id IN (
+    SELECT CONCAT(dataset_id, '.', '1') 
+    FROM datasets 
+    WHERE status = 'Live'
+);
+DELETE FROM datasets_draft WHERE id IN (SELECT CONCAT(dataset_id, '.', '1') 
+    FROM datasets 
+    WHERE status = 'Live');
 
 ALTER TABLE dataset_source_config_draft ALTER COLUMN published_date DROP NOT NULL;
 ALTER TABLE datasets_draft ALTER COLUMN published_date DROP NOT NULL;
@@ -85,16 +94,8 @@ CREATE TABLE IF NOT EXISTS connector_instances (
 ALTER TABLE datasources_draft
 DROP CONSTRAINT IF EXISTS datasources_draft_dataset_id_datasource_key;
 
-ALTER TABLE datasources_draft
-ADD CONSTRAINT datasources_draft_dataset_id_datasource_type_key
-UNIQUE (dataset_id, datasource, type);
-
 ALTER TABLE datasources
 DROP CONSTRAINT IF EXISTS datasources_dataset_id_datasource_key;
-
-ALTER TABLE datasources
-ADD CONSTRAINT datasources_dataset_id_datasource_type_key
-UNIQUE (dataset_id, datasource, type);
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;

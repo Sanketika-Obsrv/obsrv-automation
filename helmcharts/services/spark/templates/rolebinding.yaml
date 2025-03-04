@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark-pod-reader-binding
+  namespace: spark
+subjects:
+- kind: ServiceAccount
+  name: spark-sa
+  namespace: spark
+roleRef:
+  kind: Role
+  name: spark-pod-reader
+  apiGroup: rbac.authorization.k8s.io

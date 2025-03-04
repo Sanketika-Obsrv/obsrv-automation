@@ -16,13 +16,14 @@ global:
   cloud_storage_bucket: &cloud_storage_bucket "storage-obsrv-local" # Update with the name of cloud storage bucket
   # Should check wether we can create prefix directly for hudi
   hudi_metadata_bucket: &hudi_metadata_bucket "s3a://storage-obsrv-local/hudi" # Update with hudi bucket name
+  loki_logs_bucket: &loki_logs_bucket "loki-logs"
 
   s3_bucket: &s3-bucket "storage-obsrv-local"
   s3_access_key: &s3-access-key "minioadmin"
   s3_secret_key: &s3-secret-access-key "198CImxTlly79Dx9ZCDJ"
   region: &region "us-east-1"
   s3_endpoint_url: &s3-endpoint-url "http://minio.minio.svc.cluster.local:9000"
-  s3_path_style_access: &s3-path-style-access "true"
+  s3_path_style_access: &s3-path-style-access true
   s3_protocol: &s3-protocol "http"
   s3_signing_region: &s3-signing-region "us-east-1"
   backup_bucket: &backup_bucket ""
@@ -40,23 +41,37 @@ service-account-disable: &service-account-disable
     create: false
 
 ### Enable to Write to MinIO: WIP
-# loki:
-#   loki:
-#     storage:
-#       type: s3
-#       bucketNames:
-#         chunks: "loki-logs"
-#         ruler: "loki-logs"
-#         admin: "loki-logs"
-#       s3:
-#         endpoint: *s3-endpoint-url
-#         region: *s3-signing-region
-#         secretAccessKey: *s3-secret-access-key
-#         accessKeyId: *s3-access-key
-#         s3ForcePathStyle: true
-#         insecure: true
-#     compactor:
-#       delete_request_store: *cloud_store_provider
+loki:
+  <<: *service-account-disable
+  loki:
+    storage:
+      bucketNames:
+        chunks: *loki_logs_bucket
+        ruler: *loki_logs_bucket
+        admin: *loki_logs_bucket
+      s3:
+        endpoint: *s3-endpoint-url
+        region: *region
+        secretAccessKey: *s3-secret-access-key
+        accessKeyId: *s3-access-key
+        s3ForcePathStyle: *s3-path-style-access
+        insecure: true
+    storage_config:
+      aws:
+        endpoint: *s3-endpoint-url
+        access_key_id: *s3-access-key
+        secret_access_key: *s3-secret-access-key
+        insecure: true
+        s3forcepathstyle: *s3-path-style-access
+        region: *region
+  write:
+    persistence:
+      storageClass: *storage_class
+  backend:
+    persistence:
+      storageClass: *storage_class
+  minio:
+    enabled: false
 
 druid-raw-cluster:
   <<: *service-account-disable
@@ -294,10 +309,11 @@ hms:
 
 minio:
   enabled: true
+  mode: standalone
   auth:
     rootUser: *s3-access-key
     rootPassword: *s3-secret-access-key
-  defaultBuckets: "backups-obsrv-local, velero-obsrv-local, checkpoint-obsrv-local, storage-obsrv-local"
+  defaultBuckets: "backups-obsrv-local, velero-obsrv-local, checkpoint-obsrv-local, storage-obsrv-local, loki-logs"
   service:
     type: NodePort
 

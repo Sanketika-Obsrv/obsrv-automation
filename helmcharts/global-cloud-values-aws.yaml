@@ -5,7 +5,7 @@ global:
   cloud_storage_region: &cloud_storage_region "<fill-value>" # Update the region to deploy obsrv instance
 
   dataset_api_container: "<fill-value>"  # Update the dataset APIs bucket name
-  config_api_container: "<fill-value>"   # Update the config APIs bucket name
+  config_api_container: "<fill-value>"   # Update the config API's bucket name only when deploying the config-api
   postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name
   velero_backup_cloud_bucket: &velero_backup_cloud_bucket "<fill-value>" # Update with velero backup  bucket name
   cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the name of cloud storage bucket
@@ -13,11 +13,11 @@ global:
 
   # Update the configuration by replacing 'name' with the access key, 'key' with the secret key, and 'region-name' with the specific region for access.
   cloud_storage_config: |+
-    '{"identity":"name","credential":"key","region":"region-name"}'
+    '{"identity":"","credential":"","region":"region-name"}'
 
   spark_cloud_bucket: ""
   storage_class_name: &storage_class_name "gp3"
-  spark_service_account_arn: ""
+  spark_service_account_arn: &spark_service_account_arn "<fill-value>" # Update with the ARN of the IAM role for this service account
   checkpoint_bucket: &checkpoint_bucket "s3://<fill-value>" # Update with checkpoint bucket name
   deep_store_type: &deep_store_type "s3"
   s3_access_key: &s3-access-key "<fill-value>" # Update with the AWS access key
@@ -36,7 +36,7 @@ service_accounts:
   dataset_api: &dataset_api_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   config_api: &config_api_sa_annotation
-    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
+    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account only when deploying the config-api
   druid_raw: &druid_raw_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   flink: &flink_sa_annotation
@@ -88,6 +88,11 @@ velero-backup: &velero-backup
           mountPath: /target
 
 spark:
+  serviceAccount:
+    create: *create_sa
+    name: spark-sa
+    annotations:
+      <<: *spark_sa_annotation
   persistence:
     masterTmp:
       storageClassName: *storage_class_name
@@ -99,10 +104,21 @@ spark:
       storageClassName: *storage_class_name
   cloud_provider: *cloud_storage_provider
 
+masterdata-indexer-cron:
+  serviceAccount:
+    name: spark-sa
+    annotations:
+      <<: *spark_sa_annotation
+  serviceAccountRoleArn: *spark_service_account_arn  
+  dataproductsJar: "<fill-value>" # Update with the path to the data products jar
+
 dataset-api-service-account: &dataset-api-service-account
   serviceAccount:
     create: *create_sa
-    annotations: {}
+    name: dataset-api-sa
+    annotations:  
+     <<: *dataset_api_sa_annotation
+
 
 velero:
   <<: *velero-backup
@@ -119,6 +135,7 @@ secor-service-account: &secor-service-account
     name: secor-sa
     annotations:
       <<: *secor_sa_annotation
+
 
 secor:
   cloud_store_provider: *cloud_store_provider
