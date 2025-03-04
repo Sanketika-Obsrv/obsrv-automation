@@ -13,7 +13,7 @@ global:
 
   # Update the configuration by replacing 'name' with the access key, 'key' with the secret key, and 'region-name' with the specific region for access.
   cloud_storage_config: |+
-    '{"identity":"name","credential":"key","region":"region-name"}'
+    '{"identity":"","credential":"","region":"region-name"}'
 
   spark_cloud_bucket: ""
   storage_class_name: &storage_class_name "gp3"
