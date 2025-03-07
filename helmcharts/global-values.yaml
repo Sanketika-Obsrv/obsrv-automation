@@ -119,6 +119,7 @@ kafka: &kafka
   connectorsMetricTopic: *connectorsMetricTopic
   connectorsFailedTopic: *connectorsFailedTopic
   numPartitions: 4
+  replicationFactor: 1
   provisioning:
     numPartitions: 4
     replicationFactor: 1
