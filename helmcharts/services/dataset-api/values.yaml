@@ -178,7 +178,7 @@ env:
   pipeline_merged_job_manager_url: "http://unified-pipeline-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   masterdata_processor_job_manager_url: "http://cache-indexer-jobmanager.{{.Values.global.flink.namespace}}.svc.cluster.local:8081"
   prometheus_url: "{{ .Values.global.prometheus.url }}"
-  storage_types: '{"lake_house":true,"realtime_store":true}'
+  storage_types: '{"lake_house":false,"realtime_store":true}'
   telemetry_dataset: "system.telemetry.events"
   default_task_duration: "PT4H" # Druid Supervisor task default duration value
 

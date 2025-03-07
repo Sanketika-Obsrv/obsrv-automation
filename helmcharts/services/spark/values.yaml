@@ -1079,6 +1079,10 @@ metrics:
     rules: []
 persistence:
   enabled: true
+  master:
+    existingClaim: ""
+  worker:
+    existingClaim: ""
   masterTmp:
     name: spark-master-tmp
     # storageClassName: gp2
