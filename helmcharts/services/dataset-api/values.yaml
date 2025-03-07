@@ -170,7 +170,8 @@ env:
   exclude_datasource_validation: "system-stats,failed-events-summary,masterdata-system-stats,system-events"
   object_key: authenticationMechanism
   encryption_key: "{{ .Values.global.encryption_key }}"
-  command_service_host: "http://command-api.command-api.svc.cluster.local"
+  command_service_host: "http://management-api.management-api.svc.cluster.local"
+  command_service_paths: '{"dataset":"/api/v1/command/execute","connector":"/api/v1/connector/register","analyzePII":"/api/v1/pii/detect"}'
   command_service_port: "8000"
   grafana_url: "http://grafana.monitoring.svc.cluster.local"
   GRAFANA_ADMIN_URL: http://grafana.monitoring.svc.cluster.local
