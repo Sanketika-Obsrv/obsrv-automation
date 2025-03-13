@@ -162,6 +162,7 @@ env:
   cloud_storage_region: "{{ .Values.global.cloud_storage_region }}"
   container: "{{ .Values.global.dataset_api_container}}"
   container_prefix: "connector-registry"
+  telemetry_data_path: "telemetry-data"
   storage_url_expiry: "3600"
   exhaust_query_range: "31" # In Days
   max_query_threshold: "5000"
