@@ -9,3 +9,7 @@ output "single_zone_public_subnets_id" {
 output "vpc_id" {
   value = aws_vpc.vpc.id
 }
+
+output "load_balancer_subnet" {
+  value = aws_subnet.public_subnets[0].id
+}
