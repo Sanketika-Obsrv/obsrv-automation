@@ -458,8 +458,9 @@ module "get_kubeconfig" {
 # }
 
 
-module "global_cloud_values" {
-  source        = "../modules/aws/local_file"
+module "aws_cloud_values" {
+  source        = "../modules/aws/aws_cloud_values"
+
   template_path = "../../helmcharts/global-cloud-values-aws.tpl"
   output_path   = "../../helmcharts/global-cloud-values-aws.yaml"
 
