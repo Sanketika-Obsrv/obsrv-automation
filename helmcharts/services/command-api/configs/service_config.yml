@@ -1,1 +1,13 @@
 {{- include "common.tplvalues.render" (dict "value" .Values.serviceConfig "context" $) }}
+node_selector:
+{{- if .Values.nodeSelector }}
+  {{- toYaml .Values.nodeSelector | nindent 2 }}
+{{- end }}
+container_security_context:
+{{- if .Values.securityContext }}
+  {{- toYaml .Values.securityContext | nindent 2 }}
+{{- end }}
+pod_security_context:
+{{- if .Values.podSecurityContext }}
+  {{- toYaml .Values.podSecurityContext | nindent 2 }}
+{{- end }}
