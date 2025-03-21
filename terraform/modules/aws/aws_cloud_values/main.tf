@@ -1,3 +1,5 @@
+# This resource is used to replace the contents of global-cloud-values-aws.yaml
+
 resource "null_resource" "global_cloud_values" {
   provisioner "local-exec" {
     command = <<EOT

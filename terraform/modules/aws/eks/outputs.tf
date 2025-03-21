@@ -8,6 +8,10 @@ output "spark_sa_annotations" {
   value = aws_iam_role.spark_sa_iam_role.arn
 }
 
+output "velero_backup_sa_annotation" {
+  value = aws_iam_role.velero_backup_sa_iam_role.arn
+}
+
 output "flink_sa_iam_role" {
   value = aws_iam_role.flink_sa_iam_role.arn
 }
@@ -66,8 +70,4 @@ output "redis_backup_sa_iam_role" {
 
 output "redis_namespace" {
   value = var.redis_namespace
-}
-
-output "velero_backup_sa_annotation" {
-  value = aws_iam_role.velero_backup_sa_iam_role.arn
 }
