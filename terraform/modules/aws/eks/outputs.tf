@@ -48,6 +48,10 @@ output "postgresql_backup_sa_iam_role" {
   value = aws_iam_role.postgresql_backup_sa_iam_role.arn
 }
 
+output "velero_backup_sa_annotation" {
+  value = aws_iam_role.velero_backup_sa_iam_role.arn
+}
+
 output "s3_exporter_namespace" {
   value = var.s3_exporter_namespace
 }

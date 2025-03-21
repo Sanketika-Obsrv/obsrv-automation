@@ -67,6 +67,7 @@ module "s3" {
   building_block = var.building_block
 }
 
+
 resource "random_string" "connectors_encryption_key" {
   length  = 32
   special = false

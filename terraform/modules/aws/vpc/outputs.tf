@@ -13,3 +13,4 @@ output "vpc_id" {
 output "load_balancer_subnet" {
   value = aws_subnet.public_subnets[0].id
 }
+
