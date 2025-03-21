@@ -455,3 +455,36 @@ module "get_kubeconfig" {
 #   spark_sa_annotations        = "eks.amazonaws.com/role-arn: ${module.eks.spark_sa_annotations}"
 #   spark_sa_role               = module.eks.spark_sa_annotations
 # }
+
+module "aws_cloud_values" {
+  source        = "../modules/aws/aws_cloud_values"
+
+  template_path = "../../helmcharts/global-aws-cloud-values.tpl"
+  output_path   = "../../helmcharts/global-cloud-values-aws.yaml"
+
+  template_vars = {
+    cloud_storage_region            = var.region
+
+    dataset_api_container           = length(module.s3) > 0 ? module.s3[0].s3_backups_bucket : var.s3_buckets["s3_backups_bucket"]
+    config_api_container            = length(module.s3) > 0 ? module.s3[0].s3_backups_bucket : var.s3_buckets["s3_backups_bucket"]
+    postgresql_backup_cloud_bucket  = length(module.s3) > 0 ? module.s3[0].s3_backups_bucket : var.s3_buckets["s3_backups_bucket"]
+    velero_backup_cloud_bucket      = length(module.s3) > 0 ? module.s3[0].velero_storage_bucket : var.s3_buckets["velero_storage_bucket"]
+    cloud_storage_bucket            = length(module.s3) > 0 ? module.s3[0].s3_bucket : var.s3_buckets["s3_bucket"]
+    hudi_metadata_bucket            = length(module.s3) > 0 ? module.s3[0].s3_bucket : var.s3_buckets["s3_bucket"]
+    checkpoint_bucket               = length(module.s3) > 0 ? module.s3[0].checkpoint_storage_bucket : var.s3_buckets["checkpoint_storage_bucket"]
+
+    secor_sa_annotation             = module.eks.secor_sa_iam_role != null ? module.eks.secor_sa_iam_role : "" 
+    dataset_api_sa_annotation       = module.eks.dataset_api_sa_annotations != null ? module.eks.dataset_api_sa_annotations : ""
+    config_api_sa_annotation        = module.eks.config_api_sa_annotations != null ? module.eks.config_api_sa_annotations : ""
+    druid_raw_sa_annotation         = module.eks.druid_raw_sa_iam_role != null ? module.eks.druid_raw_sa_iam_role : ""
+    flink_sa_annotation             = module.eks.flink_sa_iam_role != null ? module.eks.flink_sa_iam_role : ""
+    postgresql_backup_sa_annotation = module.eks.postgresql_backup_sa_iam_role != null ? module.eks.postgresql_backup_sa_iam_role : ""
+    s3_exporter_sa_annotation       = module.eks.s3_exporter_sa_annotations != null ? module.eks.s3_exporter_sa_annotations : ""
+    spark_sa_annotation             = module.eks.spark_sa_annotations != null ? module.eks.spark_sa_annotations : ""
+    velero_sa_annotation            = module.eks.velero_backup_sa_annotation != null ? module.eks.velero_backup_sa_annotation : ""
+
+    load_balancer_subnet            = length(module.vpc) > 0 ? module.vpc[0].load_balancer_subnet : var.vpc_id
+    elastic_ip_allocation_id        = length(module.eip) > 0 ? module.eip[0].eip_allocation_id : var.kong_ingress_alloc_id
+
+  }
+}
