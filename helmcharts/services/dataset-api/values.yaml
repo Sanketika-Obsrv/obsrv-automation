@@ -188,6 +188,7 @@ env:
   storage_types: '{"lake_house":false,"realtime_store":true}'
   telemetry_dataset: "system.telemetry.events"
   default_task_duration: "PT4H" # Druid Supervisor task default duration value
+  alerts_config_path: /config
 
   ## Below metrics are used for data observability
   default_freshness_threshold: "5" # In Minutes, default freshness threshold for data observability
