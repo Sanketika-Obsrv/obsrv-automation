@@ -1370,3 +1370,10 @@ cache:
 logging:
   output: default
   level: INFO
+
+kubectl:
+  image:
+    registry: "sanketikahub"
+    repository: "kubectl"
+    tag: "1.32.0-r1"
+    digest: ""

@@ -24,5 +24,9 @@ spec:
       labels:
         {{- include "prometheus-pushgateway.defaultLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8}}
+      {{- end }}
       {{- include "prometheus-pushgateway.podSpec" . | nindent 6 }}
 {{- end }}
