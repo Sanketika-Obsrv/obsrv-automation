@@ -46,10 +46,14 @@ metadata:
 spec:
   template:
     spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "common.names.fullname" . }}-grafana-token-job-sa
       containers:
         - name: {{ include "common.names.fullname" . }}-create-token
-          image: sanketikahub/kubectl:1.32.0-r1
+          image: {{ .Values.kubectl.image.registry }}/{{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
           command: ["/bin/sh"]
           args:
             - -c

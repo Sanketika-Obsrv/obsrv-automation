@@ -32,6 +32,10 @@ spec:
         app: secor
         release: {{ $jobName }}
     spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
       {{- if .Values.serviceAccount.create}}
       serviceAccountName: {{ include "base.serviceaccountname" . }}
       {{- end }}
