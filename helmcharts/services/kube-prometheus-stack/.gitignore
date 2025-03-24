@@ -1,0 +1,3 @@
+./charts/kube-state-metrics/*
+./charts/prometheus-node-exporter/*
+./charts/prometheus-windows-exporter/*

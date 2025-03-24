@@ -12,6 +12,13 @@ repository: "obsrv-web-console"
 tag: "1.0.0-GA"
 digest: ""
 
+kubectl:
+  image:
+    registry: "sanketikahub"
+    repository: "kubectl"
+    tag: "1.32.0-r1"
+    digest: ""
+
 imagePullPolicy: IfNotPresent
 imagePullSecrets: []
 
