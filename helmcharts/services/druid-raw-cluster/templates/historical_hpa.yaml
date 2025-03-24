@@ -1,29 +1,46 @@
-# apiVersion: autoscaling/v2beta2
-# kind: HorizontalPodAutoscaler
-# metadata:
-#   name: "{{ .Release.Namespace }}-historicals"
-#   namespace: {{ .Values.namespace }} 
-# spec:
-#   scaleTargetRef:
-#     apiVersion: apps/v1
-#     kind: StatefulSet
-#     name: "{{ .Release.Namespace }}-{{ .Values.druid_env }}-historicals"
-#   # behavior:
-#   #   scaleUp:
-#   #     stabilizationWindowSeconds: 10
-#   #   scaleDown:
-#   #     stabilizationWindowSeconds: 20
-#   minReplicas: 1
-#   maxReplicas: 2
-#   metrics:
-#   - type: Object
-#     object:
-#       metric:
-#         name: pv_used_percentage
-#       describedObject:
-#         apiVersion: v1
-#         kind: persistentvolumeclaim
-#         name: "historical-volume-{{ .Release.Namespace }}-{{ .Values.druid_env }}-historicals-0"
-#       target:
-#         type: Utilization
-#         averageValue: 20
+apiVersion: autoscaling/v2  # Specifies the API version for HPA
+kind: HorizontalPodAutoscaler  # Defines the resource type as HPA
+metadata:
+  name: druid-historical-hpa  # Name of the HPA resource
+  namespace: druid-raw  # Namespace where the HPA will be created
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1  # API version of the target workload
+    kind: StatefulSet  # Specifies that HPA will scale a StatefulSet
+    name: druid-raw-historicals  # Name of the StatefulSet to be scaled
+
+  minReplicas: 1  # Minimum number of replicas (pods) to maintain
+  maxReplicas: 4 # Maximum number of replicas the HPA can scale up to
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30  # Prevents rapid scaling by waiting 30 seconds before scaling up
+      selectPolicy: Max  # Uses the policy that results in the maximum possible scale-up
+      policies:
+      - type: Pods  # Defines scaling behavior based on the number of pods
+        value: 1  # Adds 1 pod at a time when scaling up
+        periodSeconds: 15  # HPA checks every 15 seconds to decide whether to scale up
+
+    scaleDown:
+      selectPolicy: Max  # Uses the policy that results in the maximum possible scale-down
+      policies:
+      - type: Pods  # Defines scaling behavior based on the number of pods
+        value: 1  # Removes 1 pod at a time when scaling down
+        periodSeconds: 10  # HPA checks every 15 seconds to decide whether to scale down
+
+  metrics:
+    # Uncomment the following section if you want to enable CPU-based scaling
+    # - type: Resource
+    #   resource:
+    #     name: cpu
+    #     target:
+    #       type: Utilization
+    #       averageUtilization: 1 # Scale when CPU usage exceeds 70%
+
+    - type: Resource  # Defines resource-based scaling
+      resource:
+        name: memory  # Uses memory utilization for scaling
+        target:
+          type: Utilization  # Target utilization type
+          averageUtilization: 90 # Scale when memory usage exceeds 80%

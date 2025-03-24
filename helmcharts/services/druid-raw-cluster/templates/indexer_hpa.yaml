@@ -1,0 +1,30 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: druid-indexer-hpa
+  namespace: druid-raw
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: druid-raw-indexers # Ensure this matches your StatefulSet name
+
+  minReplicas: 1
+  maxReplicas: 3
+
+  metrics:
+    - type: External
+      external:
+        metric:
+          name: druid_ingest_kafka_lag  # Custom Prometheus metric
+        target:
+          type: AverageValue
+          averageValue: 1000
+
+    - type: External
+      external:
+        metric:
+          name: druid_ingest_kafka_maxLag  # Another Prometheus metric
+        target:
+          type: AverageValue
+          averageValue: 1000
