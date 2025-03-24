@@ -42,13 +42,13 @@ service:
 automountServiceAccountToken: true
 
 # Optional pod annotations
-podAnnotations: 
+podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "9091"
   prometheus.io/path: "/metrics"
 
 # Optional pod labels
-podLabels: 
+podLabels:
   release: monitoring
   system.monitoring: "true"
 
