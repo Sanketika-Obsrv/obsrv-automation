@@ -189,6 +189,7 @@ env:
   telemetry_dataset: "system.telemetry.events"
   default_task_duration: "PT4H" # Druid Supervisor task default duration value
   alerts_config_path: /config
+  obsrv_version: "1.7.0"
 
   ## Below metrics are used for data observability
   default_freshness_threshold: "5" # In Minutes, default freshness threshold for data observability
