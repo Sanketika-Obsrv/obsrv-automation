@@ -416,7 +416,7 @@ dataset-api: &dataset-api
   host: *dataset-service-url
   env:
     otel_collector_endpoint: *otel_collector_endpoint
-    is_RBAC_enabled: "true"
+    is_rbac_enabled: "false"
     keycloak_audience: ""
     otel_enable: *otel_enable
 
