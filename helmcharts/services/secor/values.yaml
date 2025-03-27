@@ -170,3 +170,6 @@ persistence:
   existingClaim: ""
 
 nodeSelector:
+
+setPvOwnership:
+  enabled: true
