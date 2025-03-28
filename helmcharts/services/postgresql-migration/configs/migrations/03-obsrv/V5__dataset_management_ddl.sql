@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS job_queue (
     iteration INTEGER DEFAULT 0 CHECK (iteration BETWEEN 0 AND 3)  
 );  
 
+ALTER TABLE job_queue 
 ADD CONSTRAINT job_queue_status_check 
 CHECK (status IN ('submitted', 'approved', 'rejected', 'in_progress', 'completed', 'failed', 'cancelled', 'queued', 'partial_success'));
 
