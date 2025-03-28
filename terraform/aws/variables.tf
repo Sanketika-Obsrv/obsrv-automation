@@ -127,3 +127,8 @@ variable "create_kong_ingress_ip" {
   type        = bool  # This is expected to be a boolean
 }
 
+variable "kong_ingress_alloc_id" {
+  type        = string
+  description = "EIP allocation id"
+  default     = ""
+}
