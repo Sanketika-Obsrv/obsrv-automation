@@ -31,3 +31,8 @@ variable "volume_encryption" {
   type        = bool
   default     = false
 }
+
+variable "eks_storage_class_custom_values_yaml" {
+  type    = string
+  default = "eks_storage_class.yaml.tfpl"
+}
