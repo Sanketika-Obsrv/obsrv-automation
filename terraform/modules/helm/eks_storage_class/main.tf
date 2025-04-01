@@ -16,5 +16,4 @@ resource "helm_release" "eks_storage_class" {
     cleanup_on_fail  = true
     atomic           = true
     values           = [templatefile("${path.module}/${var.eks_storage_class_custom_values_yaml}", { volume_encryption = var.volume_encryption })]
-    volume_encryption = var.volume_encryption
 }
