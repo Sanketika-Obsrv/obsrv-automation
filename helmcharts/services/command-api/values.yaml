@@ -163,7 +163,6 @@ serviceConfig:
         - SUBMIT_INGESTION_TASKS
         - START_PIPELINE_JOBS
         - DEPLOY_CONNECTORS
-        - CREATE_ALERT_METRIC
         - CREATE_AUDIT_EVENT
     RESTART_PIPELINE:
       workflow:
@@ -172,100 +171,12 @@ serviceConfig:
       workflow:
         - DEPLOY_CONNECTORS
 
-  alert_manager:
-    metrics:
-      - flink:
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_extractor_failed_count[5m]))"
-          alias: "Number of Failed Extraction Events"
-          description: "This alert tracks how many events failed the extraction stage"
-          frequency: 5m
-          interval: 5m
-          operator: "gt"
-          threshold: 0
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_extractor_duplicate_count[5m]))"
-          alias: "Number of Duplicate Extraction Events"
-          description: "This alert tracks how many duplicate events were found during extraction stage"
-          frequency: 5m
-          interval: 5m
-          operator: "gt"
-          threshold: 0
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_dedup_failed_count[5m]))"
-          alias: "Number of Duplicate Preprocessing Events"
-          description: "This alert tracks how many duplicate events were found during preprocessing stage"
-          frequency: 5m
-          interval: 5m
-          operator: "gt"
-          threshold: 0
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_validator_failed_count[5m]))"
-          alias: "Number of Failed Validation Events"
-          description: "This alert tracks how many events failed the validation stage"
-          frequency: 5m
-          interval: 5m
-          operator: "gt"
-          threshold: 0
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_DenormalizerJob_dataset_id_denorm_failed[5m])) + sum(sum_over_time(flink_taskmanager_job_task_operator_DenormalizerJob_dataset_id_denorm_partial_success[5m]))"
-          alias: "Number of Failed Denorm Events"
-          description: "This alert tracks how many events failed the denorm stage"
-          frequency: 5m
-          interval: 5m
-          operator: "gt"
-          threshold: 0
-        - metric: "sum(sum_over_time(flink_taskmanager_job_task_operator_TransformerJob_dataset_id_transform_failed_count[5m])) + sum(sum_over_time(flink_taskmanager_job_task_operator_TransformerJob_dataset_id_transform_partial_count[5m]))"
-          alias: "Number of Failed Transformer Events"
-          description: "This alert tracks how many events failed the transformation stage"
-          frequency: 5m
-          interval: 5m
-          operator: "gt"
-          threshold: 0
-    object_connector_metrics:
-      - metric: "sum_over_time(ObjectDiscoveryJob_cloud_authentication_failure{datasetId='dataset_id'}[1h])"
-        alias: "Cloud Authentication Failure"
-        description: "This alert tracks whether the cloud authentication failed for the dataset"
-        frequency: 1h
-        interval: 1h
-        operator: "gt"
-        threshold: 1
-      - metric: "sum_over_time(ObjectProcessorJob_object_tag_update_failure{datasetId='dataset_id'}[1h])"
-        alias: "Update Tag Failure"
-        description: "This alert tracks whether the tag update failed for the dataset"
-        frequency: 1h
-        interval: 1h
-        operator: "gt"
-        threshold: 1
-      - metric: "sum_over_time(ObjectDiscoveryJob_num_new_objects{datasetId='dataset_id'}[1d])"
-        alias: "Number Of New Objects"
-        description: "This alert tracks whether any new objects are processed. If not, then this alert is fired"
-        frequency: 1d
-        interval: 1h
-        operator: "eq"
-        threshold: 0
-    jdbc_connector_metrics:
-      - metric: "sum_over_time(JDBCConnectorJob_failure_count{datasetId='dataset_id'}[1d])"
-        alias: "Number of Failed Records"
-        description: "This alert tracks whether any records failed to be ingested into the database"
-        frequency: 1d
-        interval: 1h
-        operator: "gt"
-        threshold: 10
-    masterdata_metrics:
-      - metric: "MasterDataProcessorIndexerJob_failure_dataset_count{datasetId='dataset_id'}"
-        alias: "Master Dataset failed to index"
-        description: "This alert tracks whether the given master dataset failed to index data"
-        frequency: 240m
-        interval: 5m
-        operator: "gt"
-        threshold: 0
-
   postgres:
     db_host: "{{ .Values.global.postgresql.host }}"
     db_port: "{{ .Values.global.postgresql.port }}"
     db_user: "{{ .Values.postgresqlUser | default .Values.global.postgresql.obsrv.user }}"
     db_password: "{{ .Values.postgresqlPassword | default .Values.global.postgresql.obsrv.password }}"
     database: "{{ .Values.postgresqlDatabase | default .Values.global.postgresql.obsrv.name }}"
-
-  config_service:
-    host: dataset-api.dataset-api.svc.cluster.local
-    port: 3000
 
   druid:
     router_host: "{{ .Values.global.druid.host }}"
@@ -322,10 +233,6 @@ serviceConfig:
     pod: "prometheus-kube-prometheus-stack-prometheus-0"
     namespace: "{{ .Values.global.namespaces.monitoring_namespace }}"
     endpoint: "/api/v1/admin/tsdb/snapshot"
-
-  dataset_api:
-    host: "http://dataset-api.dataset-api.svc.cluster.local:3000"
-    pre_signed_url: "v2/files/generate-url"
 
   connector_registry:
     download_path: /tmp/connector-registry

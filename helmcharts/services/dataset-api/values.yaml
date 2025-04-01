@@ -13,6 +13,13 @@ repository: obsrv-api-service
 tag: "1.0.0-GA"
 digest: ""
 
+kubectl:
+  image:
+    registry: "sanketikahub"
+    repository: "kubectl"
+    tag: "1.32.0-r1"
+    digest: ""
+
 imagePullPolicy: IfNotPresent
 imagePullSecrets: []
 
@@ -162,6 +169,7 @@ env:
   cloud_storage_region: "{{ .Values.global.cloud_storage_region }}"
   container: "{{ .Values.global.dataset_api_container}}"
   container_prefix: "connector-registry"
+  telemetry_data_path: "telemetry-data"
   storage_url_expiry: "3600"
   exhaust_query_range: "31" # In Days
   max_query_threshold: "5000"
@@ -180,6 +188,8 @@ env:
   storage_types: '{"lake_house":false,"realtime_store":true}'
   telemetry_dataset: "system.telemetry.events"
   default_task_duration: "PT4H" # Druid Supervisor task default duration value
+  alerts_config_path: /config
+  obsrv_version: "{{ .Values.tag }}"
 
   ## Below metrics are used for data observability
   default_freshness_threshold: "5" # In Minutes, default freshness threshold for data observability
