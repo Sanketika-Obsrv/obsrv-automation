@@ -30,13 +30,13 @@ spec:
         periodSeconds: 10  # HPA checks every 15 seconds to decide whether to scale down
 
   metrics:
-    # Uncomment the following section if you want to enable CPU-based scaling
-    # - type: Resource
-    #   resource:
-    #     name: cpu
-    #     target:
-    #       type: Utilization
-    #       averageUtilization: 1 # Scale when CPU usage exceeds 70%
+    Uncomment the following section if you want to enable CPU-based scaling
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 1 # Scale when CPU usage exceeds 70%
 
     - type: Resource  # Defines resource-based scaling
       resource:

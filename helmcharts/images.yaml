@@ -392,6 +392,11 @@ images: &images
 # Hence we are keeping their original desgin
 # It enables easy upgrade in future
 
+  metrics-server: &metrics-server
+    repository: registry.k8s.io/metrics-server/metrics-server
+    tag: "v0.7.2"
+    digest: ""
+
 internal: &internal
   command-api:
     <<: *command-api
@@ -627,6 +632,11 @@ internal: &internal
 
   promtail:
     <<: *promtail
+    
+  metrics-server:
+    image:
+      <<: *metrics-server  
+
 
   submit-ingestion:
     <<: *sanketikahub-kubectl

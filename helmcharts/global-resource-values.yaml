@@ -722,3 +722,12 @@ redis-exporter:
       requests:
         cpu: 250m
         memory: 256Mi
+
+metrics-server:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi        
