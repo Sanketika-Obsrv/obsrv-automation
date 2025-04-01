@@ -15,5 +15,5 @@ resource "helm_release" "eks_storage_class" {
     depends_on       = [null_resource.kubectl]
     cleanup_on_fail  = true
     atomic           = true
-    values           = []
+    values           = [file("${path.root}/../../helmcharts/global-cloud-values-aws.yaml")]
 }

@@ -50,6 +50,7 @@ module "eks" {
   eks_node_group_scaling_config = var.eks_node_group_scaling_config
   eks_node_disk_size            = var.eks_node_disk_size
   eks_endpoint_private_access   = var.eks_endpoint_private_access
+  volume_encryption             = var.volume_encryption
 }
 
 module "iam" {

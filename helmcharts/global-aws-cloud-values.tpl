@@ -27,6 +27,7 @@ global:
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "${elastic_ip_allocation_id}"
     service.beta.kubernetes.io/aws-load-balancer-subnets: "${load_balancer_subnet}"
+  volume_encryption: "false"
 
 service_accounts:
   enabled: &create_sa true
