@@ -315,6 +315,7 @@ module "eks_storage_class" {
   env            = var.env
   building_block = var.building_block
   depends_on     = [module.eks]
+  volume_encryption = var.volume_encryption
 }
 
 module "get_kubeconfig" {
