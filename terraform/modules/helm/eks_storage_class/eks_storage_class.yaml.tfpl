@@ -1,1 +1,1 @@
-volume_encryption: "${volume_encryption}"
+volume_encryption: ${volume_encryption}

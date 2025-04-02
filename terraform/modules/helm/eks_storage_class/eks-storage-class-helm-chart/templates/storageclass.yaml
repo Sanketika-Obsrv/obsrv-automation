@@ -11,4 +11,4 @@ reclaimPolicy: Delete
 parameters:
   fsType: ext4
   type: gp3
-  encrypted: {{ .Values.volume_encryption }}
+  encrypted: "{{ .Values.volume_encryption }}"
