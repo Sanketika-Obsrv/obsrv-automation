@@ -250,9 +250,6 @@ secor:
   s3_endpoint: *s3-endpoint-url
   s3_path_style_access: *s3-path-style-access
 
-superset:
-  oauth_enabled: false
-
 letsencrypt-ssl:
   enabled: *ssl_enabled
 

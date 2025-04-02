@@ -132,3 +132,9 @@ variable "kong_ingress_alloc_id" {
   description = "EIP allocation id"
   default     = ""
 }
+
+variable "volume_encryption" {
+  description = "Enable EBS volume encryption for EKS nodes"
+  type        = bool
+  default     = false
+}
