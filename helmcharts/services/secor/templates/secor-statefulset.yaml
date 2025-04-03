@@ -32,6 +32,10 @@ spec:
         app: secor
         release: {{ $jobName }}
     spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
       {{- if .Values.serviceAccount.create}}
       serviceAccountName: {{ include "base.serviceaccountname" . }}
       {{- end }}
@@ -39,6 +43,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{if .Values.setPvOwnership.enabled}}
       initContainers:
       - name: change-pv-dir-ownership
         image: alpine:3
@@ -47,6 +52,7 @@ spec:
         volumeMounts:
         - name: data-path
           mountPath: /mnt/data
+      {{end}}
       containers:
         - name: {{ $jobName }}-secor
           image: "{{ include "base.image" . }}"
@@ -59,7 +65,7 @@ spec:
             - name: "JVM_MEMORY"
               value: "{{ .Values.jvm_memory }}"
             - name: "TIMEZONE"
-              value: "{{ .Values.timezone }}"  
+              value: "{{ .Values.timezone }}"
           volumeMounts:
            - mountPath: /opt/secor/config
              name: secor-config

@@ -182,6 +182,7 @@ resource "aws_launch_template" "eks_launch_template" {
       volume_size = var.eks_node_disk_size
       volume_type = "gp3"
       delete_on_termination = true
+      encrypted = var.volume_encryption
     }
   }
 }

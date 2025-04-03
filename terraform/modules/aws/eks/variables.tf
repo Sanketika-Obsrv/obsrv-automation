@@ -253,3 +253,8 @@ variable "velero_namespace" {
   description = "Velero namespace."
   default = "velero"
 }
+variable "volume_encryption" {
+  description = "Enable EBS volume encryption for EKS nodes"
+  type        = bool
+  default     = true
+}

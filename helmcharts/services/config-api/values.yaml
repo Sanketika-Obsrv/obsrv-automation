@@ -13,6 +13,13 @@ repository: config-service-ext
 tag: "1.2.0-RC"
 digest: ""
 
+kubectl:
+  image:
+    registry: "sanketikahub"
+    repository: "kubectl"
+    tag: "1.32.0-r1"
+    digest: ""
+
 imagePullPolicy: IfNotPresent
 imagePullSecrets: []
 

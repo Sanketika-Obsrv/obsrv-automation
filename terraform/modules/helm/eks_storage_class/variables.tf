@@ -25,3 +25,14 @@ variable "eks_storage_class_chart_path" {
   description = "EKS storage class helm chart path."
   default     = "eks-storage-class-helm-chart"
 }
+
+variable "volume_encryption" {
+  description = "Enable EBS volume encryption for EKS nodes"
+  type        = bool
+  default     = true
+}
+
+variable "eks_storage_class_custom_values_yaml" {
+  type    = string
+  default = "eks_storage_class.yaml.tfpl"
+}

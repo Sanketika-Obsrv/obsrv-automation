@@ -33,6 +33,10 @@ spec:
         checksum/config: {{ .Files.Glob "configs/*" | toYaml | sha256sum }}
         checksum/job-config: {{ $jobData | toYaml | sha256sum }}
     spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
       {{- if .Values.serviceAccount.create}}
       serviceAccountName: {{ include "base.serviceaccountname" . }}
       {{- end }}
@@ -135,6 +139,10 @@ spec:
         checksum/config: {{ .Files.Glob "configs/*" | toYaml | sha256sum }}
         checksum/job-config: {{ $jobData | toYaml | sha256sum }}
     spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
       {{- if .Values.serviceAccount.create}}
       serviceAccountName: {{ include "base.serviceaccountname" . }}
       {{- end}}
