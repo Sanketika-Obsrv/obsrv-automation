@@ -256,5 +256,5 @@ variable "velero_namespace" {
 variable "volume_encryption" {
   description = "Enable EBS volume encryption for EKS nodes"
   type        = bool
-  default     = false
+  default     = true
 }

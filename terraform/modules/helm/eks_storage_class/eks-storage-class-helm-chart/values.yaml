@@ -1,2 +1,2 @@
 # This chart does not require any inputs
-volume_encryption: "false"
+volume_encryption: "true"

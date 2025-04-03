@@ -29,7 +29,7 @@ variable "eks_storage_class_chart_path" {
 variable "volume_encryption" {
   description = "Enable EBS volume encryption for EKS nodes"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "eks_storage_class_custom_values_yaml" {

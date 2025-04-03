@@ -136,5 +136,5 @@ variable "kong_ingress_alloc_id" {
 variable "volume_encryption" {
   description = "Enable EBS volume encryption for EKS nodes"
   type        = bool
-  default     = false
+  default     = true
 }
