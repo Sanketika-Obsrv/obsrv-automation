@@ -21,3 +21,6 @@ CREATE TABLE IF NOT EXISTS job_queue (
 ALTER TABLE job_queue 
 ADD CONSTRAINT job_queue_status_check 
 CHECK (status IN ('submitted', 'approved', 'rejected', 'in_progress', 'completed', 'failed', 'cancelled', 'queued', 'partial_success'));
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO obsrv;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO obsrv;
