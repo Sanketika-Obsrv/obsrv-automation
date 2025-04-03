@@ -328,7 +328,7 @@ module "get_kubeconfig" {
 module "aws_cloud_values" {
   source        = "../modules/aws/aws_cloud_values"
 
-  template_path = "${path.module}/../../helmcharts/global-aws-cloud-values.tpl"
+  template_path = "${path.module}/global-cloud-values-aws.yaml.tfpl"
   output_path   = "${path.module}/../../helmcharts/global-cloud-values-aws.yaml"
 
   template_vars = {
