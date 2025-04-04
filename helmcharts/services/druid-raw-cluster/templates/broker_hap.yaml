@@ -1,3 +1,4 @@
+{{- if .Values.global.autoscaler_enabled }}
 apiVersion: autoscaling/v2  # Specifies the API version for HPA
 kind: HorizontalPodAutoscaler  # Defines the resource type as HPA
 metadata:
@@ -36,7 +37,7 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 0.5 # Scale when CPU usage exceeds 70%
+          averageUtilization: 5 # Scale when CPU usage exceeds 70%
 
     - type: Resource  # Defines resource-based scaling
       resource:
@@ -44,3 +45,4 @@ spec:
         target:
           type: Utilization  # Target utilization type
           averageUtilization: 90 # Scale when memory usage exceeds 80%
+{{- end }}

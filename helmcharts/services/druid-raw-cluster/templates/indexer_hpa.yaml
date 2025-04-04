@@ -1,3 +1,4 @@
+{{- if .Values.global.autoscaler_enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -19,7 +20,7 @@ spec:
           name: druid_ingest_kafka_lag  # Custom Prometheus metric
         target:
           type: AverageValue
-          averageValue: 1000
+          averageValue: {{ .Values.druid_indexer.druid_ingest_kafka_lag.averageValue }}
 
     - type: External
       external:
@@ -27,4 +28,5 @@ spec:
           name: druid_ingest_kafka_maxLag  # Another Prometheus metric
         target:
           type: AverageValue
-          averageValue: 1000
+          averageValue: {{ .Values.druid_indexer.druid_ingest_kafka_maxLag.averageValue }} # Set this to your desired max lag value
+{{- end }}

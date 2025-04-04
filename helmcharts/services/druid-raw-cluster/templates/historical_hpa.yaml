@@ -1,3 +1,4 @@
+{{- if .Values.global.autoscaler_enabled }}
 apiVersion: autoscaling/v2  # Specifies the API version for HPA
 kind: HorizontalPodAutoscaler  # Defines the resource type as HPA
 metadata:
@@ -30,17 +31,18 @@ spec:
         periodSeconds: 10  # HPA checks every 15 seconds to decide whether to scale down
 
   metrics:
-    Uncomment the following section if you want to enable CPU-based scaling
+    # Uncomment the following section if you want to enable CPU-based scaling
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 1 # Scale when CPU usage exceeds 70%
+          averageUtilization: {{ .Values.druid_historical.cpu.averageUtilization }} # Scale when CPU usage exceeds 70%
 
     - type: Resource  # Defines resource-based scaling
       resource:
         name: memory  # Uses memory utilization for scaling
         target:
           type: Utilization  # Target utilization type
-          averageUtilization: 90 # Scale when memory usage exceeds 80%
+          averageUtilization: {{ .Values.druid_historical.memory.averageUtilization }} # Scale when memory usage exceeds 80%
+{{- end }}

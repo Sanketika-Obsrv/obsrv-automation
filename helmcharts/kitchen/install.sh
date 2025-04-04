@@ -27,6 +27,30 @@ else
     cmd="upgrade -i ${@: 2}"
 fi
 
+# VPA (Vertical Pod Autoscaler) setup if autoscaler is enabled
+autoscaler_enabled=$(cat $cloud_file_name | grep 'autoscaler_enabled:' | awk '{ print $3}')
+
+if [ "$autoscaler_enabled" == "true" ]; then
+    echo "Autoscaler is enabled. Setting up VPA..."
+    if [ ! -d "autoscaler" ]; then
+        git clone https://github.com/kubernetes/autoscaler.git
+    fi
+    cd autoscaler/vertical-pod-autoscaler
+    ./hack/vpa-up.sh
+    cd ../../
+
+elif [ "$autoscaler_enabled" == "false" ]; then
+    echo "Autoscaler is disabled. Skipping VPA setup..."
+    if [ -d "autoscaler" ]; then
+        cd autoscaler/vertical-pod-autoscaler
+        ./hack/vpa-down.sh
+        cd ../../
+        echo "Removing autoscaler directory..."
+        rm -rf autoscaler
+    fi
+
+fi
+
 case "$1" in
 bootstrap)
     cp -rf ../bootstrapper ./bootstrapper
@@ -68,7 +92,7 @@ monitoring)
     ;;
 coreinfra)
     cp -rf ../obsrv coreinfra
-    cp -rf ../services/{druid-raw-cluster,flink,superset} coreinfra/charts/
+    cp -rf ../services/{druid-raw-cluster,flink,superset}  coreinfra/charts/
 
     helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf coreinfra
