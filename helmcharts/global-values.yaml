@@ -31,6 +31,7 @@ defaults:
     opentelemetry-collector: &opentelemetry-collector "otel"
     keycloak_namespace: &keycloak_namespace "keycloak"
     s3_exporter_namespace: &s3_exporter_namespace "s3-exporter"
+    metrics_server_namespace: &metrics-server-namespace "kube-system"
     connector_namespaces:
       spark: *spark-namespace
       flink: &flink_connector_namespace "flink-connectors"
@@ -563,6 +564,9 @@ minio:
 
 s3-exporter:
   namespace: *s3_exporter_namespace
+
+metrics-server:
+  namespace: *metrics-server-namespace  
 
 global:
   env: *env
