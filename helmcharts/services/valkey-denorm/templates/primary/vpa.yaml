@@ -1,0 +1,20 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: valkey-denorm-primary-vpa
+  namespace: redis
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: valkey-denorm-primary
+  updatePolicy:
+    updateMode: "Auto"  # Can be "Auto", "Off", or "Initial"
+    minReplicas: 1
+resourcePolicy:
+  containerPolicies:
+    - containerName: valkey
+      controlledResources: ["memory"]
+      maxAllowed:
+        memory: "8Gi"
+        controlledValues: "RequestsAndLimits"
