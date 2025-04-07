@@ -85,7 +85,7 @@ valkey-denorm:
         cpu: 0.5
         memory: 1Gi
     extraFlags:
-        - "--maxmemory $(($(cat /sys/fs/cgroup/memory.max) / 2))"
+        - "--maxmemory $(( $(cat /sys/fs/cgroup/memory.max) * 80 / 100 ))"
         - "--maxmemory-policy volatile-ttl"
     # sidecars:
     #   resources:
