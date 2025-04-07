@@ -63,6 +63,11 @@ migrations)
 monitoring)
     cp -rf ../obsrv monitoring
     cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,alert-rules} monitoring/charts/
+
+    if [ -z "$cloud_env" ]; then
+        rm -rf monitoring/charts/loki/charts/minio
+    fi
+    
     helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name
     rm -rf monitoring
     ;;
