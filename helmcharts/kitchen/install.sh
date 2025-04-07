@@ -19,7 +19,7 @@ case $cloud_env in
         ;;
 esac
 
-cp -rf ../{global-values.yaml,global-resource-values.yaml,images.yaml} ./
+cp -rf ../{global-values.yaml,global-resource-values.yaml,images.yaml,autoscale-resource-values.yaml} ./
 
 if [ "$2" == "template" ]; then
     cmd="template ${@: 3}"
@@ -28,7 +28,7 @@ else
 fi
 
 # VPA (Vertical Pod Autoscaler) setup if autoscaler is enabled
-autoscaler_enabled=$(cat $cloud_file_name | grep 'autoscaler_enabled:' | awk '{ print $3}')
+autoscaler_enabled=$(cat autoscale-resource-values.yaml | grep 'autoscaler_enabled:' | awk '{ print $3}')
 
 if [ "$autoscaler_enabled" == "true" ]; then
     echo "Autoscaler is enabled. Setting up VPA..."

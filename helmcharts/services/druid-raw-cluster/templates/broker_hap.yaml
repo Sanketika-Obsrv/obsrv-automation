@@ -1,4 +1,4 @@
-{{- if .Values.global.autoscaler_enabled }}
+{{- if .Values.autoscaler_enabled }}
 apiVersion: autoscaling/v2  # Specifies the API version for HPA
 kind: HorizontalPodAutoscaler  # Defines the resource type as HPA
 metadata:
@@ -8,7 +8,7 @@ metadata:
 spec:
   scaleTargetRef:
     apiVersion: apps/v1  # API version of the target workload
-    kind: StatefulSet  # Specifies that HPA will scale a StatefulSet
+    kind: Deployment  # Specifies that HPA will scale a StatefulSet
     name: druid-raw-broker  # Name of the StatefulSet to be scaled
 
   minReplicas: 1  # Minimum number of replicas (pods) to maintain

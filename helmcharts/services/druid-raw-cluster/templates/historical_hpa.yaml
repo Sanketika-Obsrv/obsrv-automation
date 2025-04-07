@@ -1,4 +1,4 @@
-{{- if .Values.global.autoscaler_enabled }}
+{{- if .Values.autoscaler_enabled }}
 apiVersion: autoscaling/v2  # Specifies the API version for HPA
 kind: HorizontalPodAutoscaler  # Defines the resource type as HPA
 metadata:

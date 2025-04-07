@@ -96,6 +96,10 @@ valkey-denorm:
       accessModes:
         - ReadWriteOnce
       size: 2Gi
+     
+
+
+      scaling method
   replica:
     persistence:
       accessModes:
@@ -296,10 +300,6 @@ loki:
 #druid-raw-cluster need changes in yaml files
 druid-raw-cluster:
   druid_brokers:
-    cpu:
-      averageUtilization: 5
-    memory:
-      averageUtilization: 90
     resources:
       limits:
         cpu: 500m
@@ -327,10 +327,6 @@ druid-raw-cluster:
         memory: 256Mi
 
   druid_historical:
-    cpu:
-      averageUtilization: 2
-    memory:
-      averageUtilization: 2
     resources:
       limits:
         cpu: 1
@@ -350,10 +346,6 @@ druid-raw-cluster:
       size: 1Gi
 
   druid_indexer:
-    druid_ingest_kafka_lag:
-      averageValue: 1000
-    druid_ingest_kafka_maxLag :
-      averageValue: 1000
     resources:
       limits:
         cpu: 1
