@@ -1,4 +1,4 @@
-autoscaler_enabled: &autoscaler_enabled true
+autoscaler_enabled: true
 
 # vpa resource for valkey-denorm 
  valkey-denorm:
