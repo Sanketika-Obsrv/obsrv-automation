@@ -62,7 +62,7 @@ images: &images
   ## TODO: Add every component here
   transformer-ext: &transforer-ext # registry: ""
     repository: transformer-ext
-    tag: "1.7.0"
+    tag: "1.4.0"
     digest: ""
 
   master-data-processor: &master-data-processor # registry: ""
