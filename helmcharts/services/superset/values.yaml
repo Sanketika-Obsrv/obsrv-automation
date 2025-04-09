@@ -84,7 +84,8 @@ extraConfigs:
       allow_ctas: true
       allow_cvas: true
       database_name: obsrv
-      sqlalchemy_uri: druid://druid-raw-brokers.druid-raw.svc.cluster.local:8082/druid/v2/sql
+      allow_dml: true
+      sqlalchemy_uri: druid://dataset-api.dataset-api.svc.cluster.local:3000/v2/obsrv/data/sql-query
       uuid: 04e7a613-525a-4ec7-80b6-e703584cc743
       version: 1.0.0
       tables:
@@ -428,8 +429,22 @@ extraSecrets:
     import json
     from superset.security import SupersetSecurityManager
     from flask_appbuilder.security.manager import AUTH_OAUTH
+    import redis
+    import os
 
-    logging.info("Loading custom_sso_security_manager.py")
+    def env(key, default=None):
+        return os.getenv(key, default)
+
+    def set_token_for_user(user_id, token, expiration=86400):
+      sso_cache = redis.Redis(
+          host=env("REDIS_HOST"),
+          port=int(env("REDIS_PORT")),
+          password=env("REDIS_PASSWORD"),
+          db=int(env("REDIS_DB", 1)),
+          decode_responses=False,
+      )
+      print(f"✅ Setting token for user {user_id}: {token[:20]}... (expires in {expiration} seconds)")
+      sso_cache.setex(f"sso_user_token:{user_id}", expiration, token)
 
     class CustomSsoSecurityManager(SupersetSecurityManager):
       def __init__(self, appbuilder):
@@ -440,15 +455,23 @@ extraSecrets:
 
       def oauth_user_info(self, provider, response=None):
         print("Oauth2 provider:", provider)
+
         if provider == 'obsrv':
+          token_data = self.appbuilder.sm.oauth_remotes[provider].token
+          access_token = token_data.get("access_token") if token_data else None
+
           # As example, this line request a GET to base_url + '/' + userDetails with Bearer  Authentication,
           # and expects that authorization server checks the token, and response with user details
           me = self.appbuilder.sm.oauth_remotes[provider].get(
-              f'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/userinfo'
+            f'http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/userinfo'
           )
           me.raise_for_status()
           data = me.json()
-          logging.info("User info from Keycloak: %s", data)
+          logging.info("✅ User info from Keycloak: %s", data)
+
+          if access_token and data["preferred_username"]:
+            set_token_for_user(data["preferred_username"], token_data.get("access_token"), token_data.get("expires_in"))
+
           return {
             "name": data["name"],
             "email": data["email"],
