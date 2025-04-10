@@ -165,17 +165,7 @@ def patched_urlopen(self, method, url, body=None, headers=None, *args, **kwargs)
     return _original_urlopen(self, method, url, body=body, headers=headers, *args, **kwargs)
 
 urllib3.connectionpool.HTTPConnectionPool.urlopen = patched_urlopen
-print("✅ Patched urllib3 to inject bearer token")
-
-def FLASK_APP_MUTATOR(app):
-    # For debugging token extraction
-    @app.route('/debug/token')
-    def debug_token():
-        token = get_access_token_from_session()
-        return {
-            'has_token': token is not None,
-            'token': token if token else None
-        }
+logging.info("✅ Patched urllib3 to inject bearer token")
 
 {{ if .Values.configOverrides }}
 {{- $oauth_enabled := .Values.oauth_enabled -}}
