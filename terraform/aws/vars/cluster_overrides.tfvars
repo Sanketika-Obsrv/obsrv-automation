@@ -31,3 +31,7 @@ s3_buckets = {
 }
 
 create_kong_ingress_ip = "true" 
+kong_ingress_alloc_id  = ""
+
+# EBS volume encryption for EKS nodes
+volume_encryption = "true"

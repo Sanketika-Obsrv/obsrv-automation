@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: keycloak-sa  # Name of the service account
-  namespace: keycloak  # Namespace where the service account is created
+  namespace: {{ include "base.namespace" . }}  # Namespace where the service account is created
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -11,7 +11,7 @@ metadata:
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
   name: keycloak-job-role  # The role name
-  namespace: keycloak  # Namespace where the role should be applied
+  namespace: {{ include "base.namespace" . }}  # Namespace where the role should be applied
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
@@ -22,11 +22,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: keycloak-secrets-access-binding
-  namespace: keycloak  # Ensure the RoleBinding is in the `keycloak` namespace
+  namespace: {{ include "base.namespace" . }}  # Ensure the RoleBinding is in the `keycloak` namespace
 subjects:
   - kind: ServiceAccount
     name: keycloak-sa  # Name of the service account
-    namespace: keycloak  # Namespace where the service account is located
+    namespace: {{ include "base.namespace" . }}  # Namespace where the service account is located
 roleRef:
   kind: Role
   name: keycloak-job-role  # Role that grants access to secrets
@@ -37,7 +37,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: keycloak-public-key
-  namespace: keycloak
+  namespace: {{ include "base.namespace" . }}
   annotations:
     deployment_version: "v2"
 spec:
@@ -52,7 +52,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: keycloak-public-key
-          image: sanketikahub/kubectl:1.32.0-r1
+          image: {{ .Values.kubectl.image.registry }}/{{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
           command:
             - sh
             - -c
@@ -83,49 +83,48 @@ spec:
                     exit 1
                 fi
 
-                # Convert the x5c value into a PEM certificate
-                echo "-----BEGIN CERTIFICATE-----" > certificate.pem
-                echo "$x5c" | fold -w 64 >> certificate.pem
-                echo "-----END CERTIFICATE-----" >> certificate.pem
-                echo "Certificate has been extracted and saved to 'certificate.pem'."
+                # Convert x5c to PEM format in a variable
+                CERT_PEM=$(printf "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n" "$(echo "$x5c" | fold -w 64)")
 
-                # Extract the public key from the certificate
-                openssl x509 -in certificate.pem -pubkey -noout > public.pem
+                echo "Certificate content created in memory."
+
+                # Extract public key directly using echo and pipe
+                PUBLIC_KEY=$(echo "$CERT_PEM" | openssl x509 -pubkey -noout)
 
                 if [ $? -ne 0 ]; then
-                    echo "Error: Failed to extract the public key from the certificate."
-                    exit 1
+                  echo "Error: Failed to extract the public key from the certificate."
+                  exit 1
                 fi
 
-                echo "Public key has been extracted and saved to 'public.pem'."
+                echo "Public key extracted successfully."
 
                 # Define secret name and namespace
                 SECRET_NAME="keycloak-public-key"
-                NAMESPACE="keycloak"
+                NAMESPACE="{{.Values.global.namespaces.keycloak_namespace}}"
 
                 # Check if the secret already exists
                 echo "Checking if secret '$SECRET_NAME' already exists in namespace '$NAMESPACE'..."
                 if kubectl get secret "$SECRET_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
-                    echo "Secret '$SECRET_NAME' already exists. Overriding..."
+                  echo "Secret '$SECRET_NAME' already exists. Overriding..."
                 else
-                    echo "Secret '$SECRET_NAME' does not exist. Creating new one..."
+                  echo "Secret '$SECRET_NAME' does not exist. Creating new one..."
                 fi
 
                 # Create or update the secret with the public key
                 kubectl create secret generic "$SECRET_NAME" \
-                    --from-file=public.pem \
-                    --namespace="$NAMESPACE" \
-                    --dry-run=client -o yaml | kubectl apply -f -
+                  --from-literal=public.pem="$PUBLIC_KEY" \
+                  --namespace="$NAMESPACE" \
+                  --dry-run=client -o yaml | kubectl apply -f -
 
                 if [ $? -ne 0 ]; then
-                    echo "Error: Failed to create or update the Kubernetes secret in '$NAMESPACE'."
-                    exit 1
+                  echo "Error: Failed to create or update the Kubernetes secret in '$NAMESPACE'."
+                  exit 1
                 fi
 
                 echo "Secret '$SECRET_NAME' created/updated successfully in Keycloak namespace."
 
                 # Optionally, add annotations to the secret for reflection
-                DATASET_API_NAMESPACE="dataset-api"
+                DATASET_API_NAMESPACE="{{.Values.global.namespaces.dataset_api_namespace}}"
                 echo "Adding annotations for reflection into $DATASET_API_NAMESPACE namespace..."
                 kubectl annotate secret "$SECRET_NAME" \
                     --namespace "$NAMESPACE" \

@@ -21,7 +21,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.6.0"
+    tag: "1.7.0"
     digest: ""
 
   # dataset-api: #open source
@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.6.0"
+    tag: "1.7.0"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -46,14 +46,16 @@ images: &images
     digest: ""
 
   ## PIPELINE ENTERPRISE
-  unified-pipeline: &unified-pipeline # registry: ""
+  unified-pipeline: &unified-pipeline
+    registry: *global_registry
     repository: unified-pipeline
-    tag: "1.4.0"
+    tag: "1.7.0"
     digest: ""
 
-  cache-indexer: &cache-indexer # registry: ""
+  cache-indexer: &cache-indexer
+    registry: *global_registry
     repository: cache-indexer
-    tag: "1.4.0"
+    tag: "1.7.0"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
@@ -120,7 +122,7 @@ images: &images
 
 
   # submit-ingestion: &submit-ingestion
-  #   registry: "docker.io"
+  #   registry: *global_registry
   #   repository: "ubuntu"
   #   tag: "20.04"
   #   digest: ""
@@ -149,32 +151,32 @@ images: &images
     digest: ""
 
   alertmanager: &alertmanager
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: alertmanager
     tag: v0.28.0-rc.0
     digest: ""
 
   prometheus-operator-webhook: &prometheus-operator-webhook
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: kube-webhook-certgen
     tag: v20221220-controller-v1.5.1-58-g787ea74b6
     digest: ""
 
   prometheus-operator: &prometheus-operator
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: prometheus-operator
     tag: "v0.78.2"
     digest: ""
 
   prometheus-config-reloader: &prometheus-config-reloader
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: prometheus-config-reloader
     # if not set appVersion field from Chart.yaml is used
     tag: "v0.79.0"
     digest: ""
 
   prometheus: &prometheus
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: prometheus
     tag: v2.44.0
     digest: ""
@@ -209,19 +211,19 @@ images: &images
     digest: ""
 
   grafana-side-car: &grafana-side-car
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: k8s-sidecar
     tag: 1.27.4
     digest: ""
 
   kube-state-metrics: &kube-state-metrics
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: "kube-state-metrics"
     tag: "v2.13.0"
     digest: ""
 
   prometheus-node-exporter: &prometheus-node-exporter
-    registry: "sanketikahub"
+    registry: *global_registry
     repository: "node-exporter"
     tag: "v1.8.2"
     digest: ""
@@ -232,12 +234,14 @@ images: &images
     tag: "v1.15.0"
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
-  superset: &superset # registry: ""
-    repository: "sanketikahub/superset"
+  superset: &superset
+    registry: *global_registry
+    repository: "superset"
     tag: "4.1.1"
     digest: ""
 
-  secor: &secor # registry: ""
+  secor: &secor
+    # registry: *global_registry
     repository: "secor"
     tag: "0.29.1"
     digest: ""
@@ -278,9 +282,15 @@ images: &images
     digest: ""
 
   kafka: &kafka
-    # registry: ""
-    # repository: bitnami/kafka
+    registry: ""
+    repository: bitnami/kafka
     tag: 3.6.0
+    digest: ""
+
+  jmx: &jmx
+    registry: *global_registry
+    repository: jmx-exporter
+    tag: 0.17.2-debian-11-r29
     digest: ""
 
   minio: &minio
@@ -295,11 +305,11 @@ images: &images
   #   tag: 1.0.5-GA
   #   digest: ""
 
-  # kafka-exporter: &kafka-exporter
-  #   registry: "docker.io"
-  #   repository: danielqsj/kafka-exporter
-  #   tag: latest
-  #   digest: ""
+  kafka-exporter: &kafka-exporter
+    registry: *global_registry
+    repository: kafka-exporter
+    tag: 1.6.0-debian-11-r40
+    digest: ""
 
   kafka-message-exporter: &kafka-message-exporter # registry: ""
     repository: kafka-message-exporter
@@ -313,8 +323,8 @@ images: &images
     digest: ""
 
   druid-raw-cluster: &druid-raw-cluster
-    registry: "docker.io/druidio"
-    repository: docker.io/apache
+    registry: apache
+    repository: druid
     tag: "28.0.1"
     digest: ""
 
@@ -361,6 +371,22 @@ images: &images
     repository: otel/opentelemetry-collector-contrib
     tag: "latest"
     digest: ""
+
+  kubernetes-ingress-controller: &kubernetes-ingress-controller
+    repository: "kong/kubernetes-ingress-controller"
+    tag: "2.10"
+    digest: ""
+  
+  kubectl: &kubectl
+    repository: "docker.io/bitnami/kubectl"
+    tag: "1.26.14-debian-11-r6"
+  
+  sanketikahub-kubectl: &sanketikahub-kubectl
+    registry: *global_registry
+    repository: kubectl
+    tag: "1.32.0-r1"
+    digest: ""
+
 # Public charts like bitnami etc
 # Modyfying these charts involves many changes
 # Hence we are keeping their original desgin
@@ -374,14 +400,23 @@ internal: &internal
   web-console:
     <<: *web-console
     imagePullSecrets: *imagePullSecrets
+    kubectl:
+      image:
+        <<: *sanketikahub-kubectl
 
   dataset-api:
     <<: *dataset-api
     imagePullSecrets: *imagePullSecrets
+    kubectl:
+      image:
+        <<: *sanketikahub-kubectl
 
   config-api:
     <<: *config-api
     imagePullSecrets: *imagePullSecrets
+    kubectl:
+      image:
+        <<: *sanketikahub-kubectl
 
   postgresql:
     image:
@@ -402,12 +437,18 @@ internal: &internal
   postgresql-exporter:
     <<: *postgresql-exporter
 
+  postgresql-migration:
+    <<: *postgresql-migration
+
   s3-exporter:
     <<: *s3-exporter
 
   velero:
     image:
       <<: *velero
+    kubectl:
+      image:
+        <<: *kubectl
 
   valkey-dedup:
     image:
@@ -416,9 +457,6 @@ internal: &internal
   valkey-denorm:
     image:
       <<: *valkey
-
-
-
 
   loki:
     singleBinary:
@@ -471,13 +509,16 @@ internal: &internal
       image:
         <<: *prometheus-node-exporter
 
-  prometheus-pushgateway: 
+  prometheus-pushgateway:
     image:
       <<: *prometheus-pushgateway
 
   keycloak:
     image:
       <<: *keycloak
+    kubectl:
+      image:
+        <<: *sanketikahub-kubectl
 
     keycloakConfigCli:
       image:
@@ -488,10 +529,9 @@ internal: &internal
       <<: *druid_exporter
 
   druid-raw-cluster:
-    image:
-      <<: *druid-raw-cluster
+    <<: *druid-raw-cluster
 
-  druid_operator:
+  druid-operator:
     image:
       <<: *druid_operator
 
@@ -514,6 +554,9 @@ internal: &internal
   kong:
     image:
       <<: *kong
+    ingressController:
+      image:
+        <<: *kubernetes-ingress-controller
 
   cert-manager:
     imagePullSecrets: *imagePullSecrets
@@ -582,7 +625,11 @@ internal: &internal
     <<: *opentelemetry-collector
     imagePullSecrets: *imagePullSecrets
 
+  promtail:
+    <<: *promtail
 
+  submit-ingestion:
+    <<: *sanketikahub-kubectl
 ## Sourcing internal as root element,
 ## should need arise
 <<: *internal

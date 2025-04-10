@@ -1486,6 +1486,7 @@ write:
     selector: null
     # -- Annotations for volume claim
     annotations: {}
+    existingClaim: ""
 # --  Configuration for the read pod(s)
 read:
   # -- Number of replicas for the read

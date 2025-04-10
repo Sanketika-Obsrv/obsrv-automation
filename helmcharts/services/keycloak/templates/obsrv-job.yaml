@@ -16,7 +16,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: create-obsrv-user
-          image: sanketikahub/kubectl:1.32.0-r1
+          image: {{ .Values.kubectl.image.registry }}/{{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
           command:
             - sh
             - -c
