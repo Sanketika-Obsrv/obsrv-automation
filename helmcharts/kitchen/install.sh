@@ -27,29 +27,30 @@ else
     cmd="upgrade -i ${@: 2}"
 fi
 
-# VPA (Vertical Pod Autoscaler) setup if autoscaler is enabled
-autoscaler_enabled=$(cat autoscale-resource-values.yaml | grep 'autoscaler_enabled:' | awk '{ print $3}')
+# Read autoscaler flag from YAML (only top-level anchor)
+autoscaler_enabled=$(grep '^autoscaler_enabled:' autoscale-resource-values.yaml | head -n1 | awk '{ print $NF }' | tr -d '"')
 
 if [ "$autoscaler_enabled" == "true" ]; then
-    echo "Autoscaler is enabled. Setting up VPA..."
+    echo "✅ Autoscaler is enabled. Setting up VPA..."
+
     if [ ! -d "autoscaler" ]; then
         git clone https://github.com/kubernetes/autoscaler.git
     fi
-    cd autoscaler/vertical-pod-autoscaler
+
+    pushd autoscaler/vertical-pod-autoscaler
     ./hack/vpa-up.sh
-    cd ../../
+    popd
+
+    vpa_cleanup_needed=false
 
 elif [ "$autoscaler_enabled" == "false" ]; then
-    echo "Autoscaler is disabled. Skipping VPA setup..."
-    if [ -d "autoscaler" ]; then
-        cd autoscaler/vertical-pod-autoscaler
-        ./hack/vpa-down.sh
-        cd ../../
-        echo "Removing autoscaler directory..."
-        rm -rf autoscaler
-    fi
-
+    echo "❌ Autoscaler is disabled. Will clean up VPA **after** Helm upgrade..."
+    vpa_cleanup_needed=true
+else
+    echo "⚠️ Invalid autoscaler_enabled value: $autoscaler_enabled. Must be 'true' or 'false'."
+    exit 1
 fi
+
 
 case "$1" in
 bootstrap)
@@ -74,8 +75,20 @@ coredb)
         cp -rf ../services/cert-manager coredb/charts/
     fi
 
-    helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name -f autoscale-resource-values.yaml --debug
     rm -rf coredb
+    # 🧹 Only remove VPA after Helm if autoscaler was disabled
+    if [ "$vpa_cleanup_needed" == "true" ]; then
+        echo "🧹 Tearing down VPA after Helm upgrade..."
+        if [ -d "autoscaler" ]; then
+            pushd autoscaler/vertical-pod-autoscaler
+            ./hack/vpa-down.sh
+            popd
+
+            echo "🧽 Removing autoscaler directory..."
+            rm -rf autoscaler
+        fi
+    fi
     ;;
 migrations)
     cp -rf ../obsrv migrations

@@ -1,19 +1,21 @@
-autoscaler_enabled: true
+autoscaler_enabled: &autoscaler_enabled true
 
-# vpa resource for valkey-denorm 
- valkey-denorm:
+# VPA resource for valkey-denorm 
+valkey-denorm:
+  autoscaler_enabled: *autoscaler_enabled
   primary:
     vpa:
-        maxAllowed:
-          memory: "8Gi"
+      maxAllowed:
+        memory: "8Gi"
 
-# hap resource for druid
+# HPA resource for Druid
 druid-raw-cluster:
+  autoscaler_enabled: *autoscaler_enabled
   druid_historical:
-      cpu:
-        averageUtilization: 2
-      memory:
-        averageUtilization: 2
+    cpu:
+      averageUtilization: 2
+    memory:
+      averageUtilization: 2
 
   druid_broker:
     cpu:
@@ -24,8 +26,5 @@ druid-raw-cluster:
   druid_indexer:
     druid_ingest_kafka_lag:
       averageValue: 1000
-    druid_ingest_kafka_maxLag :
+    druid_ingest_kafka_maxLag:
       averageValue: 1000
-
-
-

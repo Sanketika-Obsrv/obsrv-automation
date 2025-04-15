@@ -1,4 +1,4 @@
-{{- if .Values.global.autoscaler_enabled }}
+{{- if .Values.autoscaler_enabled }}
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
@@ -17,6 +17,6 @@ resourcePolicy:
     - containerName: valkey
       controlledResources: ["memory"]
       maxAllowed:
-        memory: "8Gi"
+        memory: {{ .Values.primary.vpa.max_memory }}
         controlledValues: "RequestsAndLimits"
-{{- end }}        
+{{- end }}  

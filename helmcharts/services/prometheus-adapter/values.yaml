@@ -1,0 +1,194 @@
+affinity: {}
+
+topologySpreadConstraints: []
+
+image:
+  repository: registry.k8s.io/prometheus-adapter/prometheus-adapter
+  tag: ""
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+logLevel: 4
+
+metricsRelistInterval: 2m
+
+listenPort: 6443
+
+nodeSelector: {}
+
+priorityClassName: ""
+
+namespaceOverride: ""
+
+customAnnotations: {}
+
+customLabels: {}
+
+prometheus:
+  url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local
+  port: 9090
+  path: ""
+
+replicas: 1
+
+podSecurityContext:
+  fsGroup: 10001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+rbac:
+  create: true
+  useAuthReaderClusterRole: false
+  externalMetrics:
+    resources: ["*"]
+  customMetrics:
+    resources: ["*"]
+
+psp:
+  create: false
+  annotations: {}
+
+automountServiceAccountToken: true
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: true
+
+dnsConfig: {}
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: https
+    scheme: HTTPS
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: https
+    scheme: HTTPS
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+
+startupProbe: {}
+
+rules:
+  default: false
+  custom:
+    - seriesQuery: '{__name__=~"request_duration_seconds_count",container!="POD",namespace!="",pod!=""}'
+      seriesFilters: []
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: request_duration_seconds_count
+        as: ""
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>,container!="POD"}[1m])) by (<<.GroupBy>>)
+
+    - seriesQuery: '{__name__=~"druid_health_status",container!="POD",namespace!="",pod!=""}'
+      seriesFilters: []
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: druid_health_status
+        as: ""
+      metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>,container!="POD"}) by (<<.GroupBy>>)
+
+    # - seriesQuery: 'druid_ingest_kafka_lag'
+    #   seriesFilters: []
+    #   resources:
+    #     overrides:
+    #       instance:
+    #         resource: pod
+    #   name:
+    #     matches: druid_ingest_kafka_lag
+    #     as: ""
+    #   metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)
+
+
+      
+
+
+  existing: []  # Corrected from 'existing:'
+
+  external:
+    - seriesQuery: 'druid_ingest_kafka_lag{dataSource!=""}'
+      metricsQuery: 'sum(druid_ingest_kafka_lag{dataSource!=""})'
+      name:
+        matches: "druid_ingest_kafka_lag"
+
+
+service:
+  annotations: {}
+  port: 443
+  type: ClusterIP
+  ipDualStack:
+    enabled: false
+    ipFamilies: ["IPv6", "IPv4"]
+    ipFamilyPolicy: "PreferDualStack"
+
+tls:
+  enable: false
+  ca: ""  
+  key: ""  
+  certificate: ""
+
+env: []
+
+extraArguments: []
+
+extraContainers: []
+
+extraVolumes: []
+
+extraVolumeMounts: []
+
+tolerations: []
+
+podLabels: {}
+
+podAnnotations: {}
+
+deploymentAnnotations: {}
+
+hostNetwork:
+  enabled: false
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: ""
+  maxUnavailable: 1
+
+certManager:
+  enabled: false
+  caCertDuration: 43800h0m0s
+  certDuration: 8760h0m0s
+  caCertRevisionHistoryLimit: ""
+  certRevisionHistoryLimit: ""
