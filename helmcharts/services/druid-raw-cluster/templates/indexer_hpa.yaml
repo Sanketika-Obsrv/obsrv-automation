@@ -1,0 +1,32 @@
+{{- if .Values.autoscaler_enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: druid-indexer-hpa
+  namespace: druid-raw
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: druid-raw-indexers # Ensure this matches your StatefulSet name
+
+  minReplicas: 1
+  maxReplicas: 3
+
+  metrics:
+    - type: External
+      external:
+        metric:
+          name: druid_ingest_kafka_lag  # Custom Prometheus metric
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.druid_indexer.druid_ingest_kafka_lag.averageValue }}
+
+    - type: External
+      external:
+        metric:
+          name: druid_ingest_kafka_maxLag  # Another Prometheus metric
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.druid_indexer.druid_ingest_kafka_maxLag.averageValue }} # Set this to your desired max lag value
+{{- end }}

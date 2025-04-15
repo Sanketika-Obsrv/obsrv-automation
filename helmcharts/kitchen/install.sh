@@ -19,13 +19,38 @@ case $cloud_env in
         ;;
 esac
 
-cp -rf ../{global-values.yaml,global-resource-values.yaml,images.yaml} ./
+cp -rf ../{global-values.yaml,global-resource-values.yaml,images.yaml,autoscale-resource-values.yaml} ./
 
 if [ "$2" == "template" ]; then
     cmd="template ${@: 3}"
 else
     cmd="upgrade -i ${@: 2}"
 fi
+
+# Read autoscaler flag from YAML (only top-level anchor)
+autoscaler_enabled=$(grep '^autoscaler_enabled:' autoscale-resource-values.yaml | head -n1 | awk '{ print $NF }' | tr -d '"')
+
+if [ "$autoscaler_enabled" == "true" ]; then
+    echo "✅ Autoscaler is enabled. Setting up VPA..."
+
+    if [ ! -d "autoscaler" ]; then
+        git clone https://github.com/kubernetes/autoscaler.git
+    fi
+
+    pushd autoscaler/vertical-pod-autoscaler
+    ./hack/vpa-up.sh
+    popd
+
+    vpa_cleanup_needed=false
+
+elif [ "$autoscaler_enabled" == "false" ]; then
+    echo "❌ Autoscaler is disabled. Will clean up VPA **after** Helm upgrade..."
+    vpa_cleanup_needed=true
+else
+    echo "⚠️ Invalid autoscaler_enabled value: $autoscaler_enabled. Must be 'true' or 'false'."
+    exit 1
+fi
+
 
 case "$1" in
 bootstrap)
@@ -43,15 +68,27 @@ prerequisites)
     ;;
 coredb)
     cp -rf ../obsrv coredb
-    cp -rf ../services/{kafka,postgresql,kong,druid-operator,valkey-dedup,valkey-denorm} coredb/charts/
+    cp -rf ../services/{metrics-server,kafka,postgresql,kong,druid-operator,valkey-dedup,valkey-denorm} coredb/charts/
 
     ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
     if [ "$ssl_enabled" == "true" ]; then
         cp -rf ../services/cert-manager coredb/charts/
     fi
 
-    helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
+    helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name -f autoscale-resource-values.yaml --debug
     rm -rf coredb
+    # 🧹 Only remove VPA after Helm if autoscaler was disabled
+    if [ "$vpa_cleanup_needed" == "true" ]; then
+        echo "🧹 Tearing down VPA after Helm upgrade..."
+        if [ -d "autoscaler" ]; then
+            pushd autoscaler/vertical-pod-autoscaler
+            ./hack/vpa-down.sh
+            popd
+
+            echo "🧽 Removing autoscaler directory..."
+            rm -rf autoscaler
+        fi
+    fi
     ;;
 migrations)
     cp -rf ../obsrv migrations
@@ -73,7 +110,7 @@ monitoring)
     ;;
 coreinfra)
     cp -rf ../obsrv coreinfra
-    cp -rf ../services/{druid-raw-cluster,flink,superset} coreinfra/charts/
+    cp -rf ../services/{druid-raw-cluster,flink,superset}  coreinfra/charts/
 
     helm $cmd coreinfra ./coreinfra -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf coreinfra
