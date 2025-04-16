@@ -20,7 +20,7 @@ env: local
 
 dataset_api:
   host: "http://dataset-api.dataset-api.svc.cluster.local:3000"
-  pre_signed_url: "v2/files/generate-url"
+  pre_signed_url: "v2/files/url-access"
 
 connectors:
   extraction_path: "/tmp/obsrv-connectors-extracted"
