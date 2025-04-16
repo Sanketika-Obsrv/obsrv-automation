@@ -1,4 +1,4 @@
-- name: "[KAFKA]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[KAFKA]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{pod="kafka-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -11,7 +11,7 @@
   annotations: {}
   severity: warning
 
-- name: "[VALKEY]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[VALKEY]: High CPU Usage Detected. System Under Heavy Load."
   query: sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) ) + sum by() (max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -24,7 +24,7 @@
   annotations: {}
   severity: warning
 
-- name: "[DRUID HISTORICAL]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[DRUID HISTORICAL]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-historicals'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -37,7 +37,7 @@
   annotations: {}
   severity: warning
 
-- name: "[DRUID INDEXER]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[DRUID INDEXER]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-indexers'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -50,7 +50,7 @@
   annotations: {}
   severity: warning
 
-- name: "[DRUID OVERLORD]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[DRUID OVERLORD]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-overlords'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -63,7 +63,7 @@
   annotations: {}
   severity: warning
 
-- name: "[DRUID BROKER]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[DRUID BROKER]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-brokers'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -76,7 +76,7 @@
   annotations: {}
   severity: warning
 
-- name: "[PROMETHEUS]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[PROMETHEUS]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='prometheus'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -90,7 +90,7 @@
   severity: warning
 
 
-- name: "[GRAFANA]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[GRAFANA]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='grafana'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -104,7 +104,7 @@
   severity: warning
 
 
-- name: "[POSTGRES]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[POSTGRES]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='postgresql'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -118,7 +118,7 @@
   severity: warning
 
 
-- name: "[API SERVICE]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[API SERVICE]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='dataset-api'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -131,7 +131,7 @@
   annotations: {}
   severity: warning
 
-- name: "[SECOR BACKUP]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[SECOR BACKUP]: High CPU Usage Detected. System Under Heavy Load."
   query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='dataset-api'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -144,7 +144,7 @@
   annotations: {}
   severity: warning
 
-- name: "[KAFKA MESSAGE EXPORTER]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[KAFKA MESSAGE EXPORTER]: High CPU Usage Detected. System Under Heavy Load."
   query:  max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='kafka-message-exporter'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
@@ -157,7 +157,7 @@
   annotations: {}
   severity: warning
 
-- name: "[UNIFIED PIPELINE]: High CPU Usage Detected. System Under Heavy Load"
+- name: "[UNIFIED PIPELINE]: High CPU Usage Detected. System Under Heavy Load."
   query: sum by()(max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})))) + sum by() (max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})))) * 100
   operator: gt
   threshold: [90]
@@ -170,7 +170,7 @@
   annotations: {}
   severity: warning
 
-- name: "[KAFKA]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[KAFKA]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="kafka-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -183,7 +183,7 @@
   annotations: {}
   severity: warning
 
-- name: "[VALKEY]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[VALKEY]: High Memory Usage Detected. System Could Become Unstable."
   query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) + sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
   operator: gt
   threshold: [90]
@@ -197,7 +197,7 @@
   severity: warning
 
 
-- name: "[DRUID_HISTORICAL]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[DRUID_HISTORICAL]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-historicals"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -210,7 +210,7 @@
   annotations: {}
   severity: warning
 
-- name: "[DRUID INDEXER]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[DRUID INDEXER]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-indexers"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -223,7 +223,7 @@
   annotations: {}
   severity: warning
 
-- name: "[DRUID OVERLORD]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[DRUID OVERLORD]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-overlords"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -236,7 +236,7 @@
   annotations: {}
   severity: warning
 
-- name: "[DRUID BROKER]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[DRUID BROKER]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-brokers"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -249,7 +249,7 @@
   annotations: {}
   severity: warning
 
-- name: "[PROMETHEUS]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[PROMETHEUS]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="prometheus"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -262,7 +262,7 @@
   annotations: {}
   severity: warning
 
-- name: "[GRAFANA]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[GRAFANA]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="grafana"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -277,7 +277,7 @@
 
 
 
-- name: "[API SERVICE]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[API SERVICE]: High Memory Usage Detected. System Could Become Unstable."
   query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="dataset-api"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
   threshold: [90]
@@ -290,7 +290,7 @@
   annotations: {}
   severity: warning
 
-- name: "[UNIFIED PIPELINE]: High Memory Usage Detected. System Could Become Unstable"
+- name: "[UNIFIED PIPELINE]: High Memory Usage Detected. System Could Become Unstable."
   query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="unified-pipeline-jobmanager"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) + sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="unified-pipeline-jobmanager"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
   operator: gt
   threshold: [90]
@@ -303,7 +303,7 @@
   annotations: {}
   severity: warning
 
-- name: "[KAFKA]: System has restarted. May Affect Services."
+- name: "[KAFKA]: System has restarted. May Affect Ingestion."
   query: increase(kube_pod_container_status_restarts_total{container="kafka",pod="kafka-0"}[$__range])
   operator: gt
   threshold: [3]
@@ -317,7 +317,7 @@
   severity: critical
 
 
-- name: "[DRUID HISTORICALS]: System has restarted. May Affect Services."
+- name: "[DRUID HISTORICALS]: System has Restarted. May Affect Querying."
   query: increase(kube_pod_container_status_restarts_total{container="druid-raw-historicals"}[$__range])
   operator: gt
   threshold: [3]
@@ -330,7 +330,7 @@
   annotations: {}
   severity: critical
 
-- name: "[DRUID INDEXER]: System has restarted. May Affect Services."
+- name: "[DRUID INDEXER]: System has Restarted. May Affect Querying."
   query: increase(kube_pod_container_status_restarts_total{container="druid-raw-indexers"}[$__range])
   operator: gt
   threshold: [3]
@@ -344,7 +344,7 @@
   severity: critical
 
 
-- name: "[DRUID OVERLORD]: System has restarted. May Affect Services."
+- name: "[DRUID OVERLORD]: System has Restarted. May Affect Querying."
   query: increase(kube_pod_container_status_restarts_total{container="druid-raw-overlords"}[$__range])
   operator: gt
   threshold: [3]
@@ -358,7 +358,7 @@
   severity: critical
 
 
-- name: "[DRUID BROKER]: System has restarted. May Affect Services."
+- name: "[DRUID BROKER]: System has Restarted. May Affect Querying."
   query: increase(kube_pod_container_status_restarts_total{container="druid-raw-brokers"}[$__range])
   operator: gt
   threshold: [3]
@@ -372,7 +372,7 @@
   severity: critical
 
 
-- name: "[DRUID CORDINATOR]: System has restarted. May Affect Services."
+- name: "[DRUID CORDINATOR]: System has Restarted. May Affect Querying."
   query: increase(kube_pod_container_status_restarts_total{container="druid-raw-coordinators"}[$__range])
   operator: gt
   threshold: [3]
@@ -386,7 +386,7 @@
   severity: critical
 
 
-- name: "[API SERVICE]: System has restarted. May Affect Services."
+- name: "[API SERVICE]: System has restarted. May Affect API Availability."
   query: increase(kube_pod_container_status_restarts_total{container="dataset-api"}[$__range])
   operator: gt
   threshold: [3]
@@ -400,7 +400,7 @@
   severity: critical
 
 
-- name: "[PROMETHEUS]: System has restarted. May Affect Services."
+- name: "[PROMETHEUS]: System has restarted. May Affect Monitoring."
   query: increase(kube_pod_container_status_restarts_total{container="prometheus"}[$__range])
   operator: gt
   threshold: [3]
@@ -414,7 +414,7 @@
   severity: critical
 
 
-- name: "[GRAFANA]: System has restarted. May Affect Services."
+- name: "[GRAFANA]: System has restarted. May Affect Monitoring."
   query: increase(kube_pod_container_status_restarts_total{container="grafana"}[$__range])
   operator: gt
   threshold: [3]
@@ -427,7 +427,7 @@
   annotations: {}
   severity: critical
 
-- name: "[LOKI]: System has restarted. May Affect Services."
+- name: "[LOKI]: System has restarted. May Affect Monitoring."
   query: avg(increase(kube_pod_container_status_restarts_total{container="loki"}[$__range]))
   operator: gt
   threshold: [3]  
@@ -441,7 +441,7 @@
   severity: critical
 
 
-- name: "[WEB CONSOLE]: System has restarted. May Affect Services"
+- name: "[WEB CONSOLE]: System has restarted. May Affect Data Analytics View in Web Console."
   query: increase(kube_pod_container_status_restarts_total{container="management-console"}[$__range])
   operator: gt
   threshold: [3]
@@ -455,7 +455,7 @@
   severity: critical
 
 
-- name: "[POSTGRES]: System has restarted. May Affect Services."
+- name: "[POSTGRES]: System has restarted. May Affect Database Connectivity."
   query: increase(kube_pod_container_status_restarts_total{container="postgresql"}[$__range])
   operator: gt
   threshold: [3]
@@ -469,7 +469,7 @@
   severity: critical
 
 
-- name: "[PROMTAIL]: System has restarted. May Affect Services."
+- name: "[PROMTAIL]: System has restarted. May Affect Log Ingestion."
   query: increase(kube_pod_container_status_restarts_total{container="promtail"}[$__range])
   operator: gt
   threshold: [3]
@@ -483,7 +483,7 @@
   severity: critical
 
 
-- name: "[KEYCLOAK]: System has restarted. May Affect Services."
+- name: "[KEYCLOAK]: System has restarted. May Affect User Authentication and Login Flow"
   query: increase(kube_pod_container_status_restarts_total{container="keycloak"}[$__range])
   operator: gt
   threshold: [3]
@@ -496,7 +496,7 @@
   annotations: {}
   severity: critical
 
-- name: "[SUPERSET]: System has restarted. May Affect Services."
+- name: "[SUPERSET]: System has restarted. May Affect Superset Dashboard Access "
   query: increase(kube_pod_container_status_restarts_total{container="superset"}[$__range])
   operator: gt
   threshold: [3]
@@ -509,7 +509,7 @@
   annotations: {}
   severity: critical
 
-- name: "[S3 EXPORTER]: System has restarted. May Affect Services."
+- name: "[S3 EXPORTER]: System has restarted. May Affect Data export to S3."
   query: increase(kube_pod_container_status_restarts_total{container="s3-exporter"}[$__range])
   operator: gt
   threshold: [3]
@@ -523,7 +523,7 @@
   severity: critical
 
 
-- name: "[VOLUME AUTOSCALER]: System has restarted. May Affect Services."
+- name: "[VOLUME AUTOSCALER]: System has restarted. Automatic Volume Scaling May Be Disrupted."
   query: increase(kube_pod_container_status_restarts_total{container="volume-autoscaler"}[$__range])
   operator: gt
   threshold: [3]
