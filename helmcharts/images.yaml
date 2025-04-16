@@ -129,7 +129,7 @@ images: &images
 
   system-rules-ingestor: &system-rules-ingestor # registry: ""
     repository: "system-rules-ingestor"
-    tag: "1.0.3-GA"
+    tag: "1.7.0"
     digest: ""
 
   loki: &loki
