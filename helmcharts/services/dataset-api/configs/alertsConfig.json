@@ -3,18 +3,12 @@
     "alerts": {
       "dataset_metrics_flink": [
         {
-          "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_extractor_failed_count[5m]))",
-          "alias": "Number of Failed Extraction Events",
-          "description": "This alert tracks how many events failed the extraction stage",
-          "frequency": "5m",
-          "interval": "5m",
-          "operator": "gt",
-          "threshold": 0
-        },
-        {
-          "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_extractor_duplicate_count[5m]))",
-          "alias": "Number of Duplicate Extraction Events",
-          "description": "This alert tracks how many duplicate events were found during extraction stage",
+          "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_extractor_failed_count[5m])) + sum(sum_over_time(flink_taskmanager_job_task_operator_ExtractorJob_dataset_id_extractor_duplicate_count[5m])) + sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_validator_failed_count[5m]))",
+          "alias": "[DATASET]: Detected high rate of invalid data than expected",
+          "category": "Processing",
+          "severity": "critical",
+          "code": "PROCESS_DATASET_002",
+          "description": "A high rate of invalid data can disrupt processing pipeline reduce data quality and lead to inaccurate insights in downstream analytics and reporting",
           "frequency": "5m",
           "interval": "5m",
           "operator": "gt",
@@ -22,17 +16,11 @@
         },
         {
           "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_dedup_failed_count[5m]))",
-          "alias": "Number of Duplicate Preprocessing Events",
-          "description": "This alert tracks how many duplicate events were found during preprocessing stage",
-          "frequency": "5m",
-          "interval": "5m",
-          "operator": "gt",
-          "threshold": 0
-        },
-        {
-          "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_validator_failed_count[5m]))",
-          "alias": "Number of Failed Validation Events",
-          "description": "This alert tracks how many events failed the validation stage",
+          "alias": "[DATASET]: Detected higher rate of duplicate data than expected",
+          "category": "Processing",
+          "severity": "warning",
+          "code": "PROCESS_DATASET_003",
+          "description": "A higher rate of duplicate data can inflate storage usage and impact the accuracy of reports and downstream data processing.",
           "frequency": "5m",
           "interval": "5m",
           "operator": "gt",
@@ -40,8 +28,11 @@
         },
         {
           "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_DenormalizerJob_dataset_id_denorm_failed[5m])) + sum(sum_over_time(flink_taskmanager_job_task_operator_DenormalizerJob_dataset_id_denorm_partial_success[5m]))",
-          "alias": "Number of Failed Denorm Events",
-          "description": "This alert tracks how many events failed the denorm stage",
+          "alias": "[DATASET]: Detected higher incidence of failures during data enrichment.",
+          "category": "Processing",
+          "severity": "critical",
+          "code": "PROCESS_DATASET_004",
+          "description": "Frequent data enrichment failures can cause incomplete data and affect downstream analytics accuracy.",
           "frequency": "5m",
           "interval": "5m",
           "operator": "gt",
@@ -49,13 +40,85 @@
         },
         {
           "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_TransformerJob_dataset_id_transform_failed_count[5m])) + sum(sum_over_time(flink_taskmanager_job_task_operator_TransformerJob_dataset_id_transform_partial_count[5m]))",
-          "alias": "Number of Failed Transformer Events",
-          "description": "This alert tracks how many events failed the transformation stage",
+          "alias": "[DATASET]: Detected higher incidence of failures during data transformations.",
+          "category": "Processing",
+          "severity": "critical",
+          "code": "PROCESS_DATASET_005",
+          "description": "Frequent transformation failures can lead to unmasked or unencrypted data risking data security and analytics reliability",
           "frequency": "5m",
           "interval": "5m",
           "operator": "gt",
           "threshold": 0
+        },
+        {
+          "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_validator_total_count[1h]))",
+          "alias": "[DATASET]: No data has been received for the past hour.",
+          "category": "Processing",
+          "flattened": true,
+          "severity": "warning",
+          "code": "PROCESS_UNIFIED_PIPELINE_010",
+          "description": "The dataset hasn’t received any new data for the past hour, which may affect the querying of the new data.",
+          "frequency": "5m",
+          "interval": "5m",
+          "operator": "lt",
+          "threshold": 1
         }
+      ],
+      "dataset_metrics_druid": [
+        {
+          "metric": "max(druid_supervisors{supervisor_name=\"dataset_id\", state=\"RUNNING\"} or (0 * absent(druid_supervisors{supervisor_name=\"dataset_id\", state=\"RUNNING\"})))",
+          "alias": "[DATASET]: Druid supervisor is in an unhealthy state",
+          "category": "Querying",
+          "severity": "critical",
+          "code": "QUERY_DRUID_INDEXER_009",
+          "description": "An unhealthy Druid Supervisor can halt real-time ingestion, delay data availability and querying.",
+          "frequency": "5m",
+          "interval": "5m",
+          "operator": "lt",
+          "threshold": 1
+        },
+        {
+          "metric": "druid_ingest_events_unparseable_total{dataSource=\"dataset_id\"}",
+          "alias": "[DATASET]: Detected higher amount of unparseable data.",
+          "flattened": true,
+          "category": "Querying",
+          "severity": "critical",
+          "code": "QUERY_DRUID_INDEXER_008",
+          "description": "High volume of unparseable data can lead to incomplete ingestion, data loss, and gaps in downstream analytics",
+          "frequency": "5m",
+          "interval": "5m",
+          "operator": "gt",
+          "threshold": 0
+        },
+        {
+          "metric": "druid_ingest_kafka_lag{dataSource=\"dataset_id\"}",
+          "alias": "[DATASET]: Detected higher amount of query lag than expected.",
+          "category": "Querying",
+          "flattened": true,
+          "severity": "critical",
+          "code": "QUERY_DRUID_INDEXER_007",
+          "description": "Increased query lag in Druid Indexers can affect real-time insights, causing delayed analytics and slower data-driven responses.",
+          "frequency": "5m",
+          "interval": "60m",
+          "operator": "gt",
+          "threshold": 5000000
+        },
+        {
+          "metric": "druid_ingest_kafka_lag{dataSource=\"dataset_id\"}",
+          "alias": "[DATASET]: Druid Supervisor Ingestion Failure Due to Offsets.",
+          "category": "Querying",
+          "flattened": true,
+          "severity": "critical",
+          "code": "QUERY_DRUID_INDEXER_012",
+          "description": "A Druid Supervisor with invalid offset can halt real-time ingestion, delay data availability and querying.",
+          "frequency": "5m",
+          "interval": "5m",
+          "operator": "lt",
+          "threshold": 0
+        }
+      ],
+      "query_metric": [
+        
       ]
     }
   }
