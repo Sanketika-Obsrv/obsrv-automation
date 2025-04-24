@@ -545,8 +545,9 @@
   interval: 5m
   labels: 
     alert_code: "STORAGE_PV_003"
-  description: "Failed Persistent Volume (PV) expansion can lead to storage bottlenecks, affecting data ingestion, processing, and service reliability."
-  annotations: {}
+  description: "The system couldn’t increase storage space and may enter an unhealthy state if the issue continues."
+  annotations: 
+    summary: "The volume autoscaler failed to expand the storage space (PV) due to certain limitations of the cloud provider. As a result, the system may become unhealthy."
   severity: critical
 
 - name: "[VELERO]:Kubernetes cluster backup not found."
@@ -558,8 +559,9 @@
   interval: 5m
   labels: 
     alert_code: "STORAGE_VELERO_008"
-  description: "Missing Velero backups in the Kubernetes cluster can risk data loss and hinder recovery during outages or failures."
-  annotations: {}
+  description: "The backup for the cluster failed, which could impact the recovery process if there's a system issue."
+  annotations: 
+    summary: "The backup process for the Kubernetes cluster failed, resulting in the system and its associated data may not be recoverable in the event of a failure or outage, impacting availability, disaster recovery, and rollback capabilities."
   severity: critical
 
 - name: "[VALKEY]: Detected higher memory usage than expected."
@@ -571,8 +573,9 @@
   interval: 5m
   labels: 
     alert_code: "PROCESS_VALKEY_012"
-  description: "High memory usage in Valkey can slow down key retrievals and increase latency in data enrichment processes."
-  annotations: {}
+  description: "All datasets are at risk of becoming unhealthy due to high memory usage"
+  annotations: 
+    summary: "High memory usage in Valkey can cause the data processing system to pause. As a result, no new data will be processed or available for querying."
   severity: critical
 
 - name: "[UNIFIED PIPELINE]: Detected higher amount of processing lag than expected."
@@ -585,5 +588,6 @@
   labels: 
     alert_code: "PROCESS_UNIFIED_PIPELINE_013"
   description: "A large amount of data is still waiting to be processed. This may cause in querying the most recent data."
-  annotations: {}
+  annotations: 
+    summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn’t available when querying the dataset."
   severity: critical
