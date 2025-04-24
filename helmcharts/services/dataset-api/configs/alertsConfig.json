@@ -51,15 +51,16 @@
           "threshold": 0
         },
         {
-          "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_validator_total_count[1h]))",
+          "metric": "sum(sum_over_time(flink_taskmanager_job_task_operator_PipelinePreprocessorJob_dataset_id_validator_total_count[$__range]))",
           "alias": "[DATASET]: No data has been received for the past hour.",
           "category": "Processing",
           "flattened": true,
           "severity": "warning",
           "code": "PROCESS_UNIFIED_PIPELINE_010",
           "description": "The dataset hasn’t received any new data for the past hour, which may affect the querying of the new data.",
+          "summary": "The dataset has not received any new data, which will impact real-time data processing",
           "frequency": "5m",
-          "interval": "5m",
+          "interval": "1h",
           "operator": "lt",
           "threshold": 1
         }
@@ -71,7 +72,8 @@
           "category": "Querying",
           "severity": "critical",
           "code": "QUERY_DRUID_INDEXER_009",
-          "description": "An unhealthy Druid Supervisor can halt real-time ingestion, delay data availability and querying.",
+          "description": "The dataset is unhealthy, and no new data has been available for querying since the system encountered the issue.",
+          "summary": "The associated Druid Supervisor is in an unhealthy state, preventing druid ingestion tasks from running. As a result, real-time data cannot be queried.",
           "frequency": "5m",
           "interval": "5m",
           "operator": "lt",
@@ -84,7 +86,8 @@
           "category": "Querying",
           "severity": "critical",
           "code": "QUERY_DRUID_INDEXER_008",
-          "description": "High volume of unparseable data can lead to incomplete ingestion, data loss, and gaps in downstream analytics",
+          "description": "The dataset is unhealthy, and the query results may be incorrect",
+          "summary": "Unparseable data has been detected in the system, preventing it from being processed. Henceforth, queries on this dataset may not return accurate data until the issue is resolved.",
           "frequency": "5m",
           "interval": "5m",
           "operator": "gt",
@@ -97,9 +100,10 @@
           "flattened": true,
           "severity": "critical",
           "code": "QUERY_DRUID_INDEXER_007",
-          "description": "Increased query lag in Druid Indexers can affect real-time insights, causing delayed analytics and slower data-driven responses.",
+          "description": "A large amount of data is still waiting to be processed. This may cause delays in querying the most recent data",
+          "summary": "High indexer lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn’t available when querying the dataset.",
           "frequency": "5m",
-          "interval": "60m",
+          "interval": "1h",
           "operator": "gt",
           "threshold": 5000000
         },
@@ -110,16 +114,15 @@
           "flattened": true,
           "severity": "critical",
           "code": "QUERY_DRUID_INDEXER_012",
-          "description": "A Druid Supervisor with invalid offset can halt real-time ingestion, delay data availability and querying.",
+          "description": "The dataset is unhealthy, and no new data has been available for querying since the issue occurred",
+          "summary": "The supervisor is experiencing a negative offset, preventing it from ingesting new data. As a result, real-time data is unavailable for querying.",
           "frequency": "5m",
           "interval": "5m",
           "operator": "lt",
           "threshold": 0
         }
       ],
-      "query_metric": [
-        
-      ]
+      "query_metric": []
     }
   }
 }
