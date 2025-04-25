@@ -26,6 +26,20 @@
     summary: "The backup process for the Kubernetes cluster failed, resulting in the system and its associated data may not be recoverable in the event of a failure or outage, impacting availability, disaster recovery, and rollback capabilities."
   severity: critical
 
+- name: "[PERSISTENT VOLUMES]: Storage volume resize request not processed by autoscaler"
+  query: count(kube_persistentvolumeclaim_info) - min(volume_autoscaler_num_valid_pvcs)
+  operator: gt
+  threshold: [0]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "STORAGE_PV_002"
+  description: "The system couldn’t increase storage space and may enter an unhealthy state if the issue continues."
+  annotations: 
+    summary: "The volume autoscaler failed to process the request to increase storage capacity, which may lead to system instability."
+  severity: critical
+
 - name: "[VALKEY]: Detected higher memory usage than expected."
   query: sum(sum_over_time(redis_memory_used_bytes[$__range]) / sum_over_time(redis_memory_max_bytes[$__range])) * 100
   operator: gt
@@ -52,4 +66,87 @@
   description: "A large amount of data is still waiting to be processed. This may cause in querying the most recent data."
   annotations: 
     summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn’t available when querying the dataset."
+  severity: critical
+
+- name: "[RDBMS]: A high number of open connections to PostgreSQL has been detected."
+  query: sum(pg_stat_activity_count)
+  operator: gt
+  threshold: [50]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "PROCESS_RDBMS_006"
+  description: "Dataset management is interrupted due to high number of open connections."
+  annotations: 
+    summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
+  severity: critical
+
+- name: "[KAFKA]: High Disk Usage Detected"
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="data-kafka-0"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="data-kafka-0"} *100
+  operator: gt
+  threshold: [90]
+  category: "Ingestion"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INGEST_KAFKA_010"
+  description: "New data is not being written into the dataset due to high disk usage."
+  annotations: 
+    summary: "High disk usage in Kafka may prevent new data from being written to the dataset, resulting in delays in real-time ingestion."
+  severity: critical
+
+- name: "[VALKEY]: High Disk Usage Detected."
+  query: sum(kubelet_volume_stats_used_bytes{namespace="redis"})/sum(kubelet_volume_stats_capacity_bytes{namespace="redis"}) * 100
+  operator: gt
+  threshold: [90]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "PROCESS_VALKEY_001"
+  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
+  annotations:
+    summary: "High disk usage in Valkey can cause the data processing system to pause, preventing new data from being queried. This can lead to data unavailability, impacting the overall data pipeline."
+  severity: critical
+
+- name: "[DRUID HISTORICAL]: High Disk Usage Detected"
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Querying"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "QUERY_DRUID_HISTORICAL_001"
+  description: "The dataset is unhealthy, and the querying of old data is affected if disk usage is high"
+  annotations: 
+    summary: "High disk usage in Druid historical can prevent the querying of older data, potentially causing incomplete query results and affecting data availability."
+  severity: critical
+
+- name: "[DRUID INDEXER]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Querying"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "QUERY_DRUID_INDEXER_002"
+  description: "The dataset is unhealthy, and it can affect the addition of new data if the disk usage is high"
+  annotations: 
+    summary: "High disk usage in Druid Indexer can interrupt data ingestion. As a result, real-time data is unavailable for querying."
+  severity: critical
+
+- name: "[SECOR]: High Disk Usage Detected."
+  query: sum(kubelet_volume_stats_used_bytes{namespace="secor"})/sum(kubelet_volume_stats_capacity_bytes{namespace="secor"}) * 100
+  threshold: [90]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "STORAGE_SECOR_001"
+  description: "Some of the data is not being saved if the disk usage is high"
+  annotations:
+    summary: "High disk usage in Secor can delay saving processed data into the system"
   severity: critical
