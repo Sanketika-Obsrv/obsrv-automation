@@ -96,8 +96,8 @@
     summary: "High disk usage in Kafka may prevent new data from being written to the dataset, resulting in delays in real-time ingestion."
   severity: critical
 
-- name: "[VALKEY]: High Disk Usage Detected."
-  query: sum(kubelet_volume_stats_used_bytes{namespace="redis"})/sum(kubelet_volume_stats_capacity_bytes{namespace="redis"}) * 100
+- name: "[VALKEY DENORM]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"} * 100
   operator: gt
   threshold: [90]
   category: "Processing"
@@ -107,7 +107,21 @@
     alert_code: "PROCESS_VALKEY_001"
   description: "All datasets are at risk of becoming unhealthy due to high disk usage"
   annotations:
-    summary: "High disk usage in Valkey can cause the data processing system to pause, preventing new data from being queried. This can lead to data unavailability, impacting the overall data pipeline."
+    summary: "High disk usage Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
+  severity: critical
+
+- name: "[VALKEY DEDUPE]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "PROCESS_VALKEY_014"
+  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
+  annotations:
+    summary: "High disk usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
   severity: critical
 
 - name: "[DRUID HISTORICAL]: High Disk Usage Detected"
@@ -119,7 +133,7 @@
   interval: 5m
   labels: 
     alert_code: "QUERY_DRUID_HISTORICAL_001"
-  description: "The dataset is unhealthy, and the querying of old data is affected if disk usage is high"
+  description: "The dataset is unhealthy, and the querying previously stored data is affected if disk usage is high"
   annotations: 
     summary: "High disk usage in Druid historical can prevent the querying of older data, potentially causing incomplete query results and affecting data availability."
   severity: critical
@@ -175,7 +189,7 @@
   interval: 5m
   labels: 
     alert_code: "INFRA_DRUID_HISTORICAL_028"
-  description: "The dataset is unhealthy, and the querying of old data is affected if there are frequent restarts in the system"
+  description: "The dataset is unhealthy, and querying previously stored data is affected if there are frequent restarts in the system"
   annotations:
     summary: "Frequent restarts in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
   severity: critical
@@ -292,8 +306,8 @@
     summary: "High CPU usage in Kafka may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
   severity: warning
 
-- name: "[VALKEY]: High CPU Usage Detected. System Under Heavy Load."
-  query: (sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) ) + sum by() (max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})))) * 100
+- name: "[VALKEY DENORM]: High CPU Usage Detected. System Under Heavy Load."
+  query: sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
   threshold: [90]
   category: "Infra"
@@ -303,7 +317,21 @@
     alert_code: "INFRA_VALKEY_002"
   description: "The system is working slowly, which may put datasets at risk of becoming unhealthy."
   annotations:
-    summary: "High CPU usage in Valkey may stop the caching of new data, causing delays in processing real-time data and preventing new data from being queried."
+    summary: "High CPU usage in Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
+  severity: warning
+
+- name: "[VALKEY DEDUPE]: High CPU Usage Detected. System Under Heavy Load."
+  query: sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_VALKEY_050"
+  description: "The system is working slowly, which may put datasets at risk of becoming unhealthy."
+  annotations:
+    summary: "High CPU usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
   severity: warning
 
 - name: "[DRUID HISTORICAL]: High CPU Usage Detected. System Under Heavy Load."
@@ -374,4 +402,116 @@
   description: "The system is working slowly, affecting the storage and addition of new data to the dataset."
   annotations:
     summary: "High CPU usage in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
+  severity: warning
+
+- name: "[KAFKA]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="kafka-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_KAFKA_015"
+  description: "The system is using excessive memory, which may delay the addition of new data to the dataset"
+  annotations:
+    summary: "High Memory usage in Kafka may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
+  severity: warning
+
+- name: "[VALKEY DENORM]: High Memory Usage Detected. System Could Become Unstable."
+  query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_VALKEY_016"
+  description: "The system is using excessive memory, which may put datasets at risk of becoming unhealthy."
+  annotations:
+    summary: "High Memory usage in Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
+  severity: warning
+
+- name: "[VALKEY DEDUPE]: High Memory Usage Detected. System Could Become Unstable."
+  query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_VALKEY_049"
+  description: "The system is using excessive memory, which may put datasets at risk of becoming unhealthy."
+  annotations:
+    summary: "High memory usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
+  severity: warning
+
+- name: "[DRUID_HISTORICAL]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-historicals"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_DRUID_HISTORICAL_017"
+  description: "The system is using excessive memory,  which may delay access to previously stored data in the dataset."
+  annotations:
+    summary: "High Memory usage in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
+  severity: warning
+
+- name: "[DRUID INDEXER]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-indexers"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_DRUID_INDEXER_018"
+  description: "The system is using excessive memory, which may delay querying new data from the dataset."
+  annotations:
+    summary: "High Memory usage in Druid Indexer can interrupt data ingestion, making real-time data unavailable for querying."
+  severity: warning
+
+- name: "[PROMETHEUS]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="prometheus"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_PROMETHEUS_021"
+  description: "The system is using excessive memory,  which may delay retrieving monitoring information for the system"
+  annotations:
+    summary: "High Memory usage in Prometheus can cause delays in collecting and processing metrics, potentially leading to slower response times for queries and incomplete data for monitoring and alerting."
+  severity: warning
+
+- name: "[GRAFANA]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="grafana"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_GRAFANA_022"
+  description: "The system is using excessive memory,  which may delay retrieving monitoring information for the system"
+  annotations:
+    summary: "High Memory usage in Grafana can lead to delayed alerting, affecting the monitoring and analysis of system metrics."
+  severity: warning
+
+- name: "[UNIFIED PIPELINE]: High Memory Usage Detected. System Could Become Unstable."
+  query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="unified-pipeline-jobmanager"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) + sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="unified-pipeline-jobmanager"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_UNIFIED_PIPELINE_025"
+  description: "The system is using excessive memory, affecting the storage and addition of new data to the dataset."
+  annotations:
+    summary: "High memory usage in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
   severity: warning
