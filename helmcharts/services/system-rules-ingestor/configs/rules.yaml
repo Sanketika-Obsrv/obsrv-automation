@@ -287,13 +287,13 @@
   interval: 5m
   labels: 
     alert_code: "INFRA_KAFKA_001"
-  description: "The system is working slowly, which may delay the addition of new data."
+  description: "The system is working slowly, which may delay the addition of new data to the dataset."
   annotations:
     summary: "High CPU usage in Kafka may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
   severity: warning
 
 - name: "[VALKEY]: High CPU Usage Detected. System Under Heavy Load."
-  query: sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) ) + sum by() (max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
+  query: (sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) ) + sum by() (max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})))) * 100
   operator: gt
   threshold: [90]
   category: "Infra"
@@ -315,7 +315,7 @@
   interval: 5m
   labels: 
     alert_code: "INFRA_DRUID_HISTORICAL_003"
-  description: "The system is working slowly, which may prevent access to old data."
+  description: "The system is running slowly due to high CPU usage, which may delay access to previously stored data in the dataset."
   annotations:
     summary: "High CPU usage in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
   severity: warning
@@ -363,7 +363,7 @@
   severity: warning
 
 - name: "[UNIFIED PIPELINE]: High CPU Usage Detected. System Under Heavy Load."
-  query: (sum by()(max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[1h]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})))) + sum by() (max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[1h]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))))) * 100 
+  query: (sum by()(max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})))) + sum by() (max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))))) * 100 
   operator: gt
   threshold: [90]
   category: "Infra"
