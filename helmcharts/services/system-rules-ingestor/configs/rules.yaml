@@ -7,7 +7,7 @@
   interval: 5m
   labels: 
     alert_code: "STORAGE_PV_003"
-  description: "The system couldn’t increase storage space and may enter an unhealthy state if the issue continues."
+  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
   annotations: 
     summary: "The volume autoscaler failed to expand the storage space (PV) due to certain limitations of the cloud provider. As a result, the system may become unhealthy."
   severity: critical
@@ -35,7 +35,7 @@
   interval: 5m
   labels: 
     alert_code: "STORAGE_PV_002"
-  description: "The system couldn’t increase storage space and may enter an unhealthy state if the issue continues."
+  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
   annotations: 
     summary: "The volume autoscaler failed to process the request to increase storage capacity, which may lead to system instability."
   severity: critical
@@ -65,7 +65,7 @@
     alert_code: "PROCESS_UNIFIED_PIPELINE_013"
   description: "A large amount of data is still waiting to be processed. This may cause in querying the most recent data."
   annotations: 
-    summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn’t available when querying the dataset."
+    summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn't available when querying the dataset."
   severity: critical
 
 - name: "[RDBMS]: A high number of open connections to PostgreSQL has been detected."
