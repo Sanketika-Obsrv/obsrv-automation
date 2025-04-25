@@ -151,6 +151,19 @@
           "interval": "5m",
           "operator": "gt",
           "threshold": 100
+        },
+        {
+          "metric": "sum(sum_over_time(node_failed_api_calls{dataset_id='<dataset_id>', id='api.data.in'}[$__range]))",
+          "alias": "[DATASET]: Failed to ingest data into the system",
+          "category": "Ingestion",
+          "severity": "warning",
+          "code": "INGEST_API_001",
+          "description": "Detected failures while adding new data to the dataset.",
+          "summary": "Failed to add new data to the dataset, impacting real-time data availability.",
+          "frequency": "5m",
+          "interval": "5m",
+          "operator": "gt",
+          "threshold": 0
         }
       ]
     }
