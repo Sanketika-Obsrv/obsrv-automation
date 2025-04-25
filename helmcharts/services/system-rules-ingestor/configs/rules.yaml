@@ -515,3 +515,17 @@
   annotations:
     summary: "High memory usage in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
   severity: warning
+
+- name: "[RDBMS]: A high number of open connections to PostgreSQL has been detected."
+  query: sum(pg_stat_activity_count)
+  operator: gt
+  threshold: [50]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "PROCESS_RDBMS_006"
+  description: "Dataset management is interrupted due to high number of open connections."
+  annotations:
+    summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
+  severity: warning
