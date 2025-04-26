@@ -62,7 +62,7 @@
   frequency: 5m
   interval: 1h
   labels: 
-    alert_code: "PROCESS_UNIFIED_PIPELINE_013"
+    alert_code: "PROCESS_UNIFIED_PIPELINE_009"
   description: "A large amount of data is still waiting to be processed. This may cause in querying the most recent data."
   annotations: 
     summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn't available when querying the dataset."
@@ -118,7 +118,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "PROCESS_VALKEY_014"
+    alert_code: "PROCESS_VALKEY_013"
   description: "All datasets are at risk of becoming unhealthy due to high disk usage"
   annotations:
     summary: "High disk usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
