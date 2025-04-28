@@ -642,3 +642,31 @@
   annotations:
     summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
   severity: warning
+
+- name: "[KUBERNETES NODE]: High CPU usage is detected in the Cluster Nodes"
+  query: (cluster:node_cpu:ratio_rate5m{cluster=""}) * 100
+  operator: gt
+  threshold: [80]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_KUBERNETES_047"
+  description: "The system has become unstable and is experiencing degraded performance due to high CPU usage."
+  annotations:
+    summary: "Persistent high CPU usage can cause Kubernetes nodes to become under pressure, leading to pod throttling, evictions, or failed launches, impacting overall cluster health."
+  severity: warning
+
+- name: "[KUBERNETES NODE]: High memory usage is detected in Cluster Nodes"
+  query: (1 - sum(:node_memory_MemAvailable_bytes:sum{cluster=''}) / sum(node_memory_MemTotal_bytes{job='node-exporter',cluster=''})) * 100
+  operator: gt
+  threshold: [80]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "INFRA_KUBERNETES_048"
+  description: "The system has slowed down and has become unstable due to high memory usage."
+  annotations:
+    summary: "Persistent high memory usage has led to resource exhaustion, causing performance degradation and potential failures in services"
+  severity: warning
