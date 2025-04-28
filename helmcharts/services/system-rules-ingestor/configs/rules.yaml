@@ -1,170 +1,3 @@
-- name: "[PERSISTENT VOLUMES]: Failed to automatically expand storage volume."
-  query: volume_autoscaler_resize_failure_total
-  operator: gt
-  threshold: [0]
-  category: "Storage"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "STORAGE_PV_003"
-  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
-  annotations: 
-    summary: "The volume autoscaler failed to expand the storage space (PV) due to certain limitations of the cloud provider. As a result, the system may become unhealthy."
-  severity: critical
-
-- name: "[VELERO]:Kubernetes cluster backup not found."
-  query: sum(increase(velero_backup_failure_total[$__range]))
-  operator: gt
-  threshold: [0]
-  category: "Storage"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "STORAGE_VELERO_008"
-  description: "The backup for the cluster failed, which could impact the recovery process if there's a system issue."
-  annotations: 
-    summary: "The backup process for the Kubernetes cluster failed, resulting in the system and its associated data may not be recoverable in the event of a failure or outage, impacting availability, disaster recovery, and rollback capabilities."
-  severity: critical
-
-- name: "[PERSISTENT VOLUMES]: Storage volume resize request not processed by autoscaler"
-  query: count(kube_persistentvolumeclaim_info) - min(volume_autoscaler_num_valid_pvcs)
-  operator: gt
-  threshold: [0]
-  category: "Storage"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "STORAGE_PV_002"
-  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
-  annotations: 
-    summary: "The volume autoscaler failed to process the request to increase storage capacity, which may lead to system instability."
-  severity: critical
-
-- name: "[VALKEY]: Detected higher memory usage than expected."
-  query: sum(sum_over_time(redis_memory_used_bytes[$__range]) / sum_over_time(redis_memory_max_bytes[$__range])) * 100
-  operator: gt
-  threshold: [80]
-  category: "Processing"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "PROCESS_VALKEY_012"
-  description: "All datasets are at risk of becoming unhealthy due to high memory usage"
-  annotations: 
-    summary: "High memory usage in Valkey can cause the data processing system to pause. As a result, no new data will be processed or available for querying."
-  severity: critical
-
-- name: "[UNIFIED PIPELINE]: Detected higher amount of processing lag than expected."
-  query: sum(sum_over_time(kafka_consumergroup_lag{consumergroup="unified-pipeline-group"}[$__range]))
-  operator: gt
-  threshold: [5000000]
-  category: "Processing"
-  frequency: 5m
-  interval: 1h
-  labels: 
-    alert_code: "PROCESS_UNIFIED_PIPELINE_009"
-  description: "A large amount of data is still waiting to be processed. This may cause in querying the most recent data."
-  annotations: 
-    summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn't available when querying the dataset."
-  severity: critical
-
-- name: "[RDBMS]: A high number of open connections to PostgreSQL has been detected."
-  query: sum(pg_stat_activity_count)
-  operator: gt
-  threshold: [50]
-  category: "Processing"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "PROCESS_RDBMS_006"
-  description: "Dataset management is interrupted due to high number of open connections."
-  annotations: 
-    summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
-  severity: critical
-
-- name: "[KAFKA]: High Disk Usage Detected"
-  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="data-kafka-0"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="data-kafka-0"} *100
-  operator: gt
-  threshold: [90]
-  category: "Ingestion"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "INGEST_KAFKA_010"
-  description: "New data is not being written into the dataset due to high disk usage."
-  annotations: 
-    summary: "High disk usage in Kafka may prevent new data from being written to the dataset, resulting in delays in real-time ingestion."
-  severity: critical
-
-- name: "[VALKEY DENORM]: High Disk Usage Detected."
-  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"} * 100
-  operator: gt
-  threshold: [90]
-  category: "Processing"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "PROCESS_VALKEY_001"
-  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
-  annotations:
-    summary: "High disk usage Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
-  severity: critical
-
-- name: "[VALKEY DEDUPE]: High Disk Usage Detected."
-  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"} * 100
-  operator: gt
-  threshold: [90]
-  category: "Processing"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "PROCESS_VALKEY_013"
-  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
-  annotations:
-    summary: "High disk usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
-  severity: critical
-
-- name: "[DRUID HISTORICAL]: High Disk Usage Detected"
-  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"} * 100
-  operator: gt
-  threshold: [90]
-  category: "Querying"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "QUERY_DRUID_HISTORICAL_001"
-  description: "The dataset is unhealthy, and the querying previously stored data is affected if disk usage is high"
-  annotations: 
-    summary: "High disk usage in Druid historical can prevent the querying of older data, potentially causing incomplete query results and affecting data availability."
-  severity: critical
-
-- name: "[DRUID INDEXER]: High Disk Usage Detected."
-  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"} * 100
-  operator: gt
-  threshold: [90]
-  category: "Querying"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "QUERY_DRUID_INDEXER_002"
-  description: "The dataset is unhealthy, and it can affect the addition of new data if the disk usage is high"
-  annotations: 
-    summary: "High disk usage in Druid Indexer can interrupt data ingestion. As a result, real-time data is unavailable for querying."
-  severity: critical
-
-- name: "[SECOR]: High Disk Usage Detected."
-  query: sum(kubelet_volume_stats_used_bytes{namespace="secor"})/sum(kubelet_volume_stats_capacity_bytes{namespace="secor"}) * 100
-  threshold: [90]
-  category: "Storage"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "STORAGE_SECOR_001"
-  description: "Some of the data is not being saved if the disk usage is high"
-  annotations:
-    summary: "High disk usage in Secor can delay saving processed data into the system"
-  severity: critical
-
 - name: "[KAFKA]: System has restarted. May Affect Ingestion."
   query: increase(kube_pod_container_status_restarts_total{container="kafka",pod="kafka-0"}[$__range])
   operator: gt
@@ -173,12 +6,11 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_KAFKA_026"
+    alert_code: "ALERT_1001"
   description: "The system has restarted, which may cause delays in adding new data to the dataset."
   annotations:
     summary: "Frequent restarts in kafka system may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
   severity: critical
-
 
 - name: "[DRUID HISTORICALS]: System has Restarted. May Affect Querying."
   query: increase(kube_pod_container_status_restarts_total{container="druid-raw-historicals"}[$__range])
@@ -188,7 +20,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_HISTORICAL_028"
+    alert_code: "ALERT_1002"
   description: "The dataset is unhealthy, and querying previously stored data is affected if there are frequent restarts in the system"
   annotations:
     summary: "Frequent restarts in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
@@ -202,7 +34,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_INDEXER_029"
+    alert_code: "ALERT_1003"
   description: "The dataset is unhealthy, and frequent restarts can affect the addition of new data to the dataset"
   annotations:
     summary: "Frequent restarts in Druid Indexer can interrupt data ingestion. As a result, real-time data is unavailable for querying."
@@ -216,7 +48,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_OVERLORD_030"
+    alert_code: "ALERT_1004"
   description: "The dataset is unhealthy, and frequent restarts can cause delays in adding new data to the dataset"
   annotations:
     summary: "Frequent restarts in Druid Overlord can interrupt the handling of ingestion tasks, leading to delays or loss of new data, and impacting real-time data querying."
@@ -230,7 +62,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_BROKER_031"
+    alert_code: "ALERT_1005"
   description: "The dataset is unhealthy, and frequent restarts may result in inaccurate data while querying"
   annotations:
     summary: "Frequent restarts in Druid Broker can cause query routing issues, leading to delays while querying the data"
@@ -245,7 +77,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_COORDINATOR_032"
+    alert_code: "ALERT_1006"
   description: "The dataset is unhealthy, and frequent restarts may cause previously stored data to become unavailable for querying."
   annotations:
     summary: "Frequent restarts in Druid Coordinator can disrupt segment balancing and the availability of historical data, leading to incomplete query results."
@@ -259,7 +91,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_API_SVC_033"
+    alert_code: "ALERT_1007"
   description: "Dataset management is interrupted due to frequent restarts in the system ."
   annotations:
     summary: "Frequent restarts in the API service can disrupt dataset management, making it difficult to perform operations on the dataset."
@@ -273,7 +105,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_PROMETHEUS_034"
+    alert_code: "ALERT_1008"
   description: "Detected delays in tracking system health due to frequent restarts in the system."
   annotations:
     summary: "Frequent restarts of Prometheus can interrupt metric scraping and storage, causing missing data points, delayed alerts and moniroting."
@@ -287,7 +119,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_GRAFANA_035"
+    alert_code: "ALERT_1009"
   description: "Notifying about system issues is delayed due to frequent restarts in the system"
   annotations:
     summary: "Frequent restarts of Grafana can affect monitoring, resulting in delays or issues with alerting about the system."
@@ -301,7 +133,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_LOKI_036"
+    alert_code: "ALERT_1010"
   description: "Storing the system logs is delayed due to frequent restarts in the system"
   annotations:
     summary: "Frequent restarts in Loki can disrupt the log ingestion process, causing delays in storing logs and potentially leading to issues when analyzing them."
@@ -315,7 +147,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_POSTGRES_041"
+    alert_code: "ALERT_1011"
   description: "Dataset management is interrupted due to frequent restarts in system."
   annotations:
     summary: "Frequent restarts in PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
@@ -329,7 +161,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_VALKEY_027"
+    alert_code: "ALERT_1012"
   description: "All datasets are at risk of becoming unhealthy due to frequent restarts in the system"
   annotations:
     summary: "A system restart in Valkey may stop the caching of new data, causing delays in processing of real time data, preventing new data from being queried. "
@@ -343,7 +175,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_UNIFIED_PIPELINE_037"
+    alert_code: "ALERT_1013"
   description: "The dataset is unhealthy, and no new data will be stored in the dataset, making it unavailable for querying."
   annotations:
     summary: "Frequent restarts in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
@@ -357,7 +189,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_KAFKA_001"
+    alert_code: "ALERT_1014"
   description: "The system is working slowly, which may delay the addition of new data to the dataset."
   annotations:
     summary: "High CPU usage in Kafka may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
@@ -371,7 +203,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_VALKEY_002"
+    alert_code: "ALERT_1015"
   description: "The system is working slowly, which may put datasets at risk of becoming unhealthy."
   annotations:
     summary: "High CPU usage in Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
@@ -385,7 +217,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_VALKEY_050"
+    alert_code: "ALERT_1016"
   description: "The system is working slowly, which may put datasets at risk of becoming unhealthy."
   annotations:
     summary: "High CPU usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
@@ -399,7 +231,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_HISTORICAL_003"
+    alert_code: "ALERT_1017"
   description: "The system is running slowly due to high CPU usage, which may delay access to previously stored data in the dataset."
   annotations:
     summary: "High CPU usage in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
@@ -413,7 +245,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_INDEXER_004"
+    alert_code: "ALERT_1018"
   description: "The system is working slowly, which may delay querying of new data from the dataset."
   annotations:
     summary: "High CPU usage in Druid Indexer can interrupt data ingestion, making real-time data unavailable for querying."
@@ -427,7 +259,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_OVERLORD_005"
+    alert_code: "ALERT_1019"
   description: "The system is working slowly, causing delays in adding new data to the dataset"
   annotations:
     summary: "High CPU usage in Druid Overlord can interrupt the handling of ingestion tasks, leading to delays or loss of new data, and impacting real-time data querying."
@@ -441,7 +273,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_BROKER_006"
+    alert_code: "ALERT_1020"
   description: "The system is working slowly, resulting in inaccurate data while querying the data from the dataset"
   annotations:
     summary: "High CPU usage in Druid Broker can cause query routing issues, leading to delays while querying the data"
@@ -455,7 +287,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_PROMETHEUS_007"
+    alert_code: "ALERT_1021"
   description: "The system is working slowly, which may delay retrieving monitoring information for the system"
   annotations:
     summary: "High CPU usage in Prometheus can cause delays in collecting and processing metrics, potentially leading to slower response times for queries and incomplete data for monitoring and alerting."
@@ -469,7 +301,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_GRAFANA_008"
+    alert_code: "ALERT_1022"
   description: "The system is working slowly, which may delay retrieving monitoring information for the system"
   annotations:
     summary: "High CPU usage in Grafana can lead to, delayed alerting, affecting the monitoring and analysis of system metrics."
@@ -483,7 +315,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_UNIFIED_PIPELINE_014"
+    alert_code: "ALERT_1023"
   description: "The system is working slowly, affecting the storage and addition of new data to the dataset."
   annotations:
     summary: "High CPU usage in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
@@ -497,7 +329,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_KAFKA_015"
+    alert_code: "ALERT_1024"
   description: "The system is using excessive memory, which may delay the addition of new data to the dataset"
   annotations:
     summary: "High Memory usage in Kafka may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
@@ -511,7 +343,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_VALKEY_016"
+    alert_code: "ALERT_1025"
   description: "The system is using excessive memory, which may put datasets at risk of becoming unhealthy."
   annotations:
     summary: "High Memory usage in Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
@@ -525,7 +357,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_VALKEY_049"
+    alert_code: "ALERT_1026"
   description: "The system is using excessive memory, which may put datasets at risk of becoming unhealthy."
   annotations:
     summary: "High memory usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
@@ -539,7 +371,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_HISTORICAL_017"
+    alert_code: "ALERT_1027"
   description: "The system is using excessive memory,  which may delay access to previously stored data in the dataset."
   annotations:
     summary: "High Memory usage in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
@@ -553,7 +385,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_INDEXER_018"
+    alert_code: "ALERT_1028"
   description: "The system is using excessive memory, which may delay querying new data from the dataset."
   annotations:
     summary: "High Memory usage in Druid Indexer can interrupt data ingestion, making real-time data unavailable for querying."
@@ -567,7 +399,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_OVERLORD_019"
+    alert_code: "ALERT_1029"
   description: "The system is using excessive memory, causing delays in adding new data to the dataset"
   annotations:
     summary: "High memory usage in Druid Overlord can interrupt the handling of ingestion tasks, leading to delays or loss of new data, and impacting real-time data querying."
@@ -581,7 +413,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_DRUID_BROKER_020"
+    alert_code: "ALERT_1030"
   description: "The system is working slowly, resulting in inaccurate data while querying the data from the dataset"
   annotations:
     summary: "High memory usage in Druid Broker can cause query routing issues, leading to delays while querying the data"
@@ -595,7 +427,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_PROMETHEUS_021"
+    alert_code: "ALERT_1031"
   description: "The system is using excessive memory,  which may delay retrieving monitoring information for the system"
   annotations:
     summary: "High Memory usage in Prometheus can cause delays in collecting and processing metrics, potentially leading to slower response times for queries and incomplete data for monitoring and alerting."
@@ -609,7 +441,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_GRAFANA_022"
+    alert_code: "ALERT_1032"
   description: "The system is using excessive memory,  which may delay retrieving monitoring information for the system"
   annotations:
     summary: "High Memory usage in Grafana can lead to delayed alerting, affecting the monitoring and analysis of system metrics."
@@ -623,24 +455,10 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_UNIFIED_PIPELINE_025"
+    alert_code: "ALERT_1033"
   description: "The system is using excessive memory, affecting the storage and addition of new data to the dataset."
   annotations:
     summary: "High memory usage in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
-  severity: warning
-
-- name: "[RDBMS]: A high number of open connections to PostgreSQL has been detected."
-  query: sum(pg_stat_activity_count)
-  operator: gt
-  threshold: [50]
-  category: "Processing"
-  frequency: 5m
-  interval: 5m
-  labels: 
-    alert_code: "PROCESS_RDBMS_006"
-  description: "Dataset management is interrupted due to high number of open connections."
-  annotations:
-    summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
   severity: warning
 
 - name: "[KUBERNETES NODE]: High CPU usage is detected in the Cluster Nodes"
@@ -651,7 +469,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_KUBERNETES_047"
+    alert_code: "ALERT_1034"
   description: "The system has become unstable and is experiencing degraded performance due to high CPU usage."
   annotations:
     summary: "Persistent high CPU usage can cause Kubernetes nodes to become under pressure, leading to pod throttling, evictions, or failed launches, impacting overall cluster health."
@@ -665,8 +483,176 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "INFRA_KUBERNETES_048"
+    alert_code: "ALERT_1035"
   description: "The system has slowed down and has become unstable due to high memory usage."
   annotations:
     summary: "Persistent high memory usage has led to resource exhaustion, causing performance degradation and potential failures in services"
   severity: warning
+
+- name: "[KAFKA]: High Disk Usage Detected"
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="data-kafka-0"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="data-kafka-0"} *100
+  operator: gt
+  threshold: [90]
+  category: "Ingestion"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1101"
+  description: "New data is not being written into the dataset due to high disk usage."
+  annotations: 
+    summary: "High disk usage in Kafka may prevent new data from being written to the dataset, resulting in delays in real-time ingestion."
+  severity: critical
+
+- name: "[RDBMS]: A high number of open connections to PostgreSQL has been detected."
+  query: sum(pg_stat_activity_count)
+  operator: gt
+  threshold: [50]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1201"
+  description: "Dataset management is interrupted due to high number of open connections."
+  annotations:
+    summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
+  severity: warning
+
+- name: "[VALKEY]: Detected higher memory usage than expected."
+  query: sum(sum_over_time(redis_memory_used_bytes[$__range]) / sum_over_time(redis_memory_max_bytes[$__range])) * 100
+  operator: gt
+  threshold: [80]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1202"
+  description: "All datasets are at risk of becoming unhealthy due to high memory usage"
+  annotations: 
+    summary: "High memory usage in Valkey can cause the data processing system to pause. As a result, no new data will be processed or available for querying."
+  severity: critical
+
+- name: "[UNIFIED PIPELINE]: Detected higher amount of processing lag than expected."
+  query: sum(sum_over_time(kafka_consumergroup_lag{consumergroup="unified-pipeline-group"}[$__range]))
+  operator: gt
+  threshold: [5000000]
+  category: "Processing"
+  frequency: 5m
+  interval: 1h
+  labels: 
+    alert_code: "ALERT_1203"
+  description: "A large amount of data is still waiting to be processed. This may cause delays in querying the most recent data."
+  annotations: 
+    summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn't available when querying the dataset."
+  severity: critical
+
+- name: "[VALKEY DENORM]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1204"
+  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
+  annotations:
+    summary: "High disk usage Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
+  severity: critical
+
+- name: "[VALKEY DEDUPE]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1205"
+  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
+  annotations:
+    summary: "High disk usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
+  severity: critical
+
+- name: "[DRUID HISTORICAL]: High Disk Usage Detected"
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Querying"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1301"
+  description: "The dataset is unhealthy, and the querying previously stored data is affected if disk usage is high"
+  annotations: 
+    summary: "High disk usage in Druid historical can prevent the querying of older data, potentially causing incomplete query results and affecting data availability."
+  severity: critical
+
+- name: "[DRUID INDEXER]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Querying"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1302"
+  description: "The dataset is unhealthy, and it can affect the addition of new data if the disk usage is high"
+  annotations: 
+    summary: "High disk usage in Druid Indexer can interrupt data ingestion. As a result, real-time data is unavailable for querying."
+  severity: critical
+
+- name: "[SECOR]: High Disk Usage Detected."
+  query: sum(kubelet_volume_stats_used_bytes{namespace="secor"})/sum(kubelet_volume_stats_capacity_bytes{namespace="secor"}) * 100
+  threshold: [90]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1401"
+  description: "Some of the data is not being saved if the disk usage is high"
+  annotations:
+    summary: "High disk usage in Secor can delay saving processed data into the system"
+  severity: critical
+
+
+- name: "[PERSISTENT VOLUMES]: Failed to automatically expand storage volume."
+  query: volume_autoscaler_resize_failure_total
+  operator: gt
+  threshold: [0]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1402"
+  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
+  annotations: 
+    summary: "The volume autoscaler failed to expand the storage space (PV) due to certain limitations of the cloud provider. As a result, the system may become unhealthy."
+  severity: critical
+
+- name: "[VELERO]:Kubernetes cluster backup not found."
+  query: sum(increase(velero_backup_failure_total[$__range]))
+  operator: gt
+  threshold: [0]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1403"
+  description: "The backup for the cluster failed, which could impact the recovery process if there's a system issue."
+  annotations: 
+    summary: "The backup process for the Kubernetes cluster failed, resulting in the system and its associated data may not be recoverable in the event of a failure or outage, impacting availability, disaster recovery, and rollback capabilities."
+  severity: critical
+
+- name: "[PERSISTENT VOLUMES]: Storage volume resize request not processed by autoscaler"
+  query: count(kube_persistentvolumeclaim_info) - min(volume_autoscaler_num_valid_pvcs)
+  operator: gt
+  threshold: [0]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1404"
+  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
+  annotations: 
+    summary: "The volume autoscaler failed to process the request to increase storage capacity, which may lead to system instability."
+  severity: critical
