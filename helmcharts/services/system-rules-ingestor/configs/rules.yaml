@@ -654,7 +654,7 @@
     alert_code: "ALERT_1047"
   description: "Dataset management is interrupted due to frequent restarts in system."
   annotations:
-    summary: "Frequent restarts of the PostgreSQL migration process may disrupt the migration flow, affecting dataset management and causing delays in database table creationt"
+    summary: "Frequent restarts of the PostgreSQL migration process may disrupt the migration flow, affecting dataset management and causing delays in database table creation"
   severity: critical
 
 - name: "[KAFKA]: High Disk Usage Detected"
