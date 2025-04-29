@@ -354,7 +354,7 @@ kube-prometheus-stack:
         ehlo_identity: ""
         startTLS_policy: ""
         skip_verify: true
-        from_name: "Grafana"
+        from_name: "Obsrv"
 
 
 kubernetes-reflector:

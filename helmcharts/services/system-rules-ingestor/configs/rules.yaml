@@ -308,7 +308,7 @@
   severity: warning
 
 - name: "[KAFKA]: System has restarted. May Affect Ingestion."
-  query: increase(kube_pod_container_status_restarts_total{container="kafka",pod="kafka-0"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="kafka",pod="kafka-0"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -322,7 +322,7 @@
   severity: critical
 
 - name: "[DRUID HISTORICALS]: System has Restarted. May Affect Querying."
-  query: increase(kube_pod_container_status_restarts_total{container="druid-raw-historicals"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="druid-raw-historicals"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -336,7 +336,7 @@
   severity: critical
 
 - name: "[DRUID INDEXER]: System has Restarted. May Affect Querying."
-  query: increase(kube_pod_container_status_restarts_total{container="druid-raw-indexers"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="druid-raw-indexers"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -350,8 +350,7 @@
   severity: critical
 
 - name: "[DRUID OVERLORD]: System has Restarted. May Affect Querying."
-  query: increase(kube_pod_container_status_restarts_total{container="druid-raw-overlords"}[$__range])
-  operator: gt
+  query: kube_pod_container_status_restarts_total{container="druid-raw-overlords"}
   threshold: [3]
   category: "Infra"
   frequency: 5m
@@ -364,7 +363,7 @@
   severity: critical
 
 - name: "[DRUID BROKER]: System has Restarted. May Affect Querying."
-  query: increase(kube_pod_container_status_restarts_total{container="druid-raw-brokers"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="druid-raw-brokers"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -379,7 +378,7 @@
 
 
 - name: "[DRUID CORDINATOR]: System has Restarted. May Affect Querying."
-  query: increase(kube_pod_container_status_restarts_total{container="druid-raw-coordinators"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="druid-raw-coordinators"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -393,7 +392,7 @@
   severity: critical
 
 - name: "[API SERVICE]: System has restarted. May Affect API Availability."
-  query: increase(kube_pod_container_status_restarts_total{container="dataset-api"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="dataset-api"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -407,7 +406,7 @@
   severity: critical
 
 - name: "[PROMETHEUS]: System has restarted. May Affect Monitoring."
-  query: increase(kube_pod_container_status_restarts_total{container="prometheus"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="prometheus"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -417,11 +416,11 @@
     alert_code: "ALERT_1030"
   description: "Detected delays in tracking system health due to frequent restarts in the system."
   annotations:
-    summary: "Frequent restarts of Prometheus can interrupt metric scraping and storage, causing missing data points, delayed alerts and moniroting."
+    summary: "Frequent restarts of Prometheus can interrupt metric scraping and storage, causing missing data points, delayed alerts and monitoring."
   severity: critical
 
 - name: "[GRAFANA]: System has restarted. May Affect Monitoring."
-  query: increase(kube_pod_container_status_restarts_total{container="grafana"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="grafana"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -435,7 +434,7 @@
   severity: critical
 
 - name: "[LOKI]: System has restarted. May Affect Monitoring."
-  query: avg(increase(kube_pod_container_status_restarts_total{container="loki"}[$__range]))
+  query: max(kube_pod_container_status_restarts_total{container="loki"})
   operator: gt
   threshold: [3]  
   category: "Infra"
@@ -449,7 +448,7 @@
   severity: critical
 
 - name: "[POSTGRES]: System has restarted. May Affect Database Connectivity."
-  query: increase(kube_pod_container_status_restarts_total{container="postgresql"}[$__range])
+  query: kube_pod_container_status_restarts_total{container="postgresql"}
   operator: gt
   threshold: [3]
   category: "Infra"
@@ -490,6 +489,174 @@
     summary: "Frequent restarts in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
   severity: critical
 
+- name: "[CACHE INDEXER]: System has restarted. May Affect Monitoring."
+  query: max(kube_pod_container_status_restarts_total{container=~"(cache-indexer-jobmanager|cache-indexer-taskmanager)"})
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1036"
+  description: "The system has restarted, affecting the querying of data."
+  annotations:
+    summary: "A system restart in Cache Indexer job may stop the caching of new data and make all datasets unhealthy, causing delays in processing of real time data, preventing new data from being queried."
+  severity: critical
+
+- name: "[SECOR]: System has restarted. May Affect Services."
+  query: max(kube_pod_container_status_restarts_total{container=~"(unique-backup-secor|ingest-backup-secor|transform-backup-secor|failed-backup-secor|raw-backup-secor|denorm-backup-secor)"})
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1037"
+  description: "The system has restarted, affecting the availability of the data"
+  annotations:
+    summary: "A system restart in Secor may affect the backup of ingested data, potentially leading to delays or inconsistencies in data availability."
+  severity: critical
+
+- name: "[WEB CONSOLE]: System has restarted. May Affect Data Analytics View in Web Console."
+  query: kube_pod_container_status_restarts_total{container="management-console"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1038"
+  description: "The system has restarted, disrupting user interactions to visualize dataset."
+  annotations:
+    summary: "Frequent web console restarts can disrupt user interactions, affecting visualization of data for all the datasets."
+  severity: critical
+
+- name: "[PROMTAIL]: System has restarted. May Affect Log Ingestion."
+  query: kube_pod_container_status_restarts_total{container="promtail"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1039"
+  description: "The system has restarted, affecting the storage of system logs"
+  annotations:
+    summary: "Frequent restarts in Promtail can disrupt the log ingestion process, causing delays in storing logs and potentially leading to issues when analyzing them."
+  severity: critical
+
+- name: "[KEYCLOAK]: System has restarted. May Affect User Authentication and Login Flow"
+  query: kube_pod_container_status_restarts_total{container="keycloak"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1040"
+  description: "The system has restarted, disrupting authentication and authorization flow of the system."
+  annotations:
+    summary: "Frequent Keycloak restarts can disrupt authentication and authorization flows, causing login failures and access issues in the system."
+  severity: critical
+
+- name: "[SUPERSET]: System has restarted. May Affect Superset Dashboard Access."
+  query: kube_pod_container_status_restarts_total{container="superset"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1041"
+  description: "The system has restarted, affecting visualization of the data."
+  annotations:
+    summary: "Frequent Superset restarts may lead to dashboard unavailability, impacting access to analytical insights for the datasets"
+  severity: critical
+
+- name: "[S3 EXPORTER]: System has restarted. May Affect Data export to S3."
+  query: kube_pod_container_status_restarts_total{container="s3-exporter"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1042"
+  description: "The system has restarted, affecting the availability of the data"
+  annotations:
+    summary: "Frequent restarts of the S3 Exporter may interrupt data exports to object storage, leading to incomplete backups or delays in data archival"
+  severity: critical
+
+- name: "[MANAGEMENT API]: System has restarted. May Affect Data export to S3."
+  query: kube_pod_container_status_restarts_total{container="management-api"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1043"
+  description: "Dataset management is interrupted due to frequent restarts in the system."
+  annotations:
+    summary: "Frequent restarts in the Management Api service can disrupt dataset management, making it difficult to perform operations on the dataset."
+  severity: critical
+
+- name: "[VELERO]: System has restarted. May Affect cluster backup."
+  query: kube_pod_container_status_restarts_total{container="velero"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1044"
+  description: "The system has restarted, potentially disrupting availability of the system."
+  annotations:
+    summary: "A system restart in Velero may affect the Kubernetes cluster backup, potentially making backup and restore services temporarily unavailable."
+  severity: critical
+
+- name: "[VOLUME AUTOSCALER]: System has restarted. Automatic Volume Scaling May Be Disrupted."
+  query: kube_pod_container_status_restarts_total{container="volume-autoscaler"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1045"
+  description: "The system has restarted, affecting the availability of the data"
+  annotations:
+    summary: "Frequent restarts of the Volume Autoscaler may delay persistent volume resizing, potentially leading to disruptions in system operations."
+  severity: critical
+
+- name: "[SYSTEM RULES INGESTOR]: System has restarted. Automatic Volume Scaling May Be Disrupted."
+  query: kube_pod_container_status_restarts_total{container="system-rules-ingestor"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1046"
+  description: "Detected delays in tracking system health due to frequent restarts in the system"
+  annotations:
+    summary: "Frequent restarts of the System rules ingestor may affect the monitoring of the system, causing delays in  tracking system health"
+  severity: critical
+
+- name: "[POSTGRES MIGRATION]: System has restarted. Automatic Volume Scaling May Be Disrupted."
+  query: kube_pod_container_status_restarts_total{container="postgresql-migration"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1047"
+  description: "Dataset management is interrupted due to frequent restarts in system."
+  annotations:
+    summary: "Frequent restarts of the PostgreSQL migration process may disrupt the migration flow, affecting dataset management and causing delays in database table creationt"
+  severity: critical
+
 - name: "[KAFKA]: High Disk Usage Detected"
   query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="data-kafka-0"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="data-kafka-0"} *100
   operator: gt
@@ -498,7 +665,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "ALERT_1101"
+    alert_code: "ALERT_1110"
   description: "New data is not being written into the dataset due to high disk usage."
   annotations: 
     summary: "High disk usage in Kafka may prevent new data from being written to the dataset, resulting in delays in real-time ingestion."
@@ -512,7 +679,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "ALERT_1201"
+    alert_code: "ALERT_1207"
   description: "Dataset management is interrupted due to high number of open connections."
   annotations:
     summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
@@ -526,7 +693,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "ALERT_1202"
+    alert_code: "ALERT_1210"
   description: "All datasets are at risk of becoming unhealthy due to high memory usage"
   annotations: 
     summary: "High memory usage in Valkey can cause the data processing system to pause. As a result, no new data will be processed or available for querying."
@@ -540,7 +707,7 @@
   frequency: 5m
   interval: 1h
   labels: 
-    alert_code: "ALERT_1203"
+    alert_code: "ALERT_1208"
   description: "A large amount of data is still waiting to be processed. This may cause delays in querying the most recent data."
   annotations: 
     summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn't available when querying the dataset."
@@ -554,7 +721,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "ALERT_1204"
+    alert_code: "ALERT_1201"
   description: "All datasets are at risk of becoming unhealthy due to high disk usage"
   annotations:
     summary: "High disk usage Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
@@ -568,7 +735,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "ALERT_1205"
+    alert_code: "ALERT_1202"
   description: "All datasets are at risk of becoming unhealthy due to high disk usage"
   annotations:
     summary: "High disk usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
@@ -651,7 +818,7 @@
   frequency: 5m
   interval: 5m
   labels: 
-    alert_code: "ALERT_1404"
+    alert_code: "ALERT_1408"
   description: "The backup for the cluster failed, which could impact the recovery process if there's a system issue."
   annotations: 
     summary: "The backup process for the Kubernetes cluster failed, resulting in the system and its associated data may not be recoverable in the event of a failure or outage, impacting availability, disaster recovery, and rollback capabilities."
