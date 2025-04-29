@@ -587,7 +587,7 @@
     summary: "Frequent restarts of the S3 Exporter may interrupt data exports to object storage, leading to incomplete backups or delays in data archival"
   severity: critical
 
-- name: "[MANAGEMENT API]: System has restarted. May Affect Data export to S3."
+- name: "[MANAGEMENT API]: System has restarted. May Affect dataset management."
   query: kube_pod_container_status_restarts_total{container="management-api"}
   operator: gt
   threshold: [3]
@@ -629,7 +629,7 @@
     summary: "Frequent restarts of the Volume Autoscaler may delay persistent volume resizing, potentially leading to disruptions in system operations."
   severity: critical
 
-- name: "[SYSTEM RULES INGESTOR]: System has restarted. Automatic Volume Scaling May Be Disrupted."
+- name: "[SYSTEM RULES INGESTOR]: System has restarted. May Affect System Health"
   query: kube_pod_container_status_restarts_total{container="system-rules-ingestor"}
   operator: gt
   threshold: [3]
@@ -643,7 +643,7 @@
     summary: "Frequent restarts of the System rules ingestor may affect the monitoring of the system, causing delays in  tracking system health"
   severity: critical
 
-- name: "[POSTGRES MIGRATION]: System has restarted. Automatic Volume Scaling May Be Disrupted."
+- name: "[POSTGRES MIGRATION]: System has restarted. May Affect dataset management."
   query: kube_pod_container_status_restarts_total{container="postgresql-migration"}
   operator: gt
   threshold: [3]
