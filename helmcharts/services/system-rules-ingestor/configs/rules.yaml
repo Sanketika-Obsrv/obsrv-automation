@@ -573,7 +573,7 @@
     summary: "Frequent Superset restarts may lead to dashboard unavailability, impacting access to analytical insights for the datasets"
   severity: critical
 
-- name: "[S3 EXPORTER]: System has restarted. May Affect Data export to S3."
+- name: "[S3 EXPORTER]: System has restarted. May Affect Monitoring."
   query: kube_pod_container_status_restarts_total{container="s3-exporter"}
   operator: gt
   threshold: [3]
@@ -582,9 +582,9 @@
   interval: 5m
   labels: 
     alert_code: "ALERT_1042"
-  description: "The system has restarted, affecting the availability of the data"
+  description: "The system has restarted, affecting the system health"
   annotations:
-    summary: "Frequent restarts of the S3 Exporter may interrupt data exports to object storage, leading to incomplete backups or delays in data archival"
+    summary: "Frequent restarts of the S3 Exporter may interrupt the export of S3 metrics, potentially impacting the monitoring of cloud storage health and performance."
   severity: critical
 
 - name: "[MANAGEMENT API]: System has restarted. May Affect dataset management."
