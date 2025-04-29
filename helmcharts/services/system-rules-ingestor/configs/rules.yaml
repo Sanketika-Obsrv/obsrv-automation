@@ -705,7 +705,7 @@
   threshold: [5000000]
   category: "Processing"
   frequency: 5m
-  interval: 1h
+  interval: 60m
   labels: 
     alert_code: "ALERT_1208"
   description: "A large amount of data is still waiting to be processed. This may cause delays in querying the most recent data."
