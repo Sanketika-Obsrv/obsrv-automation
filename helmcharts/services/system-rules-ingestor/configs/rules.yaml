@@ -500,7 +500,7 @@
     alert_code: "ALERT_1036"
   description: "The system has restarted, affecting the querying of data."
   annotations:
-    summary: "A system restart in Cache Indexer job may stop the caching of new data and make all datasets unhealthy, causing delays in processing of real time data, preventing new data from being queried."
+    summary: "A system restart in Cache Indexer job may result in inaccurate data while processing and make all datasets unhealthy, causing delays in processing of real time data, preventing new data from being queried."
   severity: critical
 
 - name: "[SECOR]: System has restarted. May Affect Services."
