@@ -20,7 +20,7 @@ env: "{{ .Values.global.env }}"
 
 dataset_api:
   host: "{{ .Values.global.dataset_api.host}}"
-  pre_signed_url: "v2/files/generate-url"
+  pre_signed_url: "/v2/files/url-access"
 
 connectors:
   extraction_path: "/tmp/obsrv-connectors-extracted"
