@@ -351,6 +351,7 @@
 
 - name: "[DRUID OVERLORD]: System has Restarted. May Affect Querying."
   query: kube_pod_container_status_restarts_total{container="druid-raw-overlords"}
+  operator: gt
   threshold: [3]
   category: "Infra"
   frequency: 5m
@@ -700,7 +701,7 @@
   severity: critical
 
 - name: "[UNIFIED PIPELINE]: Detected higher amount of processing lag than expected."
-  query: sum(sum_over_time(kafka_consumergroup_lag{consumergroup="unified-pipeline-group"}[$__range]))
+  query: sum(sum_over_time(kafka_consumergroup_lag{consumergroup="unified-pipeline-group"}[$__range])) or vector(0)
   operator: gt
   threshold: [5000000]
   category: "Processing"
@@ -771,6 +772,7 @@
 
 - name: "[SECOR]: High Disk Usage Detected."
   query: sum(kubelet_volume_stats_used_bytes{namespace="secor"})/sum(kubelet_volume_stats_capacity_bytes{namespace="secor"}) * 100
+  operator: gt
   threshold: [90]
   category: "Storage"
   frequency: 5m
