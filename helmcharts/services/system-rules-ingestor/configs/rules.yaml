@@ -533,7 +533,7 @@
   severity: critical
 
 - name: "[PROMTAIL]: System has restarted. May Affect Log Ingestion."
-  query: kube_pod_container_status_restarts_total{container="promtail"}
+  query: max(kube_pod_container_status_restarts_total{container="promtail"})
   operator: gt
   threshold: [3]
   category: "Infra"
