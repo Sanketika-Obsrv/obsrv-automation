@@ -85,8 +85,8 @@ valkey-denorm:
         cpu: 0.5
         memory: 1Gi
     extraFlags:
-      - --maxmemory 1024mb
-      - --maxmemory-policy volatile-ttl
+        - "--maxmemory $(( $(cat /sys/fs/cgroup/memory.max) * 80 / 100 ))"
+        - "--maxmemory-policy volatile-ttl"
     # sidecars:
     #   resources:
     #     limits:
@@ -96,6 +96,10 @@ valkey-denorm:
       accessModes:
         - ReadWriteOnce
       size: 2Gi
+     
+
+
+      scaling method
   replica:
     persistence:
       accessModes:
@@ -722,3 +726,12 @@ redis-exporter:
       requests:
         cpu: 250m
         memory: 256Mi
+
+metrics-server:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi        

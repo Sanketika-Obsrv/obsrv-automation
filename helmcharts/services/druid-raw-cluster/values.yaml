@@ -372,6 +372,25 @@ zookeeper:
     headless:
       annotations: {}
 
+
+druid_historical:
+  cpu:
+    averageUtilization: 
+  memory:
+    averageUtilization: 
+  
+druid_broker:
+  cpu:
+    averageUtilization: 
+  memory:
+    averageUtilization:
+
+druid_indexer:
+  druid_ingest_kafka_lag:
+    averageValue: 
+  druid_ingest_kafka_maxLag :
+    averageValue:
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: false
