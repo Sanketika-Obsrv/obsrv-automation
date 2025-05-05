@@ -354,7 +354,7 @@ kube-prometheus-stack:
         ehlo_identity: ""
         startTLS_policy: ""
         skip_verify: true
-        from_name: "Grafana"
+        from_name: "Obsrv"
 
 
 kubernetes-reflector:
@@ -419,6 +419,7 @@ dataset-api: &dataset-api
     is_rbac_enabled: "false"
     keycloak_audience: ""
     otel_enable: *otel_enable
+    telemetry_log: '{"enable":true,"response_data":false}'
 
 config-api: &config-api
   namespace: *config-api-namespace

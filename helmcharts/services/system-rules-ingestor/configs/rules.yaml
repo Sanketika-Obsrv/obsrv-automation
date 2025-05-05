@@ -1,683 +1,827 @@
-- name: "Excessive CPU Utilization Detected in Ingestion"
-  query: max without(label_system_ingestion, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
-  operator: gt
-  threshold: [80]
-  category: ingestion
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in ingestion system. Review the usage."
-  annotations: {}
-  severity: critical
 
-- name: "Moderate CPU Utilization in Ingestion"
-  query: max without(label_system_ingestion, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
-  operator: within_range
-  threshold: [60, 80]
-  category: ingestion
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in ingestion system. Monitor the usage closely."
-  annotations: {}
+- name: "[KAFKA]: High CPU Usage Detected. System Under Heavy Load."
+  query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{pod="kafka-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1001"
+  description: "The system is working slowly, which may delay the addition of new data to the dataset."
+  annotations:
+    summary: "High CPU usage in Kafka may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
   severity: warning
 
-- name: "Excessive CPU Utilization Detected in Processing"
-  query: max without(label_system_processing, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
+- name: "[VALKEY DENORM]: High CPU Usage Detected. System Under Heavy Load."
+  query: sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: processing
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in processing system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate CPU Utilization in Processing"
-  query: max without(label_system_processing, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: processing
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in processing system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1002"
+  description: "The system is working slowly, which may put datasets at risk of becoming unhealthy."
+  annotations:
+    summary: "High CPU usage in Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
   severity: warning
 
-- name: "Excessive CPU Utilization Detected in Querying"
-  query: max without(label_system_querying, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
+- name: "[VALKEY DEDUPE]: High CPU Usage Detected. System Under Heavy Load."
+  query: sum by()(max by (label_system_infra,pod) (rate(container_cpu_usage_seconds_total{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: querying
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in querying system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate CPU Utilization in Querying"
-  query: max without(label_system_querying, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: querying
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in querying system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1003"
+  description: "The system is working slowly, which may put datasets at risk of becoming unhealthy."
+  annotations:
+    summary: "High CPU usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
   severity: warning
 
-- name: "Excessive CPU Utilization Detected in Monitoring"
-  query: max without(label_system_monitoring, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
+- name: "[DRUID HISTORICAL]: High CPU Usage Detected. System Under Heavy Load."
+  query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-historicals'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: monitoring
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in monitoring system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate CPU Utilization in Monitoring"
-  query: max without(label_system_monitoring, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: monitoring
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in monitoring system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1004"
+  description: "The system is running slowly due to high CPU usage, which may delay access to previously stored data in the dataset."
+  annotations:
+    summary: "High CPU usage in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
   severity: warning
 
-- name: "Excessive CPU Utilization Detected in Reporting"
-  query: max without(label_system_reporting, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
+- name: "[DRUID INDEXER]: High CPU Usage Detected. System Under Heavy Load."
+  query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-indexers'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: reporting
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in reporting system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate CPU Utilization in Reporting"
-  query: max without(label_system_reporting, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: reporting
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in reporting system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1005"
+  description: "The system is working slowly, which may delay querying of new data from the dataset."
+  annotations:
+    summary: "High CPU usage in Druid Indexer can interrupt data ingestion, making real-time data unavailable for querying."
   severity: warning
 
-- name: "Excessive CPU Utilization Detected in Storage"
-  query: max without(label_system_storage, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
+- name: "[DRUID OVERLORD]: High CPU Usage Detected. System Under Heavy Load."
+  query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-overlords'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: storage
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in storage system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate CPU Utilization in Storage"
-  query: max without(label_system_storage, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: storage
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in storage system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1006"
+  description: "The system is working slowly, causing delays in adding new data to the dataset"
+  annotations:
+    summary: "High CPU usage in Druid Overlord can interrupt the handling of ingestion tasks, leading to delays or loss of new data, and impacting real-time data querying."
   severity: warning
 
-- name: "Excessive CPU Utilization Detected in Dataset Management"
-  query: max without(label_system_dataset_management, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
+- name: "[DRUID BROKER]: High CPU Usage Detected. System Under Heavy Load."
+  query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='druid-raw-brokers'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: dataset management
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in dataset management system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate CPU Utilization in Dataset Management"
-  query: max without(label_system_dataset_management, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: dataset management
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in dataset management system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1007"
+  description: "The system is working slowly, resulting in inaccurate data while querying the data from the dataset"
+  annotations:
+    summary: "High CPU usage in Druid Broker can cause query routing issues, leading to delays while querying the data"
   severity: warning
 
-- name: "Excessive CPU Utilization Detected in Infra"
-  query: max without(label_system_infra, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
+- name: "[PROMETHEUS]: High CPU Usage Detected. System Under Heavy Load."
+  query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='prometheus'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: infra
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical CPU usage (>80%) in Infra system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate CPU Utilization in Infra"
-  query: max without(label_system_infra, pod) (( max by (pod) (rate(container_cpu_usage_seconds_total[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: infra
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High CPU usage (60-80%) in Infra system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1008"
+  description: "The system is working slowly, which may delay retrieving monitoring information for the system"
+  annotations:
+    summary: "High CPU usage in Prometheus can cause delays in collecting and processing metrics, potentially leading to slower response times for queries and incomplete data for monitoring and alerting."
   severity: warning
 
-- name: "Excessive Memory Utilization Detected in Ingestion"
-  query: max without(label_system_ingestion, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
+- name: "[GRAFANA]: High CPU Usage Detected. System Under Heavy Load."
+  query: max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='grafana'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))) * 100
   operator: gt
-  threshold: [80]
-  category: ingestion
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in ingestion system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Ingestion"
-  query: max without(label_system_ingestion, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_ingestion)kube_pod_labels{label_system_ingestion="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: ingestion
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in ingestion system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1009"
+  description: "The system is working slowly, which may delay retrieving monitoring information for the system"
+  annotations:
+    summary: "High CPU usage in Grafana can lead to, delayed alerting, affecting the monitoring and analysis of system metrics."
   severity: warning
 
-- name: "Excessive Memory Utilization Detected in Processing"
-  query: max without(label_system_processing, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
+- name: "[UNIFIED PIPELINE]: High CPU Usage Detected. System Under Heavy Load."
+  query: (sum by()(max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"})))) + sum by() (max without(label_system_infra, pod)(max by (pod) (rate(container_cpu_usage_seconds_total{container='unified-pipeline-jobmanager'}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="cpu"}))))) * 100 
   operator: gt
-  threshold: [80]
-  category: processing
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in processing system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Processing"
-  query: max without(label_system_processing, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_processing)kube_pod_labels{label_system_processing="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: processing
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in processing system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1010"
+  description: "The system is working slowly, affecting the storage and addition of new data to the dataset."
+  annotations:
+    summary: "High CPU usage in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
   severity: warning
 
-- name: "Excessive Memory Utilization Detected in Querying"
-  query: max without(label_system_querying, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
+- name: "[KAFKA]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="kafka-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
-  threshold: [80]
-  category: querying
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in querying system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Querying"
-  query: max without(label_system_querying, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_querying)kube_pod_labels{label_system_querying="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: querying
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in querying system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1011"
+  description: "The system is using excessive memory, which may delay the addition of new data to the dataset"
+  annotations:
+    summary: "High Memory usage in Kafka may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
   severity: warning
 
-- name: "Excessive Memory Utilization Detected in Monitoring"
-  query: max without(label_system_monitoring, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
+- name: "[VALKEY DENORM]: High Memory Usage Detected. System Could Become Unstable."
+  query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="valkey-denorm-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
   operator: gt
-  threshold: [80]
-  category: monitoring
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in monitoring system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Monitoring"
-  query: max without(label_system_monitoring, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_monitoring)kube_pod_labels{label_system_monitoring="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: monitoring
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in monitoring system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1012"
+  description: "The system is using excessive memory, which may put datasets at risk of becoming unhealthy."
+  annotations:
+    summary: "High Memory usage in Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
   severity: warning
 
-- name: "Excessive Memory Utilization Detected in Reporting"
-  query: max without(label_system_reporting, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
+- name: "[VALKEY DEDUPE]: High Memory Usage Detected. System Could Become Unstable."
+  query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{pod="valkey-dedup-primary-0"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
   operator: gt
-  threshold: [80]
-  category: reporting
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in reporting system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Reporting"
-  query: max without(label_system_reporting, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_reporting)kube_pod_labels{label_system_reporting="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: reporting
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in reporting system. Monitor the usage closely."
-  annotations: {}
-  severity: warning  
-
-- name: "Excessive Memory Utilization Detected in Storage"
-  query: max without(label_system_storage, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
-  operator: gt
-  threshold: [80]
-  category: storage
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in storage system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Storage"
-  query: max without(label_system_storage, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_storage)kube_pod_labels{label_system_storage="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: storage
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in storage system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1013"
+  description: "The system is using excessive memory, which may put datasets at risk of becoming unhealthy."
+  annotations:
+    summary: "High memory usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
   severity: warning
 
-- name: "Excessive Memory Utilization Detected in Dataset Management"
-  query: max without(label_system_dataset_management, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
+- name: "[DRUID HISTORICAL]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-historicals"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
-  threshold: [80]
-  category: dataset management
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in dataset management system. Review the usage."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Dataset Management"
-  query: max without(label_system_dataset_management, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_dataset_management)kube_pod_labels{label_system_dataset_management="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: dataset management
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in dataset management system. Monitor the usage closely."
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1014"
+  description: "The system is using excessive memory,  which may delay access to previously stored data in the dataset."
+  annotations:
+    summary: "High Memory usage in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
   severity: warning
 
-- name: "Excessive Memory Utilization Detected in Infra"
-  query: max without(label_system_infra, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
+- name: "[DRUID INDEXER]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-indexers"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
   operator: gt
-  threshold: [80]
-  category: infra
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "Critical memory usage (>80%) in infra."
-  annotations: {}
-  severity: critical
-
-- name: "Moderate Memory Utilization in Infra"
-  query: max without(label_system_infra, pod) (( max by (pod) (avg_over_time(container_memory_usage_bytes[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})) * 100)* on (pod) group_left (label_system_infra)kube_pod_labels{label_system_infra="true"})
-  operator: within_range
-  threshold: [60,80]
-  category: infra
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: "High memory usage (60-80%) in infra."
-  annotations: {}
-  severity: warning 
-
-- name: Reporting System Recovery Update in Infra
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_infra='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: infra
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Obsrv System has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1015"
+  description: "The system is using excessive memory, which may delay querying new data from the dataset."
+  annotations:
+    summary: "High Memory usage in Druid Indexer can interrupt data ingestion, making real-time data unavailable for querying."
   severity: warning
 
-- name: "Obsrv System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_infra='true'}))
+- name: "[DRUID OVERLORD]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-overlords"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1016"
+  description: "The system is using excessive memory, causing delays in adding new data to the dataset"
+  annotations:
+    summary: "High memory usage in Druid Overlord can interrupt the handling of ingestion tasks, leading to delays or loss of new data, and impacting real-time data querying."
+  severity: warning
+
+- name: "[DRUID BROKER]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="druid-raw-brokers"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1017"
+  description: "The system is working slowly, resulting in inaccurate data while querying the data from the dataset"
+  annotations:
+    summary: "High memory usage in Druid Broker can cause query routing issues, leading to delays while querying the data"
+  severity: warning
+
+- name: "[PROMETHEUS]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="prometheus"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1018"
+  description: "The system is using excessive memory,  which may delay retrieving monitoring information for the system"
+  annotations:
+    summary: "High Memory usage in Prometheus can cause delays in collecting and processing metrics, potentially leading to slower response times for queries and incomplete data for monitoring and alerting."
+  severity: warning
+
+- name: "[GRAFANA]: High Memory Usage Detected. System Could Become Unstable."
+  query: max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="grafana"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"}))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1019"
+  description: "The system is using excessive memory,  which may delay retrieving monitoring information for the system"
+  annotations:
+    summary: "High Memory usage in Grafana can lead to delayed alerting, affecting the monitoring and analysis of system metrics."
+  severity: warning
+
+- name: "[UNIFIED PIPELINE]: High Memory Usage Detected. System Could Become Unstable."
+  query: sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="unified-pipeline-jobmanager"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) + sum by()(max without(label_system_infra, pod) ( max by (pod) (avg_over_time(container_memory_usage_bytes{container="unified-pipeline-jobmanager"}[$__range]) / on (pod) group_left max by (pod) (kube_pod_container_resource_limits{resource="memory"})))) * 100
+  operator: gt
+  threshold: [90]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1020"
+  description: "The system is using excessive memory, affecting the storage and addition of new data to the dataset."
+  annotations:
+    summary: "High memory usage in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
+  severity: warning
+
+- name: "[KUBERNETES NODE]: High CPU usage is detected in the Cluster Nodes"
+  query: (cluster:node_cpu:ratio_rate5m{cluster=""}) * 100
+  operator: gt
+  threshold: [80]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1021"
+  description: "The system has become unstable and is experiencing degraded performance due to high CPU usage."
+  annotations:
+    summary: "Persistent high CPU usage can cause Kubernetes nodes to become under pressure, leading to pod throttling, evictions, or failed launches, impacting overall cluster health."
+  severity: warning
+
+- name: "[KUBERNETES NODE]: High memory usage is detected in Cluster Nodes"
+  query: (1 - sum(:node_memory_MemAvailable_bytes:sum{cluster=''}) / sum(node_memory_MemTotal_bytes{job='node-exporter',cluster=''})) * 100
+  operator: gt
+  threshold: [80]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1022"
+  description: "The system has slowed down and has become unstable due to high memory usage."
+  annotations:
+    summary: "Persistent high memory usage has led to resource exhaustion, causing performance degradation and potential failures in services"
+  severity: warning
+
+- name: "[KAFKA]: System has restarted. May Affect Ingestion."
+  query: kube_pod_container_status_restarts_total{container="kafka",pod="kafka-0"}
   operator: gt
   threshold: [3]
-  category: infra
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Obsrv System has experienced repeated restarts. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1023"
+  description: "The system has restarted, which may cause delays in adding new data to the dataset."
+  annotations:
+    summary: "Frequent restarts in kafka system may disrupt the data ingestion process, causing delays in data being processed and affecting the real-time flow of data into the dataset."
   severity: critical
 
-- name: Ingestion System Recovery Update
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_ingestion='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: ingestion
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Ingestion System has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
-  severity: warning
-
-- name: "Ingestion System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_ingestion='true'}))
+- name: "[DRUID HISTORICALS]: System has Restarted. May Affect Querying."
+  query: kube_pod_container_status_restarts_total{container="druid-raw-historicals"}
   operator: gt
   threshold: [3]
-  category: ingestion
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Ingestion System has experienced repeated restarts. The data ingestion will be paused. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1024"
+  description: "The dataset is unhealthy, and querying previously stored data is affected if there are frequent restarts in the system"
+  annotations:
+    summary: "Frequent restarts in Druid Historicals can affect the ability to access old segments, leading to delayed or incomplete query results."
   severity: critical
 
-- name: Querying System Recovery Update
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_querying='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: querying
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Query system has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
-  severity: warning
-
-- name: "Querying System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_querying='true'}))
+- name: "[DRUID INDEXER]: System has Restarted. May Affect Querying."
+  query: kube_pod_container_status_restarts_total{container="druid-raw-indexers"}
   operator: gt
   threshold: [3]
-  category: querying
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Querying system has experienced repeated restarts. The data Querying will be paused. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1025"
+  description: "The dataset is unhealthy, and frequent restarts can affect the addition of new data to the dataset"
+  annotations:
+    summary: "Frequent restarts in Druid Indexer can interrupt data ingestion. As a result, real-time data is unavailable for querying."
   severity: critical
 
-- name: Storage System Recovery Update
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_storage='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: storage
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Storage system has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
-  severity: warning
-
-- name: "Storage System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_storage='true'}))
+- name: "[DRUID OVERLORD]: System has Restarted. May Affect Querying."
+  query: kube_pod_container_status_restarts_total{container="druid-raw-overlords"}
   operator: gt
   threshold: [3]
-  category: storage
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Storage system has experienced repeated restarts. The data Backup will be paused. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1026"
+  description: "The dataset is unhealthy, and frequent restarts can cause delays in adding new data to the dataset"
+  annotations:
+    summary: "Frequent restarts in Druid Overlord can interrupt the handling of ingestion tasks, leading to delays or loss of new data, and impacting real-time data querying."
   severity: critical
 
-- name: Processing System Recovery Update
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_processing='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: processing
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Processing system has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
-  severity: warning
-
-- name: "Processing System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_processing='true'}))
+- name: "[DRUID BROKER]: System has Restarted. May Affect Querying."
+  query: kube_pod_container_status_restarts_total{container="druid-raw-brokers"}
   operator: gt
   threshold: [3]
-  category: processing
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Processing system has experienced repeated restarts. The data processing will be paused. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1027"
+  description: "The dataset is unhealthy, and frequent restarts may result in inaccurate data while querying"
+  annotations:
+    summary: "Frequent restarts in Druid Broker can cause query routing issues, leading to delays while querying the data"
   severity: critical
 
-- name: Dataset Management System Recovery Update
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_dataset_management='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: dataset management
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Dataset Management system has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
-  severity: warning
 
-- name: "Dataset Management System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_dataset_management='true'}))
+- name: "[DRUID CORDINATOR]: System has Restarted. May Affect Querying."
+  query: kube_pod_container_status_restarts_total{container="druid-raw-coordinators"}
   operator: gt
   threshold: [3]
-  category: dataset management
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Dataset Management system has experienced repeated restarts. The Dataset Managment will not be functional. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1028"
+  description: "The dataset is unhealthy, and frequent restarts may cause previously stored data to become unavailable for querying."
+  annotations:
+    summary: "Frequent restarts in Druid Coordinator can disrupt segment balancing and the availability of historical data, leading to incomplete query results."
   severity: critical
 
-- name: Monitoring System Recovery Update
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_monitoring='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: monitoring
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Infra Monitoring system has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
-  severity: warning
-
-- name: "Monitoring System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_monitoring='true'}))
+- name: "[API SERVICE]: System has restarted. May Affect API Availability."
+  query: kube_pod_container_status_restarts_total{container="dataset-api"}
   operator: gt
   threshold: [3]
-  category: monitoring
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Infra Monitoring system has experienced repeated restarts. The Infra Monitoring will not be functional. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1029"
+  description: "Dataset management is interrupted due to frequent restarts in the system ."
+  annotations:
+    summary: "Frequent restarts in the API service can disrupt dataset management, making it difficult to perform operations on the dataset."
   severity: critical
 
-- name: Reporting System Recovery Update
-  query: (sum without(pod) (sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) * on(pod) kube_pod_labels{label_system_reporting='true'}))
-  operator: within_range
-  threshold: [1,3]
-  category: reporting
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Infra Reporting system has undergone a restart and is actively working towards regaining a healthy state.
-  annotations: {}
-  severity: warning
-
-- name: "Reporting System Restart Notifications"
-  query: (sum without(pod) ((sum by (pod) (ceil(increase(kube_pod_container_status_restarts_total[$__range]))) > 0) * on(pod) kube_pod_labels{label_system_reporting='true'}))
+- name: "[PROMETHEUS]: System has restarted. May Affect Monitoring."
+  query: kube_pod_container_status_restarts_total{container="prometheus"}
   operator: gt
   threshold: [3]
-  category: reporting
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The Infra Reporting system has experienced repeated restarts. The Infra Reporting will not be functional. Please examine the logs or immediately contact administrative support for assistance.
-  annotations: {}
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1030"
+  description: "Detected delays in tracking system health due to frequent restarts in the system."
+  annotations:
+    summary: "Frequent restarts of Prometheus can interrupt metric scraping and storage, causing missing data points, delayed alerts and monitoring."
   severity: critical
 
-- name: "PostgreSQL Database Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-backups", prefix=~"postgresql"})
+- name: "[GRAFANA]: System has restarted. May Affect Monitoring."
+  query: kube_pod_container_status_restarts_total{container="grafana"}
   operator: gt
-  threshold: [86400]
-  category: db backup
-  frequency: 1h
-  interval: 1h
-  labels: {}
-  description: The PostgreSQL database backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
-  annotations: {}
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1031"
+  description: "Notifying about system issues is delayed due to frequent restarts in the system"
+  annotations:
+    summary: "Frequent restarts of Grafana can affect monitoring, resulting in delays or issues with alerting about the system."
   severity: critical
 
-- name: "Dedup Redis Database Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-backups", prefix=~"dedup-redis"})
+- name: "[LOKI]: System has restarted. May Affect Monitoring."
+  query: max(kube_pod_container_status_restarts_total{container="loki"})
   operator: gt
-  threshold: [86400]
-  category: db backup
-  frequency: 1h
-  interval: 1h
-  labels: {}
-  description: The Dedup Redis database backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
-  annotations: {}
+  threshold: [3]  
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1032"
+  description: "Storing the system logs is delayed due to frequent restarts in the system"
+  annotations:
+    summary: "Frequent restarts in Loki can disrupt the log ingestion process, causing delays in storing logs and potentially leading to issues when analyzing them."
   severity: critical
 
-- name: "Denorm Redis Database Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-backups", prefix=~"denorm-redis"})
+- name: "[POSTGRES]: System has restarted. May Affect Database Connectivity."
+  query: kube_pod_container_status_restarts_total{container="postgresql"}
   operator: gt
-  threshold: [86400]
-  category: db backup
-  frequency: 1h
-  interval: 1h
-  labels: {}
-  description: The Denorm Redis database backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
-  annotations: {}
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1033"
+  description: "Dataset management is interrupted due to frequent restarts in system."
+  annotations:
+    summary: "Frequent restarts in PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
   severity: critical
 
-- name: "Velero (Kubernetes Cluster) Backup Failure"
-  query: (time() - s3_last_modified_object_date{job="s3-backups", bucket=~"velero.*"})
+- name: "[VALKEY]: System has restarted. May affect data enrichment"
+  query: max(kube_pod_container_status_restarts_total{container="valkey", pod=~"valkey-(dedup|denorm)-primary-0"})
   operator: gt
-  threshold: [86400]
-  category: db backup
-  frequency: 1h
-  interval: 1h
-  labels: {}
-  description: The Kubernetes cluster backup has not occurred within the expected timeframe. Please Investigate immediately or contact administrative support for assistance.
-  annotations: {}
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1034"
+  description: "All datasets are at risk of becoming unhealthy due to frequent restarts in the system"
+  annotations:
+    summary: "A system restart in Valkey may stop the caching of new data, causing delays in processing of real time data, preventing new data from being queried. "
   severity: critical
 
-- name: "Kubernetes Node Storage Capacity Exceeded"
-  query: min by (instance) (max by (instance, mountpoint) (max_over_time(node_filesystem_avail_bytes{mountpoint!~".*/tmp.*"}[$__range]) > 0) / on (instance, mountpoint) max by (instance, mountpoint) (node_filesystem_size_bytes{mountpoint!~".*/tmp.*"}) * 100)
-  operator: lt
-  threshold: [20]
-  category: disk space
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The disk space on the Kubernetes node(s) has exceeded 80% of the total capacity. Please investigate immediately or contact administrative support for assistance.
-  annotations: {}
-  severity: critical
-
-- name: "Volume Autoscaler failed to resize storage"
-  query: volume_autoscaler_resize_failure_total
+- name: "[UNIFIED PIPELINE]: System has restarted. May Affect Dataset."
+  query: max(kube_pod_container_status_restarts_total{container=~"(unified-pipeline-jobmanager|unified-pipeline-taskmanager)"})
   operator: gt
-  threshold: [0]
-  category: disk space
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: The trigger to resize Persistent Volume (PV) in the Kubernetes cluster failed. Persistent Volumes are essential for providing durable storage for stateful applications, and failure to resize these volumes can lead to application downtime or data unavailability. Please investigate immediately or contact administrative support for assistance.
-  annotations: {}
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1035"
+  description: "The dataset is unhealthy, and no new data will be stored in the dataset, making it unavailable for querying."
+  annotations:
+    summary: "Frequent restarts in the Unified pipeline can interrupt the processing of real-time data, making it unavailable for querying."
   severity: critical
 
-- name: "Persistent Volume(PV) Resizing Ignored by Volume Autoscaler"
+- name: "[CACHE INDEXER]: System has restarted. May Affect Monitoring."
+  query: max(kube_pod_container_status_restarts_total{container=~"(cache-indexer-jobmanager|cache-indexer-taskmanager)"})
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1036"
+  description: "The system has restarted, affecting the querying of data."
+  annotations:
+    summary: "A system restart in Cache Indexer job may result in inaccurate data while processing and make all datasets unhealthy, causing delays in processing of real time data, preventing new data from being queried."
+  severity: critical
+
+- name: "[SECOR]: System has restarted. May Affect Services."
+  query: max(kube_pod_container_status_restarts_total{container=~"(unique-backup-secor|ingest-backup-secor|transform-backup-secor|failed-backup-secor|raw-backup-secor|denorm-backup-secor)"})
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1037"
+  description: "The system has restarted, affecting the availability of the data"
+  annotations:
+    summary: "A system restart in Secor may affect the backup of ingested data, potentially leading to delays or inconsistencies in data availability."
+  severity: critical
+
+- name: "[WEB CONSOLE]: System has restarted. May Affect Data Analytics View in Web Console."
+  query: kube_pod_container_status_restarts_total{container="management-console"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1038"
+  description: "The system has restarted, disrupting user interactions to visualize dataset."
+  annotations:
+    summary: "Frequent web console restarts can disrupt user interactions, affecting visualization of data for all the datasets."
+  severity: critical
+
+- name: "[PROMTAIL]: System has restarted. May Affect Log Ingestion."
+  query: max(kube_pod_container_status_restarts_total{container="promtail"})
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1039"
+  description: "The system has restarted, affecting the storage of system logs"
+  annotations:
+    summary: "Frequent restarts in Promtail can disrupt the log ingestion process, causing delays in storing logs and potentially leading to issues when analyzing them."
+  severity: critical
+
+- name: "[KEYCLOAK]: System has restarted. May Affect User Authentication and Login Flow"
+  query: kube_pod_container_status_restarts_total{container="keycloak"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1040"
+  description: "The system has restarted, disrupting authentication and authorization flow of the system."
+  annotations:
+    summary: "Frequent Keycloak restarts can disrupt authentication and authorization flows, causing login failures and access issues in the system."
+  severity: critical
+
+- name: "[SUPERSET]: System has restarted. May Affect Superset Dashboard Access."
+  query: kube_pod_container_status_restarts_total{container="superset"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1041"
+  description: "The system has restarted, affecting visualization of the data."
+  annotations:
+    summary: "Frequent Superset restarts may lead to dashboard unavailability, impacting access to analytical insights for the datasets"
+  severity: critical
+
+- name: "[S3 EXPORTER]: System has restarted. May Affect Monitoring."
+  query: kube_pod_container_status_restarts_total{container="s3-exporter"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1042"
+  description: "The system has restarted, affecting the system health"
+  annotations:
+    summary: "Frequent restarts of the S3 Exporter may interrupt the export of S3 metrics, potentially impacting the monitoring of cloud storage health and performance."
+  severity: critical
+
+- name: "[MANAGEMENT API]: System has restarted. May Affect dataset management."
+  query: kube_pod_container_status_restarts_total{container="management-api"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1043"
+  description: "Dataset management is interrupted due to frequent restarts in the system."
+  annotations:
+    summary: "Frequent restarts in the Management Api service can disrupt dataset management, making it difficult to perform operations on the dataset."
+  severity: critical
+
+- name: "[VELERO]: System has restarted. May Affect cluster backup."
+  query: kube_pod_container_status_restarts_total{container="velero"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1044"
+  description: "The system has restarted, potentially disrupting availability of the system."
+  annotations:
+    summary: "A system restart in Velero may affect the Kubernetes cluster backup, potentially making backup and restore services temporarily unavailable."
+  severity: critical
+
+- name: "[VOLUME AUTOSCALER]: System has restarted. Automatic Volume Scaling May Be Disrupted."
+  query: kube_pod_container_status_restarts_total{container="volume-autoscaler"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1045"
+  description: "The system has restarted, affecting the availability of the data"
+  annotations:
+    summary: "Frequent restarts of the Volume Autoscaler may delay persistent volume resizing, potentially leading to disruptions in system operations."
+  severity: critical
+
+- name: "[SYSTEM RULES INGESTOR]: System has restarted. May Affect System Health"
+  query: kube_pod_container_status_restarts_total{container="system-rules-ingestor"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1046"
+  description: "Detected delays in tracking system health due to frequent restarts in the system"
+  annotations:
+    summary: "Frequent restarts of the System rules ingestor may affect the monitoring of the system, causing delays in  tracking system health"
+  severity: critical
+
+- name: "[POSTGRES MIGRATION]: System has restarted. May Affect dataset management."
+  query: kube_pod_container_status_restarts_total{container="postgresql-migration"}
+  operator: gt
+  threshold: [3]
+  category: "Infra"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1047"
+  description: "Dataset management is interrupted due to frequent restarts in system."
+  annotations:
+    summary: "Frequent restarts of the PostgreSQL migration process may disrupt the migration flow, affecting dataset management and causing delays in database table creation"
+  severity: critical
+
+- name: "[KAFKA]: High Disk Usage Detected"
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="data-kafka-0"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="data-kafka-0"} *100
+  operator: gt
+  threshold: [90]
+  category: "Ingestion"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1110"
+  description: "New data is not being written into the dataset due to high disk usage."
+  annotations: 
+    summary: "High disk usage in Kafka may prevent new data from being written to the dataset, resulting in delays in real-time ingestion."
+  severity: critical
+
+- name: "[RDBMS]: A high number of open connections to PostgreSQL has been detected."
+  query: sum(pg_stat_activity_count)
+  operator: gt
+  threshold: [50]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1207"
+  description: "Dataset management is interrupted due to high number of open connections."
+  annotations:
+    summary: "High number of open connections to PostgreSQL can disrupt dataset management, affecting read/write operations and potentially leading to failed dataset transactions."
+  severity: warning
+
+- name: "[VALKEY]: Detected higher memory usage than expected."
+  query: sum(sum_over_time(redis_memory_used_bytes[$__range]) / sum_over_time(redis_memory_max_bytes[$__range])) * 100
+  operator: gt
+  threshold: [80]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1210"
+  description: "All datasets are at risk of becoming unhealthy due to high memory usage"
+  annotations: 
+    summary: "High memory usage in Valkey can cause the data processing system to pause. As a result, no new data will be processed or available for querying."
+  severity: critical
+
+- name: "[UNIFIED PIPELINE]: Detected higher amount of processing lag than expected."
+  query: sum(sum_over_time(kafka_consumergroup_lag{consumergroup="unified-pipeline-group"}[$__range])) or vector(0)
+  operator: gt
+  threshold: [5000000]
+  category: "Processing"
+  frequency: 5m
+  interval: 60m
+  labels: 
+    alert_code: "ALERT_1208"
+  description: "A large amount of data is still waiting to be processed. This may cause delays in querying the most recent data."
+  annotations: 
+    summary: "High pipeline lag in the dataset indicates processing of new data is delayed. Because of this delay, new data isn't available when querying the dataset."
+  severity: critical
+
+- name: "[VALKEY DENORM]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-denorm-primary-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1201"
+  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
+  annotations:
+    summary: "High disk usage Valkey may delay the enrichment of the data, causing delays in processing real-time data and potentially causing inaccurate data to be returned in queries."
+  severity: critical
+
+- name: "[VALKEY DEDUPE]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"}/kubelet_volume_stats_capacity_bytes{namespace="redis", persistentvolumeclaim="valkey-data-valkey-dedup-primary-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Processing"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1202"
+  description: "All datasets are at risk of becoming unhealthy due to high disk usage"
+  annotations:
+    summary: "High disk usage in Valkey may lead to duplicate data being processed, resulting in inaccurate query results."
+  severity: critical
+
+- name: "[DRUID HISTORICAL]: High Disk Usage Detected"
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="historical-volume-druid-raw-historicals-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Querying"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1301"
+  description: "The dataset is unhealthy, and the querying previously stored data is affected if disk usage is high"
+  annotations: 
+    summary: "High disk usage in Druid historical can prevent the querying of older data, potentially causing incomplete query results and affecting data availability."
+  severity: critical
+
+- name: "[DRUID INDEXER]: High Disk Usage Detected."
+  query: kubelet_volume_stats_used_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="indexer-volume-druid-raw-indexers-0"} * 100
+  operator: gt
+  threshold: [90]
+  category: "Querying"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1302"
+  description: "The dataset is unhealthy, and it can affect the addition of new data if the disk usage is high"
+  annotations: 
+    summary: "High disk usage in Druid Indexer can interrupt data ingestion. As a result, real-time data is unavailable for querying."
+  severity: critical
+
+- name: "[SECOR]: High Disk Usage Detected."
+  query: sum(kubelet_volume_stats_used_bytes{namespace="secor"})/sum(kubelet_volume_stats_capacity_bytes{namespace="secor"}) * 100
+  operator: gt
+  threshold: [90]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1401"
+  description: "Some of the data is not being saved if the disk usage is high"
+  annotations:
+    summary: "High disk usage in Secor can delay saving processed data into the system"
+  severity: critical
+
+- name: "[PERSISTENT VOLUMES]: Storage volume resize request not processed by autoscaler"
   query: count(kube_persistentvolumeclaim_info) - min(volume_autoscaler_num_valid_pvcs)
   operator: gt
   threshold: [0]
-  category: disk space
-  frequency: 2m
-  interval: 1m
-  labels: {}
-  description: There are a few Persistent Volume(PV)s ignored by the volume autoscaler considering the total available PVs in the Kubernetes cluster. Please review the ignored PVs and to ensure they are expected to not auto scale. Please investigate immediately or contact administrative support for assistance.
-  annotations: {}
-  severity: warning
-
-- name: "Postgres Backup Job Failure"
-  query: kube_job_status_failed{job_name=~".*postgresql-backup.*"}
-  operator: gt
-  threshold: [0]
-  category: db backup
-  frequency: 4h
-  interval: 1h
-  labels: {}
-  description: The Postgres backup has encountered an issue. Please Investigate immediately or contact administrative support for assistance.
-  annotations: {}
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1402"
+  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
+  annotations: 
+    summary: "The volume autoscaler failed to process the request to increase storage capacity, which may lead to system instability."
   severity: critical
 
-- name: "Velero Backup Job Failure"
-  query: increase(velero_backup_failure_total{schedule=~".*obsrv-daily-backup.*"}[4h])
+- name: "[PERSISTENT VOLUMES]: Failed to automatically expand storage volume."
+  query: volume_autoscaler_resize_failure_total
   operator: gt
   threshold: [0]
-  category: db backup
-  frequency: 4h
-  interval: 1h
-  labels: {}
-  description: The Velero (Cluster) backup has encountered an issue. Please Investigate immediately or contact administrative support for assistance.
-  annotations: {}
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1403"
+  description: "The system couldn't increase storage space and may enter an unhealthy state if the issue continues."
+  annotations: 
+    summary: "The volume autoscaler failed to expand the storage space (PV) due to certain limitations of the cloud provider. As a result, the system may become unhealthy."
+  severity: critical
+
+- name: "[VELERO]:Kubernetes cluster backup not found."
+  query: sum(increase(velero_backup_failure_total[$__range]))
+  operator: gt
+  threshold: [0]
+  category: "Storage"
+  frequency: 5m
+  interval: 5m
+  labels: 
+    alert_code: "ALERT_1408"
+  description: "The backup for the cluster failed, which could impact the recovery process if there's a system issue."
+  annotations: 
+    summary: "The backup process for the Kubernetes cluster failed, resulting in the system and its associated data may not be recoverable in the event of a failure or outage, impacting availability, disaster recovery, and rollback capabilities."
   severity: critical
