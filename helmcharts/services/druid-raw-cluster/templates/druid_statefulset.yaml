@@ -470,6 +470,7 @@ spec:
         #   cpu: {{ .Values.druid_indexer_pod_cpu_limit }}
 
     routers:
+      kind: Deployment
       nodeType: "router"
       druid.port: {{ .Values.druid_router_plaintextPort }}
       nodeConfigMountPath: "/opt/druid/conf/druid/cluster/query/router"
