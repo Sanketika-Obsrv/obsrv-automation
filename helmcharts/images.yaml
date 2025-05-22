@@ -181,11 +181,11 @@ images: &images
     tag: v2.44.0
     digest: ""
 
-  prometheus-pushgateway: &prometheus-pushgateway 
+  prometheus-pushgateway: &prometheus-pushgateway
     repository: sanketikahub/pushgateway
     tag: v1.10.0
-    digest: "" 
-    
+    digest: ""
+
   grafana: &grafana
     registry: docker.io
     repository: grafana/grafana
@@ -323,7 +323,7 @@ images: &images
     digest: ""
 
   druid-raw-cluster: &druid-raw-cluster
-    registry: apache
+    registry: *global_registry
     repository: druid
     tag: "28.0.1"
     digest: ""
@@ -376,11 +376,11 @@ images: &images
     repository: "kong/kubernetes-ingress-controller"
     tag: "2.10"
     digest: ""
-  
+
   kubectl: &kubectl
     repository: "docker.io/bitnami/kubectl"
     tag: "1.26.14-debian-11-r6"
-  
+
   sanketikahub-kubectl: &sanketikahub-kubectl
     registry: *global_registry
     repository: kubectl
