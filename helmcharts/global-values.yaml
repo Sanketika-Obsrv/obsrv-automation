@@ -80,6 +80,11 @@ defaults:
     admin_user: &superset_admin_user "admin"
     admin_password: &superset_admin_password "admin123"
 
+  druid_users:
+    admin_password: &druid_admin_password "admin123"
+    escalator_username: &druid_escalator_username "druid_system"
+    escalator_password: &druid_escalator_password "internal123"
+
   # config_service_host: &config-service-host "http://command-api.command-api.svc.cluster.local"
   # druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
   druid_url: &global-druid-url "http://druid-raw-routers.druid-raw.svc.cluster.local:8888"
@@ -315,6 +320,10 @@ druid-raw-cluster: &druid-raw-cluster
   druid_metadata_storage_connector_password: *psql-druid-pwd
   zookeeper:
     namespace: *druid-namespace
+  druid_auth_admin_password: *druid_admin_password
+  druid_auth_escalator_username: *druid_escalator_username
+  druid_auth_escalator_password: *druid_escalator_password
+
 
 druid-operator:
   namespace: *druid-namespace
