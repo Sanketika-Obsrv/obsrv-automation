@@ -421,6 +421,8 @@ internal: &internal
   postgresql:
     image:
       <<: *postgresql
+      pullSecrets:
+      - *dockerSecretName
 
   hms:
     image:
@@ -534,6 +536,8 @@ internal: &internal
   druid-operator:
     image:
       <<: *druid_operator
+      pullSecrets:
+      - *dockerSecretName
 
   kafka-message-exporter:
     imagePullSecrets: *imagePullSecrets

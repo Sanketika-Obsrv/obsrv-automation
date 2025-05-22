@@ -197,6 +197,7 @@ druid-raw-cluster:
   azure_storage_account_key: *azure_storage_account_key
   azure_storage_container: *cloud_storage_bucket
   <<: *druid-raw-service-account
+  druid_auth_enabled: false
 
 secor-service-account: &secor-service-account
   serviceAccount:

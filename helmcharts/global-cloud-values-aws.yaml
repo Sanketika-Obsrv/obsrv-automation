@@ -189,6 +189,7 @@ druid-raw-cluster:
   s3_access_key: ""
   s3_secret_key: ""
   <<: *druid-raw-service-account
+  druid_auth_enabled: false
 
 lakehouse-connector:
   hadoop_core_site:
