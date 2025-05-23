@@ -61,6 +61,7 @@ defaults:
     grafana_url: &grafana-url "http://grafana.monitoring.svc.cluster.local"
 
   kafka-topics:
+    numPartitions: &kafkaNumPartitions 4
     ingestTopic: &ingestTopic "ingest"
     system_stats_topic: &system_stats_topic "stats"
     masterdata_system_stats_topic: &masterdata_system_stats_topic "masterdata.stats"
@@ -118,34 +119,34 @@ kafka: &kafka
   hudiConnectorTopic: *hudiConnectorTopic
   connectorsMetricTopic: *connectorsMetricTopic
   connectorsFailedTopic: *connectorsFailedTopic
-  numPartitions: 4
+  numPartitions: *kafkaNumPartitions
   provisioning:
-    numPartitions: 4
+    numPartitions: *kafkaNumPartitions
     replicationFactor: 1
     topics:
       - name: *ingestTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *masterdataIngestTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *telemetryEventsTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *system_stats_topic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *masterdata_system_stats_topic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *hudiConnectorTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *connectorsMetricTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *connectorsFailedTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
 
   zookeeper: &zookeeper
@@ -340,8 +341,6 @@ kube-prometheus-stack:
     env:
       GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
       GF_SECURITY_ADMIN_USER: *grafana-admin-user
-     
-
     grafana.ini:
       smtp:
         enabled: true
