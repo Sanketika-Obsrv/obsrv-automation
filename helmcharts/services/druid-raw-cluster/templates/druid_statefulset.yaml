@@ -60,6 +60,9 @@ spec:
 
     #Druid console - basic security authentication 
     druid.auth.enabled={{ .Values.druid_auth_enabled }}
+
+    {{- if .Values.druid_auth_enabled }}
+
     druid.auth.authenticatorChain=["MyBasicMetadataAuthenticator"]
     druid.auth.authenticator.MyBasicMetadataAuthenticator.type=basic
     #the property initialAdminPassword only creates a user named admin by default and does not allow changing the username via config
@@ -75,6 +78,7 @@ spec:
     druid.auth.authorizers=["MyBasicMetadataAuthorizer"]
     druid.auth.authorizer.MyBasicMetadataAuthorizer.type=basic
 
+    {{- end }}
     # Zookeeper
     druid.zk.service.host={{ .Release.Name }}-zookeeper-headless.{{ .Values.namespace }}.svc.cluster.local
     druid.zk.paths.base=/druid

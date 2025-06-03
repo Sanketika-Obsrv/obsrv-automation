@@ -102,7 +102,6 @@ druid-raw-cluster:
   druid_deepstorage_type: *deep_store_type
   druid_indexer_logs_type: *deep_store_type
   gcs_bucket: *cloud_storage_bucket
-  druid_auth_enabled: false
 
 flink:
   !!merge <<: *flink-service-account
