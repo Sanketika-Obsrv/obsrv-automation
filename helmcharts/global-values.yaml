@@ -82,6 +82,7 @@ defaults:
     admin_password: &superset_admin_password "admin123"
 
   druid_users:
+    auth_enabled: &druid_auth_enabled "false"
     admin_password: &druid_admin_password "admin123"
     escalator_username: &druid_escalator_username "druid_system"
     escalator_password: &druid_escalator_password "internal123"
@@ -324,6 +325,8 @@ druid-raw-cluster: &druid-raw-cluster
   druid_auth_admin_password: *druid_admin_password
   druid_auth_escalator_username: *druid_escalator_username
   druid_auth_escalator_password: *druid_escalator_password
+  druid_auth_enabled: *druid_auth_enabled
+
 
 
 druid-operator:

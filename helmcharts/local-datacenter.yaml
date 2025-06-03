@@ -85,7 +85,6 @@ druid-raw-cluster:
   druid_s3_endpoint_signingRegion: *s3-signing-region
   druid_s3_protocol: *s3-protocol
   druid_s3_path_style_access: *s3-path-style-access
-  druid_auth_enabled: false
 
 kafka:
   persistence:
