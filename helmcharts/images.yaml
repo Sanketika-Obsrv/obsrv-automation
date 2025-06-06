@@ -5,8 +5,8 @@ global:
      #Replace the dockerConfigJson below for the private images
     dockerConfigJson: |-
       {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
-
-
+  imagePullSecrets:
+  - name: *dockerSecretName
 
 imagePullSecrets: &imagePullSecrets
   - name: *dockerSecretName
@@ -464,7 +464,7 @@ internal: &internal
     image:
       <<: *velero
       imagePullSecrets: 
-      - name: *dockerSecretName
+      - *dockerSecretName
     kubectl:
       image:
         <<: *kubectl
@@ -472,64 +472,53 @@ internal: &internal
   valkey-dedup:
     image:
       <<: *valkey
-      imagePullSecrets: 
-      - name: *dockerSecretName
+      pullSecrets:
+      - *dockerSecretName
 
   valkey-denorm:
     image:
       <<: *valkey
-      imagePullSecrets: 
-      - name: *dockerSecretName
+      pullSecrets:
+      - *dockerSecretName
 
   loki:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     singleBinary:
       image:
         <<: *loki
-        imagePullSecrets: 
-        - name: *dockerSecretName
     gateway:
       image:
         <<: *loki-gateway
-        imagePullSecrets: 
-        - name: *dockerSecretName
 
   kubernetes-reflector:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     image:
       <<: *kubernetes-reflector
-      imagePullSecrets: 
-        - name: *dockerSecretName
+
 
   kube-prometheus-stack:
     prometheus:
       prometheusSpec:
         image:
           <<: *prometheus
-          imagePullSecrets: 
-          - name: *dockerSecretName
     alertmanager:
       alertmanagerSpec:
         image:
           <<: *alertmanager
-          imagePullSecrets: 
-          - name: *dockerSecretName
     prometheusOperator:
       admissionWebhooks:
         patch:
           image:
             <<: *prometheus-operator-webhook
-            imagePullSecrets: 
-            - name: *dockerSecretName
  
       image:
         <<: *prometheus-operator
-        imagePullSecrets: 
-        - name: *dockerSecretName
  
       prometheusConfigReloader:
         image:
           <<: *prometheus-config-reloader
-          imagePullSecrets: 
-          - name: *dockerSecretName
     grafana:
       image:
         <<: *grafana
@@ -537,34 +526,24 @@ internal: &internal
         - *dockerSecretName
       testFramework:
         <<: *grafana-test-framework
-        imagePullSecrets: 
-        - name: *dockerSecretName
       downloadDashboardsImage:
         <<: *grafana-download-dashboards
-        imagePullSecrets: 
-        - name: *dockerSecretName
       initChownData:
         image:
           <<: *grafana-init-chown-data
-          imagePullSecrets: 
-          - name: *dockerSecretName
       sidecar:
         image:
           <<: *grafana-side-car
-          imagePullSecrets: 
-          - name: *dockerSecretName
     kube-state-metrics:
       image:
         <<: *kube-state-metrics
-        imagePullSecrets: 
-        - name: *dockerSecretName
     prometheus-node-exporter:
       image:
         <<: *prometheus-node-exporter
-        imagePullSecrets: 
-        - name: *dockerSecretName
 
   prometheus-pushgateway:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     image:
       <<: *prometheus-pushgateway
       imagePullSecrets: 
@@ -597,10 +576,10 @@ internal: &internal
     - name: *dockerSecretName
 
   druid-operator:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     image:
       <<: *druid_operator
-      imagePullSecrets: 
-      - name: *dockerSecretName
 
   kafka-message-exporter:
     <<: *kafka-message-exporter
@@ -669,8 +648,6 @@ internal: &internal
       - name: *dockerSecretName
 
   flink:
-    imagePullSecrets: 
-    - name: *dockerSecretName
     flink_jobs:
       master-data-processor:
         enabled: false
@@ -708,16 +685,19 @@ internal: &internal
     image:
       <<: *lakehouse-connector
       imagePullSecrets: 
-      - name: *dockerSecretName
+      - *dockerSecretName
 
   minio:
     image:
       <<: *minio
       pullSecrets:
       - *dockerSecretName
-
+      
   opentelemetry-collector:
     image:
+    <<: *opentelemetry-collector
+
+  opentelemetry-collector:
     <<: *opentelemetry-collector
     imagePullSecrets: 
     - name: *dockerSecretName
