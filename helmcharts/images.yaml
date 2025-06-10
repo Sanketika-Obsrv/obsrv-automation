@@ -5,8 +5,8 @@ global:
      #Replace the dockerConfigJson below for the private images
     dockerConfigJson: |-
       {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
-  imagePullSecrets:
-  - name: *dockerSecretName
+  # imagePullSecrets:
+  # - name: *dockerSecretName
 
 imagePullSecrets: &imagePullSecrets
   - name: *dockerSecretName
@@ -500,14 +500,20 @@ internal: &internal
 
   kube-prometheus-stack:
     prometheus:
+      imagePullSecrets:
+        - name: *dockerSecretName
       prometheusSpec:
         image:
           <<: *prometheus
     alertmanager:
+      imagePullSecrets:
+        - name: *dockerSecretName
       alertmanagerSpec:
         image:
           <<: *alertmanager
     prometheusOperator:
+      imagePullSecrets:
+        - name: *dockerSecretName
       admissionWebhooks:
         patch:
           image:
@@ -535,9 +541,13 @@ internal: &internal
         image:
           <<: *grafana-side-car
     kube-state-metrics:
+      imagePullSecrets:
+      - name: *dockerSecretName
       image:
         <<: *kube-state-metrics
     prometheus-node-exporter:
+      imagePullSecrets:
+      - name: *dockerSecretName
       image:
         <<: *prometheus-node-exporter
 
@@ -711,6 +721,23 @@ internal: &internal
     <<: *sanketikahub-kubectl
     imagePullSecrets: 
     - name: *dockerSecretName
+
+  prometheus:
+    <<: *prometheus
+    imagePullSecrets: 
+    - name: *dockerSecretName
+
+  alertmanager:
+    <<: *alertmanager
+    imagePullSecrets: 
+    - name: *dockerSecretName  
+
+  prometheus-operator:
+    <<: *prometheus-operator
+    imagePullSecrets: 
+    - name: *dockerSecretName
+
+  
 ## Sourcing internal as root element,
 ## should need arise
 <<: *internal

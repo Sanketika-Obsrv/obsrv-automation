@@ -41,9 +41,9 @@ spec:
     {{- if .Values.prometheusOperator.admissionWebhooks.deployment.priorityClassName }}
       priorityClassName: {{ .Values.prometheusOperator.admissionWebhooks.deployment.priorityClassName }}
     {{- end }}
-    {{- if .Values.global.imagePullSecrets }}
+    {{- if .Values.alertmanager.imagePullSecrets }}
       imagePullSecrets:
-      {{- include "kube-prometheus-stack.imagePullSecrets" . | indent 8 }}
+    {{ toYaml .Values.alertmanager.imagePullSecrets | indent 4 }}
     {{- end }}
       containers:
         - name: prometheus-operator-admission-webhook
