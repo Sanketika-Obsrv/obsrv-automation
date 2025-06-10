@@ -5,8 +5,6 @@ global:
      #Replace the dockerConfigJson below for the private images
     dockerConfigJson: |-
       {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
-  # imagePullSecrets:
-  # - name: *dockerSecretName
 
 imagePullSecrets: &imagePullSecrets
   - name: *dockerSecretName
