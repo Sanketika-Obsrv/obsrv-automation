@@ -73,8 +73,10 @@ spec:
         component: {{ .Chart.Name }}-jobmanager
         app: flink
     spec:
-      # imagePullSecrets:
-      # - name: {{ .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.imagePullSecrets }}
+        - name: {{ . }}
+      {{- end }}
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ include "base.serviceaccountname" . }}
       {{- end }}
@@ -184,8 +186,10 @@ spec:
         app.kubernetes.io/name: {{ include "common.names.name" . }}
         app.kubernetes.io/component: {{ .Chart.Name }}-taskmanager
     spec:
-      # imagePullSecrets:
-      # - name: {{ .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.imagePullSecrets }}
+        - name: {{ . }}
+      {{- end }}
       # serviceAccount: flink-sa
       volumes:
       - configMap:
