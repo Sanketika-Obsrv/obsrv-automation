@@ -325,7 +325,7 @@ images: &images
   druid-raw-cluster: &druid-raw-cluster
     registry: *global_registry
     repository: druid
-    tag: "28.0.1"
+    tag: "32.0.1"
     digest: ""
 
   druid_exporter: &druid_exporter
