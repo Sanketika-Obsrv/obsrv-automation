@@ -800,7 +800,13 @@ controller:
   ##     cpu: 3
   ##     memory: 1024Mi
   ##
-  resources: {}
+  resources:
+    limits:
+      cpu: 2
+      memory: 2048Mi
+    requests:
+      cpu: 750m
+      memory: 512Mi
   ## Kafka pods' Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param controller.podSecurityContext.enabled Enable security context for the pods
@@ -1261,7 +1267,13 @@ broker:
   ##     cpu: 3
   ##     memory: 1024Mi
   ##
-  resources: {}
+  resources:
+    limits:
+      cpu: 2
+      memory: 2048Mi
+    requests:
+      cpu: 750m
+      memory: 512Mi
   ## Kafka pods' Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param broker.podSecurityContext.enabled Enable security context for the pods
@@ -1975,8 +1987,14 @@ rbac:
 ## Prometheus Exporters / Metrics
 ##
 metrics:
-  ## Prometheus JMX exporter: exposes the majority of Kafka metrics
-  ##
+  kafka:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
   jmx:
     ## @param metrics.jmx.enabled Whether or not to expose JMX metrics to Prometheus
     ##
