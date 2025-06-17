@@ -3,21 +3,21 @@ kafka:
   broker:
     resources:
       limits:
-        cpu: 2
+        cpu: 1
         memory: 2048Mi
       requests:
         cpu: 750m
-        memory: 512Mi
+        memory: 1024Mi
     persistence:
       size: 8Gi
   controller:
     resources:
       limits:
-        cpu: 2
+        cpu: 1
         memory: 2048Mi
       requests:
         cpu: 750m
-        memory: 512Mi
+        memory: 1024Mi
     persistence:
       size: 8Gi
     
