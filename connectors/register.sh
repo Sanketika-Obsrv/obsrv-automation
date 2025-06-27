@@ -1,6 +1,7 @@
 #!/bin/bash
 
 dataset_api_port=3000
+dataset_api_host="localhost"
 
 # function to check and install kubectl
 install_kubectl() {
@@ -89,11 +90,11 @@ open_dataset_api_ports(){
             exit 1
         fi
     done
-    echo "Dataset API is now accessible at http://localhost:$dataset_api_port"
+    echo "Dataset API is now accessible at http://$dataset_api_host:$dataset_api_port"
 }
 
 register_connectors() {
-  echo "📦 Starting GitHub-based connector registration..."
+  echo "Starting GitHub-based connector registration..."
   mkdir -p distributions
 
   # List of connectors as "repo-name:asset-filename"
@@ -110,7 +111,7 @@ register_connectors() {
     download_url="https://github.com/Sanketika-Obsrv/${repo_name}/releases/latest/download/${asset_name}"
     output_path="distributions/${asset_name}"
 
-    echo "⬇️  Downloading $asset_name from $repo_name..."
+    echo "Downloading $asset_name from $repo_name..."
     if curl -L --fail "$download_url" -o "$output_path"; then
       echo "Downloaded: $output_path"
     else
@@ -119,7 +120,7 @@ register_connectors() {
     fi
 
     echo "Registering: $asset_name to Dataset API..."
-    curl --progress-bar --location "http://localhost:$dataset_api_port/v2/connector/register" \
+    curl --progress-bar --location "http://$dataset_api_host:$dataset_api_port/v2/connector/register" \
       --header 'Content-Type: multipart/form-data' \
       --form "file=@$output_path"
 
