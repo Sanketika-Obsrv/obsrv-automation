@@ -92,7 +92,7 @@ open_dataset_api_ports(){
     echo "Dataset API is now accessible at http://localhost:$dataset_api_port"
 }
 
-connector_register() {
+register_connectors() {
   echo "📦 Starting GitHub-based connector registration..."
   mkdir -p distributions
 
@@ -138,7 +138,7 @@ install_kubectl
 check_kubeconfig
 check_dataset_installation
 open_dataset_api_ports
-connector_register
+register_connectors
 close_dataset_api_ports
 
 ## Handle SIGINT and SIGTERM and close port-forward
