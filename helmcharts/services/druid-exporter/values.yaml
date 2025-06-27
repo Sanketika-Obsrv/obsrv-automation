@@ -37,10 +37,10 @@ affinity: {}
 tolerations: []
 
 security:
-  enabled: true
+  enabled: false
   druidUser: admin
   druidPassword:
-    value: admin123
+    value: admin
     secretKeyRef:
       enabled: false
       secretName: mysecret
