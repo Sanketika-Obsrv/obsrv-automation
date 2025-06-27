@@ -1,6 +1,7 @@
 #!/bin/bash
 
 dataset_api_port=3000
+dataset_api_host="localhost"
 
 # function to check and install kubectl
 install_kubectl() {
@@ -89,18 +90,43 @@ open_dataset_api_ports(){
             exit 1
         fi
     done
-    echo "Dataset API is now accessible at http://localhost:$dataset_api_port"
+    echo "Dataset API is now accessible at http://$dataset_api_host:$dataset_api_port"
 }
 
 register_connectors() {
-    # list all normal files in distributions directory
-    for connector in $(ls -1 distributions/*.tar.gz); do
-        echo "\nRegistering connector: $connector"
-        curl --progress-bar --location "localhost:$dataset_api_port/v2/connector/register" \
-        --header 'Content-Type: multipart/form-data' \
-        --form "file=@$connector" | cat
-        rm -rf $connector
-    done
+  echo "Starting GitHub-based connector registration..."
+  mkdir -p distributions
+
+  # List of connectors as "repo-name:asset-filename"
+  connectors=(
+    "kafka-connector:kafka-connector.tar.gz"
+    "jdbc-connector:jdbc-connector.tar.gz"
+    "object-store-connector:object-store-connector.tar.gz"
+    "debezium-connector:debezium-connector.tar.gz"
+  )
+
+  for entry in "${connectors[@]}"; do
+    repo_name="${entry%%:*}"
+    asset_name="${entry##*:}"
+    download_url="https://github.com/Sanketika-Obsrv/${repo_name}/releases/latest/download/${asset_name}"
+    output_path="distributions/${asset_name}"
+
+    echo "Downloading $asset_name from $repo_name..."
+    if curl -L --fail "$download_url" -o "$output_path"; then
+      echo "Downloaded: $output_path"
+    else
+      echo "Failed to download: $asset_name from $repo_name"
+      continue
+    fi
+
+    echo "Registering: $asset_name to Dataset API..."
+    curl --progress-bar --location "http://$dataset_api_host:$dataset_api_port/v2/connector/register" \
+      --header 'Content-Type: multipart/form-data' \
+      --form "file=@$output_path"
+
+    echo "Cleaning up: $output_path"
+    rm -f "$output_path"
+  done
 }
 
 close_dataset_api_ports(){
