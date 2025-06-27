@@ -101,7 +101,7 @@ connector_register() {
     "kafka-connector:kafka-connector.tar.gz"
     "jdbc-connector:jdbc-connector.tar.gz"
     "object-store-connector:object-store-connector.tar.gz"
-    "knowlg-connector:knowlg-connector.tar.gz"
+    "debezium-connector:debezium-connector.tar.gz"
   )
 
   for entry in "${connectors[@]}"; do
