@@ -145,6 +145,19 @@ all)
     bash $0 additional ${@: 2}
 
     ;;
+
+register_connectors)
+    echo "Running connector registration script..."
+    if [ -x "../../connectors/register.sh" ]; then
+        bash ../../connectors/register.sh
+    elif [ -f "../../connectors/register.sh" ]; then
+        chmod +x ../../connectors/register.sh
+        bash ../../connectors/register.sh
+    else
+        echo "Warning: Connector registration script not found at ../../connectors/register.sh. Skipping connector registration."
+    fi
+    ;;
+
 reset)
     helm uninstall additional -n obsrv
     helm uninstall obsrvtools -n obsrv
