@@ -37,10 +37,10 @@ affinity: {}
 tolerations: []
 
 security:
-  enabled: "{{ .Values.global.druid_users.auth_enabled }}"
+  enabled: true
   druidUser: admin
   druidPassword:
-    value: "{{ .Values.global.druid.password }}"
+    value: admin123
     secretKeyRef:
       enabled: false
       secretName: mysecret
