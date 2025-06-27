@@ -384,8 +384,8 @@ serviceAccount:
 
 #################### Druid Auth Variables ######################
 
-  druid_auth_enabled: {{ .Values.druid_auth_enabled }}
-  druid_auth_admin_password: {{ .Values.global.druid.password }}
+  druid_auth_enabled: false
+  druid_auth_admin_password: admin123
   druid_auth_escalator_username: druid_system
   druid_auth_escalator_password: internal123
   
