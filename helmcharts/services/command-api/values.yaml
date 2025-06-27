@@ -181,6 +181,8 @@ serviceConfig:
   druid:
     router_host: "{{ .Values.global.druid.host }}"
     router_port: "{{ .Values.global.druid.port }}"
+    username: "{{ .Values.global.druid.username }}"
+    password: "{{ .Values.global.druid.password }}"
     supervisor_endpoint: "{{ .Values.global.druid.supervisorEndpoint }}"
     ingestion_endpoint: "{{ .Values.global.druid.ingestionEndpoint }}"
 

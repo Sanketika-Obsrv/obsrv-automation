@@ -5,8 +5,8 @@ namespace: submit-ingestion
 
 # Druid authentication credentials
 druid:
-  username: "admin"  # Druid username 
-  password: "admin123"  # Druid password 
+  username: "{{ .Values.global.druid.username }}"
+  password: "{{ .Values.global.druid.password }}"
 
 
 replicaCount: 1
