@@ -3,11 +3,19 @@ node_selector:
 {{- if .Values.nodeSelector }}
   {{- toYaml .Values.nodeSelector | nindent 2 }}
 {{- end }}
-container_security_context:
+spark_connector_container_security_context:
 {{- if .Values.securityContext }}
   {{- toYaml .Values.securityContext | nindent 2 }}
 {{- end }}
-pod_security_context:
-{{- if .Values.podSecurityContext }}
+spark_connector_pod_security_context:
+{{- if .Values.connectorPodSecurityContext }}
   {{- toYaml .Values.podSecurityContext | nindent 2 }}
+{{- end }}
+flink_connector_container_security_context:
+{{- if .Values.flinkContainerSecurityContext }}
+  {{- toYaml .Values.flinkContainerSecurityContext | nindent 2 }}
+{{- end }}
+flink_connector_pod_security_context:
+{{- if .Values.flinkPodSecurityContext }}
+  {{- toYaml .Values.flinkPodSecurityContext | nindent 2 }}
 {{- end }}

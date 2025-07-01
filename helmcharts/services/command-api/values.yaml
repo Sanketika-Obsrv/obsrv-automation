@@ -33,6 +33,14 @@ securityContext: {}
   #   drop:
   #   - ALL
 
+flinkContainerSecurityContext:
+  {}
+
+flinkPodSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 9999
+  fsGroup: 0
+
 # This block is an interface for k8s service spec.
 service:
   type: ClusterIP
