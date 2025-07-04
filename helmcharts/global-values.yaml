@@ -445,8 +445,11 @@ config-api: &config-api
 grafana-configs:
   namespace: *monitoring-namespace
 
-submit-ingestion:
+submit-ingestion: &submit-ingestion
   namespace: *submit-ingestion-namespace
+  druid:
+    admin_username: *druid_admin_user
+    admin_password: *druid_admin_password
 
 system-rules-ingestor:
   namespace: *system-rules-ingestor-namespace
