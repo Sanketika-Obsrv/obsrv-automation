@@ -145,6 +145,14 @@ all)
     bash $0 additional ${@: 2}
 
     ;;
+
+register_connectors)
+    echo "Running connector registration script..."
+    chmod +x ../../connectors/register.sh
+    ../../connectors/register.sh
+    ;;
+
+
 reset)
     helm uninstall additional -n obsrv
     helm uninstall obsrvtools -n obsrv

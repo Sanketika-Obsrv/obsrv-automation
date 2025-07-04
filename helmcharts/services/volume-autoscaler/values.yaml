@@ -4,6 +4,7 @@ global:
     registry: ""
 name: volume-autoscaler
 namespace: volume-autoscaler
+imagePullPolicy: IfNotPresent
 
 # The typical config variables for the volume-autoscaler service, and their respective defaults
 

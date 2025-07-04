@@ -82,8 +82,9 @@ defaults:
     admin_password: &superset_admin_password "admin123"
 
   druid_users:
-    auth_enabled: &druid_auth_enabled "false"
+    auth_enabled: &druid_auth_enabled "true"
     admin_password: &druid_admin_password "admin123"
+    admin_user: &druid_admin_user "admin"
     escalator_username: &druid_escalator_username "druid_system"
     escalator_password: &druid_escalator_password "internal123"
 
@@ -243,6 +244,8 @@ druid: &druid
   host: "druid-raw-routers.druid-raw.svc.cluster.local"
   port: 8888
   supervisorEndpoint: "indexer/v1/supervisor"
+  username: *druid_admin_user
+  password: *druid_admin_password
 
 opentelemetry-collector:
   namespace: *opentelemetry-collector
@@ -442,8 +445,11 @@ config-api: &config-api
 grafana-configs:
   namespace: *monitoring-namespace
 
-submit-ingestion:
+submit-ingestion: &submit-ingestion
   namespace: *submit-ingestion-namespace
+  druid:
+    admin_username: *druid_admin_user
+    admin_password: *druid_admin_password
 
 system-rules-ingestor:
   namespace: *system-rules-ingestor-namespace
@@ -463,6 +469,9 @@ alert-rules: &alert-rules
 druid-exporter:
   namespace: *druid-namespace
   druidURL: *global-druid-url
+  auth_enabled: *druid_auth_enabled
+  admin_password: *druid_admin_password
+  admin_user: *druid_admin_user
   serviceMonitor:
     enabled: true
     namespace: *druid-namespace

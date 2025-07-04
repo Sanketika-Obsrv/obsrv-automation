@@ -33,6 +33,14 @@ securityContext: {}
   #   drop:
   #   - ALL
 
+flinkContainerSecurityContext:
+  {}
+
+flinkPodSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 9999
+  fsGroup: 0
+
 # This block is an interface for k8s service spec.
 service:
   type: ClusterIP
@@ -181,6 +189,8 @@ serviceConfig:
   druid:
     router_host: "{{ .Values.global.druid.host }}"
     router_port: "{{ .Values.global.druid.port }}"
+    username: "{{ .Values.global.druid.username }}"
+    password: "{{ .Values.global.druid.password }}"
     supervisor_endpoint: "{{ .Values.global.druid.supervisorEndpoint }}"
     ingestion_endpoint: "{{ .Values.global.druid.ingestionEndpoint }}"
 
