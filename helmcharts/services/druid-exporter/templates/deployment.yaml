@@ -1,4 +1,3 @@
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,12 +39,12 @@ spec:
 {{- if .Values.extraEnv }}
 {{ toYaml .Values.extraEnv | indent 8 }}
 {{- end }}
-{{- if .Values.security.enabled }}
+{{- if .Values.auth_enabled }}
         - name: DRUID_USER
-          value: {{ .Values.security.druidUser }}
+          value: {{ .Values.admin_user | quote }}
         - name: DRUID_PASSWORD
 {{- if not .Values.security.druidPassword.secretKeyRef.enabled }}
-          value: {{ .Values.security.druidPassword.value }}
+          value: {{ .Values.admin_password | quote }}
 {{- else }}
           valueFrom:
             secretKeyRef:

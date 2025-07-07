@@ -299,7 +299,7 @@ global:
   - pullSecret2
 */}}
 {{- define "kube-prometheus-stack.imagePullSecrets" -}}
-{{- range .Values.global.imagePullSecrets }}
+{{- range .Values.imagePullSecrets }}
   {{- if eq (typeOf .) "map[string]interface {}" }}
 - {{ toYaml . | trim }}
   {{- else }}

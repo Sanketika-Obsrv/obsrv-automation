@@ -17,6 +17,7 @@ commonLabels:
 registry: sanketikahub
 repository: merged-pipeline
 tag: 1.0.0-GA
+imagePullPolicy: IfNotPresent
 imagePullSecrets: []
 
 ## Databases
