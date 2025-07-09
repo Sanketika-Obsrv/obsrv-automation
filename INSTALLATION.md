@@ -67,12 +67,12 @@ gcloud auth application-default login
 gcloud components install gke-gcloud-auth-plugin
 ```
 
-4. Create a project and export it as variable. Please see [Creating and Managing Projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects) for reference.
+4. Create a project and pass values for these variable in `helmcharts/infra-setup/obsrv.conf`.
 
 ```
-export GOOGLE_PROJECT_ID=myproject
+GOOGLE_PROJECT_ID=myproject
 GOOGLE_TERRAFORM_BACKEND_LOCATION=mylocation
-export GOOGLE_TERRAFORM_BACKEND_BUCKET=mybucket
+GOOGLE_TERRAFORM_BACKEND_BUCKET=mybucket
 ```
 
 5. Enable the Kubernets Engine API for the created project. Please see [Enabling the Kubernetes Engine API](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-zonal-cluster#enable-api) for reference.
@@ -82,19 +82,15 @@ export GOOGLE_TERRAFORM_BACKEND_BUCKET=mybucket
 
 
 ### Steps:
-In order to complete the installation, please run the below steps in the same terminal.
+In order to complete the installation, please run the below cmd in the same terminal under `/infra-setup`.
 ```
-cd terraform/gcp
-terragrunt init
-terrahelp decrypt -simple-key=<decryption_key> -file=vars/dev.tfvars
-terragrunt plan --var-file=vars/cluster_overrides.tfvars --var-file=vars/dev.tfvars
-terragrunt apply --var-file=vars/cluster_overrides.tfvars --var-file=vars/dev.tfvars
+time ./obsrv.sh install --provider gcp --config ./obsrv.conf
 ```
 
-7. Set `KUBECONFIG` variable in your environment to point to the kubeconfig file.
+7. Set `KUBECONFIG` variable in your environment to point to the kubeconfig file. You will find the kubeconfig file under `terraform/gcp/` directory.
 
 ```
-export KUBECONFIG=$(pwd)/credentials/config-<building_block>-<env>.yaml
+export KUBECONFIG=$(pwd)/config-<building_block>-<env>.yaml
 ```
 
 
@@ -104,7 +100,7 @@ export KUBECONFIG=$(pwd)/credentials/config-<building_block>-<env>.yaml
 cd ../../helmcharts/kitchen
 ```
 
-7. Update the `global-cloud-values-gcp.yaml` file with the necessary values. The values to be updated are:
+7. Update the `global-cloud-values-gcp.yaml` file with the necessary values. The values to be updated are(all the service accounts annotations should be updated in placeholders.):
 ```
 project_id:
 cloud_storage_config:
@@ -112,7 +108,7 @@ cloud_storage_region:
 cloud_storage_bucket:
 postgresql_backup_cloud_bucket:
 checkpoint_bucket:
-redis_backup_cloud_bucket:
+redis_backup_cloud_bucket: # currently we don't have this key in the global file.
 velero_backup_cloud_bucket:
 
 serviceAccounts:
@@ -123,8 +119,8 @@ serviceAccounts:
 
 ```
 cd kitchen/
-CLOUD_ENV=gcp bash install.sh bootstrap
-CLOUD_ENV=gcp bash install.sh coredb
+export cloud_env=gcp 
+bash install.sh core-setup
 ```
 
 9. Get the IP address of the LoadBalancer Service by Kong
@@ -135,14 +131,9 @@ kubectl get svc -n kong-ingress
 
 10. Update `../global-values.yaml` with the domain as `<ip>.sslip.io` or a complete domain name if DNS is mapped
 
-11. Follow the steps to complete the installation
-
+11. Follow this step to complete the installation.
 ```
-bash install.sh migrations
-bash install.sh monitoring
-bash install.sh coreinfra
-bash install.sh obsrvtools
-bash install.sh additional
+bash install.sh all
 ```
 
 12. Check if the ingress routes are created
