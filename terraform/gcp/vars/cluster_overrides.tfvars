@@ -11,7 +11,7 @@ service_type                  = "LoadBalancer"
 gke_node_pool_instance_type   = "c2d-standard-8"
 gke_node_pool_scaling_config = {
   desired_size = 2
-  max_size = 2
+  max_size = 3
   min_size = 0
 }
 
