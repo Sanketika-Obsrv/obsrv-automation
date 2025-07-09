@@ -130,10 +130,14 @@ additional)
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf additional
     ;;
-all)
+core-setup)
     bash $0 bootstrap ${@: 2}
-    bash $0 prerequisites ${@: 2}
     bash $0 coredb ${@: 2}
+    ;;
+all)
+    # bash $0 bootstrap ${@: 2}
+    # bash $0 prerequisites ${@: 2}
+    # bash $0 coredb ${@: 2}
     bash $0 migrations ${@: 2}
     bash $0 monitoring ${@: 2}
     bash $0 oauth ${@: 2}
