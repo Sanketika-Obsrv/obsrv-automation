@@ -4,16 +4,17 @@
 install_obsrv() {
     echo "Obsrv installation has started.."
     terragrunt init
-    terragrunt apply -target module.eks -var-file=vars/cluster_overrides.tfvars -auto-approve
-    terragrunt apply -target module.get_kubeconfig -var-file=vars/cluster_overrides.tfvars -auto-approve
-    terragrunt apply  -var-file=vars/cluster_overrides.tfvars -auto-approve
+    terragrunt apply -target module.eks -var-file=vars/cluster_overrides.tfvars
+    terragrunt apply -target module.get_kubeconfig -var-file=vars/cluster_overrides.tfvars
+    terragrunt apply  -var-file=vars/cluster_overrides.tfvars
     echo "Installation completed successfully!"
 }
 
-# Function to destroy Obsrv
+# WARNING: This will destroy all resources created by Obsrv
+# Execute this only if you want to decommission Obsrv completely
 destroy_obsrv() {
-    echo "Destroying Obsrv..."
-    terragrunt destroy -var-file=vars/cluster_overrides.tfvars -auto-approve
+    echo "Started Decommissioning Obsrv"
+    terragrunt destroy -var-file=vars/cluster_overrides.tfvars
     echo "Obsrv has been successfully destroyed."
 }
 
