@@ -220,7 +220,7 @@ if [ "$provider" == "aws" ]; then
     export KUBECONFIG=$KUBE_CONFIG_PATH
     cd ../terraform/aws
 elif [ "$provider" == "gcp" ]; then
-    export GOOGLE_PROJECT_ID=$GCP_PROJECT_ID
+    export GOOGLE_PROJECT_ID=$GOOGLE_PROJECT_ID
     export GOOGLE_TERRAFORM_BACKEND_LOCATION=$GOOGLE_TERRAFORM_BACKEND_LOCATION
     export GOOGLE_TERRAFORM_BACKEND_BUCKET=$GOOGLE_TERRAFORM_BACKEND_BUCKET
     cd ../terraform/gcp
