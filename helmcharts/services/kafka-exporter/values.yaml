@@ -6,8 +6,8 @@ replicaCount: 1
 
 namespace: kafka
 image:
-  repository: danielqsj/kafka-exporter
-  tag: latest
+  repository: sanketikahub/kafka-exporter
+  tag: 1.0.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -19,9 +19,8 @@ service:
 
 kafkaExporter:
   kafka:
-    servers: ["kafka-headless:9093"]
-  zookeeper:
-    servers: ["kafka-zookeeper-headless.kafka.svc.cluster.local:2181"]
+    servers: ["kafka-controller-headless:9092"]
+
   additionalFlags: []
     # - --use.consumelag.zookeeper
 

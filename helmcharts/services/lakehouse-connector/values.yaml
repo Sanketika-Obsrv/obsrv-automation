@@ -81,11 +81,8 @@ global:
     host: localhost
     port: 9042
   kafka:
-    host: "kafka-headless.kafka.svc.cluster.local"
-    port: 9092
-  zookeeper:
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
-    port: 2181
+    host: "{{ .Values.global.kafka.host }}"
+    port: "{{ .Values.global.kafka.port }}"
   image:
     registry: ""
 
