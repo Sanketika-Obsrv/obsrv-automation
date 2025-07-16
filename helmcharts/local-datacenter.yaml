@@ -37,8 +37,8 @@ global:
 
 service-account-disable: &service-account-disable
   serviceAccount:
-    enabled: false
-    create: false
+    enabled: true
+    create: true
 
 ### Enable to Write to MinIO: WIP
 loki:
