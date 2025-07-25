@@ -350,9 +350,9 @@ images: &images
     digest: ""
 
   trino: &trino
-    registry: "registry-1.docker.io"
+    registry: "docker.io"
     repository: trinodb/trino
-    tag: "432"
+    tag: "476"
     digest: ""
 
   promitor-agent-scraper: &promitor-agent-scraper
