@@ -113,7 +113,7 @@ images: &images
   valkey: &valkey
     registry: "docker.io"
     repository: "bitnami/valkey"
-    tag: "8.0.1-debian-12-r3"
+    tag: "8.1.3-debian-12-r2"
     digest: ""
     pullSecrets:
       - *dockerSecretName
