@@ -43,7 +43,7 @@ prerequisites)
     ;;
 coredb)
     cp -rf ../obsrv coredb
-    cp -rf ../services/{kafka,kafka-exporter,postgresql,kong,druid-operator,valkey-dedup,valkey-denorm} coredb/charts/
+    cp -rf ../services/{kafka,postgresql,kong,druid-operator,valkey-dedup,valkey-denorm} coredb/charts/
 
     ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
     if [ "$ssl_enabled" == "true" ]; then
