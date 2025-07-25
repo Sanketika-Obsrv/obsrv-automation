@@ -76,7 +76,7 @@ images: &images
   postgresql: &postgresql
     registry: "docker.io"
     repository: "bitnami/postgresql"
-    tag: "17.2.0"
+    tag: "17.5.0"
     digest: ""
 
   postgresql-exporter: &postgresql-exporter
