@@ -1,0 +1,46 @@
+# This file has to added in the helm upgrade command to run the Prometheus stack without built-in monitoring
+global:
+  rbac:
+    create: false
+
+# Fix Prometheus reload error by completely disabling built-in monitoring
+
+kube-prometheus-stack:
+  prometheus:
+    enabled: false
+  prometheusOperator:
+    enabled: false
+  alertmanager:
+    enabled: false
+  grafana:
+    enabled: true # Keep Grafana enabled
+  kubeStateMetrics:
+    enabled: false
+  kubeApiServer:
+    enabled: false
+  kubelet:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  coreDns:
+    enabled: false
+  kubeDns:
+    enabled: false
+  prometheusNodeExporter:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  kube-state-metrics:
+    enabled: false
+    rbac:
+      create: false
+  kubeProxy:
+    enabled: false
+
+# # Disable any Prometheus config reloader
+# prometheusOperator:
+#   enabled: false
+#   prometheusConfigReloader:
+#     enabled: false
