@@ -12,8 +12,8 @@ install_obsrv() {
             ;;
         gcp)
             terragrunt init
-            terragrunt plan -var-file=vars/cluster_overrides.tfvars 
-            terragrunt apply -var-file=vars/cluster_overrides.tfvars
+            terragrunt plan -var-file=vars/cluster_overrides.tfvars --auto-approve
+            terragrunt apply -var-file=vars/cluster_overrides.tfvars --auto-approve
             ;;
         *)
             echo "Unknown provider: $provider"
