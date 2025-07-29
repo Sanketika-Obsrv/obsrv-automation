@@ -3,6 +3,12 @@ fullnameOverride: "submit-ingestion"
 
 namespace: submit-ingestion
 
+# Druid authentication credentials
+druid:
+  admin_username: ""
+  admin_password: ""
+
+
 replicaCount: 1
 
 global:
@@ -150,9 +156,21 @@ startupCommand:
   - -c
   - |
     if [ "{{ .Values.datasource.system_events.enable }}" = "true" ]; then
-      curl -XPOST -H 'Content-Type: application/json' -d @/config/system-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }};
+      echo "Submitting system-events.json with headers:"
+      curl -v -X POST \
+        -H "Content-Type: application/json" \
+        -u {{ .Values.druid.admin_username }}:{{ .Values.druid.admin_password }} \
+        -d @/config/system-events.json \
+        http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }}
     fi
+
     if [ "{{ .Values.datasource.system_telemetry_events.enable }}" = "true" ]; then
-      curl -XPOST -H 'Content-Type: application/json' -d @/config/system-telemetry-events.json http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }};
+      echo "Submitting system-telemetry-events.json with headers:"
+      curl -v -X POST \
+        -H "Content-Type: application/json" \
+        -u {{ .Values.druid.admin_username }}:{{ .Values.druid.admin_password }} \
+        -d @/config/system-telemetry-events.json \
+        http://{{ .Values.druid_router_host }}/{{ .Values.supervisor_path }}
     fi
 restartPolicy: "OnFailure"
+

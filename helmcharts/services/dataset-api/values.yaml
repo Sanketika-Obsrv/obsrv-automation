@@ -150,6 +150,8 @@ env:
   telemetry_kafka_compression: snappy
   druid_host: "http://{{ .Values.global.druid.host }}"
   druid_port: "{{ .Values.global.druid.port }}"
+  druid_username: "{{ .Values.global.druid.username }}"
+  druid_password: "{{ .Values.global.druid.password }}"
   kafka_host: "{{ .Values.global.kafka.host }}"
   kafka_port: "{{ .Values.global.kafka.port }}"
   client_id: "obsrv-apis"

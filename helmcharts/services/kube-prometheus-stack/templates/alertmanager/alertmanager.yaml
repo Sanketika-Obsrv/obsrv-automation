@@ -132,9 +132,9 @@ spec:
   topologySpreadConstraints:
 {{ toYaml .Values.alertmanager.alertmanagerSpec.topologySpreadConstraints | indent 4 }}
 {{- end }}
-{{- if .Values.global.imagePullSecrets }}
+{{- if .Values.alertmanager.imagePullSecrets }}
   imagePullSecrets:
-{{ include "kube-prometheus-stack.imagePullSecrets" . | trim | indent 4 }}
+{{ toYaml .Values.alertmanager.imagePullSecrets | indent 4 }}
 {{- end }}
 {{- if .Values.alertmanager.alertmanagerSpec.containers }}
   containers:

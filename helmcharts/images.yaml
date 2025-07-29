@@ -6,8 +6,6 @@ global:
     dockerConfigJson: |-
       {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
 
-
-
 imagePullSecrets: &imagePullSecrets
   - name: *dockerSecretName
 
@@ -32,7 +30,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.8.0"
+    tag: "1.9.0"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -181,11 +179,11 @@ images: &images
     tag: v2.44.0
     digest: ""
 
-  prometheus-pushgateway: &prometheus-pushgateway 
+  prometheus-pushgateway: &prometheus-pushgateway
     repository: sanketikahub/pushgateway
     tag: v1.10.0
-    digest: "" 
-    
+    digest: ""
+
   grafana: &grafana
     registry: docker.io
     repository: grafana/grafana
@@ -323,7 +321,7 @@ images: &images
     digest: ""
 
   druid-raw-cluster: &druid-raw-cluster
-    registry: apache
+    registry: *global_registry
     repository: druid
     tag: "28.0.1"
     digest: ""
@@ -376,11 +374,11 @@ images: &images
     repository: "kong/kubernetes-ingress-controller"
     tag: "2.10"
     digest: ""
-  
+
   kubectl: &kubectl
     repository: "docker.io/bitnami/kubectl"
     tag: "1.26.14-debian-11-r6"
-  
+
   sanketikahub-kubectl: &sanketikahub-kubectl
     registry: *global_registry
     repository: kubectl
@@ -395,25 +393,29 @@ images: &images
 internal: &internal
   command-api:
     <<: *command-api
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   web-console:
     <<: *web-console
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
     kubectl:
       image:
         <<: *sanketikahub-kubectl
 
   dataset-api:
     <<: *dataset-api
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
     kubectl:
       image:
         <<: *sanketikahub-kubectl
 
   config-api:
     <<: *config-api
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
     kubectl:
       image:
         <<: *sanketikahub-kubectl
@@ -421,31 +423,46 @@ internal: &internal
   postgresql:
     image:
       <<: *postgresql
+      pullSecrets:
+      - *dockerSecretName
 
   hms:
     image:
       <<: *hms
+      imagePullSecrets: 
+      - name: *dockerSecretName
 
   trino:
     image:
       <<: *trino
+      imagePullSecrets: 
+      - name: *dockerSecretName
 
   postgresql-backup:
     <<: *postgresql-backup
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   postgresql-exporter:
     <<: *postgresql-exporter
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   postgresql-migration:
     <<: *postgresql-migration
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   s3-exporter:
     <<: *s3-exporter
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   velero:
     image:
       <<: *velero
+      imagePullSecrets: 
+      - *dockerSecretName
     kubectl:
       image:
         <<: *kubectl
@@ -453,12 +470,18 @@ internal: &internal
   valkey-dedup:
     image:
       <<: *valkey
+      pullSecrets:
+      - *dockerSecretName
 
   valkey-denorm:
     image:
       <<: *valkey
+      pullSecrets:
+      - *dockerSecretName
 
   loki:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     singleBinary:
       image:
         <<: *loki
@@ -467,31 +490,44 @@ internal: &internal
         <<: *loki-gateway
 
   kubernetes-reflector:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     image:
       <<: *kubernetes-reflector
 
+
   kube-prometheus-stack:
     prometheus:
+      imagePullSecrets:
+        - name: *dockerSecretName
       prometheusSpec:
         image:
           <<: *prometheus
     alertmanager:
+      imagePullSecrets:
+        - name: *dockerSecretName
       alertmanagerSpec:
         image:
           <<: *alertmanager
     prometheusOperator:
+      imagePullSecrets:
+        - name: *dockerSecretName
       admissionWebhooks:
         patch:
           image:
             <<: *prometheus-operator-webhook
+ 
       image:
         <<: *prometheus-operator
+ 
       prometheusConfigReloader:
         image:
           <<: *prometheus-config-reloader
     grafana:
       image:
         <<: *grafana
+        pullSecrets:
+        - *dockerSecretName
       testFramework:
         <<: *grafana-test-framework
       downloadDashboardsImage:
@@ -503,19 +539,29 @@ internal: &internal
         image:
           <<: *grafana-side-car
     kube-state-metrics:
+      imagePullSecrets:
+      - name: *dockerSecretName
       image:
         <<: *kube-state-metrics
     prometheus-node-exporter:
+      imagePullSecrets:
+      - name: *dockerSecretName
       image:
         <<: *prometheus-node-exporter
 
   prometheus-pushgateway:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     image:
       <<: *prometheus-pushgateway
+      imagePullSecrets: 
+      - name: *dockerSecretName
 
   keycloak:
     image:
       <<: *keycloak
+      pullSecrets:
+      - *dockerSecretName
     kubectl:
       image:
         <<: *sanketikahub-kubectl
@@ -523,25 +569,36 @@ internal: &internal
     keycloakConfigCli:
       image:
         <<: *keycloakConfigCli
+        pullSecrets:
+        - *dockerSecretName
 
   druid-exporter:
     image:
       <<: *druid_exporter
+      pullSecrets:
+      - *dockerSecretName
 
   druid-raw-cluster:
     <<: *druid-raw-cluster
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   druid-operator:
+    imagePullSecrets: 
+    - name: *dockerSecretName
     image:
       <<: *druid_operator
 
   kafka-message-exporter:
-    imagePullSecrets: *imagePullSecrets
     <<: *kafka-message-exporter
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   # kafka-exporter:
   #   image:
   #     <<: *kafka-exporter
+
+
 
   # kafka-connector:
   #   image:
@@ -558,12 +615,17 @@ internal: &internal
   kong:
     image:
       <<: *kong
+      pullSecrets:
+      - *dockerSecretName
     ingressController:
       image:
         <<: *kubernetes-ingress-controller
+        pullSecrets:
+        - *dockerSecretName
 
   cert-manager:
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
     image:
       <<: *cert_manager_controller
     startupapicheck:
@@ -582,58 +644,100 @@ internal: &internal
   spark:
     image:
       <<: *spark
+      pullSecrets:
+      - *dockerSecretName
 
   secor:
     <<: *secor
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   superset:
     <<: *superset
+    imagePullSecrets: 
+      - name: *dockerSecretName
 
   flink:
-    imagePullSecrets: *imagePullSecrets
     flink_jobs:
       master-data-processor:
         enabled: false
         <<: *master-data-processor
+        imagePullSecrets: 
+        - name: *dockerSecretName
       unified-pipeline:
         enabled: true
         <<: *unified-pipeline
+        imagePullSecrets: 
+        - name: *dockerSecretName
       cache-indexer:
         enabled: true
         <<: *cache-indexer
+        imagePullSecrets: 
+        - name: *dockerSecretName
 
   system-rules-ingestor:
     <<: *system-rules-ingestor
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   volume-autoscaler:
     <<: *volume-autoscaler
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   promitor-agent-scraper:
     image:
       <<: *promitor-agent-scraper
+      pullSecrets:
+      - *dockerSecretName
 
   lakehouse-connector:
     image:
       <<: *lakehouse-connector
+      imagePullSecrets: 
+      - *dockerSecretName
 
   minio:
     image:
       <<: *minio
-
+      pullSecrets:
+      - *dockerSecretName
+      
   opentelemetry-collector:
     image:
     <<: *opentelemetry-collector
 
   opentelemetry-collector:
     <<: *opentelemetry-collector
-    imagePullSecrets: *imagePullSecrets
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   promtail:
     <<: *promtail
+    imagePullSecrets: 
+    - name: *dockerSecretName
 
   submit-ingestion:
     <<: *sanketikahub-kubectl
+    imagePullSecrets: 
+    - name: *dockerSecretName
+
+  prometheus:
+    <<: *prometheus
+    imagePullSecrets: 
+    - name: *dockerSecretName
+
+  alertmanager:
+    <<: *alertmanager
+    imagePullSecrets: 
+    - name: *dockerSecretName  
+
+  prometheus-operator:
+    <<: *prometheus-operator
+    imagePullSecrets: 
+    - name: *dockerSecretName
+
+  
 ## Sourcing internal as root element,
 ## should need arise
 <<: *internal

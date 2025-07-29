@@ -61,6 +61,7 @@ defaults:
     grafana_url: &grafana-url "http://grafana.monitoring.svc.cluster.local"
 
   kafka-topics:
+    numPartitions: &kafkaNumPartitions 4
     ingestTopic: &ingestTopic "ingest"
     system_stats_topic: &system_stats_topic "stats"
     masterdata_system_stats_topic: &masterdata_system_stats_topic "masterdata.stats"
@@ -79,6 +80,13 @@ defaults:
   superset_users:
     admin_user: &superset_admin_user "admin"
     admin_password: &superset_admin_password "admin123"
+
+  druid_users:
+    auth_enabled: &druid_auth_enabled "true"
+    admin_password: &druid_admin_password "admin123"
+    admin_user: &druid_admin_user "admin"
+    escalator_username: &druid_escalator_username "druid_system"
+    escalator_password: &druid_escalator_password "internal123"
 
   # config_service_host: &config-service-host "http://command-api.command-api.svc.cluster.local"
   # druid_host: &global-druid-host "http://druid-raw-routers.druid-raw.svc.cluster.local"
@@ -118,34 +126,34 @@ kafka: &kafka
   hudiConnectorTopic: *hudiConnectorTopic
   connectorsMetricTopic: *connectorsMetricTopic
   connectorsFailedTopic: *connectorsFailedTopic
-  numPartitions: 4
+  numPartitions: *kafkaNumPartitions
   provisioning:
-    numPartitions: 4
+    numPartitions: *kafkaNumPartitions
     replicationFactor: 1
     topics:
       - name: *ingestTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *masterdataIngestTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *telemetryEventsTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *system_stats_topic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *masterdata_system_stats_topic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *hudiConnectorTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *connectorsMetricTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
       - name: *connectorsFailedTopic
-        partitions: 4
+        partitions: *kafkaNumPartitions
         replicationFactor: 1
 
   zookeeper: &zookeeper
@@ -236,6 +244,8 @@ druid: &druid
   host: "druid-raw-routers.druid-raw.svc.cluster.local"
   port: 8888
   supervisorEndpoint: "indexer/v1/supervisor"
+  username: *druid_admin_user
+  password: *druid_admin_password
 
 opentelemetry-collector:
   namespace: *opentelemetry-collector
@@ -315,6 +325,12 @@ druid-raw-cluster: &druid-raw-cluster
   druid_metadata_storage_connector_password: *psql-druid-pwd
   zookeeper:
     namespace: *druid-namespace
+  druid_auth_admin_password: *druid_admin_password
+  druid_auth_escalator_username: *druid_escalator_username
+  druid_auth_escalator_password: *druid_escalator_password
+  druid_auth_enabled: *druid_auth_enabled
+
+
 
 druid-operator:
   namespace: *druid-namespace
@@ -340,8 +356,6 @@ kube-prometheus-stack:
     env:
       GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
       GF_SECURITY_ADMIN_USER: *grafana-admin-user
-     
-
     grafana.ini:
       smtp:
         enabled: true
@@ -431,8 +445,11 @@ config-api: &config-api
 grafana-configs:
   namespace: *monitoring-namespace
 
-submit-ingestion:
+submit-ingestion: &submit-ingestion
   namespace: *submit-ingestion-namespace
+  druid:
+    admin_username: *druid_admin_user
+    admin_password: *druid_admin_password
 
 system-rules-ingestor:
   namespace: *system-rules-ingestor-namespace
@@ -452,6 +469,9 @@ alert-rules: &alert-rules
 druid-exporter:
   namespace: *druid-namespace
   druidURL: *global-druid-url
+  auth_enabled: *druid_auth_enabled
+  admin_password: *druid_admin_password
+  admin_user: *druid_admin_user
   serviceMonitor:
     enabled: true
     namespace: *druid-namespace

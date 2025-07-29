@@ -23,7 +23,8 @@ install_obsrv() {
     echo "Installation completed successfully!"
 }
 
-# Function to destroy Obsrv
+# WARNING: This will destroy all resources created by Obsrv
+# Execute this only if you want to decommission Obsrv completely
 destroy_obsrv() {
     echo "Destroying Obsrv for $provider..."
     terragrunt destroy -var-file=vars/cluster_overrides.tfvars -auto-approve
