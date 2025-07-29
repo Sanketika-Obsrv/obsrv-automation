@@ -26,7 +26,7 @@ install_obsrv() {
 # Function to destroy Obsrv
 destroy_obsrv() {
     echo "Destroying Obsrv for $provider..."
-    terragrunt destroy -var-file=vars/cluster_overrides.tfvars -auto-approve
+    terragrunt destroy -var-file=vars/cluster_overrides.tfvars
     echo "Obsrv has been successfully destroyed."
 }
 
