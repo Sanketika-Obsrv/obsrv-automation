@@ -68,7 +68,7 @@ monitoring)
         rm -rf monitoring/charts/loki/charts/minio
     fi
     
-    helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name
+    helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name
     rm -rf monitoring
     ;;
 coreinfra)
@@ -130,15 +130,17 @@ additional)
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf additional
     ;;
-all)
+core-setup)
     bash $0 bootstrap ${@: 2}
-    bash $0 prerequisites ${@: 2}
     bash $0 coredb ${@: 2}
+    ;;
+all)
     bash $0 migrations ${@: 2}
     bash $0 monitoring ${@: 2}
     bash $0 oauth ${@: 2}
     bash $0 coreinfra ${@: 2}
     bash $0 obsrvapis ${@: 2}
+    # We are not installing these for now.
     # bash $0 hudi ${@: 2}
     # bash $0 otel ${@: 2}
     bash $0 obsrvtools ${@: 2}
