@@ -90,7 +90,7 @@ time ./obsrv.sh install --provider gcp --config ./obsrv.conf
 7. Set `KUBECONFIG` variable in your environment to point to the kubeconfig file. You will find the kubeconfig file under `terraform/gcp/` directory.
 
 ```
-export KUBECONFIG=$(pwd)/config-<building_block>-<env>.yaml
+export KUBECONFIG=$(pwd)/credentials/config-<building_block>-<env>.yaml
 ```
 
 
