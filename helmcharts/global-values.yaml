@@ -115,9 +115,9 @@ defaults:
 #coredb-charts/
 kafka: &kafka
   namespace: *kafka-namespace
-  host: "kafka-headless.kafka.svc.cluster.local"
+  host: "kafka-controller-headless.kafka.svc.cluster.local"
   port: 9092
-  bootstrap-server: &kafka-bootstrap-server "kafka-headless.kafka.svc.cluster.local:9092"
+  bootstrap-server: &kafka-bootstrap-server "kafka-controller-headless.kafka.svc.cluster.local:9092"
   ingestTopic: *ingestTopic
   masterdataIngestTopic: *masterdataIngestTopic
   telemetryEventsTopic: *telemetryEventsTopic
@@ -173,10 +173,6 @@ kafka: &kafka
       enabled: false
     existingSecret: ""
 
-  zookeeper: &zookeeper
-    namespace: *kafka-namespace
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
-    port: 2181
 
 postgresql: &postgresql
   namespace: *postgresql-namespace
@@ -610,7 +606,6 @@ global:
   domain: *domain
   grafana: *grafana
   kafka: *kafka
-  zookeeper: *zookeeper
   druid: *druid
   postgresql: *postgresql
   flink: *flink
