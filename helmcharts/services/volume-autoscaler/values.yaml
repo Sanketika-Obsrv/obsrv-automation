@@ -11,7 +11,7 @@ imagePullPolicy: IfNotPresent
 # This is how we we can deploy this chart to a different namespace (or cluster) than Prometheus, by telling it where to access Prometheus
 #   Eg: http://prometheus-server.namespace.svc.cluster.local.  This can be auto-detected if run in the same namespace as prometheus
 # This is also how you can run this script remotely (eg: on your local machine to develop this tool against an remote Prometheus server)
-prometheus_url: "http://monitoring-kube-prometheus-prometheus.sunbird.svc.cluster.local:9090"
+prometheus_url: "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
 # This is how we confiure the Slack integration, set the two values below
 slack_webhook_url: "REPLACEME"
 slack_channel: "REPLACEME"
