@@ -2,18 +2,31 @@
 
 # Function to install Obsrv
 install_obsrv() {
-    echo "Obsrv installation has started.."
-    terragrunt init
-    terragrunt apply -target module.eks -var-file=vars/cluster_overrides.tfvars
-    terragrunt apply -target module.get_kubeconfig -var-file=vars/cluster_overrides.tfvars
-    terragrunt apply  -var-file=vars/cluster_overrides.tfvars
+    echo "Obsrv installation has started for $provider.."
+    case "$provider" in
+        aws)
+            terragrunt init
+            terragrunt apply -target module.eks -var-file=vars/cluster_overrides.tfvars -auto-approve
+            terragrunt apply -target module.get_kubeconfig -var-file=vars/cluster_overrides.tfvars -auto-approve
+            terragrunt apply  -var-file=vars/cluster_overrides.tfvars -auto-approve
+            ;;
+        gcp)
+            terragrunt init
+            terragrunt plan -var-file=vars/cluster_overrides.tfvars --auto-approve
+            terragrunt apply -var-file=vars/cluster_overrides.tfvars --auto-approve
+            ;;
+        *)
+            echo "Unknown provider: $provider"
+            exit 1
+            ;;
+    esac
     echo "Installation completed successfully!"
 }
 
 # WARNING: This will destroy all resources created by Obsrv
 # Execute this only if you want to decommission Obsrv completely
 destroy_obsrv() {
-    echo "Started Decommissioning Obsrv"
+    echo "Destroying Obsrv for $provider..."
     terragrunt destroy -var-file=vars/cluster_overrides.tfvars
     echo "Obsrv has been successfully destroyed."
 }
@@ -31,7 +44,6 @@ version_compare() {
     fi
 }
 
-# Function to get installed version
 get_installed_version() {
     local version_command="$1"
     if [ -n "$version_command" ]; then
@@ -41,7 +53,6 @@ get_installed_version() {
         echo "0.0.0"
     fi
 }
-
 
 install_tool() {
     local tool_name="$1"
@@ -62,7 +73,6 @@ install_tool() {
             echo "Installing $tool_name..."
             eval "$install_command"
 
-            # Check if the installation was successful
             if [ $? -eq 0 ]; then
                 echo "$tool_name installed successfully."
                 if [ -n "$version_command" ]; then
@@ -79,16 +89,27 @@ install_tool() {
     fi
 }
 
-# Function to validate and install required tools
 validate_and_install_tools() {
-    # Define all the required tools with version
-    tool_versions=(
-        "aws:2.13.8"
-        "helm:3.10.2"
-        "terraform:1.5.7"
-        "terrahelp:0.7.5"
-        "terragrunt:0.45.6"
-    )
+    if [ "$provider" == "aws" ]; then
+        tool_versions=(
+            "aws:2.13.8"
+            "helm:3.10.2"
+            "terraform:1.5.7"
+            "terrahelp:0.7.5"
+            "terragrunt:0.45.6"
+        )
+    elif [ "$provider" == "gcp" ]; then
+        tool_versions=(
+            "gcloud:474.0.0"
+            "helm:3.10.2"
+            "terraform:1.5.7"
+            "terrahelp:0.7.5"
+            "terragrunt:0.45.6"
+        )
+    else
+        echo "Unknown provider: $provider"
+        exit 1
+    fi
 
     for tool_version in "${tool_versions[@]}"; do
         IFS=':' read -r tool required_version <<< "$tool_version"
@@ -96,6 +117,10 @@ validate_and_install_tools() {
             "aws")
                 aws_version="aws --version | awk 'NR==1{print \$1}' | cut -d'/' -f2"
                 install_tool "$tool" 'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install -i /usr/local/aws-cli -b /usr/local/bin' "$aws_version" "$required_version"
+                ;;
+            "gcloud")
+                gcloud_version="gcloud version --format='value(core.version)' | head -n1"
+                install_tool "$tool" 'curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-474.0.0-linux-x86_64.tar.gz && tar -xf google-cloud-cli-474.0.0-linux-x86_64.tar.gz && ./google-cloud-sdk/install.sh --quiet && sudo ln -sf $(pwd)/google-cloud-sdk/bin/gcloud /usr/local/bin/gcloud' "$gcloud_version" "$required_version"
                 ;;
             "helm")
                 helm_version="helm version --short | awk -F'[v+]' '/v/{print \$2}'"
@@ -121,11 +146,12 @@ validate_and_install_tools() {
 
 # Main script
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 [install|destroy] --config <config_file> [--install_dependencies true|false]"
+    echo "Usage: $0 [install|destroy] --provider <aws|gcp> --config <config_file> [--install_dependencies true|false]"
     exit 1
 fi
 
 action=""
+provider=""
 config_file=""
 install_dependencies="false"
 
@@ -135,6 +161,10 @@ while [[ $# -gt 0 ]]; do
     case $key in
         install|destroy)
             action="$1"
+            ;;
+        --provider)
+            provider="$2"
+            shift
             ;;
         --config)
             config_file="$2"
@@ -158,6 +188,15 @@ if [ -z "$action" ]; then
     exit 1
 fi
 
+# Validate provider
+if [ -z "$provider" ]; then
+    echo "Error: Provider (aws/gcp) not specified."
+    exit 1
+elif [[ "$provider" != "aws" && "$provider" != "gcp" ]]; then
+    echo "Error: Provider must be 'aws' or 'gcp'."
+    exit 1
+fi
+
 # Validate config file
 if [ -z "$config_file" ]; then
     echo "Error: Config file not provided."
@@ -170,15 +209,23 @@ fi
 # Source the config file
 source "$config_file" || { echo "Error: Failed to load $config_file."; exit 1; }
 
-# Set up AWS environment variables
+# Set up environment variables
 echo "Environment is updated with secrets"
-export AWS_TERRAFORM_BACKEND_BUCKET_NAME=$AWS_TERRAFORM_BACKEND_BUCKET_NAME
-export AWS_TERRAFORM_BACKEND_BUCKET_REGION=$AWS_TERRAFORM_BACKEND_BUCKET_REGION
-export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
-export KUBE_CONFIG_PATH=$KUBE_CONFIG_PATH
-export KUBECONFIG=$KUBE_CONFIG_PATH
+if [ "$provider" == "aws" ]; then
+    export AWS_TERRAFORM_BACKEND_BUCKET_NAME=$AWS_TERRAFORM_BACKEND_BUCKET_NAME
+    export AWS_TERRAFORM_BACKEND_BUCKET_REGION=$AWS_TERRAFORM_BACKEND_BUCKET_REGION
+    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+    export KUBE_CONFIG_PATH=$KUBE_CONFIG_PATH
+    export KUBECONFIG=$KUBE_CONFIG_PATH
+    cd ../terraform/aws
+elif [ "$provider" == "gcp" ]; then
+    export GOOGLE_PROJECT_ID=$GOOGLE_PROJECT_ID
+    export GOOGLE_TERRAFORM_BACKEND_LOCATION=$GOOGLE_TERRAFORM_BACKEND_LOCATION
+    export GOOGLE_TERRAFORM_BACKEND_BUCKET=$GOOGLE_TERRAFORM_BACKEND_BUCKET
+    cd ../terraform/gcp
+fi
 
 # Install dependencies if required
 if [[ "$install_dependencies" == "true" ]]; then
@@ -186,7 +233,6 @@ if [[ "$install_dependencies" == "true" ]]; then
 fi
 
 # Proceed with the specified action
-cd ../terraform/aws
 case "$action" in
     install)
         install_obsrv
@@ -195,8 +241,7 @@ case "$action" in
         destroy_obsrv
         ;;
     *)
-        echo "Invalid command. Usage: $0 [install|destroy] --config <config_file> [--install_dependencies true|false]"
+        echo "Invalid command. Usage: $0 [install|destroy] --provider <aws|gcp> --config <config_file> [--install_dependencies true|false]"
         exit 1
         ;;
 esac
-
