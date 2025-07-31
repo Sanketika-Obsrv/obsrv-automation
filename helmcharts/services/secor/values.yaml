@@ -27,13 +27,9 @@ kafka: &kafka
   host: "{{ .Values.global.kafka.host }}"
   port: "{{.Values.global.kafka.port}}"
 
-zookeeper: &zookeeper
-  host: "{{.Values.global.zookeeper.host}}"
-  port: "{{.Values.global.zookeeper.port}}"
 
 global:
   kafka: *kafka
-  zookeeper: *zookeeper
   env: "dev"
 
 base_path: "telemetry-data"
@@ -45,7 +41,6 @@ base_config: &base_config
   timestamp_key: "obsrv_meta.syncts"
   fallback_timestamp_key: "ets"
   kafka_broker_host: "{{.Values.global.kafka.host}}"
-  zookeeper_quorum: "{{.Values.global.zookeeper.host}}:{{.Values.global.zookeeper.port}}"
   max_file_size: "100000000"
   max_file_age: "900"
   partition_prefix_enabled: "false"
@@ -72,7 +67,7 @@ secor_jobs:
     service_name: "ingest-backup"
     consumer_group: "ingest"
     base_path: "{{ .Values.base_path }}/ingest"
-    timestamp_key: "syncts"
+    timestamp_key: "obsrv_meta.syncts"
   raw-backup:
     <<: *base_config
     enabled: true

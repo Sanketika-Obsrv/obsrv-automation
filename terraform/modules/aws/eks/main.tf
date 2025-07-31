@@ -185,6 +185,13 @@ resource "aws_launch_template" "eks_launch_template" {
       encrypted = var.volume_encryption
     }
   }
+
+  metadata_options {
+    http_tokens               = "required"   # Require IMDSv2
+    http_put_response_hop_limit = 2          # Hop limit as required
+    http_endpoint             = "enabled"    # Ensure endpoint is accessible
+  }
+
 }
 
 resource "aws_eks_addon" "addons" {

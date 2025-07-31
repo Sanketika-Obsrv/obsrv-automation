@@ -62,7 +62,7 @@ migrations)
     ;;
 monitoring)
     cp -rf ../obsrv monitoring
-    cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,alert-rules} monitoring/charts/
+    cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,kafka-exporter,alert-rules} monitoring/charts/
 
     if [ -z "$cloud_env" ]; then
         rm -rf monitoring/charts/loki/charts/minio
@@ -152,22 +152,23 @@ register_connectors)
     ../../connectors/register.sh
     ;;
 
+ # Warning: The reset will uninstall all the helm charts in obsrv namespace and enable it only for development purposes.
+# reset)
+#     echo "Uninstalling all helm charts in obsrv namespace..."
+#     helm uninstall additional -n obsrv
+#     helm uninstall obsrvtools -n obsrv
+#     helm uninstall otel -n obsrv
+#     helm uninstall hudi -n obsrv
+#     helm uninstall obsrvapis -n obsrv
+#     helm uninstall coreinfra -n obsrv
+#     helm uninstall oauth -n obsrv
+#     helm uninstall monitoring -n obsrv
+#     helm uninstall migrations -n obsrv
+#     helm uninstall coredb -n obsrv
+#     helm uninstall prerequisites -n obsrv
+#     helm uninstall obsrv-bootstrap -n obsrv
 
-reset)
-    helm uninstall additional -n obsrv
-    helm uninstall obsrvtools -n obsrv
-    helm uninstall otel -n obsrv
-    helm uninstall hudi -n obsrv
-    helm uninstall obsrvapis -n obsrv
-    helm uninstall coreinfra -n obsrv
-    helm uninstall oauth -n obsrv
-    helm uninstall monitoring -n obsrv
-    helm uninstall migrations -n obsrv
-    helm uninstall coredb -n obsrv
-    helm uninstall prerequisites -n obsrv
-    helm uninstall obsrv-bootstrap -n obsrv
-
-    ;;
+#     ;;
 *)
     if [ ! -d "../services/$1" ]; then
         echo "Service $1 not found in ../services"

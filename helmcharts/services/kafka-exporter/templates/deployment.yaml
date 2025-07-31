@@ -30,9 +30,7 @@ spec:
             {{- range .Values.kafkaExporter.kafka.servers }}
             - "--kafka.server={{ . }}"
             {{- end }}
-            {{- range .Values.kafkaExporter.zookeeper.servers }}
-            - "--zookeeper.server={{ . }}"
-            {{- end }}
+
             {{- range .Values.kafkaExporter.additionalFlags }}
             - "{{ . }}"
             {{- end }}
