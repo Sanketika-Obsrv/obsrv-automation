@@ -354,7 +354,7 @@ baseconfig: |
   }
 
   otel.collector.endpoint="http://opentelemetry-collector.otel.svc.cluster.local:4317"
-  otel.enable = true
+  otel.enable = false
 
 serviceMonitor: &serviceMonitor
   jobmanager:
