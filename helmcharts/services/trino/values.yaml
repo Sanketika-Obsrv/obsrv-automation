@@ -187,10 +187,13 @@ additionalCatalogs:
   lakehouse: |-
     connector.name=hudi
     hive.metastore.uri=thrift://localhost:9083
-    hive.s3.aws-access-key=""
-    hive.s3.aws-secret-key=""
-    hive.s3.endpoint=http://localhost:4566
-    hive.s3.ssl.enabled=false
+    fs.native-s3.enabled=true
+    s3.aws-access-key=""
+    s3.aws-secret-key=""
+    s3.endpoint=http://localhost:4566
+    s3.region=us-east-1
+    s3.path-style-access=true
+   
 
 # Array of EnvVar (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#envvar-v1-core)
 env: []

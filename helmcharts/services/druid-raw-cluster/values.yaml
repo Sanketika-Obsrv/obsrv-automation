@@ -8,7 +8,7 @@ global:
 
 registry: "apache"
 repository: "druid"
-tag: "28.0.1"
+tag: "32.0.1"
 digest: ""
 
 imagePullPolicy: IfNotPresent
