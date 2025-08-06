@@ -47,13 +47,13 @@ images: &images
   unified-pipeline: &unified-pipeline
     registry: *global_registry
     repository: unified-pipeline
-    tag: "1.7.0"
+    tag: "1.7.1"
     digest: ""
 
   cache-indexer: &cache-indexer
     registry: *global_registry
     repository: cache-indexer
-    tag: "1.7.0"
+    tag: "1.7.1"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
