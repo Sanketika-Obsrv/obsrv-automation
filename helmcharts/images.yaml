@@ -304,9 +304,9 @@ images: &images
   #   digest: ""
 
   kafka-exporter: &kafka-exporter
-    registry: *global_registry
-    repository: kafka-exporter
-    tag: 1.0.1
+    registry: "docker.io"
+    repository: sanketikahub/kafka-exporter
+    tag: "1.0.1"
     digest: ""
 
   kafka-message-exporter: &kafka-message-exporter # registry: ""
@@ -607,10 +607,10 @@ internal: &internal
   kafka:
     image:
       <<: *kafka
-    metrics: # The kafka exporter is being deployed from the kafka chart
-      kafka:
-        image:
-          <<: *kafka-exporter
+    # metrics: # The kafka exporter is being deployed from the kafka chart
+    #   kafka:
+    #     image:
+    #       <<: *kafka-exporter
 
   kong:
     image:
