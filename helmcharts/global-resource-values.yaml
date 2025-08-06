@@ -1,41 +1,44 @@
 #coredb
 kafka:
-  resources:
-    limits:
-      cpu: 1
-      memory: 2048Mi
-    requests:
-      cpu: 750m
-      memory: 1024Mi
-  zookeeper:
+  broker:
     resources:
       limits:
-        cpu: 256m
-        memory: 512Mi
+        cpu: 1
+        memory: 2048Mi
       requests:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 750m
+        memory: 1024Mi
     persistence:
-      accessModes:
-        - ReadWriteOnce
       size: 8Gi
+  controller:
+    resources:
+      limits:
+        cpu: 1
+        memory: 2048Mi
+      requests:
+        cpu: 750m
+        memory: 1024Mi
+    persistence:
+      size: 8Gi
+    
   metrics:
     kafka:
       resources:
-      limits:
-        cpu: 100m
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 256Mi
+        limits:
+          cpu: 200m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
     jmx:
       resources:
-      limits:
-        cpu: 100m
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 256Mi
+        limits:
+          cpu: 300m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+
 
 postgresql:
   primary:
@@ -403,6 +406,7 @@ flink:
     resources: *flink_resources
     cache-indexer:
         resources: *flink_resources
+
 
 kafka-message-exporter:
   resources:
