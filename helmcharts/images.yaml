@@ -285,6 +285,12 @@ images: &images
     tag: 3.6.0
     digest: ""
 
+  kafka-4-0: &kafka-4-0
+    registry: ""
+    repository: bitnami/kafka
+    tag: 4.0.0-debian-12-r7
+    digest: ""
+
   jmx: &jmx
     registry: *global_registry
     repository: jmx-exporter
@@ -608,6 +614,16 @@ internal: &internal
     image:
       <<: *kafka
     metrics: # The kafka exporter is being deployed from the kafka chart
+      kafka:
+        image:
+          <<: *kafka-exporter
+
+  kafka-4-0:
+    image:
+      <<: *kafka-4-0
+      pullSecrets:
+      - *dockerSecretName
+    metrics:
       kafka:
         image:
           <<: *kafka-exporter
