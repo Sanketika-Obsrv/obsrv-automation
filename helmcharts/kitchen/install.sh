@@ -53,6 +53,18 @@ coredb)
     helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf coredb
     ;;
+kafka-4-0)
+    cp -rf ../obsrv kafka-4-0
+    cp -rf ../services/kafka-4-0 kafka-4-0/charts/
+
+    ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
+    if [ "$ssl_enabled" == "true" ]; then
+        cp -rf ../services/cert-manager kafka-4-0/charts/
+    fi
+
+    helm $cmd kafka-4-0 ./kafka-4-0 -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name 
+    rm -rf kafka-4-0
+    ;;
 migrations)
     cp -rf ../obsrv migrations
     cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
@@ -132,7 +144,9 @@ additional)
     ;;
 core-setup)
     bash $0 bootstrap ${@: 2}
+    bash $0 prerequisites ${@: 2}
     bash $0 coredb ${@: 2}
+    bash $0 kafka-4-0 ${@: 2}
     ;;
 all)
     bash $0 migrations ${@: 2}
@@ -166,6 +180,7 @@ register_connectors)
 #     helm uninstall oauth -n obsrv
 #     helm uninstall monitoring -n obsrv
 #     helm uninstall migrations -n obsrv
+#     helm uninstall kafka-4-0 -n obsrv
 #     helm uninstall coredb -n obsrv
 #     helm uninstall prerequisites -n obsrv
 #     helm uninstall obsrv-bootstrap -n obsrv
