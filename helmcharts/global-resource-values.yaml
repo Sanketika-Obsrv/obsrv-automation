@@ -36,6 +36,46 @@ kafka:
       requests:
         cpu: 100m
         memory: 256Mi
+kafka-4-0:
+  broker:
+    resources:
+      limits:
+        cpu: 1
+        memory: 2048Mi
+      requests:
+        cpu: 750m
+        memory: 1024Mi
+    persistence:
+      size: 8Gi
+  controller:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 1
+        memory: 2048Mi
+      requests:
+        cpu: 750m
+        memory: 1024Mi
+    persistence:
+      size: 8Gi
+    
+  metrics:
+    kafka:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    jmx:
+      resources:
+        limits:
+          cpu: 300m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
 
 postgresql:
   primary:
