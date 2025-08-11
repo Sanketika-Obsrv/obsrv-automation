@@ -315,7 +315,7 @@ prometheus: &prometheus
 
 loki: &loki
   namespace: *loki-namespace
-  url: http://loki-gateway.sunbird.svc.cluster.local
+  url: http://loki-gateway.loki.svc.cluster.local
 
 promtail:
   namespace: *loki-namespace
