@@ -4,7 +4,7 @@
 
 replicaCount: 1
 
-namespace: kafka
+namespace: kafka40
 image:
   repository: sanketikahub/kafka-exporter
   tag: 1.0.1
@@ -19,7 +19,7 @@ service:
 
 kafkaExporter:
   kafka:
-    servers: ["kafka-controller-headless:9092"]
+    servers: ["kafka40-controller-headless:9092"]
 
   additionalFlags: []
     # - --use.consumelag.zookeeper

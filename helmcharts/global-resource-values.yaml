@@ -1,5 +1,42 @@
 #coredb
 kafka:
+  resources:
+    limits:
+      cpu: 1
+      memory: 2048Mi
+    requests:
+      cpu: 750m
+      memory: 1024Mi
+  zookeeper:
+    resources:
+      limits:
+        cpu: 256m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    persistence:
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+  metrics:
+    kafka:
+      resources:
+      limits:
+        cpu: 100m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    jmx:
+      resources:
+      limits:
+        cpu: 100m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+kafka40:
   broker:
     resources:
       limits:
@@ -11,6 +48,7 @@ kafka:
     persistence:
       size: 8Gi
   controller:
+    replicaCount: 3
     resources:
       limits:
         cpu: 1

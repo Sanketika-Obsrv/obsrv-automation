@@ -150,8 +150,8 @@ env:
   telemetry_kafka_compression: snappy
   druid_host: "http://{{ .Values.global.druid.host }}"
   druid_port: "{{ .Values.global.druid.port }}"
-  kafka_host: "{{ .Values.global.kafka.host }}"
-  kafka_port: "{{ .Values.global.kafka.port }}"
+  kafka_host: "{{ .Values.global.kafka40.host }}"
+  kafka_port: "{{ .Values.global.kafka40.port }}"
   client_id: "obsrv-apis"
   kafka_initial_retry_time: "3000"
   kafka_retries: "5"

@@ -4,6 +4,7 @@ defaults:
   encryption_key: &encryption-key "strong_encryption_key_to_encrypt"
   namespaces: &namespaces
     kafka_namespace: &kafka-namespace "kafka"
+    kafka40_namespace: &kafka40-namespace "kafka40"
     postgresql_namespace: &postgresql-namespace "postgresql"
     druid_namespace: &druid-namespace "druid-raw"
     valkey_namespace: &valkey-namespace "redis"
@@ -115,9 +116,57 @@ defaults:
 #coredb-charts/
 kafka: &kafka
   namespace: *kafka-namespace
-  host: "kafka-controller-headless.kafka.svc.cluster.local"
+  host: "kafka-headless.kafka.svc.cluster.local"
   port: 9092
-  bootstrap-server: &kafka-bootstrap-server "kafka-controller-headless.kafka.svc.cluster.local:9092"
+  bootstrap-server: &kafka-bootstrap-server "kafka-headless.kafka.svc.cluster.local:9092"
+  ingestTopic: *ingestTopic
+  masterdataIngestTopic: *masterdataIngestTopic
+  telemetryEventsTopic: *telemetryEventsTopic
+  ss-kafka-topic: *system_stats_topic
+  masterdata-ss-kafka-topic: *masterdata_system_stats_topic
+  hudiConnectorTopic: *hudiConnectorTopic
+  connectorsMetricTopic: *connectorsMetricTopic
+  connectorsFailedTopic: *connectorsFailedTopic
+  numPartitions: *kafkaNumPartitions
+  provisioning:
+    numPartitions: *kafkaNumPartitions
+    replicationFactor: 1
+    topics:
+      - name: *ingestTopic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+      - name: *masterdataIngestTopic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+      - name: *telemetryEventsTopic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+      - name: *system_stats_topic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+      - name: *masterdata_system_stats_topic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+      - name: *hudiConnectorTopic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+      - name: *connectorsMetricTopic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+      - name: *connectorsFailedTopic
+        partitions: *kafkaNumPartitions
+        replicationFactor: 1
+
+  zookeeper: &zookeeper
+    namespace: *kafka-namespace
+    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
+    port: 2181
+
+kafka40: &kafka40
+  namespace: *kafka40-namespace
+  host: "kafka40-controller-headless.kafka40.svc.cluster.local"
+  port: 9092
+  bootstrap-server: &kafka-bootstrap-server "kafka40-controller-headless.kafka40.svc.cluster.local:9092"
   ingestTopic: *ingestTopic
   masterdataIngestTopic: *masterdataIngestTopic
   telemetryEventsTopic: *telemetryEventsTopic
@@ -353,7 +402,7 @@ druid-operator:
   # nameOverride: druid-operator
 
 kafka-message-exporter:
-  namespace: *kafka-namespace
+  namespace: *kafka40-namespace
   exporterEnv:
     KAFKA_BROKERS: *kafka-bootstrap-server
     KAFKA_CONSUMER_GROUP_ID: obsrv-kafka-message-exporter
@@ -609,6 +658,7 @@ global:
   domain: *domain
   grafana: *grafana
   kafka: *kafka
+  kafka40: *kafka40
   druid: *druid
   postgresql: *postgresql
   flink: *flink

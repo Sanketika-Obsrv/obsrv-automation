@@ -195,7 +195,7 @@ serviceConfig:
     ingestion_endpoint: "{{ .Values.global.druid.ingestionEndpoint }}"
 
   kafka:
-    brokers: "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
+    brokers: "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
     telemetry:
       topic: "system.telemetry.events"
     replication_factor: 1

@@ -30,7 +30,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "1.9.0"
+    tag: "2.0.0"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -47,13 +47,13 @@ images: &images
   unified-pipeline: &unified-pipeline
     registry: *global_registry
     repository: unified-pipeline
-    tag: "1.7.1"
+    tag: "2.0.0"
     digest: ""
 
   cache-indexer: &cache-indexer
     registry: *global_registry
     repository: cache-indexer
-    tag: "1.7.1"
+    tag: "2.0.0"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
@@ -241,7 +241,7 @@ images: &images
   secor: &secor
     # registry: *global_registry
     repository: "secor"
-    tag: "0.29.1"
+    tag: "0.29.2-kafka-4.0"
     digest: ""
 
   spark: &spark # registry: ""
@@ -280,6 +280,12 @@ images: &images
     digest: ""
 
   kafka: &kafka
+    registry: ""
+    repository: bitnami/kafka
+    tag: 3.6.0
+    digest: ""
+
+  kafka40: &kafka40
     registry: ""
     repository: bitnami/kafka
     tag: 4.0.0
@@ -362,7 +368,7 @@ images: &images
 
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.4.0
+    tag: 1.8.0
 
 
   opentelemetry-collector: &opentelemetry-collector
@@ -611,6 +617,16 @@ internal: &internal
     #   kafka:
     #     image:
     #       <<: *kafka-exporter
+
+  kafka40:
+    image:
+      <<: *kafka40
+      pullSecrets:
+      - *dockerSecretName
+    metrics:
+      kafka:
+        image:
+          <<: *kafka-exporter
 
   kong:
     image:
