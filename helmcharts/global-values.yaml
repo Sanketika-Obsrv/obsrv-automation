@@ -313,11 +313,9 @@ postgresql-migration:
 prometheus: &prometheus
   url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
 
-volume-autoscaler:
-  prometheus_url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
-
-loki:
+loki: &loki
   namespace: *loki-namespace
+  url: http://loki-gateway.loki.svc.cluster.local
 
 promtail:
   namespace: *loki-namespace
@@ -613,3 +611,4 @@ global:
   redis: *valkey_denorm
   prometheus: *prometheus
   oauth_configs: *oauth_configs
+  loki: *loki

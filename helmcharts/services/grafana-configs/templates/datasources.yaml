@@ -5,7 +5,14 @@ data:
     apiVersion: 1
     datasources:
     {{- range .Values.additionalDataSources }}
-    - {{ toYaml . | indent 6 | trim }}
+    - {{- $ds := deepCopy . }}
+      {{- if eq $ds.name "Prometheus" }}
+        {{- $_ := set $ds "url" $.Values.global.prometheus.url }}
+      {{- end }}
+      {{- if eq $ds.name "Loki" }}
+        {{- $_ := set $ds "url" $.Values.global.loki.url }}
+      {{- end }}
+      {{ toYaml $ds | indent 6 | trim }}
     {{- end }}
 metadata:
   name: {{ .Chart.Name }}-datasources
