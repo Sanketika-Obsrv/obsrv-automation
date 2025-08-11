@@ -32,7 +32,7 @@ keywords:
 maintainers:
 - name: Broadcom, Inc. All Rights Reserved.
   url: https://github.com/bitnami/charts
-name: kafka-4-0
+name: kafka40
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/kafka
 version: 32.2.15

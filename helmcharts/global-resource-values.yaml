@@ -36,7 +36,7 @@ kafka:
       requests:
         cpu: 100m
         memory: 256Mi
-kafka-4-0:
+kafka40:
   broker:
     resources:
       limits:
@@ -48,7 +48,7 @@ kafka-4-0:
     persistence:
       size: 8Gi
   controller:
-    replicaCount: 1
+    replicaCount: 3
     resources:
       limits:
         cpu: 1

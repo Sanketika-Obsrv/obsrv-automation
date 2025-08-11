@@ -285,7 +285,7 @@ images: &images
     tag: 3.6.0
     digest: ""
 
-  kafka-4-0: &kafka-4-0
+  kafka40: &kafka40
     registry: ""
     repository: bitnami/kafka
     tag: 4.0.0-debian-12-r7
@@ -618,9 +618,9 @@ internal: &internal
         image:
           <<: *kafka-exporter
 
-  kafka-4-0:
+  kafka40:
     image:
-      <<: *kafka-4-0
+      <<: *kafka40
       pullSecrets:
       - *dockerSecretName
     metrics:
