@@ -7,7 +7,7 @@ namespaces:
 - flink
 - hms
 - kafka
-- kafka-4-0
+- kafka40
 - kong-ingress
 - kubernetes-reflector
 - keycloak

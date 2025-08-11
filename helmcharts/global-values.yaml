@@ -4,7 +4,7 @@ defaults:
   encryption_key: &encryption-key "strong_encryption_key_to_encrypt"
   namespaces: &namespaces
     kafka_namespace: &kafka-namespace "kafka"
-    kafka_4_0_namespace: &kafka-4-0-namespace "kafka-4-0"
+    kafka40_namespace: &kafka40-namespace "kafka40"
     postgresql_namespace: &postgresql-namespace "postgresql"
     druid_namespace: &druid-namespace "druid-raw"
     valkey_namespace: &valkey-namespace "redis"
@@ -162,11 +162,11 @@ kafka: &kafka
     host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
     port: 2181
 
-kafka-4-0: &kafka-4-0
-  namespace: *kafka-4-0-namespace
-  host: "kafka-controller-headless.kafka.svc.cluster.local"
+kafka40: &kafka40
+  namespace: *kafka40-namespace
+  host: "kafka40-controller-headless.kafka.svc.cluster.local"
   port: 9092
-  bootstrap-server: &kafka-bootstrap-server "kafka-controller-headless.kafka-4-0.svc.cluster.local:9092"
+  bootstrap-server: &kafka-bootstrap-server "kafka40-controller-headless.kafka40.svc.cluster.local:9092"
   ingestTopic: *ingestTopic
   masterdataIngestTopic: *masterdataIngestTopic
   telemetryEventsTopic: *telemetryEventsTopic
@@ -657,7 +657,7 @@ global:
   domain: *domain
   grafana: *grafana
   kafka: *kafka
-  kafka_4_0: *kafka-4-0
+  kafka40: *kafka40
   zookeeper: *zookeeper
   druid: *druid
   postgresql: *postgresql

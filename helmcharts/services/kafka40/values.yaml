@@ -49,7 +49,7 @@ nameOverride: ""
 fullnameOverride: ""
 ## @param namespaceOverride String to fully override common.names.namespace
 ##
-namespaceOverride: &kafkans kafka-4-0
+namespaceOverride: &kafkans kafka40
 ## @param clusterDomain Default Kubernetes cluster domain
 ##
 clusterDomain: cluster.local
