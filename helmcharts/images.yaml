@@ -19,7 +19,7 @@ images: &images
   ## Obsrv Images
   command-api: &command-api # registry: ""
     repository: obsrv-command-service
-    tag: "1.8.0"
+    tag: "2.0.0"
     digest: ""
 
   # dataset-api: #open source
