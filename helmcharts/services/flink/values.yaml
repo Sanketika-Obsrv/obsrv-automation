@@ -29,11 +29,9 @@ global:
     host: localhost
     port: 9042
   kafka:
-    host: "kafka-headless.kafka.svc.cluster.local"
-    port: 9092
-  zookeeper:
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
-    port: 2181
+    host: "{{ .Values.global.kafka40.host }}"
+    port: "{{ .Values.global.kafka40.port }}"
+
   image:
     registry: ""
 
@@ -268,8 +266,6 @@ log4j_console_properties: |
   logger.kafka.level = ERROR
   logger.hadoop.name = org.apache.hadoop
   logger.hadoop.level = ERROR
-  logger.zookeeper.name = org.apache.zookeeper
-  logger.zookeeper.level = ERROR
 
   # Log all infos to the console
   appender.console.name = ConsoleAppender
@@ -297,10 +293,9 @@ log4j_console_properties: |
 
 baseconfig: |
   kafka {
-    broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
-    producer.broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
-    consumer.broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
-    zookeeper = "{{ .Values.global.zookeeper.host }}:{{ .Values.global.zookeeper.port }}"
+    broker-servers = "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
+    producer.broker-servers = "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
+    consumer.broker-servers = "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
     producer {
       max-request-size = 1572864
       batch.size = 98304
@@ -321,8 +316,8 @@ baseconfig: |
   task {
     parallelism = 1
     consumer.parallelism = 1
-    checkpointing.interval = 10000
-    checkpointing.pause.between.seconds = 10000
+    checkpointing.interval = 30000
+    checkpointing.pause.between.seconds = 10
     restart-strategy.attempts = 3
     restart-strategy.delay = 30000 # in milli-seconds
   }

@@ -164,7 +164,7 @@ kafka: &kafka
 
 kafka40: &kafka40
   namespace: *kafka40-namespace
-  host: "kafka40-controller-headless.kafka.svc.cluster.local"
+  host: "kafka40-controller-headless.kafka40.svc.cluster.local"
   port: 9092
   bootstrap-server: &kafka-bootstrap-server "kafka40-controller-headless.kafka40.svc.cluster.local:9092"
   ingestTopic: *ingestTopic
@@ -399,7 +399,7 @@ druid-operator:
   # nameOverride: druid-operator
 
 kafka-message-exporter:
-  namespace: *kafka-namespace
+  namespace: *kafka40-namespace
   exporterEnv:
     KAFKA_BROKERS: *kafka-bootstrap-server
     KAFKA_CONSUMER_GROUP_ID: obsrv-kafka-message-exporter
@@ -656,7 +656,6 @@ global:
   grafana: *grafana
   kafka: *kafka
   kafka40: *kafka40
-  zookeeper: *zookeeper
   druid: *druid
   postgresql: *postgresql
   flink: *flink

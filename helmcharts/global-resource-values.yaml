@@ -444,6 +444,7 @@ flink:
     cache-indexer:
         resources: *flink_resources
 
+
 kafka-message-exporter:
   resources:
     limits:

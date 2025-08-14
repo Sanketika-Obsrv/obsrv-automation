@@ -6,9 +6,9 @@ postgres:
   port: "{{ .Values.global.postgresql.port }}"
 
 kafka:
-  broker-servers:  "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
-  connector-metrics-topic: "{{ .Values.global.kafka.connectorsMetricTopic }}"
-  failed-topic: "{{ .Values.global.kafka.connectorsFailedTopic}}"
+  broker-servers:  "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
+  connector-metrics-topic: "{{ .Values.global.kafka40.connectorsMetricTopic }}"
+  failed-topic: "{{ .Values.global.kafka40.connectorsFailedTopic}}"
   producer:
     compression: snappy
     max-request-size: 1000000 # 1MB {1M: 1000000, 10M: 10000000, 5M: 5000000}

@@ -74,7 +74,7 @@ migrations)
     ;;
 monitoring)
     cp -rf ../obsrv monitoring
-    cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,alert-rules} monitoring/charts/
+    cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,kafka-exporter,alert-rules} monitoring/charts/
 
     if [ -z "$cloud_env" ]; then
         rm -rf monitoring/charts/loki/charts/minio
@@ -182,9 +182,9 @@ register_connectors)
 #     helm uninstall migrations -n obsrv
 #     helm uninstall kafka40 -n obsrv
 #     helm uninstall coredb -n obsrv
+#     helm uninstall kafka40 -n obsrv
 #     helm uninstall prerequisites -n obsrv
 #     helm uninstall obsrv-bootstrap -n obsrv
-
 #     ;;
 *)
     if [ ! -d "../services/$1" ]; then
