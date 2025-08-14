@@ -180,6 +180,7 @@ register_connectors)
 #     helm uninstall oauth -n obsrv
 #     helm uninstall monitoring -n obsrv
 #     helm uninstall migrations -n obsrv
+#     helm uninstall kafka40 -n obsrv
 #     helm uninstall coredb -n obsrv
 #     helm uninstall kafka40 -n obsrv
 #     helm uninstall prerequisites -n obsrv

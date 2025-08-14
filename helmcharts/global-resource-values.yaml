@@ -77,7 +77,6 @@ kafka40:
           cpu: 100m
           memory: 256Mi
 
-
 postgresql:
   primary:
     resources:
