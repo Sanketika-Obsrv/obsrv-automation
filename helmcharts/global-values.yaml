@@ -222,10 +222,6 @@ kafka40: &kafka40
       enabled: false
     existingSecret: ""
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin
 postgresql: &postgresql
   namespace: *postgresql-namespace
   # the below variables are not chart variables
