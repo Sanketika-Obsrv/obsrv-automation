@@ -29,8 +29,8 @@ global:
     host: localhost
     port: 9042
   kafka:
-    host: "{{ .Values.global.kafka.host }}"
-    port: "{{ .Values.global.kafka.port }}"
+    host: "{{ .Values.global.kafka40.host }}"
+    port: "{{ .Values.global.kafka40.port }}"
 
   image:
     registry: ""
@@ -293,9 +293,9 @@ log4j_console_properties: |
 
 baseconfig: |
   kafka {
-    broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
-    producer.broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
-    consumer.broker-servers = "{{ .Values.global.kafka.host }}:{{ .Values.global.kafka.port }}"
+    broker-servers = "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
+    producer.broker-servers = "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
+    consumer.broker-servers = "{{ .Values.global.kafka40.host }}:{{ .Values.global.kafka40.port }}"
     producer {
       max-request-size = 1572864
       batch.size = 98304

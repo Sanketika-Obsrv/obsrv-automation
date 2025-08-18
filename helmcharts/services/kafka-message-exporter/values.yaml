@@ -3,7 +3,7 @@ fullnameOverride: "kafka-message-exporter"
 
 replicaCount: 1
 
-namespace: kafka
+namespace: kafka40
 global:
   image:
     registry: "sanketikahub"
