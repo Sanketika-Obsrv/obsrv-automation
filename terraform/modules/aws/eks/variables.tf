@@ -49,7 +49,7 @@ variable "eks_node_group_name" {
 variable "eks_node_group_ami_type" {
   type        = string
   description = "EKS node group AMI type."
-  default     = "AL2_x86_64"
+  default     = "AL2023_x86_64_STANDARD"
 }
 
 variable "eks_node_group_instance_type" {
@@ -97,11 +97,11 @@ variable "eks_addons" {
     },
     {
     name  = "coredns"
-    version = "v1.12.0-eksbuild.1"
+    version = "v1.12.2-eksbuild.4"
     },
     {
     name  = "aws-ebs-csi-driver"
-    version = "v1.38.0-eksbuild.1"
+    version = "v1.46.0-eksbuild.1"
     }
   ]
 }
