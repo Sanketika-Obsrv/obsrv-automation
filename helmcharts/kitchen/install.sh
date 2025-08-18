@@ -57,11 +57,6 @@ kafka40)
     cp -rf ../obsrv kafka40
     cp -rf ../services/kafka40 kafka40/charts/
 
-    ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
-    if [ "$ssl_enabled" == "true" ]; then
-        cp -rf ../services/cert-manager kafka40/charts/
-    fi
-
     helm $cmd kafka40 ./kafka40 -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name 
     rm -rf kafka40
     ;;
