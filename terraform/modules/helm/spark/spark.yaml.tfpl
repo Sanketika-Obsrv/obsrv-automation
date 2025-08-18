@@ -40,7 +40,7 @@ appdata:
     conf: |+
       env = ${env}
       kafka {
-        bootstrap.servers = "kafka-headless.kafka.svc.cluster.local:9092"
+        bootstrap.servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
       }
       cipher.secret = "${encryption_key}"
       postgres {

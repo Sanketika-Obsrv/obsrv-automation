@@ -6,7 +6,7 @@ postgres:
   port: 5432
 
 kafka:
-  broker-servers: kafka-headless.kafka.svc.cluster.local:9092
+  broker-servers: b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092
   telemetry-topic: obsrv-connectors-telemetry
   connector-metrics-topic: obsrv-connectors-metrics
   producer:

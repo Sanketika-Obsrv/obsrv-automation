@@ -106,10 +106,10 @@ base_config: |
     }
   }
   kafka {
-    broker-servers = "obsrv-kafka-headless.kafka.svc.cluster.local:9092"
-    producer.broker-servers = "obsrv-kafka-headless.kafka.svc.cluster.local:9092"
-    consumer.broker-servers = "obsrv-kafka-headless.kafka.svc.cluster.local:9092"
-    zookeeper = "obsrv-kafka-headless.kafka.svc.cluster.local:2181"
+    broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    producer.broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    consumer.broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    zookeeper = "z-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181,z-1.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181,z-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181"
     producer {
       max-request-size = 1572864
       batch.size = 98304

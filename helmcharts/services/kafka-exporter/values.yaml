@@ -4,10 +4,10 @@
 
 replicaCount: 1
 
-namespace: kafka40
+namespace: kafka
 image:
-  repository: sanketikahub/kafka-exporter
-  tag: 1.0.1
+  repository: danielqsj/kafka-exporter
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -19,8 +19,9 @@ service:
 
 kafkaExporter:
   kafka:
-    servers: ["kafka40-controller-headless:9092"]
-
+    servers: ["kafka-headless:9093"]
+  zookeeper:
+    servers: ["z-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-1.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"]
   additionalFlags: []
     # - --use.consumelag.zookeeper
 

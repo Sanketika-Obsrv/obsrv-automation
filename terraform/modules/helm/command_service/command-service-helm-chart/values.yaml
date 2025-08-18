@@ -1,3 +1,4 @@
+
 http_port: 8000
 system_env: dev
 image:
@@ -126,7 +127,7 @@ service_config: |
     supervisor_endpoint: indexer/v1/supervisor
   
   kafka:
-    brokers: kafka-headless.kafka.svc.cluster.local:9092
+    brokers: b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092
     telemetry:
       topic: system.telemetry.events
 
@@ -155,3 +156,4 @@ rbac:
 
 serviceAccount:
   name: command-api-serviceaccount
+
