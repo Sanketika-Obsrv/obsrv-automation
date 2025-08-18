@@ -53,6 +53,18 @@ coredb)
     helm $cmd coredb ./coredb -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf coredb
     ;;
+kafka40)
+    cp -rf ../obsrv kafka40
+    cp -rf ../services/kafka40 kafka40/charts/
+
+    ssl_enabled=$(cat $cloud_file_name | grep 'ssl_enabled:' | awk '{ print $3}')
+    if [ "$ssl_enabled" == "true" ]; then
+        cp -rf ../services/cert-manager kafka40/charts/
+    fi
+
+    helm $cmd kafka40 ./kafka40 -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name 
+    rm -rf kafka40
+    ;;
 migrations)
     cp -rf ../obsrv migrations
     cp -rf ../services/{postgresql-migration,kubernetes-reflector,grafana-configs,letsencrypt-ssl} migrations/charts/
@@ -62,13 +74,13 @@ migrations)
     ;;
 monitoring)
     cp -rf ../obsrv monitoring
-    cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,alert-rules} monitoring/charts/
+    cp -rf ../services/{promtail,loki,kube-prometheus-stack,prometheus-pushgateway,kafka-message-exporter,kafka-exporter,alert-rules} monitoring/charts/
 
     if [ -z "$cloud_env" ]; then
         rm -rf monitoring/charts/loki/charts/minio
     fi
     
-    helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml   -f images.yaml -f $cloud_file_name
+    helm $cmd monitoring ./monitoring -n obsrv -f global-resource-values.yaml -f global-values.yaml  -f images.yaml -f $cloud_file_name
     rm -rf monitoring
     ;;
 coreinfra)
@@ -130,36 +142,50 @@ additional)
     helm $cmd additional ./additional -n obsrv -f global-resource-values.yaml -f global-values.yaml -f images.yaml -f $cloud_file_name
     rm -rf additional
     ;;
-all)
+core-setup)
     bash $0 bootstrap ${@: 2}
     bash $0 prerequisites ${@: 2}
     bash $0 coredb ${@: 2}
+    bash $0 kafka40 ${@: 2}
+    ;;
+all)
     bash $0 migrations ${@: 2}
     bash $0 monitoring ${@: 2}
     bash $0 oauth ${@: 2}
     bash $0 coreinfra ${@: 2}
     bash $0 obsrvapis ${@: 2}
+    # We are not installing these for now.
     # bash $0 hudi ${@: 2}
     # bash $0 otel ${@: 2}
     bash $0 obsrvtools ${@: 2}
     bash $0 additional ${@: 2}
 
     ;;
-reset)
-    helm uninstall additional -n obsrv
-    helm uninstall obsrvtools -n obsrv
-    helm uninstall otel -n obsrv
-    helm uninstall hudi -n obsrv
-    helm uninstall obsrvapis -n obsrv
-    helm uninstall coreinfra -n obsrv
-    helm uninstall oauth -n obsrv
-    helm uninstall monitoring -n obsrv
-    helm uninstall migrations -n obsrv
-    helm uninstall coredb -n obsrv
-    helm uninstall prerequisites -n obsrv
-    helm uninstall obsrv-bootstrap -n obsrv
 
+register_connectors)
+    echo "Running connector registration script..."
+    chmod +x ../../connectors/register.sh
+    ../../connectors/register.sh
     ;;
+
+ # Warning: The reset will uninstall all the helm charts in obsrv namespace and enable it only for development purposes.
+# reset)
+#     echo "Uninstalling all helm charts in obsrv namespace..."
+#     helm uninstall additional -n obsrv
+#     helm uninstall obsrvtools -n obsrv
+#     helm uninstall otel -n obsrv
+#     helm uninstall hudi -n obsrv
+#     helm uninstall obsrvapis -n obsrv
+#     helm uninstall coreinfra -n obsrv
+#     helm uninstall oauth -n obsrv
+#     helm uninstall monitoring -n obsrv
+#     helm uninstall migrations -n obsrv
+#     helm uninstall kafka40 -n obsrv
+#     helm uninstall coredb -n obsrv
+#     helm uninstall kafka40 -n obsrv
+#     helm uninstall prerequisites -n obsrv
+#     helm uninstall obsrv-bootstrap -n obsrv
+#     ;;
 *)
     if [ ! -d "../services/$1" ]; then
         echo "Service $1 not found in ../services"

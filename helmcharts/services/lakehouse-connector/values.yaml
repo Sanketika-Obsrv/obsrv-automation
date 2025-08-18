@@ -80,10 +80,10 @@ global:
     host: localhost
     port: 9042
   kafka:
-    host: "kafka-headless.kafka.svc.cluster.local"
+    host: "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"
     port: 9092
   zookeeper:
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
+    host: "z-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-1.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"
     port: 2181
   image:
     registry: ""

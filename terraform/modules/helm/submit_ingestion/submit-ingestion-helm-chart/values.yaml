@@ -1,7 +1,7 @@
 namespace: "submit-ingestion"
 druid_router_host: "druid-raw-routers.druid-raw.svc.cluster.local:8888"
 supervisor_path: "druid/indexer/v1/supervisor"
-bootstrap_servers: "kafka-headless.kafka.svc.cluster.local:9092"
+bootstrap_servers: "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
 datasource:
   system_events:
     topic: "sb-dev.system.events"

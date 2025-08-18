@@ -1,3 +1,4 @@
+
 namespace: "flink"
 imagepullsecrets: ""
 image:
@@ -114,10 +115,10 @@ base_config: |
     }
   }
   kafka {
-    broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
-    producer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
-    consumer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
-    zookeeper = "kafka-headless.kafka.svc.cluster.local:2181"
+    broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    producer.broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    consumer.broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    zookeeper = "z-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181,z-1.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181,z-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181"
     producer {
       max-request-size = 1572864
       batch.size = 98304
@@ -488,3 +489,4 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+

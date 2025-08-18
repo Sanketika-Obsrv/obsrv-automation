@@ -149,13 +149,13 @@ variable "jvm_memory" {
 variable "kafka_broker_ip" {
   type        = string
   description = "Kafka broker address"
-  default     = "kafka-headless.kafka.svc.cluster.local"
+  default     = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"
 }
 
 variable "kafka_zookeeper_ip" {
   type        = string
   description = "Kafka zookeeper address"
-  default     = "kafka-zookeeper-headless.kafka.svc.cluster.local:2181"
+  default     = "z-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181,z-1.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181,z-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:2181"
 }
 
 variable "cloud_store_provider" {

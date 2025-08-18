@@ -7,8 +7,8 @@ azure_secret: ${azure_secret}
 image:
   registry: ${flink_container_registry}
   repository: ${flink_image_name}
-  tag: ${flink_lakehouse_image_tag}
-  imagePullSecrets: ""
+  tag: ${flink_image_tag}
+  imagePullSecrets: ${docker_registry_secret_name}
 base_config: |
   job {
     env = "${env}"
@@ -18,9 +18,9 @@ base_config: |
     }
   }
   kafka {
-    broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
-    producer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
-    consumer.broker-servers = "kafka-headless.kafka.svc.cluster.local:9092"
+    broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    producer.broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
+    consumer.broker-servers = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
     zookeeper = "kafka-zookeeper-headless.svc.cluster.local:2181"
     producer {
       max-request-size = 1572864
@@ -65,50 +65,138 @@ base_config: |
     port = "9042"
   }
 
-enable_lakehouse: ${enable_lakehouse}
-
-lakehouse-connector:
-  lakehouse-connector: |+
+unified-pipeline:
+  unified-pipeline: |+
     include file("/data/flink/conf/baseconfig.conf")
     kafka {
-      input.topic = $${job.env}".hudi.connector.in"
-      output.topic = $${job.env}".hudi.connector.out"
-      output.invalid.topic = $${job.env}".failed"
+      input.topic = $${job.env}".ingest"
+      output.raw.topic = $${job.env}".raw"
+      output.extractor.duplicate.topic = $${job.env}".failed"
+      output.batch.failed.topic = $${job.env}".failed"
       event.max.size = "1048576" # Max is only 1MB
-      groupId = $${job.env}"-hudi-writer-group"
+      output.invalid.topic = $${job.env}".failed"
+      output.unique.topic = $${job.env}".unique"
+      output.duplicate.topic = $${job.env}".failed"
+      output.denorm.topic = $${job.env}".denorm"
+      output.denorm.failed.topic = $${job.env}".failed"
+      output.transform.topic = $${job.env}".transform"
+      output.transform.failed.topic = $${job.env}".failed"
+      stats.topic = $${job.env}".stats"
+      groupId = $${job.env}"-unified-pipeline-group"
       producer {
         max-request-size = 5242880
       }
     }
 
     task {
-      checkpointing.compressed = true
-      checkpointing.interval = 30000
-      checkpointing.pause.between.seconds = 30000
-      restart-strategy.attempts = 3
-      restart-strategy.delay = 30000 # in milli-seconds
-      parallelism = 1
+      window.time.in.seconds = 5
+      window.count = 30
+      window.shards = 1400
+      consumer.parallelism = 2
+      downstream.operators.parallelism = 2
+    }
+
+    redis {
+      database {
+        extractor.duplication.store.id = 1
+        preprocessor.duplication.store.id = 2
+        key.expiry.seconds = 3600
+      }
+    }
+
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 2
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+
+  job_classname: in.sanketika.obsrv.pipeline.task.UnifiedPipelineStreamTask
+
+transformer-ext:
+  transformer-ext: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = $${job.env}".denorm"
+      output.transform.topic = $${job.env}".transform"
+      output.transform.failed.topic = $${job.env}".failed"
+      groupId = $${job.env}"-transformer-group"
+      producer {
+        max-request-size = 5242880
+      }
+    }
+
+    task {
       consumer.parallelism = 1
       downstream.operators.parallelism = 1
     }
 
-    hudi {
-      hms {
-        enabled = true
-        uri = "thrift://hms-metastore-app.hudi.svc:9083"
-        database {
-          name = "hms"
-          username = "${postgresql_hms_username}"
-          password = "${postgresql_hms_user_password}"
-        }
+
+
+  flink-conf: |+
+    jobmanager.memory.flink.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 2
+    jobManager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    jobmanager.execution.failover-strategy: region
+    taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
+    heartbeat.timeout: 8000
+    heartbeat.interval: 5000
+    state.savepoints.dir: file:///tmp
+
+  job_classname: in.sanketika.obsrv.transformer.task.TransformerStreamTask
+
+
+master-data-processor-ext:
+  master-data-processor-ext: |+
+    include file("/data/flink/conf/baseconfig.conf")
+    kafka {
+      input.topic = $${job.env}".masterdata.ingest"
+      output.raw.topic = $${job.env}".masterdata.raw"
+      output.extractor.duplicate.topic = $${job.env}".masterdata.failed"
+      output.failed.topic = $${job.env}".masterdata.failed"
+      output.batch.failed.topic = $${job.env}".masterdata.failed"
+      event.max.size = "1048576" # Max is only 1MB
+      output.invalid.topic = $${job.env}".masterdata.failed"
+      output.unique.topic = $${job.env}".masterdata.unique"
+      output.duplicate.topic = $${job.env}".masterdata.failed"
+      output.denorm.topic = $${job.env}".masterdata.denorm"
+      output.transform.topic = $${job.env}".masterdata.transform"
+      output.transform.failed.topic = $${job.env}".masterdata.failed"
+      stats.topic = $${job.env}".masterdata.stats"
+      groupId = $${job.env}"-masterdata-pipeline-group"
+
+      producer {
+        max-request-size = 5242880
       }
-      table {
-        type = "MERGE_ON_READ"
-        base.path = "s3a://${hudi_bucket}/${hudi_prefix_path}"
-      }
-      compaction.enabled = true
-      write.tasks = 1
     }
+
+    task {
+      window.time.in.seconds = 5
+      window.count = 30
+      window.shards = 1400
+      consumer.parallelism = 1
+      downstream.operators.parallelism = 1
+    }
+
+    redis {
+      database {
+        extractor.duplication.store.id = 1
+        preprocessor.duplication.store.id = 2
+        key.expiry.seconds = 3600
+      }
+    }
+
+    dataset.type = "master-dataset"
+
   flink-conf: |+
     jobmanager.memory.flink.size: 1024m
     taskmanager.memory.flink.size: 1024m
@@ -117,13 +205,9 @@ lakehouse-connector:
     parallelism.default: 1
     jobmanager.execution.failover-strategy: region
     taskmanager.memory.network.fraction: 0.1
+    scheduler-mode: reactive
     heartbeat.timeout: 8000
     heartbeat.interval: 5000
     state.savepoints.dir: file:///tmp
-    jobmanager.rpc.address: lakehouse-connector-jobmanager
-    blob.server.port: 6124
-    jobmanager.rpc.port: 6123
-    taskmanager.rpc.port: 6122
-  job_classname: org.sunbird.obsrv.streaming.HudiConnectorStreamTask
 
-hadoop_core_site: ${hadoop_configuration}
+  job_classname: in.sanketika.obsrv.pipeline.task.MasterDataProcessorStreamTask

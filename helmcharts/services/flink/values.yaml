@@ -28,10 +28,10 @@ global:
     host: localhost
     port: 9042
   kafka:
-    host: "kafka-headless.kafka.svc.cluster.local"
+    host: "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"
     port: 9092
   zookeeper:
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
+    host: "z-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-1.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"
     port: 2181
   image:
     registry: ""
@@ -40,8 +40,8 @@ podAnnotations: {}
 
 podSecurityContext:
   # runAsNonRoot: true
-  #runAsUser: 0
-  #fsGroup: 0
+  runAsUser: 0
+  fsGroup: 0
 
 securityContext:
   {}
@@ -252,7 +252,7 @@ log4j_console_properties: |
   # This affects logging for both user code and Flink
   rootLogger.level = INFO
   rootLogger.appenderRef.console.ref = ConsoleAppender
-  #rootLogger.appenderRef.rolling.ref = RollingFileAppender
+  rootLogger.appenderRef.rolling.ref = RollingFileAppender
 
   # Uncomment this if you want to _only_ change Flink's logging
   logger.flink.name = org.apache.flink
@@ -606,9 +606,6 @@ flink_jobs:
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
       state.savepoints.dir: file:///tmp
-      state.checkpoint.interval: {{ .Values.checkpoint_interval }}
-      state.checkpoint.pause.between.seconds: {{ .Values.checkpoint_pause_between_seconds }}
-
 
 commonAnnotations:
   reloader.stakater.com/auto: "true"

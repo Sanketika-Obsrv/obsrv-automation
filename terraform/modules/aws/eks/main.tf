@@ -185,6 +185,13 @@ resource "aws_launch_template" "eks_launch_template" {
       encrypted = var.volume_encryption
     }
   }
+
+  metadata_options {
+    http_tokens               = "required"   # Require IMDSv2
+    http_put_response_hop_limit = 2          # Hop limit as required
+    http_endpoint             = "enabled"    # Ensure endpoint is accessible
+  }
+
 }
 
 resource "aws_eks_addon" "addons" {
@@ -193,6 +200,9 @@ resource "aws_eks_addon" "addons" {
   addon_name        = each.value.name
   addon_version     = each.value.version
   resolve_conflicts = "OVERWRITE"
+
+  # Configure service account for EBS CSI driver
+  service_account_role_arn = each.value.name == "aws-ebs-csi-driver" ? aws_iam_role.ebs_csi_driver_role.arn : null
 }
 
 data "tls_certificate" "cluster_tls_cert" {
@@ -346,6 +356,25 @@ resource "aws_iam_role" "velero_backup_sa_iam_role" {
     },
     local.common_tags,
   var.additional_tags)
+}
+
+resource "aws_iam_role" "ebs_csi_driver_role" {
+  name = "${var.env}-${var.building_block}-ebs-csi-driver"
+  assume_role_policy = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", {
+    OIDC_ARN  = aws_iam_openid_connect_provider.eks_openid.arn,
+    OIDC_URL  = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""),
+    NAMESPACE = "kube-system",
+    SA_NAME   = "ebs-csi-controller-sa"
+  })
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"]
+  depends_on          = [aws_iam_openid_connect_provider.eks_openid]
+  tags = merge(
+    {
+      Name = "${var.env}-${var.building_block}-ebs-csi-driver"
+    },
+    local.common_tags,
+    var.additional_tags
+  )
 }
 
 resource "aws_iam_role_policy" "velero_backup_permissions" {

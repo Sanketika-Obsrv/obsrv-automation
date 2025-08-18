@@ -94,7 +94,8 @@ defaults:
   druid_indexer_host: &druid-indexer-host "druid-raw-indexers.druid-raw.svc.cluster.local"
 
   redirection_auth_path: &redirection_auth_path ""
-  domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
+    # domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
+  domain: &domain "100.90.45.238:30100"  # Update with the Allocation ID of the Elastic IP
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
 
   oauth: &oauth_configs
@@ -107,9 +108,9 @@ defaults:
 #coredb-charts/
 kafka: &kafka
   namespace: *kafka-namespace
-  host: "kafka-headless.kafka.svc.cluster.local"
+  host: "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"
   port: 9092
-  bootstrap-server: &kafka-bootstrap-server "kafka-headless.kafka.svc.cluster.local:9092"
+  bootstrap-server: &kafka-bootstrap-server "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
   ingestTopic: *ingestTopic
   masterdataIngestTopic: *masterdataIngestTopic
   telemetryEventsTopic: *telemetryEventsTopic
@@ -150,7 +151,7 @@ kafka: &kafka
 
   zookeeper: &zookeeper
     namespace: *kafka-namespace
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
+    host: "z-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-1.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com,z-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com"
     port: 2181
 
 postgresql: &postgresql
@@ -354,7 +355,7 @@ kube-prometheus-stack:
         ehlo_identity: ""
         startTLS_policy: ""
         skip_verify: true
-        from_name: "Obsrv"
+        from_name: "Grafana"
 
 
 kubernetes-reflector:
@@ -416,10 +417,9 @@ dataset-api: &dataset-api
   host: *dataset-service-url
   env:
     otel_collector_endpoint: *otel_collector_endpoint
-    is_rbac_enabled: "false"
+    is_RBAC_enabled: "true"
     keycloak_audience: ""
     otel_enable: *otel_enable
-    telemetry_log: '{"enable":true,"response_data":false}'
 
 config-api: &config-api
   namespace: *config-api-namespace

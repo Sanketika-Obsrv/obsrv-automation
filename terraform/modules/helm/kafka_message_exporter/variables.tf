@@ -76,7 +76,7 @@ variable "docker_registry_secret_name" {
 variable "kafka_host" {
   type        = string
   description = "Kafka service name with port."
-  default     = "kafka-headless.kafka.svc.cluster.local:9092"
+  default     = "b-4.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-3.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092,b-2.dwxdevwingspan.28s42c.c4.kafka.ap-south-1.amazonaws.com:9092"
 }
 
 variable "spark_metrics_topic" {

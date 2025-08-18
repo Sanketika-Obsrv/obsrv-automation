@@ -8,8 +8,10 @@ global:
 
 registry: "apache"
 repository: "druid"
-tag: "28.0.1"
+tag: "32.0.1"
 digest: ""
+
+imagePullPolicy: IfNotPresent
 
 druid_monitoring: True
 mount_path: /druid/data
@@ -17,7 +19,7 @@ storageClass: ""
 
 ######################### Druid common variables ########################
 druid_directory: "/opt/druid"
-druid_extensions_loadList: '"postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-azure-extensions", "druid-s3-extensions", "druid-google-extensions", "prometheus-emitter", "druid-datasketches"'
+druid_extensions_loadList: '"druid-basic-security","postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-azure-extensions", "druid-s3-extensions", "druid-google-extensions", "prometheus-emitter", "druid-datasketches"'
 
 # Logging
 # Log all runtime properties on startup. Disable to avoid logging properties on startup:
@@ -381,3 +383,11 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: druid-raw-sa
+
+#################### Druid Auth Variables ######################
+
+  druid_auth_enabled: false
+  druid_auth_admin_password: admin123
+  druid_auth_escalator_username: druid_system
+  druid_auth_escalator_password: internal123
+  
