@@ -35,7 +35,7 @@ fullnameOverride: ""
 namespaceOverride: ""
 ## @param commonLabels Labels to add to all deployed objects
 ##
-commonLabels: 
+commonLabels:
   system.ingestion: 'true'
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
@@ -209,7 +209,7 @@ master:
   podAnnotations: {}
   ## @param master.podLabels Extra labels for pods in StatefulSet
   ##
-  podLabels: 
+  podLabels:
     system.ingestion: 'true'
   ## @param master.podAffinityPreset Spark master pod affinity preset. Ignored if `master.affinity` is set. Allowed values: `soft` or `hard`
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
@@ -500,7 +500,7 @@ worker:
   podAnnotations: {}
   ## @param worker.podLabels Extra labels for pods in StatefulSet
   ##
-  podLabels: 
+  podLabels:
     system.ingestion: 'true'
   ## @param worker.podAffinityPreset Spark worker pod affinity preset. Ignored if `worker.affinity` is set. Allowed values: `soft` or `hard`
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
@@ -1043,7 +1043,7 @@ metrics:
     namespace: ""
     ## @param metrics.prometheusRule.additionalLabels Additional labels that can be used so prometheusRules will be discovered by Prometheus
     ##
-    additionalLabels: 
+    additionalLabels:
       system.ingestion: 'true'
     ## @param metrics.prometheusRule.rules Custom Prometheus [rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
     ## These are just examples rules, please adapt them to your needs.
@@ -1086,7 +1086,7 @@ appdata:
     conf: |+
       env="dev"
       kafka {
-        bootstrap.servers = "kafka-headless.kafka.svc.cluster.local:9092"
+        bootstrap.servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
         topic.ingest      = "local.ingest"
       }
       postgres {
@@ -1104,9 +1104,9 @@ appdata:
     conf: |+
       include file("/opt/bitnami/spark/conf/base.conf")
       kafka {
-        bootstrap.servers = "kafka-headless.kafka.svc:9092"
+        bootstrap.servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
       }
-  masterdata-indexer: 
+  masterdata-indexer:
     conf: |+
       include file("/opt/bitnami/spark/conf/baseconfig.conf")
       redis.host = obsrv-redis-master.redis.svc.cluster.local

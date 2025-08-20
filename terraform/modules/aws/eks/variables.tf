@@ -25,7 +25,7 @@ variable "cluster_logs_enabled" {
 variable "eks_cluster_logs_retention" {
   type = number
   description = "EKS cluster logs retention period"
-  default = 1 
+  default = 1
 }
 
 variable "eks_master_role" {
@@ -252,6 +252,81 @@ variable "velero_namespace" {
   type        = string
   description = "Velero namespace."
   default = "velero"
+}
+variable "Infy_SSM_Autopatch" {
+  description = "Autopatch for INFY SSM"
+  type        = string
+  default     = "yes"
+}
+
+variable "Infy_SSM_Agents" {
+  description = "Agents for INFY SSM"
+  type        = string
+  default     = "yes"
+}
+
+variable "INFY_EA_Tenant_organization" {
+  description = "Tenant organization for INFY EA"
+  type        = string
+  default     = "Infosys"
+}
+variable "INFY_EA_Tenant_Name" {
+  description = "Tenant name for INFY EA"
+  type        = string
+  default     = "Infosys Limited"
+}
+
+variable "INFY_EA_Tenant_ID" {
+  description = "Tenant ID for INFY EA"
+  type        = string
+  default     = "305"
+}
+
+variable "INFY_EA_Purpose" {
+  description = "Purpose for INFY EA"
+  type        = string
+  default     = "ETA"
+}
+
+variable "INFY_EA_Provider" {
+  description = "Provider for INFY EA"
+  type        = string
+  default     = "AWS"
+}
+
+variable "INFY_EA_Owner" {
+  description = "Owner for INFY EA"
+  type        = string
+  default     = "nagasai_govula@infosys.com"
+}
+variable "INFY_EA_CustomTag06" {
+  description = "Custom tag 06 for INFY EA"
+  type        = string
+  default     = "dev"
+}
+
+variable "INFY_EA_CostCenter" {
+  description = "Cost center for INFY EA"
+  type        = string
+  default     = "ppcaws212"
+}
+
+variable "INFY_EA_BusinessUnit" {
+  description = "Business unit for INFY EA"
+  type        = string
+  default     = "ETA"
+}
+
+variable "INFY_EA_ProjectCode" {
+  description = "Project code for INFY EA"
+  type        = string
+  default     = "ETA"
+}
+
+variable "INFY_EA_Environment" {
+  description = "Environment for INFY EA"
+  type        = string
+  default     = "ETA"
 }
 variable "volume_encryption" {
   description = "Enable EBS volume encryption for EKS nodes"

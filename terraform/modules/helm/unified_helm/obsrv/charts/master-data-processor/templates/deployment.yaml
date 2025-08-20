@@ -23,10 +23,10 @@ data:
       }
     }
     kafka {
-      broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
-      producer.broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
-      consumer.broker-servers = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:9092"
-      zookeeper = "{{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local:2181"
+      broker-servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
+      producer.broker-servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
+      consumer.broker-servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
+      zookeeper = "z-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181,z-3.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181,z-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181"
       producer {
         max-request-size = 1572864
         batch.size = 98304
@@ -354,7 +354,7 @@ spec:
           - -ec
           - |
             until wait-for-port \
-            --host={{ .Release.Name }}-kafka-headless.kafka.svc.cluster.local \
+            --host=b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com \
             --state=inuse \
             --timeout=120 \
             9092; \
