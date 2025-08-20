@@ -89,6 +89,11 @@ resource "aws_iam_role_policy_attachment" "eks_node_policy_attachment" {
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
     "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy",
+    "arn:aws:iam::aws:policy/AmazonSSMFullAccess",
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    "arn:aws:iam::aws:policy/AmazonSSMPatchAssociation",
+    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+    "arn:aws:iam::890742585958:policy/eks_kms_access_policy",
   ])
   policy_arn = each.value
   role       = aws_iam_role.eks_nodes_role.name
@@ -185,6 +190,24 @@ resource "aws_launch_template" "eks_launch_template" {
       encrypted = var.volume_encryption
     }
   }
+tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Infy_SSM_Autopatch          = "${var.Infy_SSM_Autopatch}"
+      Infy_SSM_Agents             = "${var.Infy_SSM_Agents}"
+      INFY_EA_Tenant_organization = "${var.INFY_EA_Tenant_organization}"
+      INFY_EA_Tenant_Name         = "${var.INFY_EA_Tenant_Name}"
+      INFY_EA_Tenant_ID           = "${var.INFY_EA_Tenant_ID}"
+      INFY_EA_Purpose             = "${var.INFY_EA_Purpose}"
+      INFY_EA_Provider            = "${var.INFY_EA_Provider}"
+      INFY_EA_Owner               = "${var.INFY_EA_Owner}"
+      INFY_EA_CustomTag06         = "${var.INFY_EA_CustomTag06}"
+      INFY_EA_CostCenter          = "${var.INFY_EA_CostCenter}"
+      INFY_EA_BusinessUnit        = "${var.INFY_EA_BusinessUnit}"
+      INFY_EA_ProjectCode         = "${var.INFY_EA_ProjectCode}"
+      INFY_EA_Environment         = "${var.INFY_EA_Environment}"
+}
+}
 }
 
 resource "aws_eks_addon" "addons" {

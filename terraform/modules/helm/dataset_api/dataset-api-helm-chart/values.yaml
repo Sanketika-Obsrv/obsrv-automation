@@ -18,7 +18,7 @@ druid_service:
   DRUID_HOST: http://druid-raw-routers.druid-raw.svc
   DRUID_PORT: '8888'
 kafka_service:
-  KAFKA_HOST: "kafka-headless.kafka.svc"
+  KAFKA_HOST: "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com"
   KAFKA_PORT: '9092'
   KAFKA_INITIAL_RETRY_TIME: '3000'
   KAFKA_RETRIES: 5

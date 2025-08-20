@@ -124,14 +124,14 @@ service_config: |
     router_host: "druid-raw-dev-routers.druid-raw.svc.cluster.local"
     router_port: 8888
     supervisor_endpoint: indexer/v1/supervisor
-  
+
   kafka:
-    brokers: kafka-headless.kafka.svc.cluster.local:9092
+    brokers: b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092
     telemetry:
       topic: system.telemetry.events
 
   helm_charts_base_dir: /app/helm-charts
-  
+
   flink:
     namespace: flink
     reinstall_sleep_time: 3

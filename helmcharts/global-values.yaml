@@ -1,5 +1,5 @@
 defaults:
-  env: &env "dev"
+  env: &env "dwx-dev"
   building-block: &building-block "obsrv"
   encryption_key: &encryption-key "strong_encryption_key_to_encrypt"
   namespaces: &namespaces
@@ -101,15 +101,15 @@ defaults:
     superset_client_id: &superset_client_id "obsrv-superset"
     superset_client_secret: &superset_client_secret "supersetobsrv@123"
     grafana_client_id: &grafana_client_id "obsrv-grafana"
-    grafana_client_secret: &grafana_client_secret "grafanaobsrv@123" 
+    grafana_client_secret: &grafana_client_secret "grafanaobsrv@123"
     web_console_client_id: "obsrv-console"
 
 #coredb-charts/
 kafka: &kafka
   namespace: *kafka-namespace
-  host: "kafka-headless.kafka.svc.cluster.local"
+  host: "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com"
   port: 9092
-  bootstrap-server: &kafka-bootstrap-server "kafka-headless.kafka.svc.cluster.local:9092"
+  bootstrap-server: &kafka-bootstrap-server "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
   ingestTopic: *ingestTopic
   masterdataIngestTopic: *masterdataIngestTopic
   telemetryEventsTopic: *telemetryEventsTopic
@@ -150,7 +150,7 @@ kafka: &kafka
 
   zookeeper: &zookeeper
     namespace: *kafka-namespace
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
+    host: "z-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com"
     port: 2181
 
 postgresql: &postgresql
@@ -340,7 +340,7 @@ kube-prometheus-stack:
     env:
       GF_SECURITY_ADMIN_PASSWORD: *grafana-admin-password
       GF_SECURITY_ADMIN_USER: *grafana-admin-user
-     
+
 
     grafana.ini:
       smtp:

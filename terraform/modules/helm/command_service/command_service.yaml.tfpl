@@ -156,7 +156,7 @@ service_config: |
       - /opt/bitnami/spark/conf/masterdata-indexer.conf
 
   kafka:
-    brokers: ${kafka_release_name}-headless.${kafka_namespace}.svc.cluster.local:9092
+    brokers: b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092
     telemetry:
       topic: system.telemetry.events
 
@@ -173,5 +173,3 @@ service_config: |
       - name: "KafkaConnectorJob"
         release_name: kafka-connector
         job_manager_url: "kafka-connector-jobmanager.flink.svc.cluster.local:8081"
-      
-      

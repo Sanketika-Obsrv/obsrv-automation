@@ -16,10 +16,10 @@ jobmanager:
   prom_port: 9250
   heap_memory: 1024
   resources:
-    limits: 
+    limits:
       cpu: 0.5
       memory: 1024Mi
-    requests: 
+    requests:
       cpu: 0.25
       memory: 1024Mi
 
@@ -34,10 +34,10 @@ taskmanager:
   heap_memory: 1024
   replicas: 1
   resources:
-    limits: 
+    limits:
       cpu: 0.5
       memory: 1024Mi
-    requests: 
+    requests:
       cpu: 0.25
       memory: 1024Mi
 
@@ -106,10 +106,10 @@ base_config: |
     }
   }
   kafka {
-    broker-servers = "obsrv-kafka-headless.kafka.svc.cluster.local:9092"
-    producer.broker-servers = "obsrv-kafka-headless.kafka.svc.cluster.local:9092"
-    consumer.broker-servers = "obsrv-kafka-headless.kafka.svc.cluster.local:9092"
-    zookeeper = "obsrv-kafka-headless.kafka.svc.cluster.local:2181"
+    broker-servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
+    producer.broker-servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
+    consumer.broker-servers = "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
+    zookeeper = "z-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181,z-3.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181,z-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181"
     producer {
       max-request-size = 1572864
       batch.size = 98304

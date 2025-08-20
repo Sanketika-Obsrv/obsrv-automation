@@ -21,7 +21,7 @@ kafkaExporter:
   kafka:
     servers: ["kafka-headless:9093"]
   zookeeper:
-    servers: ["kafka-zookeeper-headless.kafka.svc.cluster.local:2181"]
+    servers: ["z-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181,z-3.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181,z-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:2181"]
   additionalFlags: []
     # - --use.consumelag.zookeeper
 

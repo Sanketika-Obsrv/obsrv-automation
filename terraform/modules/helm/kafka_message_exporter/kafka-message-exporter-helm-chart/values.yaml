@@ -21,11 +21,11 @@ podAnnotations: {}
 config:
   kafka:
     spark:
-      host: "kafka-headless.kafka.svc.cluster.local:9092"
+      host: "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
       topic: "spark.stats"
       schema: "telemetry"
     obsrv:
-      host: "kafka-headless.kafka.svc.cluster.local:9092"
+      host: "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
       topic: "sb-dev.stats"
       schema: "obsrv_meta"
 

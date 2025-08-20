@@ -67,8 +67,8 @@ config:
   prefixPath: actor.id
   prefix: ''
 
-exporterEnv: 
-  KAFKA_BROKERS: "localhost:9092"
+exporterEnv:
+  KAFKA_BROKERS: "b-2.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092,b-1.dwxdevmsk.7g8ito.c4.kafka.ap-south-1.amazonaws.com:9092"
   KAFKA_CONSUMER_GROUP_ID: "obsrv-kafka-message-exporter-group"
 
 resources:
@@ -150,5 +150,3 @@ sidecars: {}
   #   image: busybox # Use another busybox image
   #   command: ["/bin/sh"] # Override the default command
   #   args: ["-c", "tail -f /var/log/app.log"] # Run a shell script that tails the log file
-
-
