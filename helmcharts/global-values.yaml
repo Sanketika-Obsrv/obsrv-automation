@@ -164,8 +164,14 @@ kafka: &kafka
 
 kafka40: &kafka40
   namespace: *kafka40-namespace
+  # For externally managed Kafka (e.g., AWS MSK, Confluent Cloud):
+  # Replace the host with your external Kafka broker address
+  # Example: "b-1.mycluster.abc123.c3.kafka.us-east-1.amazonaws.com"
   host: "kafka40-controller-headless.kafka40.svc.cluster.local"
   port: 9092
+  # For externally managed Kafka:
+  # Replace with comma-separated list of broker addresses including ports
+  # Example: "b-1.mycluster.abc123.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mycluster.abc123.c3.kafka.us-east-1.amazonaws.com:9092"
   bootstrap-server: &kafka-bootstrap-server "kafka40-controller-headless.kafka40.svc.cluster.local:9092"
   ingestTopic: *ingestTopic
   masterdataIngestTopic: *masterdataIngestTopic
@@ -398,6 +404,10 @@ druid-operator:
   namespace: *druid-namespace
   # nameOverride: druid-operator
 
+kafka-exporter:
+  kafka:
+    bootstrapServers: *kafka-bootstrap-server
+
 kafka-message-exporter:
   namespace: *kafka40-namespace
   exporterEnv:
@@ -512,6 +522,7 @@ submit-ingestion: &submit-ingestion
   druid:
     admin_username: *druid_admin_user
     admin_password: *druid_admin_password
+  bootstrap_servers: *kafka-bootstrap-server
 
 system-rules-ingestor:
   namespace: *system-rules-ingestor-namespace
