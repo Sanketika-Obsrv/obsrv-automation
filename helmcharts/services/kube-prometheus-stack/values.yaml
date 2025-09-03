@@ -10,7 +10,7 @@ nameOverride: ""
 ##
 namespaceOverride: ""
 
-## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.26.6
+## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.33.0
 ##
 kubeTargetVersionOverride: ""
 
