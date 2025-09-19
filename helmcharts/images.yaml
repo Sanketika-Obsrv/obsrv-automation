@@ -75,7 +75,7 @@ images: &images
 
   postgresql: &postgresql
     registry: "docker.io"
-    repository: "bitnami/postgresql"
+    repository: "sanketikahub/postgresql"
     tag: "17.2.0"
     digest: ""
 
@@ -112,7 +112,7 @@ images: &images
 
   valkey: &valkey
     registry: "docker.io"
-    repository: "bitnami/valkey"
+    repository: "sanketikahub/valkey"
     tag: "8.0.1-debian-12-r3"
     digest: ""
     pullSecrets:
@@ -281,13 +281,13 @@ images: &images
 
   kafka: &kafka
     registry: ""
-    repository: bitnami/kafka
+    repository: sanketikahub/kafka
     tag: 3.6.0
     digest: ""
 
   kafka40: &kafka40
     registry: ""
-    repository: bitnami/kafka
+    repository: sanketikahub/kafka
     tag: 4.0.0-debian-12-r7
     digest: ""
 
@@ -299,7 +299,7 @@ images: &images
 
   minio: &minio
     registry: docker.io
-    repository: bitnami/minio
+    repository: sanketikahub/minio
     tag: 2024.11.7-debian-12-r0
     digest: ""
 
@@ -340,13 +340,13 @@ images: &images
 
   keycloak: &keycloak
     registry: docker.io
-    repository:  bitnami/keycloak
+    repository:  sanketikahub/keycloak
     tag: "26.0.5-debian-12-r2"
     digest: ""
 
   keycloakConfigCli: &keycloakConfigCli
     registry: docker.io
-    repository: bitnami/keycloak-config-cli
+    repository: sanketikahub/keycloak-config-cli
     tag: 6.2.0-debian-12-r0
 
   hms: &hms
@@ -382,7 +382,7 @@ images: &images
     digest: ""
 
   kubectl: &kubectl
-    repository: "docker.io/bitnami/kubectl"
+    repository: "docker.io/sanketikahub/kubectl"
     tag: "1.26.14-debian-11-r6"
 
   sanketikahub-kubectl: &sanketikahub-kubectl
