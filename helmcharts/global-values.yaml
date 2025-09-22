@@ -104,7 +104,7 @@ defaults:
   druid_indexer_host: &druid-indexer-host "druid-raw-indexers.druid-raw.svc.cluster.local"
 
   redirection_auth_path: &redirection_auth_path ""
-  domain: &domain "192.168.0.55"  # Update with the Allocation ID of the Elastic IP
+  domain: &domain "<fill-value>.sslip.io"  # Update with the Allocation ID of the Elastic IP
   domain_admin_email: &domain_admin_email "test@obsrv-ai.com"
 
   oauth: &oauth_configs
