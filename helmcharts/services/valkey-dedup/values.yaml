@@ -26,7 +26,7 @@ global:
   ##
   security:
     ## @param global.security.allowInsecureImages Allows skipping image verification
-    allowInsecureImages: false
+    allowInsecureImages: true
   valkey:
     password: ""
   ## Compatibility adaptations for Kubernetes platforms
