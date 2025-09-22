@@ -162,6 +162,10 @@ kafka: &kafka
     namespace: *kafka-namespace
     host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
     port: 2181
+    
+  global:
+    security:
+      allowInsecureImages: *allow-insecure-images
 
 kafka40: &kafka40
   namespace: *kafka40-namespace

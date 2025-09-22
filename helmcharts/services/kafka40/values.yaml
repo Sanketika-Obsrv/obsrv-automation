@@ -482,7 +482,7 @@ defaultInitContainers:
     ##
     image:
       registry: docker.io
-      repository: bitnami/os-shell
+      repository: sanketikahub/os-shell
       tag: 12-debian-12-r46
       digest: ""
       pullPolicy: IfNotPresent
@@ -603,7 +603,7 @@ defaultInitContainers:
     ##
     image:
       registry: docker.io
-      repository: bitnami/kubectl
+      repository: sanketikahub/kubectl
       tag: 1.33.1-debian-12-r5
       digest: ""
       ## Specify a imagePullPolicy
@@ -2013,7 +2013,7 @@ metrics:
     ##
     image:
       registry: docker.io
-      repository: bitnami/jmx-exporter
+      repository: sanketikahub/jmx-exporter
       tag: 1.3.0-debian-12-r3
       digest: ""
       ## Specify a imagePullPolicy
