@@ -297,8 +297,8 @@ zookeeper:
   namespace: *druidns
   image:
     registry: docker.io
-    repository: bitnami/zookeeper
-    tag: 3.6-debian-10
+    repository: sanketikahub/zookeeper
+    tag: 3.6
     pullPolicy: IfNotPresent
 
   persistence:
