@@ -1144,7 +1144,7 @@ volumePermissions:
   ##
   image:
     registry: docker.io
-    repository: bitnami/bitnami-shell
+    repository: sanketikahub/os-shell
     tag: 11-debian-11-r102
     digest: ""
     pullPolicy: IfNotPresent

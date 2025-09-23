@@ -770,7 +770,7 @@ externalAccess:
     ##
     image:
       registry: docker.io
-      repository: bitnami/kubectl
+      repository: sanketikahub/kubectl
       tag: 1.25.5-debian-11-r2
       digest: ""
       ## Specify a imagePullPolicy
@@ -1009,7 +1009,7 @@ volumePermissions:
   ##
   image:
     registry: docker.io
-    repository: bitnami/bitnami-shell
+    repository: sanketikahub/os-shell
     tag: 11-debian-11-r63
     digest: ""
     pullPolicy: IfNotPresent
@@ -1330,7 +1330,7 @@ metrics:
     ##
     image:
       registry: docker.io
-      repository: bitnami/jmx-exporter
+      repository: sanketikahub/jmx-exporter
       tag: 0.17.2-debian-11-r29
       digest: ""
       ## Specify a imagePullPolicy

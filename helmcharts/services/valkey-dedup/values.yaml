@@ -1164,7 +1164,7 @@ sentinel:
   ##
   image:
     registry: docker.io
-    repository: bitnami/valkey-sentinel
+    repository: sanketikahub/valkey-sentinel
     tag: 8.0.1-debian-12-r3
     digest: ""
     ## Specify a imagePullPolicy
@@ -1650,7 +1650,7 @@ metrics:
   ##
   image:
     registry: docker.io
-    repository: bitnami/redis-exporter
+    repository: sanketikahub/redis-exporter
     tag: 1.66.0-debian-12-r2
     digest: ""
     pullPolicy: IfNotPresent
@@ -2016,7 +2016,7 @@ volumePermissions:
   ##
   image:
     registry: docker.io
-    repository: bitnami/os-shell
+    repository: sanketikahub/os-shell
     tag: 12-debian-12-r33
     digest: ""
     pullPolicy: IfNotPresent
@@ -2072,7 +2072,7 @@ kubectl:
   ##
   image:
     registry: docker.io
-    repository: bitnami/kubectl
+    repository: sanketikahub/kubectl
     tag: 1.31.3-debian-12-r0
     digest: ""
     ## Specify a imagePullPolicy
