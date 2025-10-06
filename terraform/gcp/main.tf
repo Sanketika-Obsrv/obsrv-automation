@@ -141,6 +141,7 @@ module "gke_cluster" {
   gke_node_pool_scaling_config    = var.gke_node_pool_scaling_config
 
   enable_vertical_pod_autoscaling = var.enable_vertical_pod_autoscaling
+  enable_autoscaling              = var.enable_autoscaling
 
   alternative_default_service_account = var.override_default_node_pool_service_account ? module.gke_service_account.email : null
 

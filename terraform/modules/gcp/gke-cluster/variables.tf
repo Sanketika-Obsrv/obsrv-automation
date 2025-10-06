@@ -300,3 +300,9 @@ variable "gke_node_default_disk_size_gb" {
   type        = number
   default     = 30
 }
+
+variable "enable_autoscaling" {
+  description = "Enable autoscaling for the node pool"
+  type        = bool
+  default     = false
+}

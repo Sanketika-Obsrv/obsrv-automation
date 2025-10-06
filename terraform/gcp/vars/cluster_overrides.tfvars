@@ -24,3 +24,4 @@ services_secondary_range_name = ""
 
 # cluster node pool configuration
 gke_node_default_disk_size_gb = 30
+enable_autoscaling            = false
