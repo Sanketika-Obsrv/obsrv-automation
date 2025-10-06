@@ -312,3 +312,9 @@ variable "kubectl_config_context" {
   type        = string
   default     = "gke_"
 }
+
+variable "enable_autoscaling" {
+  description = "Enable autoscaling for the GKE node pool"
+  type        = bool
+  default     = false
+}
