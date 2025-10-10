@@ -25,3 +25,16 @@ metadata:
 data:
   {{- $var := .Files.Get "configs/env.yaml" }}
   {{- include "common.tplvalues.render" (dict "value" $var "context" $) | nindent 2 }}
+  
+---
+{{- $flinkConfig := lookup "v1" "ConfigMap" "flink" "unified-pipeline-config" }}
+{{- if $flinkConfig }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-baseconfig
+  namespace: {{ include "base.namespace" . | quote }}
+data:
+  baseconfig.conf: |
+{{ $flinkConfig.data.baseconfig | nindent 4 }}
+{{- end }}
