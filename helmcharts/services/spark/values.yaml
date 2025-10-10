@@ -291,7 +291,10 @@ master:
           python3 /data/connectors-init/connector.py
   ## @param master.extraVolumes Optionally specify extra list of additional volumes for the master pod(s)
   ##
-  extraVolumes: []
+  extraVolumes:
+    - name: flink-config
+      configMap:
+        name: flink-baseconfig
   ## @param master.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the master container(s)
   ##
   extraVolumeMounts:
@@ -301,6 +304,9 @@ master:
       mountPath: /opt/bitnami/spark/spark-metadata
     - name: "{{ .Values.persistence.connectorData.name }}"
       mountPath: /data/connectors
+    - name: flink-config
+      mountPath: /data/flink/conf
+      readOnly: true
   ## Container resource requests and limits
   ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
   ## We usually recommend not to specify default resources and to leave this as a conscious
