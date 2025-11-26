@@ -53,3 +53,9 @@ variable "resource_group_name" {
   type        = string
   description = "Resource group name to create the AKS cluster."
 }
+
+variable "aks_subnet_id" {
+  type        = string
+  description = "Subnet resource id to use for AKS nodes. If empty, AKS will create its own subnet (when used with network module defaults)."
+  default     = ""
+}

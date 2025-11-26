@@ -42,3 +42,33 @@ variable "resource_group_name" {
   type        = string
   description = "Resource group name to create the AKS cluster."
 }
+
+variable "create_vnet" {
+  type        = bool
+  description = "Whether to create a new VNet. If false, an existing subnet name must be provided in existing_aks_subnet_name."
+  default     = true
+}
+
+variable "existing_vnet_name" {
+  type        = string
+  description = "Name of an existing virtual network to use (optional)."
+  default     = ""
+}
+
+variable "existing_aks_subnet_name" {
+  type        = string
+  description = "Name of an existing subnet to use for AKS (required when create_vnet = false)."
+  default     = ""
+}
+
+variable "create_kong_ingress_ip" {
+  type        = string
+  description = "Create a Public IP for Kong ingress (string 'true' or 'false' to match root var usage)."
+  default     = "false"
+}
+
+variable "kong_ingress_alloc_id" {
+  type        = string
+  description = "If using an existing public IP, provide its name or id."
+  default     = ""
+}

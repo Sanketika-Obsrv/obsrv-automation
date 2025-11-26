@@ -17,6 +17,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name       = var.aks_nodepool_name
     node_count = var.aks_node_count
     vm_size    = var.aks_node_size
+    vnet_subnet_id = var.aks_subnet_id == "" ? null : var.aks_subnet_id
   }
 
   identity {

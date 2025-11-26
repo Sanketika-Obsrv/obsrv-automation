@@ -2,13 +2,13 @@ global:
   ssl_enabled: &ssl_enabled true
   cloud_storage_provider: &cloud_storage_provider "azure"
   cloud_store_provider: &cloud_store_provider "azure"
-  cloud_storage_region: &cloud_storage_region "eastus2"
-  postgresql_backup_cloud_bucket: &backups_bucket "obsrv-dev"
-  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "obsrv-dev"
-  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "obsrv-dev-velero"
-  cloud_storage_bucket: &cloud_storage_bucket "obsrv-dev-backups"
-  dataset_api_container: &dataset_api_container "dataset-api"
-  config_api_container: &config_api_container "config-api"
+  cloud_storage_region: &cloud_storage_region "<fill-value>" # Update the region to deploy obsrv instance
+  postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name
+  # redis_backup_cloud_bucket: &redis_backup_cloud_bucket "obsrv-dev"
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket  "<fill-value>" # Update with velero backup  bucket name
+  cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the name of cloud storage bucket
+  dataset_api_container: &dataset_api_container "<fill-value>"  # Update the dataset APIs bucket name
+  config_api_container: &config_api_container "<fill-value>"   # Update the config API's bucket name only when deploying the config-api
   storage_class_name: &storage_class_name "managed-premium"
   azure_storage_account_name: &azure_storage_account_name "azure_storage_account_name"
   azure_storage_account_key: &azure_storage_account_key "azure_storage_account_key"
@@ -157,11 +157,11 @@ velero-backup: &velero-backup
         - mountPath: /target
           name: plugins
 
-redis-denorm:
-  <<: *redis_denorm_backup_sidecar
+# redis-denorm:
+#   <<: *redis_denorm_backup_sidecar
 
-redis-dedup:
-  <<: *redis_dedup_backup_sidecar
+# redis-dedup:
+#   <<: *redis_dedup_backup_sidecar
 
 velero:
   <<: *velero-backup
@@ -209,7 +209,7 @@ secor:
   storageClass: *storage_class_name
   azure_account: *azure_storage_account_name
   azure_secret: *azure_storage_account_key
-  azure_container_name: *secor_storage_container
+  azure_container_name: *backups_bucket
   storage_type: *cloud_store_provider
   <<: *secor-service-account
 
