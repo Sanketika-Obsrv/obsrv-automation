@@ -205,8 +205,8 @@ images: &images
     digest: ""
 
   grafana-init-chown-data: &grafana-init-chown-data
-    registry: docker.io
-    repository: library/busybox
+    registry: sanketikahub
+    repository: busybox
     tag: "1.31.1"
     digest: ""
 
