@@ -1,5 +1,5 @@
 global:
-  ssl_enabled: &ssl_enabled false
+  ssl_enabled: &ssl_enabled true
   cloud_storage_provider: &cloud_storage_provider "azure"
   cloud_store_provider: &cloud_store_provider "azure"
   cloud_storage_region: &cloud_storage_region "<fill-value>" # Update with the Azure region
