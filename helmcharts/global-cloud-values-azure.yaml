@@ -1,113 +1,37 @@
 global:
-  ssl_enabled: &ssl_enabled true
+  ssl_enabled: &ssl_enabled false
   cloud_storage_provider: &cloud_storage_provider "azure"
   cloud_store_provider: &cloud_store_provider "azure"
-  cloud_storage_region: &cloud_storage_region "eastus2"
-  postgresql_backup_cloud_bucket: &backups_bucket "obsrv-dev"
-  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "obsrv-dev"
-  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "obsrv-dev-velero"
-  cloud_storage_bucket: &cloud_storage_bucket "obsrv-dev-backups"
-  dataset_api_container: &dataset_api_container "dataset-api"
-  config_api_container: &config_api_container "config-api"
-  storage_class_name: &storage_class_name "managed-premium"
-  azure_storage_account_name: &azure_storage_account_name "azure_storage_account_name"
-  azure_storage_account_key: &azure_storage_account_key "azure_storage_account_key"
-  container: &container "obsrv-dev"
+  cloud_storage_region: &cloud_storage_region "<fill-value>" # Update with the Azure region
+  postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the Azure storage container URL
+  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "<fill-value>" # Update with the Azure storage container URL
+  velero_backup_cloud_bucket: &velero_backup_cloud_bucket "<fill-value>" # Update with the Azure storage container URL
+  cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the Azure storage container URL
+  dataset_api_container: &dataset_api_container "<fill-value>" # Update with the Azure storage container URL
+  config_api_container: &config_api_container "<fill-value>" # Update with the Azure storage container URL
+  storage_class_name: &storage_class_name "<fill-value>" # Update with the Azure storage class name
+  azure_storage_account_name: &azure_storage_account_name "<fill-value>" # Update with the Azure storage account name
+  azure_storage_account_key: &azure_storage_account_key "<fill-value>" # Update with the Azure storage account key"
+  container: &container "obsrv-test"
   deep_store_type: &deep_store_type "azure"
   # required for s3 segments publishing to azure
-  azure_storage_container: &azure_storage_container "obsrv-dev-backups"
-  secor_storage_container: &secor_storage_container "obsrv-dev"
-  azure_resource_group: &azure_resource_group "obsrv-dev"
-  azure_subscription_id: &azure_subscription_id "da72f12a-e323-42b4-92d8-b3ec660b6208"
-  azure_tenant_id: &azure_tenant_id ""
-  azure_service_principal_id: &azure_service_principal_id ""
-  azure_service_principal_key: &azure_service_principal_key ""
-  checkpoint_bucket: &checkpoint_bucket "wasbs://obsrv-dev-checkpointing@obsrvdevsa.blob.core.windows.net/flink-checkpoints"
-  hudi_metadata_bucket: &hudi_metadata_bucket "wasbs://hudi-table@obsrvdevsa.blob.core.windows.net"
+  azure_storage_container: &azure_storage_container "<fill-value>" # Update with the Azure storage container URL
+  secor_storage_container: &secor_storage_container "<fill-value>" # Update with the Azure storage container URL
+  azure_resource_group: &azure_resource_group "<fill-value>" # Update with the Azure resource group name
+  azure_subscription_id: &azure_subscription_id "<fill-value>" # Update with the Azure subscription ID
+  azure_tenant_id: &azure_tenant_id "<fill-value>" # Update with the Azure tenant ID
+  azure_service_principal_id: &azure_service_principal_id "<fill-value>" # Update with the Azure service principal ID
+  azure_service_principal_key: &azure_service_principal_key "<fill-value>" # Update with the Azure service principal key
+  checkpoint_bucket: &checkpoint_bucket "wasbs://obsrv-test@obsrvvalidationsa.blob.core.windows.net/flink-checkpoints"
+  hudi_metadata_bucket: &hudi_metadata_bucket "wasbs://hudi-table@obsrvvalidationsa.blob.core.windows.net"
   cloud_storage_config: |+
-    '{"identity":"name","credential":"key"}'
+    '{"identity":"","credential":"","region":""}'
 
 #  spark_cloud_bucket: &spark_cloud_bucket ""
 #  velero_backup_cloud_bucket: &velero_backup_cloud_bucket ""
 
 service_accounts:
   enabled: &create_sa false
-
-redis-service-account: &redis-service-account
-  serviceAccount:
-    create: *create_sa
-    name: default
-    annotations: {}
-
-redis_dedup_backup_sidecar: &redis_dedup_backup_sidecar
-  master:
-    sidecars:
-      - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.6-GA
-        volumeMounts:
-          - mountPath: "/data"
-            name: redis-data
-        env:
-          - name: REDIS_BACKUP_CRON_SCHEDULE
-            value: "00 00 * * *"
-          - name: CLOUD_SERVICE
-            value: *cloud_store_provider
-          - name: S3_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: GCS_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: REDIS_RDB_FILE_PATH
-            value: "/data"
-          - name: REDIS_REPLICATION_MODE
-            value: master
-          - name: AZURE_STORAGE_ACCOUNT_NAME
-            value: *azure_storage_account_name
-          - name: AZURE_STORAGE_ACCOUNT_KEY
-            value: *azure_storage_account_key
-          - name: AZURE_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: BACKUP_PREFIX
-            value: dedup-redis
-        resources:
-          limits:
-            cpu: 0.2
-            memory: 500Mi
-    <<: *redis-service-account
-
-redis_denorm_backup_sidecar: &redis_denorm_backup_sidecar
-  master:
-    sidecars:
-      - name: redis-backup
-        image: sanketikahub/redis-backup:1.0.6-GA
-        volumeMounts:
-          - mountPath: "/data"
-            name: redis-data
-        env:
-          - name: REDIS_BACKUP_CRON_SCHEDULE
-            value: "00 00 * * *"
-          - name: CLOUD_SERVICE
-            value: *cloud_store_provider
-          - name: S3_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: GCS_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: REDIS_RDB_FILE_PATH
-            value: "/data"
-          - name: REDIS_REPLICATION_MODE
-            value: master
-          - name: AZURE_STORAGE_ACCOUNT_NAME
-            value: *azure_storage_account_name
-          - name: AZURE_STORAGE_ACCOUNT_KEY
-            value: *azure_storage_account_key
-          - name: AZURE_BACKUP_BUCKET
-            value: *redis_backup_cloud_bucket
-          - name: BACKUP_PREFIX
-            value: denorm-redis
-        resources:
-          limits:
-            cpu: 0.2
-            memory: 500Mi
-    <<: *redis-service-account
 
 velero_backup_storageLocation: &velero_backup_storageLocation
   name: default
@@ -144,11 +68,17 @@ velero-backup: &velero-backup
         AZURE_SUBSCRIPTION_ID=AZURE_SUBSCRIPTION_ID
         AZURE_TENANT_ID=AZURE_TENANT_ID
   configuration:
-    provider: *cloud_store_provider
     backupStorageLocation:
-      <<: *velero_backup_storageLocation
+    - name:
+      provider: *cloud_storage_provider
+      bucket: *velero_backup_cloud_bucket
+      config:
+        region: *cloud_storage_region
     volumeSnapshotLocation:
-      <<: *velero_volume_snapshot
+      - name:
+        provider: *cloud_storage_provider
+        config:
+          region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-azure
       image: velero/velero-plugin-for-microsoft-azure:v1.2.0
@@ -156,12 +86,6 @@ velero-backup: &velero-backup
       volumeMounts:
         - mountPath: /target
           name: plugins
-
-redis-denorm:
-  <<: *redis_denorm_backup_sidecar
-
-redis-dedup:
-  <<: *redis_dedup_backup_sidecar
 
 velero:
   <<: *velero-backup
@@ -244,7 +168,7 @@ spark:
 kong:
   proxy:
     annotations: {}
-    type: LoadBalancer
+    type: NodePort
 
 postgres-backup-service-account: &postgres-backup-service-account
   serviceAccount:
@@ -311,3 +235,8 @@ hms:
 
 letsencrypt-ssl:
   enabled: *ssl_enabled
+keycloak:
+  ingress:
+    tls: *ssl_enabled
+  tls:
+    enabled: *ssl_enabled  
