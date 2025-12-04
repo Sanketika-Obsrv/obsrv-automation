@@ -419,8 +419,8 @@ initChownData:
   ##
   image:
     # -- The Docker registry
-    registry: docker.io
-    repository: library/busybox
+    registry: sanketikahub
+    repository: busybox
     tag: "1.31.1"
     sha: ""
     pullPolicy: IfNotPresent
