@@ -12,7 +12,7 @@ global:
   storage_class_name: &storage_class_name "<fill-value>" # Update with the Azure storage class name
   azure_storage_account_name: &azure_storage_account_name "<fill-value>" # Update with the Azure storage account name
   azure_storage_account_key: &azure_storage_account_key "<fill-value>" # Update with the Azure storage account key"
-  container: &container "obsrv-test"
+  container: &container "<fill-value>" # Update with the Azure storage container name
   deep_store_type: &deep_store_type "azure"
   # required for s3 segments publishing to azure
   azure_storage_container: &azure_storage_container "<fill-value>" # Update with the Azure storage container URL
