@@ -206,8 +206,8 @@ images: &images
 
   grafana-init-chown-data: &grafana-init-chown-data
     registry: docker.io
-    repository: alpine
-    tag: "3.18.2"
+    repository: library/busybox
+    tag: "1.31.1"
     digest: ""
 
   grafana-side-car: &grafana-side-car
