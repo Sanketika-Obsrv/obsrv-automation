@@ -55,3 +55,14 @@ ingress:
     service_port: 80
     paths:
       - path: "/auth"
+  dataset-api:
+    enabled: true
+    name: dataset-api
+    namespace: dataset-api
+    path_type: "ImplementationSpecific"
+    service_name: "dataset-api"
+    domains: []
+    annotations: {}
+    service_port: 3000
+    paths:    
+      - path: "/v2"    
