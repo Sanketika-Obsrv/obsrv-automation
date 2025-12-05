@@ -407,7 +407,7 @@ flink_jobs:
       task {
         window.time.in.seconds = 5
         window.count = 30
-        window.shards = 1400
+        window.shards = 4
         consumer.parallelism = 2
         downstream.operators.parallelism = 2
       }
@@ -468,7 +468,7 @@ flink_jobs:
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
       taskmanager.memory.network.fraction: 0.1
-      scheduler-mode: reactive
+      # scheduler-mode: reactive
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
       state.savepoints.dir: file:///tmp
@@ -511,7 +511,7 @@ flink_jobs:
       task {
         window.time.in.seconds = 5
         window.count = 30
-        window.shards = 1400
+        window.shards = 4
         consumer.parallelism = 1
         downstream.operators.parallelism = 1
       }
@@ -533,7 +533,7 @@ flink_jobs:
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
       taskmanager.memory.network.fraction: 0.1
-      scheduler-mode: reactive
+      # scheduler-mode: reactive
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
       state.savepoints.dir: file:///tmp
@@ -576,7 +576,7 @@ flink_jobs:
       task {
         window.time.in.seconds = 5
         window.count = 30
-        window.shards = 1400
+        window.shards = 4
         consumer.parallelism = 1
         downstream.operators.parallelism = 1
       }
@@ -598,7 +598,7 @@ flink_jobs:
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
       taskmanager.memory.network.fraction: 0.1
-      scheduler-mode: reactive
+      # scheduler-mode: reactive
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
       state.savepoints.dir: file:///tmp

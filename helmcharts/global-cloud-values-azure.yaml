@@ -138,7 +138,7 @@ secor:
   <<: *secor-service-account
 
 flink-checkpointing: &flink-checkpointing
-  enabled: true
+  enabled: false
   statebackend: *checkpoint_bucket
 
 flink-service-account: &flink-service-account
