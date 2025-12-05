@@ -49,13 +49,13 @@ images: &images
   unified-pipeline: &unified-pipeline
     registry: *global_registry
     repository: unified-pipeline
-    tag: "2.0.0"
+    tag: "2.0.1-config-fix"
     digest: ""
 
   cache-indexer: &cache-indexer
     registry: *global_registry
     repository: cache-indexer
-    tag: "2.0.0"
+    tag: "2.0.1-config-fix"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
@@ -205,9 +205,9 @@ images: &images
     digest: ""
 
   grafana-init-chown-data: &grafana-init-chown-data
-    registry: sanketikahub
-    repository: busybox
-    tag: "1.31.1"
+    registry: docker.io
+    repository: alpine
+    tag: "3.18.2"
     digest: ""
 
   grafana-side-car: &grafana-side-car
