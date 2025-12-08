@@ -64,5 +64,7 @@ ingress:
     domains: []
     annotations: {}
     service_port: 3000
-    paths:    
-      - path: "/v2"    
+    paths:
+      - path: "/v2/data/in/"
+      - path: "/v2/data/query/"
+      - path: "/v2/datasets/"
