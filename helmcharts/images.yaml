@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "2.0.0"
+    tag: "2.0.1"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -49,13 +49,13 @@ images: &images
   unified-pipeline: &unified-pipeline
     registry: *global_registry
     repository: unified-pipeline
-    tag: "2.0.1-config-fix"
+    tag: "2.0.1"
     digest: ""
 
   cache-indexer: &cache-indexer
     registry: *global_registry
     repository: cache-indexer
-    tag: "2.0.1-config-fix"
+    tag: "2.0.1"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
