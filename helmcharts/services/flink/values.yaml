@@ -533,7 +533,7 @@ flink_jobs:
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
       taskmanager.memory.network.fraction: 0.1
-      # scheduler-mode: reactive
+      scheduler-mode: reactive
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
       state.savepoints.dir: file:///tmp
@@ -598,7 +598,7 @@ flink_jobs:
       parallelism.default: 1
       jobmanager.execution.failover-strategy: region
       taskmanager.memory.network.fraction: 0.1
-      # scheduler-mode: reactive
+      scheduler-mode: reactive
       heartbeat.timeout: 8000
       heartbeat.interval: 5000
       state.savepoints.dir: file:///tmp
