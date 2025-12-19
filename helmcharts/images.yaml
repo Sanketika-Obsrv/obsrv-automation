@@ -5,6 +5,8 @@ global:
      #Replace the dockerConfigJson below for the private images
     dockerConfigJson: |-
       {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
+  imagePullSecrets:
+    - name: *dockerSecretName
 
 imagePullSecrets: &imagePullSecrets
   - name: *dockerSecretName
@@ -30,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "2.0.0"
+    tag: "2.0.1"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -40,20 +42,20 @@ images: &images
 
   web-console: &web-console # registry: ""
     repository: "obsrv-web-console"
-    tag: "1.4.1"
+    tag: "1.4.2"
     digest: ""
 
   ## PIPELINE ENTERPRISE
   unified-pipeline: &unified-pipeline
     registry: *global_registry
     repository: unified-pipeline
-    tag: "2.0.0"
+    tag: "2.0.1"
     digest: ""
 
   cache-indexer: &cache-indexer
     registry: *global_registry
     repository: cache-indexer
-    tag: "2.0.0"
+    tag: "2.0.1"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
@@ -116,7 +118,7 @@ images: &images
     tag: "8.1.3-debian-12-r2"
     digest: ""
     pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
 
 
   # submit-ingestion: &submit-ingestion
@@ -430,7 +432,7 @@ internal: &internal
     image:
       <<: *postgresql
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
 
   hms:
     image:
@@ -467,8 +469,8 @@ internal: &internal
   velero:
     image:
       <<: *velero
-      imagePullSecrets: 
-      - *dockerSecretName
+    imagePullSecrets: 
+    - *dockerSecretName
     kubectl:
       image:
         <<: *kubectl
@@ -477,13 +479,13 @@ internal: &internal
     image:
       <<: *valkey
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
 
   valkey-denorm:
     image:
       <<: *valkey
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
 
   loki:
     imagePullSecrets: 
@@ -533,7 +535,7 @@ internal: &internal
       image:
         <<: *grafana
         pullSecrets:
-        - *dockerSecretName
+        - name: *dockerSecretName
       testFramework:
         <<: *grafana-test-framework
       downloadDashboardsImage:
@@ -567,7 +569,7 @@ internal: &internal
     image:
       <<: *keycloak
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
     kubectl:
       image:
         <<: *sanketikahub-kubectl
@@ -576,13 +578,13 @@ internal: &internal
       image:
         <<: *keycloakConfigCli
         pullSecrets:
-        - *dockerSecretName
+        - name: *dockerSecretName
 
   druid-exporter:
     image:
       <<: *druid_exporter
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
 
   druid-raw-cluster:
     <<: *druid-raw-cluster
@@ -622,7 +624,7 @@ internal: &internal
     image:
       <<: *kafka40
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
     metrics:
       kafka:
         image:
@@ -632,12 +634,12 @@ internal: &internal
     image:
       <<: *kong
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
     ingressController:
       image:
         <<: *kubernetes-ingress-controller
         pullSecrets:
-        - *dockerSecretName
+        - name: *dockerSecretName
 
   cert-manager:
     imagePullSecrets: 
@@ -661,7 +663,7 @@ internal: &internal
     image:
       <<: *spark
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
 
   secor:
     <<: *secor
@@ -705,7 +707,7 @@ internal: &internal
     image:
       <<: *promitor-agent-scraper
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
 
   lakehouse-connector:
     image:
@@ -717,7 +719,7 @@ internal: &internal
     image:
       <<: *minio
       pullSecrets:
-      - *dockerSecretName
+      - name: *dockerSecretName
       
   opentelemetry-collector:
     image:

@@ -407,7 +407,7 @@ flink_jobs:
       task {
         window.time.in.seconds = 5
         window.count = 30
-        window.shards = 1400
+        window.shards = 4
         consumer.parallelism = 2
         downstream.operators.parallelism = 2
       }
@@ -511,7 +511,7 @@ flink_jobs:
       task {
         window.time.in.seconds = 5
         window.count = 30
-        window.shards = 1400
+        window.shards = 4
         consumer.parallelism = 1
         downstream.operators.parallelism = 1
       }
@@ -576,7 +576,7 @@ flink_jobs:
       task {
         window.time.in.seconds = 5
         window.count = 30
-        window.shards = 1400
+        window.shards = 4
         consumer.parallelism = 1
         downstream.operators.parallelism = 1
       }
