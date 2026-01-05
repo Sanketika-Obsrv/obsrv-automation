@@ -11,9 +11,11 @@ body:
         ## 🧾 Obsrv Support / Incident Ticket
         Please fill all required fields carefully.
 
-  # 1. Ticket Summary
+  - type: markdown
+    attributes:
+      value: "### 1. Ticket Summary"
   - type: input
-    id: title
+    id: ticket_title
     attributes:
       label: Ticket Title
       placeholder: Short summary of the issue
@@ -49,7 +51,11 @@ body:
       label: Reported On (Date/Time)
       placeholder: YYYY-MM-DD HH:MM
 
-  # 2. Environment Details
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 2. Environment Details
   - type: input
     id: obsrv_version
     attributes:
@@ -82,7 +88,11 @@ body:
     attributes:
       label: Component Version
 
-  # 3. Customer Context
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 3. Customer Context
   - type: input
     id: customer_name
     attributes:
@@ -101,7 +111,11 @@ body:
     attributes:
       label: Expected SLA Tier (if known)
 
-  # 4. Issue Description
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 4. Description of Issue
   - type: textarea
     id: issue_description
     attributes:
@@ -124,7 +138,11 @@ body:
         - Intermittent
         - Always
 
-  # 5. Steps to Reproduce
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 5. Steps to Reproduce
   - type: textarea
     id: steps
     attributes:
@@ -134,7 +152,11 @@ body:
         2. Step 2
         3. Step 3
 
-  # 6. Impact Assessment
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 6. Impact Assessment
   - type: checkboxes
     id: impact
     attributes:
@@ -145,7 +167,11 @@ body:
         - label: Pipeline Halted
         - label: Customer Blocked
 
-  # 7. Logs / Evidence
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 7. Logs / Evidence
   - type: textarea
     id: error_snippet
     attributes:
@@ -156,15 +182,19 @@ body:
     attributes:
       label: Relevant logs or metrics attached?
       options:
-        - Yes
-        - No
+        - "Yes"
+        - "No"
 
   - type: input
     id: screenshots
     attributes:
       label: Screenshots / URLs (if any)
 
-  # 8. Validations Performed
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 8. Validations Performed
   - type: checkboxes
     id: validations
     attributes:
@@ -175,7 +205,11 @@ body:
         - label: Checked Connectivity
         - label: Config Verified
 
-  # 9. Dependencies
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 9. Dependencies/Upstream–Downstream
   - type: input
     id: upstream
     attributes:
@@ -186,7 +220,11 @@ body:
     attributes:
       label: Downstream Target
 
-  # 10. Ownership
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 10. Owner
   - type: input
     id: ticket_creator
     attributes:
@@ -209,7 +247,11 @@ body:
     attributes:
       label: Stakeholders
 
-  # 11. Status
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 11. Status Tracking
   - type: dropdown
     id: status
     attributes:
