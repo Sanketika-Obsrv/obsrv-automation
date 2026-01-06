@@ -120,7 +120,7 @@ body:
     id: issue_description
     attributes:
       label: What happened?
-      description: Short narrative of the issue also please attach the relevant logs or screenshots.
+      description: Please provide a concise description of the issue along with any relevant logs or screenshots.
     validations:
       required: true
 
