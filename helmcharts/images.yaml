@@ -106,10 +106,16 @@ images: &images
     tag: "latest"
     digest: ""
 
-  promtail: &promtail
+  alloy: &alloy
     registry: "docker.io"
-    repository: "grafana/promtail"
-    tag: "3.2.2"
+    repository: "grafana/alloy"
+    tag: "v1.12.2"
+    digest: ""
+
+  alloy-config-reloader: &alloy-config-reloader
+    registry: "quay.io"
+    repository: "prometheus-operator/prometheus-config-reloader"
+    tag: "v0.81.0"
     digest: ""
 
   valkey: &valkey
@@ -371,7 +377,6 @@ images: &images
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
     tag: 1.8.0
-
 
   opentelemetry-collector: &opentelemetry-collector
     repository: otel/opentelemetry-collector-contrib
@@ -729,11 +734,14 @@ internal: &internal
     <<: *opentelemetry-collector
     imagePullSecrets: 
     - name: *dockerSecretName
-
-  promtail:
-    <<: *promtail
+    
+  alloy:
+    <<: *alloy
     imagePullSecrets: 
     - name: *dockerSecretName
+    configReloader:
+      image:
+        <<: *alloy-config-reloader
 
   submit-ingestion:
     <<: *sanketikahub-kubectl
