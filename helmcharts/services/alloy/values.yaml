@@ -202,7 +202,13 @@ alloy:
     runAsUser: 0
 
   # -- Resource requests and limits to apply to the Grafana Alloy container.
-  resources: {}
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 
   # -- Set lifecycle hooks for the Grafana Alloy container.
   lifecycle: {}
@@ -373,7 +379,13 @@ controller:
   nodeSelector: {}
 
   # -- Tolerations to apply to Grafana Alloy pods.
-  tolerations: []
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
 
   # -- Topology Spread Constraints to apply to Grafana Alloy pods.
   topologySpreadConstraints: []
@@ -385,7 +397,8 @@ controller:
   podAnnotations: {}
 
   # -- Extra pod labels to add.
-  podLabels: {}
+  podLabels:
+    system.monitoring: "true"
 
   # -- PodDisruptionBudget configuration.
   podDisruptionBudget:
@@ -570,9 +583,11 @@ service:
     # cloud.google.com/load-balancer-type: Internal
 
 serviceMonitor:
-  enabled: false
+  enabled: true
   # -- Additional labels for the service monitor.
-  additionalLabels: {}
+  additionalLabels:
+    release: monitoring
+    system.monitoring: "true"
   # -- Scrape interval. If not set, the Prometheus default scrape interval is used.
   interval: ""
   # -- MetricRelabelConfigs to apply to samples after scraping, but before ingestion.

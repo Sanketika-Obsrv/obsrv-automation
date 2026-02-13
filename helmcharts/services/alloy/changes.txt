@@ -1,0 +1,9 @@
+# Grafana Alloy Helm Chart - Changes from default helmchart
+
+## Configuration Changes
+
+1. enabled service monitoring.
+2. added Configuration push the logs to loki.
+3. modified template to reffer the image and resource from the images.yaml and global-resources.
+4. added the pod lables configuration (same as promtail helmchart).
+5. added Tolerations (same as promtail helmchart).
