@@ -3,7 +3,13 @@ ALTER TABLE datasources
   ADD COLUMN IF NOT EXISTS is_primary BOOLEAN,
   ADD COLUMN IF NOT EXISTS name TEXT;
 
-UPDATE datasources SET is_primary = true, name = datasource;
+UPDATE datasources 
+SET is_primary = CASE 
+    WHEN (metadata::jsonb ->> 'aggregated') = 'true' THEN FALSE 
+    ELSE TRUE 
+END,
+name = datasource
+WHERE metadata IS NOT NULL;
 
 ALTER TABLE connector_instances ADD COLUMN IF NOT EXISTS name TEXT;
 
