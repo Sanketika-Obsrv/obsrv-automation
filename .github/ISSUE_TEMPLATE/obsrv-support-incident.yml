@@ -1,0 +1,265 @@
+name: Obsrv Support / Incident Ticket
+description: Create a support or incident ticket for Obsrv
+title: "[Obsrv Support]: "
+labels: ["support", "obsrv"]
+assignees: []
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧾 Obsrv Support / Incident Ticket
+        Please fill all required fields carefully.
+
+  - type: markdown
+    attributes:
+      value: "### 1. Ticket Summary"
+  - type: input
+    id: ticket_title
+    attributes:
+      label: Ticket Title
+      placeholder: Short summary of the issue
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue Type
+      options:
+        - Bug
+        - Request
+        - Support
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (Initial)
+      options:
+        - P1
+        - P2
+        - P3
+        - P4
+    validations:
+      required: true
+
+  - type: input
+    id: reported_on
+    attributes:
+      label: Reported On (Date/Time)
+      placeholder: YYYY-MM-DD HH:MM
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 2. Environment Details
+  - type: input
+    id: obsrv_version
+    attributes:
+      label: Obsrv Version
+
+  - type: input
+    id: env_name
+    attributes:
+      label: Environment Name
+
+  - type: dropdown
+    id: cloud_provider
+    attributes:
+      label: Cloud Provider
+      options:
+        - AWS
+        - GCP
+        - Azure
+        - On-Prem
+        - Other
+
+  - type: input
+    id: component
+    attributes:
+      label: Component Impacted
+      placeholder: Connector / Pipeline / Druid / etc.
+
+  - type: input
+    id: component_version
+    attributes:
+      label: Component Version
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 3. Customer Context
+  - type: input
+    id: customer_name
+    attributes:
+      label: Customer Name / Project
+
+  - type: textarea
+    id: business_impact
+    attributes:
+      label: Business Impact
+      description: 1–2 lines describing customer impact
+    validations:
+      required: true
+
+  - type: input
+    id: sla_tier
+    attributes:
+      label: Expected SLA Tier (if known)
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 4. Description of Issue
+  - type: textarea
+    id: issue_description
+    attributes:
+      label: What happened?
+      description: Please provide a concise description of the issue along with any relevant logs or screenshots.
+    validations:
+      required: true
+
+  - type: input
+    id: start_time
+    attributes:
+      label: When did it start?
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often does it occur?
+      options:
+        - Once
+        - Intermittent
+        - Always
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 5. Steps to Reproduce
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Step 1
+        2. Step 2
+        3. Step 3
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 6. Impact Assessment
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impact Assessment
+      options:
+        - label: Data Loss
+        - label: System Down
+        - label: Pipeline Halted
+        - label: Customer Blocked
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 7. Logs / Evidence
+  - type: textarea
+    id: error_snippet
+    attributes:
+      label: Error Snippet / Logs
+
+  - type: dropdown
+    id: logs_attached
+    attributes:
+      label: Relevant logs or metrics attached?
+      options:
+        - "Yes"
+        - "No"
+
+  - type: input
+    id: screenshots
+    attributes:
+      label: Screenshots / URLs (if any)
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 8. Validations Performed
+  - type: checkboxes
+    id: validations
+    attributes:
+      label: Validations Performed
+      options:
+        - label: Restarted
+        - label: Re-triggered Job
+        - label: Checked Connectivity
+        - label: Config Verified
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 9. Dependencies/Upstream–Downstream
+  - type: input
+    id: upstream
+    attributes:
+      label: Upstream Source
+
+  - type: input
+    id: downstream
+    attributes:
+      label: Downstream Target
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 10. Owner
+  - type: input
+    id: ticket_creator
+    attributes:
+      label: Ticket Creator
+    validations:
+      required: true
+
+  - type: dropdown
+    id: assigned_to
+    attributes:
+      label: Assigned To
+      options:
+        - L1
+        - L2
+        - L3
+        - Engineering
+
+  - type: input
+    id: stakeholders
+    attributes:
+      label: Stakeholders
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 11. Status Tracking
+  - type: dropdown
+    id: status
+    attributes:
+      label: Initial Status
+      options:
+        - New
+        - Acknowledged
+        - Under Analysis
+        - Fix in Progress
+        - Ready for Deployment
+        - Verified & Closed
