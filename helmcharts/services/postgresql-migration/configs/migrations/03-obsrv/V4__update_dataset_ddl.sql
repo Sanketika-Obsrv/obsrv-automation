@@ -31,7 +31,7 @@ UPDATE datasets_draft SET type = 'master' WHERE type = 'master-dataset';
 UPDATE datasets SET type = 'event' WHERE type = 'dataset';
 UPDATE datasets SET type = 'master' WHERE type = 'master-dataset';
 
-DELETE FROM dataset_transformations_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
+DELETE FROM dataset_transformations_draft where dataset_id in (SELECT CONCAT(dataset_id, '.', '1') from datasets where status = 'Live');
 DELETE FROM dataset_source_config_draft where dataset_id in (SELECT dataset_id from datasets where status = 'Live');
 DELETE FROM datasources_draft where dataset_id in (SELECT CONCAT(dataset_id, '.', '1') 
     FROM datasets 
