@@ -109,8 +109,11 @@ masterdata-indexer-cron:
     name: spark-sa
     annotations:
       <<: *spark_sa_annotation
-  serviceAccountRoleArn: *spark_service_account_arn  
-  dataproductsJar: "<fill-value>" # Update with the path to the data products jar
+  serviceAccountRoleArn: *spark_service_account_arn
+  dataproductsJar: "<fill-value>" # Update with the path to the data products jar e.g. s3a://<bucket>/data-products/data-products-1.0.0.jar
+  cronjob:
+    enabled: true
+    cronSchedule: "30 5 * * *" # Daily 5:30 AM
 
 dataset-api-service-account: &dataset-api-service-account
   serviceAccount:

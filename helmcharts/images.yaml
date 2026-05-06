@@ -32,7 +32,7 @@ images: &images
 
   dataset-api: &dataset-api # registry: ""
     repository: obsrv-api-service
-    tag: "2.0.1"
+    tag: "2.1.0"
     digest: ""
 
   config-api: &config-api # registry: ""
