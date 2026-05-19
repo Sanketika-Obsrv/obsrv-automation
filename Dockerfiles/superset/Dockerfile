@@ -1,4 +1,4 @@
-FROM apache/superset:4.1.1
+FROM apache/superset:6.1.0
 USER root
-RUN pip install Authlib psycopg2-binary pydruid sqlalchemy-trino
+RUN uv pip install --python /app/.venv/bin/python Authlib psycopg2-binary pydruid sqlalchemy-trino
 USER superset
