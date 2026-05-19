@@ -449,7 +449,7 @@ extraSecrets:
     class CustomSsoSecurityManager(SupersetSecurityManager):
       def __init__(self, appbuilder):
         super(CustomSsoSecurityManager, self).__init__(appbuilder)
-        app = self.appbuilder.get_app
+        app = self.appbuilder.app
         app.config.setdefault("AUTH_ROLES_MAPPING", {})
         app.config.setdefault("AUTH_TYPE", AUTH_OAUTH)
 
@@ -542,6 +542,7 @@ configOverrides:
     AUTH_OAUTH_REDIRECT_URI='http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/oauth-authorized/obsrv'
     AUTH_USER_REGISTRATION_ROLE = "Admin"
     ENABLE_PROXY_FIX = {{ if .Values.global.ssl_enabled }}True{{ else }}False{{ end }}
+    TALISMAN_ENABLED = {{ if .Values.global.ssl_enabled }}True{{ else }}False{{ end }}
 
     from custom_sso_security_manager import CustomSsoSecurityManager
     CUSTOM_SECURITY_MANAGER = CustomSsoSecurityManager

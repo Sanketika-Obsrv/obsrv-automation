@@ -237,7 +237,7 @@ images: &images
   superset: &superset
     registry: *global_registry
     repository: "superset"
-    tag: "4.1.1"
+    tag: "6.1.0"
     digest: ""
 
   secor: &secor
