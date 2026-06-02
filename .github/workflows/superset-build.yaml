@@ -1,5 +1,7 @@
 name: Build and Push Superset Image
 run-name: Build superset image ${{ inputs.superset_version }}
+permissions:
+  contents: read
 on:
   workflow_dispatch:
     inputs:
