@@ -508,6 +508,10 @@ superset:
   adminUser:
     username: *superset_admin_user
     password: *superset_admin_password
+  embed:
+    allowed_origins:
+      - "http://localhost:8080"
+      - "http://127.0.0.1:8080"
 
 command-api: &command-api
   namespace: *command-api-namespace
