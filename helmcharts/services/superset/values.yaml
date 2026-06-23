@@ -449,7 +449,7 @@ extraSecrets:
     class CustomSsoSecurityManager(SupersetSecurityManager):
       def __init__(self, appbuilder):
         super(CustomSsoSecurityManager, self).__init__(appbuilder)
-        app = self.appbuilder.get_app
+        app = self.appbuilder.app
         app.config.setdefault("AUTH_ROLES_MAPPING", {})
         app.config.setdefault("AUTH_TYPE", AUTH_OAUTH)
 
@@ -491,7 +491,39 @@ configOverrides:
       "DASHBOARD_CROSS_FILTERS": True,
       "DASHBOARD_NATIVE_FILTERS_SET": True,
       "ENABLE_TEMPLATE_PROCESSING": True,
+      "ALERT_REPORTS": True,
+      "DATASET_FOLDERS": True,
+      "EMBEDDED_SUPERSET": True,
     }
+  embed: |
+    GUEST_ROLE_NAME = "Gamma"
+
+    EMBED_ALLOWED_ORIGINS = {{ .Values.embed.allowed_origins | toJson }}
+
+    ALLOWED_ORIGINS = EMBED_ALLOWED_ORIGINS
+
+    ENABLE_CORS = True
+    CORS_OPTIONS = {
+        "supports_credentials": True,
+        "allow_headers": ["*"],
+        "resources": ["*"],
+        "origins": EMBED_ALLOWED_ORIGINS,
+    }
+
+    WTF_CSRF_ENABLED = False
+
+    GUEST_TOKEN_JWT_EXP_SECONDS = 300
+
+    TALISMAN_ENABLED = {{ if .Values.global.ssl_enabled }}True{{ else }}False{{ end }}
+    {{- if .Values.global.ssl_enabled }}
+    TALISMAN_CONFIG = {
+        "content_security_policy": {
+            "frame-ancestors": ["'self'", "null"] + EMBED_ALLOWED_ORIGINS,
+        },
+        "force_https": False,
+    }
+    TALISMAN_DEV_CONFIG = TALISMAN_CONFIG
+    {{- end }}
 
   data_cache_config: |
     DATA_CACHE_CONFIG = {
