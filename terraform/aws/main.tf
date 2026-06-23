@@ -351,6 +351,8 @@ module "aws_cloud_values" {
     s3_exporter_sa_annotation       = module.eks.s3_exporter_sa_annotations != null ? module.eks.s3_exporter_sa_annotations : ""
     spark_sa_annotation             = module.eks.spark_sa_annotations != null ? module.eks.spark_sa_annotations : ""
     velero_sa_annotation            = module.eks.velero_backup_sa_annotation != null ? module.eks.velero_backup_sa_annotation : ""
+    trino_sa_annotation             = module.eks.trino_sa_iam_role != null ? module.eks.trino_sa_iam_role : ""
+    hms_sa_annotation               = module.eks.hms_sa_iam_role != null ? module.eks.hms_sa_iam_role : ""
 
     load_balancer_subnet            = length(module.vpc) > 0 ? module.vpc[0].load_balancer_subnet : var.vpc_id
     elastic_ip_allocation_id        = length(module.eip) > 0 ? module.eip[0].eip_allocation_id : var.kong_ingress_alloc_id
