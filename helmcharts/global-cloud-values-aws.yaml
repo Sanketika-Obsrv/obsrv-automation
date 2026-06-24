@@ -199,9 +199,8 @@ druid-raw-cluster:
 
 lakehouse-connector:
   hadoop_core_site:
-      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem
-      fs.s3a.access.key: *s3-access-key
-      fs.s3a.secret.key: *s3-secret-access-key
+    fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+    fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
   serviceAccount:
     create: false
     name: flink-sa
@@ -223,8 +222,6 @@ trino:
       hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
       fs.native-s3.enabled=true
       s3.region=<fill-value>
-      s3.aws-access-key=
-      s3.aws-secret-key=
 
 hms:
   serviceAccount:
@@ -238,8 +235,7 @@ hms:
 
   hadoop_core_site:
     fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-    fs.s3a.access.key: ""
-    fs.s3a.secret.key: ""
+    fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
     # fs.s3a.endpoint: *s3-endpoint-url
     # fs.s3a.path.style.access: false
     # fs.s3a.connection.ssl.enabled: true
