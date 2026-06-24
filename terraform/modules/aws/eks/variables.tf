@@ -178,6 +178,30 @@ variable "flink_namespace" {
   default     = "flink"
 }
 
+variable "trino_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for trino service account."
+  default     = "trino-sa-iam-role"
+}
+
+variable "trino_namespace" {
+  type        = string
+  description = "Trino namespace."
+  default     = "trino"
+}
+
+variable "hms_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for hive metastore service account."
+  default     = "hms-sa-iam-role"
+}
+
+variable "hms_namespace" {
+  type        = string
+  description = "Hive metastore namespace."
+  default     = "hms"
+}
+
 variable "druid_raw_sa_iam_role_name" {
   type        = string
   description = "IAM role name for druid raw service account."

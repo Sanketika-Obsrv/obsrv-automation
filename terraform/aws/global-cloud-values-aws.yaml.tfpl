@@ -48,6 +48,10 @@ service_accounts:
     eks.amazonaws.com/role-arn: "${spark_sa_annotation}"
   velero: &velero_sa_annotation
     eks.amazonaws.com/role-arn: "${velero_sa_annotation}"
+  trino: &trino_sa_annotation
+    eks.amazonaws.com/role-arn: "${trino_sa_annotation}"
+  hms: &hms_sa_annotation
+    eks.amazonaws.com/role-arn: "${hms_sa_annotation}"
 
 s3-exporter-service-account: &s3-exporter-service-account
   s3_region: *cloud_storage_region
@@ -191,9 +195,8 @@ druid-raw-cluster:
 
 lakehouse-connector:
   hadoop_core_site:
-      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem
-      fs.s3a.access.key: *s3-access-key
-      fs.s3a.secret.key: *s3-secret-access-key
+      fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+      fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
   serviceAccount:
     create: false
     name: flink-sa
@@ -204,22 +207,33 @@ lakehouse-connector:
       <<: *flink_sa_annotation
 
 trino:
+  serviceAccount:
+    create: *create_sa
+    name: trino-sa
+    annotations:
+      <<: *trino_sa_annotation
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
       hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
-      hive.s3.aws-access-key=<fill-value>
-      hive.s3.aws-secret-key=<fill-value>
-      hive.s3.ssl.enabled=false
+      fs.native-s3.enabled=true
+      s3.region=${cloud_storage_region}
+      s3.aws-access-key=
+      s3.aws-secret-key=
 
 hms:
+  serviceAccount:
+    create: *create_sa
+    automount: true
+    name: hms-sa
+    annotations:
+      <<: *hms_sa_annotation
   envVars:
     WAREHOUSE_DIR: *hudi_metadata_bucket
 
-
   hadoop_core_site:
-    fs.s3a.access.key:  *s3-access-key
-    fs.s3a.secret.key:  *s3-secret-access-key
+    fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+    fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
     # fs.s3a.endpoint: *s3-endpoint-url
     # fs.s3a.path.style.access: false
     # fs.s3a.connection.ssl.enabled: true
