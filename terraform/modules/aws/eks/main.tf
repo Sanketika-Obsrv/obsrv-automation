@@ -132,6 +132,7 @@ resource "aws_eks_node_group" "eks_nodes" {
   ami_type        = var.eks_node_group_ami_type
   instance_types  = var.eks_node_group_instance_type
   capacity_type   = var.eks_node_group_capacity_type
+  version         = var.eks_version
   # disk_size       = var.eks_node_disk_size
 
   tags = merge(

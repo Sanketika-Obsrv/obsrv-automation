@@ -77,7 +77,7 @@ variable "eks_node_group_scaling_config" {
 variable "eks_version" {
   type        = string
   description = "EKS version."
-  default     = "1.33"
+  default     = "1.34"
 }
 
 variable "eks_addons" {
@@ -89,15 +89,15 @@ variable "eks_addons" {
   default = [
     {
     name  = "kube-proxy"
-    version = "v1.33.0-eksbuild.2"
+    version = "v1.34.6-eksbuild.13"
     },
     {
     name  = "vpc-cni"
-    version = "v1.20.0-eksbuild.1"
+    version = "v1.22.2-eksbuild.1"
     },
     {
     name  = "coredns"
-    version = "v1.12.2-eksbuild.4"
+    version = "v1.13.2-eksbuild.11"
     },
     {
     name  = "aws-ebs-csi-driver"
