@@ -89,19 +89,19 @@ variable "eks_addons" {
   default = [
     {
     name  = "kube-proxy"
-      version = "v1.34.6-eksbuild.13"
+    version = "v1.34.6-eksbuild.13"
     },
     {
     name  = "vpc-cni"
-      version = "v1.22.2-eksbuild.1"
+    version = "v1.22.2-eksbuild.1"
     },
     {
     name  = "coredns"
-      version = "v1.13.2-eksbuild.11"
+    version = "v1.13.2-eksbuild.11"
     },
     {
     name  = "aws-ebs-csi-driver"
-      version = "v1.46.0-eksbuild.1"
+    version = "v1.46.0-eksbuild.1"
     }
   ]
 }
