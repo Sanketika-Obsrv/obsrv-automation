@@ -21,3 +21,10 @@ variable "storage_account_name" {
   type        = string
   description = "Storage account name"
 }
+
+variable "azure_storage_account_key" {
+  type        = string
+  description = "Storage account key. Leave empty to read automatically via managed identity (requires Contributor role)."
+  default     = ""
+  sensitive   = true
+}

@@ -11,7 +11,7 @@ global:
   config_api_container: &config_api_container "<fill-value>" # Update with the Azure storage container URL
   storage_class_name: &storage_class_name "<fill-value>" # Update with the Azure storage class name
   azure_storage_account_name: &azure_storage_account_name "<fill-value>" # Update with the Azure storage account name (OBSRV_STORAGE_ACCOUNT_NAME from setup script)
-  azure_storage_account_key: &azure_storage_account_key "<fill-value>" # Run: terraform output -raw storage_account_key  (managed identity reads it automatically via Terraform)
+  azure_storage_account_key: &azure_storage_account_key "<fill-value>" # Managed identity: terraform output -raw storage_account_key | Keys: az storage account keys list --account-name <name> --query '[0].value' -o tsv
   container: &container "<fill-value>" # Update with the Azure storage container name
   deep_store_type: &deep_store_type "azure"
   # required for s3 segments publishing to azure
@@ -207,8 +207,12 @@ lakehouse-connector-service-account: &lakehouse-connector-service-account
 
 hadoop_core_site: &hadoop_core_site
   fs.azure.wasb.account.name: *azure_storage_account_name
-  # Key name must match your storage account name: fs.azure.account.key.<storage-account-name>.blob.core.windows.net
+  # --- Key-based auth (use when azure_storage_account_key is set) ---
+  # Replace <fill-value> with your storage account name
   fs.azure.account.key.<fill-value>.blob.core.windows.net: *azure_storage_account_key
+  # --- Managed identity auth (use when azure_storage_account_key is empty) ---
+  # Uncomment the line below and comment out the key line above
+  # fs.azure.account.auth.type.<fill-value>.blob.core.windows.net: "ManagedIdentity"
 
 lakehouse-connector:
   hadoop_core_site:
@@ -233,10 +237,14 @@ hms:
   envVars:
     <<: *hms_env
   hadoop_core_site:
-    # Replace <fill-value> with your storage account name (azure_storage_account_name)
+    hive.metastore.warehouse.dir: *hudi_metadata_bucket
+    # --- Key-based auth (use when azure_storage_account_key is set) ---
+    # Replace <fill-value> with your storage account name
     fs.azure.account.key.<fill-value>.blob.core.windows.net: *azure_storage_account_key
     fs.azure.account.keyprovider.<fill-value>.blob.core.windows.net: "org.apache.hadoop.fs.azure.SimpleKeyProvider"
-    hive.metastore.warehouse.dir: *hudi_metadata_bucket
+    # --- Managed identity auth (use when azure_storage_account_key is empty) ---
+    # Comment out the two key lines above and uncomment below
+    # fs.azure.account.auth.type.<fill-value>.blob.core.windows.net: "ManagedIdentity"
 
 letsencrypt-ssl:
   enabled: *ssl_enabled

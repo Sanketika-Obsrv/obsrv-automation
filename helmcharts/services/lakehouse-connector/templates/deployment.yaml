@@ -111,7 +111,11 @@ spec:
         command: ["/opt/flink/bin/standalone-job.sh"]
         args: ["start-foreground",
 {{- if eq .Values.global.checkpoint_store_type "azure" }}
+{{- if .Values.global.azure_storage_account_key }}
 - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
+{{- else }}
+- -Dfs.azure.account.auth.type.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net=ManagedIdentity
+{{- end }}
 {{- end }}
 {{- if eq .Values.global.checkpoint_store_type "s3" }}
           "-Ds3.access.key={{ .Values.global.s3_access_key }}",

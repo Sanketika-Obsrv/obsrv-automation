@@ -46,16 +46,21 @@ module "storage" {
   storage_account_name = var.storage_account_name
 }
 
-# Read the storage account using the managed identity / service principal credential
+# When azure_storage_account_key is empty, read the key via managed identity / service principal
 # (Contributor role required — granted by setup-azure-installer-identity.sh).
-# This avoids passing the key manually; all helm modules receive it via this data source.
+# When the key is explicitly provided in tfvars, the data source is skipped entirely.
 data "azurerm_storage_account" "obsrv" {
+  count               = var.azure_storage_account_key == "" ? 1 : 0
   name                = var.storage_account_name
   resource_group_name = var.resource_group_name
 }
 
+locals {
+  storage_account_key = var.azure_storage_account_key != "" ? var.azure_storage_account_key : data.azurerm_storage_account.obsrv[0].primary_access_key
+}
+
 output "storage_account_key" {
-  value     = data.azurerm_storage_account.obsrv.primary_access_key
+  value     = local.storage_account_key
   sensitive = true
 }
 

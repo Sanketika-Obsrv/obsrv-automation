@@ -78,6 +78,16 @@ building_block           = "obsrv"
 location                 = "eastus2"
 resource_group_name      = "obsrv-dev"               # must match OBSRV_RESOURCE_GROUP from Phase 1
 storage_account_name     = "<OBSRV_STORAGE_ACCOUNT_NAME>"  # must match Phase 1
+
+# Authentication — choose one:
+# Option A — managed identity (recommended, no key needed):
+#   Leave azure_storage_account_key commented out or set to "".
+#   Terraform reads the key automatically via the managed identity.
+#   Requires: Contributor role on the subscription (granted by setup script).
+#
+# Option B — storage account key:
+#   Uncomment and set the key. Managed identity not required for storage access.
+#   azure_storage_account_key = "<key from Azure portal or: az storage account keys list ...>"
 ```
 
 ### Steps to install Obsrv:

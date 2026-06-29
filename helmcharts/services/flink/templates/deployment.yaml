@@ -59,7 +59,11 @@ spec:
           command: ["/opt/flink/bin/taskmanager.sh"]
           args: ["start-foreground",
   {{- if eq .Values.checkpoint_store_type "azure" }}
+  {{- if .Values.global.azure_storage_account_key }}
             "-Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}",
+  {{- else }}
+            "-Dfs.azure.account.auth.type.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net=ManagedIdentity",
+  {{- end }}
   {{- end }}
   {{- if and (eq .Values.checkpoint_store_type "s3") (ne .Values.s3_auth_type "serviceAccount") }}
             "-Ds3.access-key={{ .Values.s3_access_key }}",
@@ -166,7 +170,11 @@ spec:
           args: ["start-foreground",
                 "--job-classname={{ index $jobData "job_classname" }}",
   {{- if eq .Values.checkpoint_store_type "azure" }}
+  {{- if .Values.global.azure_storage_account_key }}
                 "-Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}",
+  {{- else }}
+                "-Dfs.azure.account.auth.type.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net=ManagedIdentity",
+  {{- end }}
   {{- end }}
   {{- if and (eq .Values.checkpoint_store_type "s3") (ne .Values.s3_auth_type "serviceAccount") }}
                 "-Ds3.access-key={{ .Values.s3_access_key }}",

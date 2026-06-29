@@ -102,8 +102,12 @@ spec:
     druid.s3.enablePathStyleAccess={{ .Values.druid_s3_path_style_access }}
     # Azure
     druid.azure.account = {{ .Values.global.azure_storage_account_name }}
-    druid.azure.key = {{ .Values.global.azure_storage_account_key }}
     druid.azure.container = {{ .Values.global.azure_storage_container }}
+    {{- if .Values.global.azure_storage_account_key }}
+    druid.azure.key = {{ .Values.global.azure_storage_account_key }}
+    {{- else }}
+    druid.azure.useAzureCredentialChain = true
+    {{- end }}
     #druid.storage.storageDirectory = {{ .Values.druid_storage_directory }}
     druid.storage.disableAcl=true
     # Google Cloud Storage
