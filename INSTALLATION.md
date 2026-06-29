@@ -146,61 +146,44 @@ kubectl get ingress -A
 
 
 **Azure**
-### Prerequisites:
-* Log into your cloud environment in your terminal. Please see [Sign in with Azure CLI](https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli) for reference.
-    ``` bash
-    az login --allow-no-subscriptions
-    ```
-* Create a storage account and export the below variables in your terminal. Please see [Create a storage container](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?toc=/azure/storage/blobs/toc.json) for reference. Export the below variables in your terminal session
-    ```
-    export AZURE_TERRAFORM_BACKEND_RG=myregion
-    export AZURE_TERRAFORM_BACKEND_STORAGE_ACCOUNT=mystorage
-    export AZURE_TERRAFORM_BACKEND_CONTAINER=mycontainer
-    ```
-### Steps:
-* Execute the below commands in the same terminal session:
-    ```bash
-    cd terraform/azure
-    terragrunt init
-    terragrunt apply -target module.aks -auto-approve
-    ```
-* Pass the following variables when prompted:
-    ```bash
-    env: dev
-    building_block: obsrv
-    location: East US 2
-    ```
-- Note:  All the above variable values are given for example
-* Export the below variables:
-    ``` bash
-    export KUBE_CONFIG_PATH=<path_to_kubeconfig>( default to current directory)
-    export KUBECONFIG=<path_to_kubeconfig>( default to current directory)
-    ```
-* Execute the below commands in the same terminal session:
-    ``` bash
-    terragrunt apply -auto-approve
-    kubectl get ingress superset -n superset
-    ```
-* Pass the following variables when prompted:
-    ```bash
-    env: dev
-    building_block: obsrv
-    location: East US 2
-    ```
-- Note:  All the above variable values are given for example
-* Replace the ingress ip in terraform variables:
-    ```
-    web_console_base_url
-    superset_base_url
-    ```
-* Execute the below commands in the same terminal session:
-    ```
-    terragrunt apply -target module.unified_helm -auto-approve
-    ```
-* Pass the following variables when prompted:
-    ```bash
-    env: dev
-    building_block: obsrv
-    location: East US 2
-    ```
-- Note:  All the above variable values are given for example
+
+See [AZURE_INSTALLATION.md](AZURE_INSTALLATION.md) for the full guide. Summary below.
+
+### Phase 1 — Admin setup (run once, requires subscription-level access)
+
+Run the setup script from any machine with `az` CLI and subscription-level access. It creates
+the installer VM, managed identity, Terraform backend, and OBSRV storage account — no keys needed.
+
+```bash
+chmod +x terraform/azure/setup-azure-installer-identity.sh
+export SUBSCRIPTION_ID="<subscription-id>"
+export OBSRV_STORAGE_ACCOUNT_NAME="<globally-unique-storage-name>"
+./terraform/azure/setup-azure-installer-identity.sh
+```
+
+Copy the generated `obsrv-azure-env.sh` to the VM:
+
+```bash
+scp obsrv-azure-env.sh azureuser@<vm-ip>:~/
+```
+
+### Phase 2 — Install OBSRV (run from the installer VM)
+
+```bash
+ssh azureuser@<vm-ip>
+az login --identity
+source ~/obsrv-azure-env.sh
+git clone https://github.com/Sunbird-Obsrv/obsrv-automation.git
+cd obsrv-automation/terraform/azure
+# Edit vars/cluster_overrides.tfvars: set resource_group_name and storage_account_name
+terragrunt init
+terragrunt apply -target module.aks -auto-approve
+export KUBECONFIG=$(pwd)/obsrv-dev-kubeconfig.yaml
+export KUBE_CONFIG_PATH=$KUBECONFIG
+terragrunt apply -target module.unified_helm -auto-approve
+kubectl get ingress superset -n superset
+# Update web_console_base_url and superset_base_url in vars/cluster_overrides.tfvars
+terragrunt apply -target module.unified_helm -auto-approve
+```
+
+> Storage account key is read automatically by Terraform via the managed identity. No manual key lookup required.
