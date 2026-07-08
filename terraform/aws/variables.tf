@@ -3,6 +3,12 @@ variable "env" {
   description = "Environment name. All resources will be prefixed with this value."
 }
 
+variable "helmcharts_output_path" {
+  type        = string
+  default     = ""
+  description = "Absolute path to write global-cloud-values-aws.yaml. Defaults to a path relative to this module, which only resolves correctly when not run from a terragrunt cache copy."
+}
+
 variable "building_block" {
   type        = string
   description = "Building block name. All resources will be prefixed with this value."

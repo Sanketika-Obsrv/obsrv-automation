@@ -329,7 +329,7 @@ module "aws_cloud_values" {
   source        = "../modules/aws/aws_cloud_values"
 
   template_path = "${path.module}/global-cloud-values-aws.yaml.tfpl"
-  output_path   = "${path.module}/../../helmcharts/global-cloud-values-aws.yaml"
+  output_path   = var.helmcharts_output_path != "" ? var.helmcharts_output_path : "${path.module}/../../helmcharts/global-cloud-values-aws.yaml"
 
   template_vars = {
     cloud_storage_region            = var.region
