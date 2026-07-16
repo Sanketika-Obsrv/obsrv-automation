@@ -1,5 +1,14 @@
 global:
-  ssl_enabled: &ssl_enabled true
+  # SSL Mode — choose one of: "letsencrypt", "acm", "none"
+  #   letsencrypt : cert-manager issues certs via ACME (default)
+  #   acm         : AWS Certificate Manager; TLS terminates at the NLB, set ssl_enabled: false
+  #   none        : no SSL, set ssl_enabled: false
+  ssl_type: &ssl_type "letsencrypt"
+  ssl_enabled: &ssl_enabled true  # set false when ssl_type is acm or none
+
+  # ACM certificate ARN — required only when ssl_type: acm
+  acm_certificate_arn: &acm_certificate_arn ""  # e.g. arn:aws:acm:us-east-1:123456789012:certificate/xxxxx
+
   cloud_storage_provider: &cloud_storage_provider "aws"
   cloud_store_provider: &cloud_store_provider "s3"
   cloud_storage_region: &cloud_storage_region "<fill-value>" # Update the region to deploy obsrv instance
@@ -23,11 +32,23 @@ global:
   s3_access_key: &s3-access-key "<fill-value>" # Update with the AWS access key
   s3_secret_key: &s3-secret-access-key "<fill-value>" # Update with the AWS secret key
   s3_endpoint_url: &s3-endpoint-url ""
+  # Kong NLB annotations for Let's Encrypt or no-SSL mode
   kong_annotations: &kong_annotations
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "<fill-value>" # Update with the Elastic IP allocation
     service.beta.kubernetes.io/aws-load-balancer-subnets: "<fill-value>" # Update with the public subnet ID
+
+  # Kong NLB annotations for ACM mode — TLS terminates at the NLB
+  # Switch kong.proxy.annotations to use *kong_annotations_acm when ssl_type: acm
+  kong_annotations_acm: &kong_annotations_acm
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "<fill-value>" # Update with the Elastic IP allocation
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "<fill-value>" # Update with the public subnet ID
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: *acm_certificate_arn
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
 
 service_accounts:
   enabled: &create_sa true
@@ -154,7 +175,7 @@ secor:
 kong:
   proxy:
     annotations:
-      <<: *kong_annotations
+      <<: *kong_annotations        # switch to *kong_annotations_acm when ssl_type: acm
     type: LoadBalancer
 
 flink-service-account: &flink-service-account
@@ -241,10 +262,10 @@ hms:
     # fs.s3a.connection.ssl.enabled: true
 
 letsencrypt-ssl:
-  enabled: *ssl_enabled
+  enabled: *ssl_enabled  # set ssl_enabled: false when ssl_type is acm or none
 
 keycloak:
   ingress:
     tls: *ssl_enabled
   tls:
-    enabled: *ssl_enabled  
+    enabled: *ssl_enabled
