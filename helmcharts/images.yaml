@@ -98,7 +98,7 @@ images: &images
   s3-exporter: &s3-exporter
     registry: "docker.io"
     repository: "ribbybibby/s3-exporter"
-    tag: "latest"
+    tag: "0.11.0"
     digest: ""
 
   promtail: &promtail
@@ -370,7 +370,7 @@ images: &images
 
   opentelemetry-collector: &opentelemetry-collector
     repository: otel/opentelemetry-collector-contrib
-    tag: "latest"
+    tag: "0.123.0"
     digest: ""
 
   kubernetes-ingress-controller: &kubernetes-ingress-controller
@@ -386,6 +386,34 @@ images: &images
     registry: *global_registry
     repository: kubectl
     tag: "1.32.0-r1"
+    digest: ""
+
+  ## Redis backup cronjob
+  redis-backup: &redis-backup
+    registry: *global_registry
+    repository: redis-backup
+    tag: "1.0.4-GA"
+    digest: ""
+
+  ## Flink connector images (debezium / sb-knowlg / kafka-connector)
+  flink-connectors: &flink-connectors
+    registry: *global_registry
+    repository: flink-connectors
+    tag: "1.20-scala_2.12-java11"
+    digest: ""
+
+  ## Infosys enterprise transformer (flink job)
+  infosys-transformer: &infosys-transformer
+    registry: *global_registry
+    repository: infosys-transformer
+    tag: "1.0.8-test"
+    digest: ""
+
+  ## Velero GCP plugin (init container)
+  velero-plugin-for-gcp: &velero-plugin-for-gcp
+    registry: "docker.io"
+    repository: velero/velero-plugin-for-gcp
+    tag: "v1.10.0"
     digest: ""
 
   ## Flink base image (jobmanager / taskmanager)
@@ -426,14 +454,14 @@ images: &images
   alpine-curl: &alpine-curl
     registry: "docker.io"
     repository: alpine/curl
-    tag: "latest"
+    tag: "8.12.1"
     digest: ""
 
-  ## masterdata-indexer-cron job image
+  ## masterdata-indexer-cron job image (reuses bitnami-kubectl version)
   masterdata-indexer-cron: &masterdata-indexer-cron
     registry: "docker.io"
     repository: bitnami/kubectl
-    tag: "latest"
+    tag: "1.33.1-debian-12-r5"
     digest: ""
 
   ## PostgreSQL init container — volume permissions
@@ -524,7 +552,7 @@ images: &images
   statsd-exporter: &statsd-exporter
     registry: "docker.io"
     repository: prom/statsd-exporter
-    tag: "latest"
+    tag: "v0.28.0"
     digest: ""
 
   ## Promtail config-reloader sidecar
@@ -917,9 +945,6 @@ internal: &internal
       - name: *dockerSecretName
 
   flink:
-    <<: *flink
-    imagePullSecrets:
-    - name: *dockerSecretName
     flink_jobs:
       master-data-processor:
         enabled: false
