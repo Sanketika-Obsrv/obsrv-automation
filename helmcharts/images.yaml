@@ -98,7 +98,7 @@ images: &images
   s3-exporter: &s3-exporter
     registry: "docker.io"
     repository: "ribbybibby/s3-exporter"
-    tag: "0.11.0"
+    tag: "latest"
     digest: ""
 
   promtail: &promtail
@@ -370,7 +370,7 @@ images: &images
 
   opentelemetry-collector: &opentelemetry-collector
     repository: otel/opentelemetry-collector-contrib
-    tag: "0.123.0"
+    tag: "latest"
     digest: ""
 
   kubernetes-ingress-controller: &kubernetes-ingress-controller
