@@ -1,10 +1,18 @@
 global:
   # SSL Mode — choose one of: "letsencrypt", "acm", "none"
   #   letsencrypt : cert-manager issues certs via ACME (default)
-  #   acm         : AWS Certificate Manager; TLS terminates at the NLB, set ssl_enabled: false
-  #   none        : no SSL, set ssl_enabled: false
+  #   acm         : AWS Certificate Manager; TLS terminates at the NLB
+  #   none        : no SSL, set both ssl_enabled and letsencrypt_enabled to false
   ssl_type: &ssl_type "letsencrypt"
-  ssl_enabled: &ssl_enabled true  # set false when ssl_type is acm or none
+
+  # Keep ssl_enabled: true for both letsencrypt AND acm — this controls https:// URLs,
+  # Keycloak redirect URIs, Superset TALISMAN, Kong ingress TLS, etc.
+  # Only set false when ssl_type is "none".
+  ssl_enabled: &ssl_enabled true
+
+  # Controls only the letsencrypt-ssl (cert-manager) chart.
+  # Set false when ssl_type is "acm" or "none".
+  letsencrypt_enabled: &letsencrypt_enabled true
 
   # ACM certificate ARN — required only when ssl_type: acm
   acm_certificate_arn: &acm_certificate_arn ""  # e.g. arn:aws:acm:us-east-1:123456789012:certificate/xxxxx
@@ -262,7 +270,7 @@ hms:
     # fs.s3a.connection.ssl.enabled: true
 
 letsencrypt-ssl:
-  enabled: *ssl_enabled  # set ssl_enabled: false when ssl_type is acm or none
+  enabled: *letsencrypt_enabled  # set letsencrypt_enabled: false when ssl_type is acm or none
 
 keycloak:
   ingress:
