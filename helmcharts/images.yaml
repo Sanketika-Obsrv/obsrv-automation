@@ -60,6 +60,11 @@ images: &images
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
   ## TODO: Add every component here
+  transformer-ext: &transforer-ext # registry: ""
+    repository: transformer-ext
+    tag: "1.4.0"
+    digest: ""
+
   master-data-processor: &master-data-processor # registry: ""
     repository: master-data-processor
     tag: "1.4.0"
@@ -388,52 +393,11 @@ images: &images
     tag: "1.32.0-r1"
     digest: ""
 
-  ## Redis backup cronjob
-  redis-backup: &redis-backup
-    registry: *global_registry
-    repository: redis-backup
-    tag: "1.0.4-GA"
-    digest: ""
-
-  ## Flink connector images (debezium / sb-knowlg / kafka-connector)
-  flink-connectors: &flink-connectors
-    registry: *global_registry
-    repository: flink-connectors
-    tag: "1.20-scala_2.12-java11"
-    digest: ""
-
-  ## Infosys enterprise transformer (flink job)
-  infosys-transformer: &infosys-transformer
-    registry: *global_registry
-    repository: infosys-transformer
-    tag: "1.0.8-test"
-    digest: ""
-
   ## Velero GCP plugin (init container)
   velero-plugin-for-gcp: &velero-plugin-for-gcp
     registry: "docker.io"
     repository: velero/velero-plugin-for-gcp
     tag: "v1.10.0"
-    digest: ""
-
-  ## Flink base image (jobmanager / taskmanager)
-  flink: &flink
-    registry: *global_registry
-    repository: merged-pipeline
-    tag: "1.0.0-GA"
-    digest: ""
-
-  ## Additional Flink pipeline jobs
-  transformer-ext: &transformer-ext
-    registry: *global_registry
-    repository: transformer-ext
-    tag: "1.4.0"
-    digest: ""
-
-  master-data-processor-ext: &master-data-processor-ext
-    registry: *global_registry
-    repository: master-data-processor-ext
-    tag: "1.0.0-GA"
     digest: ""
 
   ## Druid bundled ZooKeeper sidecar
