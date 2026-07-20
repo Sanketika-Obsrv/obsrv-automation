@@ -66,9 +66,11 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  # Wait for the Spark pod to be ready
+                  # Wait for the Spark master pod to be ready, then resolve and validate its name
+                  kubectl wait --for=condition=Ready pod -n spark -l app.kubernetes.io/name=spark,app.kubernetes.io/component=master --timeout=300s
                   SPARK_POD=$(kubectl get pods -n spark -l app.kubernetes.io/name=spark,app.kubernetes.io/component=master -o jsonpath='{.items[0].metadata.name}')
-                  kubectl exec $SPARK_POD -n spark -- bash -c "/opt/bitnami/spark/bin/spark-submit --master={{ .Values.spark.master.host }} --class org.sunbird.obsrv.dataproducts.MasterDataProcessorIndexer --driver-class-path /data/conf --conf spark.executor.extraClassPath=/data/conf --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem --conf spark.hadoop.fs.s3a.aws.credentials.provider=org.apache.hadoop.fs.s3a.auth.AssumedRoleCredentialProvider --conf spark.hadoop.fs.s3a.assumed.role.credentials.provider=com.amazonaws.auth.InstanceProfileCredentialsProvider --conf spark.hadoop.fs.s3a.assumed.role.arn={{ .Values.serviceAccountRoleArn }} {{ .Values.dataproductsJarV2 }}"
+                  if [ -z "$SPARK_POD" ]; then echo "ERROR: no ready Spark master pod found in namespace spark" >&2; exit 1; fi
+                  kubectl exec "$SPARK_POD" -n spark -- bash -c "/opt/bitnami/spark/bin/spark-submit --master={{ .Values.spark.master.host }} --class org.sunbird.obsrv.dataproducts.MasterDataProcessorIndexer --driver-class-path /data/conf --conf spark.executor.extraClassPath=/data/conf --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem --conf spark.hadoop.fs.s3a.aws.credentials.provider=org.apache.hadoop.fs.s3a.auth.AssumedRoleCredentialProvider --conf spark.hadoop.fs.s3a.assumed.role.credentials.provider=com.amazonaws.auth.InstanceProfileCredentialsProvider --conf spark.hadoop.fs.s3a.assumed.role.arn={{ .Values.serviceAccountRoleArn }} {{ .Values.dataproductsJarV2 }}"
               {{- with .Values.sidecars }}
               {{- toYaml . | nindent 12 }}
               {{- end }}
