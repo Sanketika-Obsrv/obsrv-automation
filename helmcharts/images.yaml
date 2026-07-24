@@ -393,6 +393,139 @@ images: &images
     tag: "1.32.0-r1"
     digest: ""
 
+  ## Velero GCP plugin (init container)
+  velero-plugin-for-gcp: &velero-plugin-for-gcp
+    registry: "docker.io"
+    repository: velero/velero-plugin-for-gcp
+    tag: "v1.10.0"
+    digest: ""
+
+  ## Druid bundled ZooKeeper sidecar
+  zookeeper: &zookeeper
+    registry: "docker.io"
+    repository: sanketikahub/zookeeper
+    tag: "3.6"
+    digest: ""
+
+  ## Velero AWS plugin (init container)
+  velero-plugin-for-aws: &velero-plugin-for-aws
+    registry: "docker.io"
+    repository: velero/velero-plugin-for-aws
+    tag: "v1.10.0"
+    digest: ""
+
+  ## submit-ingestion job image
+  alpine-curl: &alpine-curl
+    registry: "docker.io"
+    repository: alpine/curl
+    tag: "8.12.1"
+    digest: ""
+
+  ## masterdata-indexer-cron job image (reuses bitnami-kubectl version)
+  masterdata-indexer-cron: &masterdata-indexer-cron
+    registry: "docker.io"
+    repository: bitnami/kubectl
+    tag: "1.33.1-debian-12-r5"
+    digest: ""
+
+  ## PostgreSQL init container — volume permissions
+  os-shell: &os-shell
+    registry: "docker.io"
+    repository: sanketikahub/os-shell
+    tag: "11-debian-11-r102"
+    digest: ""
+
+  ## PostgreSQL metrics sidecar (bundled in postgresql chart)
+  postgresql-metrics: &postgresql-metrics
+    registry: "docker.io"
+    repository: bitnami/postgres-exporter
+    tag: "0.12.0-debian-11-r72"
+    digest: ""
+
+  ## Valkey sentinel sidecar
+  valkey-sentinel: &valkey-sentinel
+    registry: "docker.io"
+    repository: sanketikahub/valkey-sentinel
+    tag: "8.0.1-debian-12-r3"
+    digest: ""
+
+  ## Valkey metrics sidecar (redis-exporter)
+  redis-exporter: &redis-exporter
+    registry: "docker.io"
+    repository: sanketikahub/redis-exporter
+    tag: "1.66.0-debian-12-r2"
+    digest: ""
+
+  ## Kafka externalAccess autoDiscovery init container
+  kafka-autodiscovery-kubectl: &kafka-autodiscovery-kubectl
+    registry: "docker.io"
+    repository: sanketikahub/kubectl
+    tag: "1.25.5-debian-11-r2"
+    digest: ""
+
+  ## Kafka40 JMX exporter sidecar (newer version than kafka 3.x)
+  jmx40: &jmx40
+    registry: "docker.io"
+    repository: sanketikahub/jmx-exporter
+    tag: "1.3.0-debian-12-r3"
+    digest: ""
+
+  ## Init container — volume permissions (bitnami debian-12 variant)
+  bitnami-os-shell: &bitnami-os-shell
+    registry: "docker.io"
+    repository: bitnami/os-shell
+    tag: "12-debian-12-r46"
+    digest: ""
+
+  ## Init container — kubectl (bitnami, for autoDiscovery)
+  bitnami-kubectl: &bitnami-kubectl
+    registry: "docker.io"
+    repository: bitnami/kubectl
+    tag: "1.33.1-debian-12-r5"
+    digest: ""
+
+  ## Loki memcached cache
+  memcached: &memcached
+    registry: "docker.io"
+    repository: memcached
+    tag: "1.6.33-alpine"
+    digest: ""
+
+  ## Loki memcached-exporter sidecar
+  memcached-exporter: &memcached-exporter
+    registry: "docker.io"
+    repository: prom/memcached-exporter
+    tag: "v0.15.0"
+    digest: ""
+
+  ## Loki k8s-sidecar (rules file injector)
+  loki-sidecar: &loki-sidecar
+    registry: "docker.io"
+    repository: kiwigrid/k8s-sidecar
+    tag: "1.28.0"
+    digest: ""
+
+  ## Minio client (provisioning jobs)
+  minio-client: &minio-client
+    registry: "docker.io"
+    repository: sanketikahub/minio-client
+    tag: "2024.10.29-debian-12-r1"
+    digest: ""
+
+  ## Secor statsd-exporter sidecar
+  statsd-exporter: &statsd-exporter
+    registry: "docker.io"
+    repository: prom/statsd-exporter
+    tag: "v0.28.0"
+    digest: ""
+
+  ## Promtail config-reloader sidecar
+  configmap-reload: &configmap-reload
+    registry: "docker.io"
+    repository: jimmidyson/configmap-reload
+    tag: "v0.8.0"
+    digest: ""
+
 # Public charts like bitnami etc
 # Modyfying these charts involves many changes
 # Hence we are keeping their original desgin
@@ -433,6 +566,16 @@ internal: &internal
       <<: *postgresql
       pullSecrets:
       - name: *dockerSecretName
+    volumePermissions:
+      image:
+        <<: *os-shell
+        pullSecrets:
+        - name: *dockerSecretName
+    metrics:
+      image:
+        <<: *postgresql-metrics
+        pullSecrets:
+        - name: *dockerSecretName
 
   hms:
     image:
@@ -469,8 +612,15 @@ internal: &internal
   velero:
     image:
       <<: *velero
-    imagePullSecrets: 
+    imagePullSecrets:
     - *dockerSecretName
+    initContainers:
+    - name: velero-plugin-for-aws
+      image: "docker.io/velero/velero-plugin-for-aws:v1.10.0"
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+      - mountPath: /target
+        name: plugins
     kubectl:
       image:
         <<: *kubectl
@@ -480,15 +630,35 @@ internal: &internal
       <<: *valkey
       pullSecrets:
       - name: *dockerSecretName
+    sentinel:
+      image:
+        <<: *valkey-sentinel
+        pullSecrets:
+        - name: *dockerSecretName
+    metrics:
+      image:
+        <<: *redis-exporter
+        pullSecrets:
+        - name: *dockerSecretName
 
   valkey-denorm:
     image:
       <<: *valkey
       pullSecrets:
       - name: *dockerSecretName
+    sentinel:
+      image:
+        <<: *valkey-sentinel
+        pullSecrets:
+        - name: *dockerSecretName
+    metrics:
+      image:
+        <<: *redis-exporter
+        pullSecrets:
+        - name: *dockerSecretName
 
   loki:
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
     singleBinary:
       image:
@@ -496,6 +666,21 @@ internal: &internal
     gateway:
       image:
         <<: *loki-gateway
+    memcached:
+      image:
+        <<: *memcached
+        pullSecrets:
+        - name: *dockerSecretName
+    memcachedExporter:
+      image:
+        <<: *memcached-exporter
+        pullSecrets:
+        - name: *dockerSecretName
+    sidecar:
+      image:
+        <<: *loki-sidecar
+        pullSecrets:
+        - name: *dockerSecretName
 
   kubernetes-reflector:
     imagePullSecrets: 
@@ -588,8 +773,13 @@ internal: &internal
 
   druid-raw-cluster:
     <<: *druid-raw-cluster
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
+    zookeeper:
+      image:
+        <<: *zookeeper
+        pullSecrets:
+        - name: *dockerSecretName
 
   druid-operator:
     imagePullSecrets: 
@@ -615,10 +805,30 @@ internal: &internal
   kafka:
     image:
       <<: *kafka
-    # metrics: # The kafka exporter is being deployed from the kafka chart
-    #   kafka:
-    #     image:
-    #       <<: *kafka-exporter
+      pullSecrets:
+      - name: *dockerSecretName
+    metrics:
+      kafka:
+        image:
+          <<: *kafka-exporter
+          pullSecrets:
+          - name: *dockerSecretName
+      jmx:
+        image:
+          <<: *jmx
+          pullSecrets:
+          - name: *dockerSecretName
+    volumePermissions:
+      image:
+        <<: *os-shell
+        pullSecrets:
+        - name: *dockerSecretName
+    externalAccess:
+      autoDiscovery:
+        image:
+          <<: *kafka-autodiscovery-kubectl
+          pullSecrets:
+          - name: *dockerSecretName
 
   kafka40:
     image:
@@ -629,6 +839,24 @@ internal: &internal
       kafka:
         image:
           <<: *kafka-exporter
+          pullSecrets:
+          - name: *dockerSecretName
+      jmx:
+        image:
+          <<: *jmx40
+          pullSecrets:
+          - name: *dockerSecretName
+    defaultInitContainers:
+      volumePermissions:
+        image:
+          <<: *bitnami-os-shell
+          pullSecrets:
+          - name: *dockerSecretName
+      autoDiscovery:
+        image:
+          <<: *bitnami-kubectl
+          pullSecrets:
+          - name: *dockerSecretName
 
   kong:
     image:
@@ -667,8 +895,13 @@ internal: &internal
 
   secor:
     <<: *secor
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
+    exporter:
+      image:
+        <<: *statsd-exporter
+        pullSecrets:
+        - name: *dockerSecretName
 
   superset:
     <<: *superset
@@ -680,22 +913,27 @@ internal: &internal
       master-data-processor:
         enabled: false
         <<: *master-data-processor
-        imagePullSecrets: 
+        imagePullSecrets:
         - name: *dockerSecretName
       unified-pipeline:
         enabled: true
         <<: *unified-pipeline
-        imagePullSecrets: 
+        imagePullSecrets:
         - name: *dockerSecretName
       cache-indexer:
         enabled: true
         <<: *cache-indexer
-        imagePullSecrets: 
+        imagePullSecrets:
         - name: *dockerSecretName
 
   system-rules-ingestor:
     <<: *system-rules-ingestor
-    imagePullSecrets: 
+    imagePullSecrets:
+    - name: *dockerSecretName
+
+  masterdata-indexer-cron:
+    <<: *masterdata-indexer-cron
+    imagePullSecrets:
     - name: *dockerSecretName
 
   volume-autoscaler:
@@ -720,6 +958,15 @@ internal: &internal
       <<: *minio
       pullSecrets:
       - name: *dockerSecretName
+    clientImage:
+      <<: *minio-client
+      pullSecrets:
+      - name: *dockerSecretName
+    volumePermissions:
+      image:
+        <<: *bitnami-os-shell
+        pullSecrets:
+        - name: *dockerSecretName
       
   opentelemetry-collector:
     image:
@@ -732,12 +979,18 @@ internal: &internal
 
   promtail:
     <<: *promtail
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
+    sidecar:
+      configReloader:
+        image:
+          <<: *configmap-reload
+          pullSecrets:
+          - name: *dockerSecretName
 
   submit-ingestion:
-    <<: *sanketikahub-kubectl
-    imagePullSecrets: 
+    <<: *alpine-curl
+    imagePullSecrets:
     - name: *dockerSecretName
 
   prometheus:
