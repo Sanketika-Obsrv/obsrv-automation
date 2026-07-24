@@ -71,39 +71,39 @@ images: &images
     digest: ""
 
   postgresql-backup: &postgresql-backup # registry: ""
-    repository: postgresql-backup
-    tag: "17.2-r0"
+    registry: "dhi"
+    repository: python
+    tag: "3.13-alpine3.24"
     digest: ""
 
   postgresql: &postgresql
-    registry: "docker.io"
-    repository: "sanketikahub/postgresql"
-    tag: "17.5.0"
+    registry: "dhi"
+    repository: "postgres"
+    tag: "17-alpine3.24"
     digest: ""
 
   postgresql-exporter: &postgresql-exporter
-    registry: "docker.io"
-    repository: "sanketikahub/postgres-exporter"
-    tag: "v0.16.0"
+    registry: "dhi"
+    repository: "postgres-exporter"
+    tag: "0-debian13"
     digest: ""
 
   postgresql-migration: &postgresql-migration
-    registry: "docker.io"
-    repository: "flyway/flyway"
-    # tag: "10.1"
-    tag: "10.12.0" # updated tag - yet to be tested
+    registry: "dhi"
+    repository: "flyway"
+    tag: "11-debian13"
     digest: ""
 
   volume-autoscaler: &volume-autoscaler
-    registry: "docker.io"
-    repository: devopsnirvana/kubernetes-volume-autoscaler
-    tag: 1.0.5
+    registry: "dhi"
+    repository: python
+    tag: "3.13-alpine3.24"
     digest: ""
 
   s3-exporter: &s3-exporter
-    registry: "docker.io"
-    repository: "ribbybibby/s3-exporter"
-    tag: "latest"
+    registry: "dhi"
+    repository: "golang"
+    tag: "alpine3.24"
     digest: ""
 
   promtail: &promtail
@@ -113,9 +113,9 @@ images: &images
     digest: ""
 
   valkey: &valkey
-    registry: "docker.io"
-    repository: "sanketikahub/valkey"
-    tag: "8.1.3-debian-12-r2"
+    registry: "dhi"
+    repository: "valkey"
+    tag: "8.1-debian13"
     digest: ""
     pullSecrets:
       - name: *dockerSecretName
@@ -133,15 +133,15 @@ images: &images
     digest: ""
 
   loki: &loki
-    registry: "docker.io"
-    repository: "grafana/loki"
-    tag: "3.3.2"
+    registry: "dhi"
+    repository: "loki"
+    tag: "3.6-debian13"
     digest: ""
 
   loki-gateway: &loki-gateway
-    registry: "docker.io"
-    repository: "nginxinc/nginx-unprivileged"
-    tag: "1.27-alpine"
+    registry: "dhi"
+    repository: "nginx"
+    tag: "stable-alpine3.24"
     digest: ""
 
   kubernetes-reflector: &kubernetes-reflector
@@ -151,45 +151,45 @@ images: &images
     digest: ""
 
   alertmanager: &alertmanager
-    registry: *global_registry
+    registry: "dhi"
     repository: alertmanager
-    tag: v0.28.0-rc.0
+    tag: "v0.28-debian13"
     digest: ""
 
   prometheus-operator-webhook: &prometheus-operator-webhook
-    registry: *global_registry
+    registry: "dhi"
     repository: kube-webhook-certgen
-    tag: v20221220-controller-v1.5.1-58-g787ea74b6
+    tag: "debian13"
     digest: ""
 
   prometheus-operator: &prometheus-operator
-    registry: *global_registry
+    registry: "dhi"
     repository: prometheus-operator
-    tag: "v0.78.2"
+    tag: "0-debian13"
     digest: ""
 
   prometheus-config-reloader: &prometheus-config-reloader
-    registry: *global_registry
+    registry: "dhi"
     repository: prometheus-config-reloader
-    # if not set appVersion field from Chart.yaml is used
-    tag: "v0.79.0"
+    tag: "0-debian13"
     digest: ""
 
   prometheus: &prometheus
-    registry: *global_registry
+    registry: "dhi"
     repository: prometheus
-    tag: v2.44.0
+    tag: "3.5-lts-debian13"
     digest: ""
 
   prometheus-pushgateway: &prometheus-pushgateway
-    repository: sanketikahub/pushgateway
-    tag: v1.10.0
+    registry: "dhi"
+    repository: pushgateway
+    tag: "1-debian13"
     digest: ""
 
   grafana: &grafana
-    registry: docker.io
-    repository: grafana/grafana
-    tag: "11.4.0"
+    registry: "dhi"
+    repository: grafana
+    tag: "12.3-debian13"
     digest: ""
 
   grafana-test-framework: &grafana-test-framework
@@ -205,50 +205,51 @@ images: &images
     digest: ""
 
   grafana-init-chown-data: &grafana-init-chown-data
-    registry: docker.io
-    repository: library/busybox
-    tag: "1.31.1"
+    registry: "dhi"
+    repository: busybox
+    tag: "latest"
     digest: ""
 
   grafana-side-car: &grafana-side-car
-    registry: *global_registry
+    registry: "dhi"
     repository: k8s-sidecar
-    tag: 1.27.4
+    tag: "2-debian13"
     digest: ""
 
   kube-state-metrics: &kube-state-metrics
-    registry: *global_registry
+    registry: "dhi"
     repository: "kube-state-metrics"
-    tag: "v2.13.0"
+    tag: "2-debian13"
     digest: ""
 
   prometheus-node-exporter: &prometheus-node-exporter
-    registry: *global_registry
+    registry: "dhi"
     repository: "node-exporter"
-    tag: "v1.8.2"
+    tag: "1-debian13"
     digest: ""
 
   velero: &velero
-    registry: "docker.io"
-    repository: "velero/velero"
-    tag: "v1.15.0"
+    registry: "dhi"
+    repository: "velero"
+    tag: "1-debian13"
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
   superset: &superset
-    registry: *global_registry
+    registry: "dhi"
     repository: "superset"
-    tag: "6.1.0"
+    tag: "6-debian13"
     digest: ""
 
   secor: &secor
-    # registry: *global_registry
-    repository: "secor"
-    tag: "0.29.2-kafka-4.0"
+    registry: "dhi"
+    repository: "eclipse-temurin"
+    tag: "17-debian13"
     digest: ""
 
   spark: &spark # registry: ""
-    repository: "sanketikahub/spark"
-    tag: "3.5.1-debian-12-r6"
+    registry: "dhi"
+    repository: "spark"
+    tag: "4.0-debian13"
     digest: ""
 
   cert_manager_cainjector: &cert_manager_cainjector
@@ -277,20 +278,21 @@ images: &images
     digest: ""
 
   kong: &kong # registry: ""
+    registry: "dhi"
     repository: kong
-    tag: 3.3
+    tag: "3-debian13"
     digest: ""
 
   kafka: &kafka
-    registry: ""
-    repository: sanketikahub/kafka
-    tag: 3.6.0
+    registry: "dhi"
+    repository: kafka
+    tag: "4.1-debian13"
     digest: ""
 
   kafka40: &kafka40
-    registry: ""
-    repository: sanketikahub/kafka
-    tag: 4.0.0
+    registry: "dhi"
+    repository: kafka
+    tag: "4.1-debian13"
     digest: ""
 
   jmx: &jmx
@@ -312,14 +314,15 @@ images: &images
   #   digest: ""
 
   kafka-exporter: &kafka-exporter
-    registry: "docker.io"
-    repository: sanketikahub/kafka-exporter
-    tag: "1.0.1"
+    registry: "dhi"
+    repository: kafka-exporter
+    tag: "1-debian13"
     digest: ""
 
   kafka-message-exporter: &kafka-message-exporter # registry: ""
-    repository: kafka-message-exporter
-    tag: 1.2.0-RC
+    registry: "dhi"
+    repository: node
+    tag: "24-alpine3.24"
     digest: ""
 
   druid_operator: &druid_operator
@@ -329,21 +332,21 @@ images: &images
     digest: ""
 
   druid-raw-cluster: &druid-raw-cluster
-    registry: *global_registry
+    registry: "dhi"
     repository: druid
-    tag: "32.0.1"
+    tag: "36-debian13"
     digest: ""
 
   druid_exporter: &druid_exporter
-    # registry: "docker.io"
-    name: sanketikahub/druid-exporter
-    tag: "v0.11"
+    registry: "dhi"
+    repository: python
+    tag: "3.13-alpine3.24"
     digest: ""
 
   keycloak: &keycloak
-    registry: docker.io
-    repository:  sanketikahub/keycloak
-    tag: "26.0.5-debian-12-r2"
+    registry: "dhi"
+    repository: keycloak
+    tag: "26-debian13"
     digest: ""
 
   keycloakConfigCli: &keycloakConfigCli
@@ -388,9 +391,9 @@ images: &images
     tag: "1.26.14-debian-11-r6"
 
   sanketikahub-kubectl: &sanketikahub-kubectl
-    registry: *global_registry
+    registry: "dhi"
     repository: kubectl
-    tag: "1.32.0-r1"
+    tag: "1.32-debian13"
     digest: ""
 
 # Public charts like bitnami etc
