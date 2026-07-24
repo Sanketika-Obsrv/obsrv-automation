@@ -73,9 +73,9 @@ diagnosticMode:
 ## @param image.debug Specify if debug values should be set
 ##
 image:
-  registry: docker.io
-  repository: sanketikahub/zookeeper
-  tag: 3.8.0-debian-11-r6
+  registry: dhi
+  repository: zookeeper
+  tag: "3.9-debian13"
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
