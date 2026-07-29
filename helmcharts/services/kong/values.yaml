@@ -58,6 +58,14 @@ deployment:
   test:
     # Enable creation of test resources for use with "helm test"
     enabled: false
+    image:
+      registry: "docker.io"
+      repository: curlimages/curl
+      tag: "8.6.0"
+    httpbinImage:
+      registry: "docker.io"
+      repository: kennethreitz/httpbin
+      tag: "latest"
   # Use a DaemonSet controller instead of a Deployment controller
   daemonset: false
   hostNetwork: false

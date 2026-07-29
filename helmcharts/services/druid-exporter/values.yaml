@@ -69,3 +69,8 @@ serviceMonitor:
     #   action: labeldrop
 
 testEnabled: true
+
+testImage:
+  registry: "docker.io"
+  repository: library/busybox
+  tag: "1.36.1"

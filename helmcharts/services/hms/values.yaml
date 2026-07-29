@@ -117,3 +117,8 @@ affinity: {}
 envVars: {}
 
 hadoop_core_site: {}
+
+testImage:
+  registry: "docker.io"
+  repository: library/busybox
+  tag: "1.36.1"

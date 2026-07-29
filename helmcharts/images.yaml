@@ -414,6 +414,37 @@ images: &images
     tag: "v1.10.0"
     digest: ""
 
+  ## Velero AWS plugin full image string (used verbatim in initContainers spec)
+  _velero-plugin-for-aws-image: &velero-plugin-for-aws-image "docker.io/velero/velero-plugin-for-aws:v1.10.0"
+
+  ## Secor initContainer — volume ownership fix
+  alpine: &alpine
+    registry: "docker.io"
+    repository: library/alpine
+    tag: "3"
+    digest: ""
+
+  ## Helm test containers (busybox for wget-based connectivity tests)
+  busybox: &busybox
+    registry: "docker.io"
+    repository: library/busybox
+    tag: "1.36.1"
+    digest: ""
+
+  ## Helm test containers (curl-based connectivity tests)
+  curlimages-curl: &curlimages-curl
+    registry: "docker.io"
+    repository: curlimages/curl
+    tag: "8.6.0"
+    digest: ""
+
+  ## Kong test resource pod
+  httpbin: &httpbin
+    registry: "docker.io"
+    repository: kennethreitz/httpbin
+    tag: "latest"
+    digest: ""
+
   ## submit-ingestion job image
   alpine-curl: &alpine-curl
     registry: "docker.io"
@@ -580,7 +611,11 @@ internal: &internal
   hms:
     image:
       <<: *hms
-      imagePullSecrets: 
+      imagePullSecrets:
+      - name: *dockerSecretName
+    testImage:
+      <<: *busybox
+      pullSecrets:
       - name: *dockerSecretName
 
   trino:
@@ -616,7 +651,7 @@ internal: &internal
     - *dockerSecretName
     initContainers:
     - name: velero-plugin-for-aws
-      image: "docker.io/velero/velero-plugin-for-aws:v1.10.0"
+      image: *velero-plugin-for-aws-image
       imagePullPolicy: IfNotPresent
       volumeMounts:
       - mountPath: /target
@@ -770,6 +805,10 @@ internal: &internal
       <<: *druid_exporter
       pullSecrets:
       - name: *dockerSecretName
+    testImage:
+      <<: *busybox
+      pullSecrets:
+      - name: *dockerSecretName
 
   druid-raw-cluster:
     <<: *druid-raw-cluster
@@ -792,11 +831,11 @@ internal: &internal
     imagePullSecrets: 
     - name: *dockerSecretName
 
-  # kafka-exporter:
-  #   image:
-  #     <<: *kafka-exporter
-
-
+  kafka-exporter:
+    image:
+      <<: *kafka-exporter
+      pullSecrets:
+      - name: *dockerSecretName
 
   # kafka-connector:
   #   image:
@@ -868,6 +907,16 @@ internal: &internal
         <<: *kubernetes-ingress-controller
         pullSecrets:
         - name: *dockerSecretName
+    deployment:
+      test:
+        image:
+          <<: *curlimages-curl
+          pullSecrets:
+          - name: *dockerSecretName
+        httpbinImage:
+          <<: *httpbin
+          pullSecrets:
+          - name: *dockerSecretName
 
   cert-manager:
     imagePullSecrets: 
@@ -900,6 +949,11 @@ internal: &internal
     exporter:
       image:
         <<: *statsd-exporter
+        pullSecrets:
+        - name: *dockerSecretName
+    setPvOwnership:
+      image:
+        <<: *alpine
         pullSecrets:
         - name: *dockerSecretName
 

@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: "{{ .Values.testImage.registry }}/{{ .Values.testImage.repository }}:{{ .Values.testImage.tag }}"
       command: ['wget']
       args: ['{{ include "metastore-app.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never

@@ -168,3 +168,7 @@ nodeSelector:
 
 setPvOwnership:
   enabled: true
+  image:
+    registry: "docker.io"
+    repository: library/alpine
+    tag: "3"

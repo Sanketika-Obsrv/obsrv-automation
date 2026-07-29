@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: httpbin
-      image: kennethreitz/httpbin
+      image: "{{ .Values.deployment.test.httpbinImage.registry }}/{{ .Values.deployment.test.httpbinImage.repository }}:{{ .Values.deployment.test.httpbinImage.tag }}"
       ports:
       - containerPort: 80
 ---

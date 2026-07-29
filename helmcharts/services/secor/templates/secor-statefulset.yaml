@@ -46,7 +46,7 @@ spec:
       {{if .Values.setPvOwnership.enabled}}
       initContainers:
       - name: change-pv-dir-ownership
-        image: alpine:3
+        image: "{{ .Values.setPvOwnership.image.registry }}/{{ .Values.setPvOwnership.image.repository }}:{{ .Values.setPvOwnership.image.tag }}"
         command: ["/bin/sh", "-c"]
         args: ["chown -R 9999:9999 /mnt/data"]
         volumeMounts:

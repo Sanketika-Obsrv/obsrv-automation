@@ -10,7 +10,7 @@ spec:
   restartPolicy: OnFailure
   containers:
     - name: "{{ .Release.Name }}-curl"
-      image: curlimages/curl
+      image: "{{ .Values.deployment.test.image.registry }}/{{ .Values.deployment.test.image.repository }}:{{ .Values.deployment.test.image.tag }}"
       command:
         - curl
         - "http://{{ .Release.Name }}-kong-proxy.{{ .Release.Namespace }}.svc.cluster.local/httpbin"
@@ -25,7 +25,7 @@ spec:
   restartPolicy: OnFailure
   containers:
     - name: "{{ .Release.Name }}-curl"
-      image: curlimages/curl
+      image: "{{ .Values.deployment.test.image.registry }}/{{ .Values.deployment.test.image.repository }}:{{ .Values.deployment.test.image.tag }}"
       command:
         - curl
         - "http://{{ .Release.Name }}-kong-proxy.{{ .Release.Namespace }}.svc.cluster.local/httproute"
