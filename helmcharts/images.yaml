@@ -60,7 +60,7 @@ images: &images
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
   ## TODO: Add every component here
-  transformer-ext: &transforer-ext # registry: ""
+  transformer-ext: &transformer-ext # registry: ""
     repository: transformer-ext
     tag: "1.4.0"
     digest: ""
@@ -112,6 +112,12 @@ images: &images
     tag: "3.2.2"
     digest: ""
 
+  # submit-ingestion: &submit-ingestion
+  #   registry: *global_registry
+  #   repository: "ubuntu"
+  #   tag: "20.04"
+  #   digest: ""
+
   valkey: &valkey
     registry: "docker.io"
     repository: "sanketikahub/valkey"
@@ -121,11 +127,6 @@ images: &images
       - name: *dockerSecretName
 
 
-  # submit-ingestion: &submit-ingestion
-  #   registry: *global_registry
-  #   repository: "ubuntu"
-  #   tag: "20.04"
-  #   digest: ""
 
   system-rules-ingestor: &system-rules-ingestor # registry: ""
     repository: "system-rules-ingestor"
@@ -305,6 +306,7 @@ images: &images
     tag: 2024.11.7-debian-12-r0
     digest: ""
 
+
   # kafka-connector: &kafka-connector
   #   # registry: ""
   #   # repository: kafka-connector
@@ -393,18 +395,18 @@ images: &images
     tag: "1.32.0-r1"
     digest: ""
 
-  ## Velero GCP plugin (init container)
-  velero-plugin-for-gcp: &velero-plugin-for-gcp
-    registry: "docker.io"
-    repository: velero/velero-plugin-for-gcp
-    tag: "v1.10.0"
-    digest: ""
-
   ## Druid bundled ZooKeeper sidecar
   zookeeper: &zookeeper
     registry: "docker.io"
     repository: sanketikahub/zookeeper
     tag: "3.6"
+    digest: ""
+
+  ## Velero GCP plugin (init container)
+  velero-plugin-for-gcp: &velero-plugin-for-gcp
+    registry: "docker.io"
+    repository: velero/velero-plugin-for-gcp
+    tag: "v1.10.0"
     digest: ""
 
   ## Velero AWS plugin (init container)
@@ -450,13 +452,6 @@ images: &images
     registry: "docker.io"
     repository: alpine/curl
     tag: "8.12.1"
-    digest: ""
-
-  ## masterdata-indexer-cron job image (reuses bitnami-kubectl version)
-  masterdata-indexer-cron: &masterdata-indexer-cron
-    registry: "docker.io"
-    repository: bitnami/kubectl
-    tag: "1.33.1-debian-12-r5"
     digest: ""
 
   ## PostgreSQL init container — volume permissions
@@ -979,6 +974,11 @@ internal: &internal
         <<: *cache-indexer
         imagePullSecrets:
         - name: *dockerSecretName
+      transformer-ext:
+        enabled: false
+        <<: *transformer-ext
+        imagePullSecrets:
+        - name: *dockerSecretName
 
   system-rules-ingestor:
     <<: *system-rules-ingestor
@@ -986,7 +986,7 @@ internal: &internal
     - name: *dockerSecretName
 
   masterdata-indexer-cron:
-    <<: *masterdata-indexer-cron
+    <<: *bitnami-kubectl
     imagePullSecrets:
     - name: *dockerSecretName
 
