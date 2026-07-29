@@ -118,6 +118,11 @@ masterdata-indexer-cron:
   cronjob:
     enabled: true
     cronSchedule: "30 5 * * *" # Daily 5:30 AM
+  # 2.0.0 master data indexer
+  dataproductsJarV2: "<fill-value>" # Update with the path to the 2.0.0 data products jar e.g. s3a://<bucket>/data-products/data-products-2.0.0.jar
+  cronjobV2:
+    enabled: false
+    cronSchedule: "0 7 * * *" # daily 7 AM
 
 dataset-api-service-account: &dataset-api-service-account
   serviceAccount:
