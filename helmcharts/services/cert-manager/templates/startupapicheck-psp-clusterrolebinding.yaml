@@ -21,6 +21,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "startupapicheck.serviceAccountName" . }}
-    namespace: {{ include "base.namespace" . }}
+    namespace: {{ include "cert-manager.namespace" . }}
 {{- end }}
 {{- end }}

@@ -16,5 +16,5 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "webhook.serviceAccountName" . }}
-    namespace: {{ include "base.namespace" . }}
+    namespace: {{ include "cert-manager.namespace" . }}
 {{- end }}

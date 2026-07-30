@@ -4,7 +4,7 @@ global:
     dockerRegistrySecretName: &dockerSecretName "registry-secret-name"
      #Replace the dockerConfigJson below for the private images
     dockerConfigJson: |-
-      {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
+      {"auths":{"http://registry.your-domain.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"},"dhi.io":{"auth":"eW91cl9yZWdpc3RyeV91c2VybmFtZTp5b3VyX3JlZ2lzdHJ5X3Rva2Vu"}}}
   imagePullSecrets:
     - name: *dockerSecretName
 
@@ -76,15 +76,15 @@ images: &images
     digest: ""
 
   postgresql: &postgresql
-    registry: "docker.io"
-    repository: "sanketikahub/postgresql"
-    tag: "17.5.0"
+    registry: "dhi.io"
+    repository: "postgres"
+    tag: "17-debian13"
     digest: ""
 
   postgresql-exporter: &postgresql-exporter
-    registry: "docker.io"
-    repository: "sanketikahub/postgres-exporter"
-    tag: "v0.16.0"
+    registry: "dhi.io"
+    repository: "postgres-exporter"
+    tag: "0-debian13"
     digest: ""
 
   postgresql-migration: &postgresql-migration
@@ -107,15 +107,15 @@ images: &images
     digest: ""
 
   promtail: &promtail
-    registry: "docker.io"
-    repository: "grafana/promtail"
-    tag: "3.2.2"
+    registry: "dhi.io"
+    repository: "promtail"
+    tag: "3.6-debian13"
     digest: ""
 
   valkey: &valkey
-    registry: "docker.io"
-    repository: "sanketikahub/valkey"
-    tag: "8.1.3-debian-12-r2"
+    registry: "dhi.io"
+    repository: "valkey"
+    tag: "8.1-debian13"
     digest: ""
     pullSecrets:
       - name: *dockerSecretName
@@ -133,15 +133,15 @@ images: &images
     digest: ""
 
   loki: &loki
-    registry: "docker.io"
-    repository: "grafana/loki"
-    tag: "3.3.2"
+    registry: "dhi.io"
+    repository: "loki"
+    tag: "3.4-debian13"
     digest: ""
 
   loki-gateway: &loki-gateway
-    registry: "docker.io"
-    repository: "nginxinc/nginx-unprivileged"
-    tag: "1.27-alpine"
+    registry: "dhi.io"
+    repository: "nginx"
+    tag: "1-alpine3.24"
     digest: ""
 
   kubernetes-reflector: &kubernetes-reflector
@@ -151,87 +151,89 @@ images: &images
     digest: ""
 
   alertmanager: &alertmanager
-    registry: *global_registry
+    registry: dhi.io
     repository: alertmanager
-    tag: v0.28.0-rc.0
+    tag: 0-debian13
     digest: ""
 
   prometheus-operator-webhook: &prometheus-operator-webhook
-    registry: *global_registry
+    registry: dhi.io
     repository: kube-webhook-certgen
-    tag: v20221220-controller-v1.5.1-58-g787ea74b6
+    tag: 1-debian13
     digest: ""
 
   prometheus-operator: &prometheus-operator
-    registry: *global_registry
+    registry: dhi.io
     repository: prometheus-operator
-    tag: "v0.78.2"
+    tag: "0-debian13"
     digest: ""
 
   prometheus-config-reloader: &prometheus-config-reloader
-    registry: *global_registry
+    registry: dhi.io
     repository: prometheus-config-reloader
     # if not set appVersion field from Chart.yaml is used
-    tag: "v0.79.0"
+    tag: "0-debian13"
     digest: ""
 
   prometheus: &prometheus
-    registry: *global_registry
+    registry: dhi.io
     repository: prometheus
-    tag: v2.44.0
+    tag: 3.5-debian13
     digest: ""
 
   prometheus-pushgateway: &prometheus-pushgateway
-    repository: sanketikahub/pushgateway
-    tag: v1.10.0
+    # prometheus-community pushgateway chart uses image.repository as the FULL path (ignores registry)
+    registry: dhi.io
+    repository: dhi.io/pushgateway
+    tag: 1-debian13
     digest: ""
 
   grafana: &grafana
-    registry: docker.io
-    repository: grafana/grafana
-    tag: "11.4.0"
+    registry: dhi.io
+    repository: grafana
+    tag: "12.3-debian13"
     digest: ""
 
   grafana-test-framework: &grafana-test-framework
-    registry: "docker.io"
-    repository: bats/bats
-    tag: "1.11.1"
+    registry: "dhi.io"
+    repository: bats
+    tag: "1-alpine3.24"
     digest: ""
 
   grafana-download-dashboards: &grafana-download-dashboards
-    registry: docker.io
-    repository: bats/bats
-    tag: "v1.4.1"
+    registry: dhi.io
+    repository: bats
+    tag: "1-alpine3.24"
     digest: ""
 
   grafana-init-chown-data: &grafana-init-chown-data
-    registry: docker.io
-    repository: library/busybox
-    tag: "1.31.1"
+    registry: dhi.io
+    repository: busybox
+    tag: "1.37"
     digest: ""
 
   grafana-side-car: &grafana-side-car
-    registry: *global_registry
+    registry: dhi.io
     repository: k8s-sidecar
-    tag: 1.27.4
+    tag: 2-debian13
     digest: ""
 
   kube-state-metrics: &kube-state-metrics
-    registry: *global_registry
+    registry: dhi.io
     repository: "kube-state-metrics"
-    tag: "v2.13.0"
+    tag: "2-debian13"
     digest: ""
 
   prometheus-node-exporter: &prometheus-node-exporter
-    registry: *global_registry
+    registry: dhi.io
     repository: "node-exporter"
-    tag: "v1.8.2"
+    tag: "1-debian13"
     digest: ""
 
   velero: &velero
-    registry: "docker.io"
-    repository: "velero/velero"
-    tag: "v1.15.0"
+    registry: "dhi.io"
+    repository: "dhi.io/velero"
+    tag: "1.16-debian13"
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
   superset: &superset
@@ -252,33 +254,35 @@ images: &images
     digest: ""
 
   cert_manager_cainjector: &cert_manager_cainjector
-    repository: sanketikahub/cert-manager-cainjector
-    tag: v1.12.2
+    repository: dhi.io/cert-manager-cainjector
+    tag: 1.20.3-debian13
     digest: ""
 
-  cert_manager_webhook: &cert_manager_webhook # registry: ""
-    repository: sanketikahub/cert-manager-webhook
-    tag: v1.12.2
+  cert_manager_webhook: &cert_manager_webhook
+    repository: dhi.io/cert-manager-webhook
+    tag: 1.20.3-debian13
     digest: ""
 
   cert_manager_controller: &cert_manager_controller
-    repository: sanketikahub/cert-manager-controller
-    tag: v1.12.2
+    repository: dhi.io/cert-manager-controller
+    tag: 1.20.3-debian13
     digest: ""
 
   cert_manager_ctl: &cert_manager_ctl
-    repository: sanketikahub/cert-manager-ctl
-    tag: v1.12.2
+    repository: dhi.io/cert-manager-startupapicheck
+    tag: 1.20.3-debian13
     digest: ""
 
   cert_manager_acmesolver: &cert_manager_acmesolver
-    repository: sanketikahub/cert-manager-acmesolver
-    tag: v1.12.2
+    repository: dhi.io/cert-manager-acmesolver
+    tag: 1.20.3-debian13
     digest: ""
 
-  kong: &kong # registry: ""
-    repository: kong
-    tag: 3.3
+  kong: &kong
+    # kong chart uses image.repository as FULL path (ignores registry) — like velero/pushgateway
+    registry: dhi.io
+    repository: dhi.io/kong
+    tag: 3-debian13
     digest: ""
 
   kafka: &kafka
@@ -294,9 +298,9 @@ images: &images
     digest: ""
 
   jmx: &jmx
-    registry: *global_registry
+    registry: dhi.io
     repository: jmx-exporter
-    tag: 0.17.2-debian-11-r29
+    tag: 1.3-debian13
     digest: ""
 
   minio: &minio
@@ -312,9 +316,9 @@ images: &images
   #   digest: ""
 
   kafka-exporter: &kafka-exporter
-    registry: "docker.io"
-    repository: sanketikahub/kafka-exporter
-    tag: "1.0.1"
+    registry: "dhi.io"
+    repository: kafka-exporter
+    tag: "1-debian13"
     digest: ""
 
   kafka-message-exporter: &kafka-message-exporter # registry: ""
@@ -341,15 +345,15 @@ images: &images
     digest: ""
 
   keycloak: &keycloak
-    registry: docker.io
-    repository:  sanketikahub/keycloak
-    tag: "26.0.5-debian-12-r2"
+    registry: dhi.io
+    repository: keycloak
+    tag: "26.3-debian13"
     digest: ""
 
   keycloakConfigCli: &keycloakConfigCli
     registry: docker.io
-    repository: sanketikahub/keycloak-config-cli
-    tag: 6.2.0-debian-12-r0
+    repository: adorsys/keycloak-config-cli
+    tag: 6.5.1-26.1.0
 
   hms: &hms
     # registry: ""
@@ -388,9 +392,9 @@ images: &images
     tag: "1.26.14-debian-11-r6"
 
   sanketikahub-kubectl: &sanketikahub-kubectl
-    registry: *global_registry
+    registry: dhi.io
     repository: kubectl
-    tag: "1.32.0-r1"
+    tag: "1.32-debian13"
     digest: ""
 
 # Public charts like bitnami etc
@@ -634,12 +638,12 @@ internal: &internal
     image:
       <<: *kong
       pullSecrets:
-      - name: *dockerSecretName
+      - *dockerSecretName
     ingressController:
       image:
         <<: *kubernetes-ingress-controller
         pullSecrets:
-        - name: *dockerSecretName
+        - *dockerSecretName
 
   cert-manager:
     imagePullSecrets: 
