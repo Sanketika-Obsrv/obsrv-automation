@@ -209,7 +209,7 @@ images: &images
   grafana-init-chown-data: &grafana-init-chown-data
     registry: dhi.io
     repository: busybox
-    tag: "1.37"
+    tag: "1.37.0"
     digest: ""
 
   grafana-side-car: &grafana-side-car
