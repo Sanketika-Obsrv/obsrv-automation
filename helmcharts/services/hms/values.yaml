@@ -117,3 +117,10 @@ affinity: {}
 envVars: {}
 
 hadoop_core_site: {}
+
+# helm-test wget image; centralized via images.yaml `hms.test.image` (os-shell/busybox anchor)
+test:
+  image:
+    registry: dhi.io
+    repository: busybox
+    tag: "1.37.0"

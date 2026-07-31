@@ -29,6 +29,13 @@ namespaces:
 - config-api
 - otel
 
+# kubectl for the openssl+kubectl secrets job; centralized via images.yaml root `kubectl.image`
+kubectl:
+  image:
+    registry: sanketikahub
+    repository: kubectl
+    tag: "1.32-dhi"
+
 global:
   image:
     dockerRegistrySecretName: obsrv-docker-secret

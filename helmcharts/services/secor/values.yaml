@@ -113,13 +113,17 @@ secor_jobs:
     service_name: "system-events-backup"
     consumer_group: "system-events"
     base_path: "{{ .Values.base_path }}/system-events"
-    timestamp_key: "obsrv_meta.syncts"
+    # system events carry dataset under ctx.dataset and timestamp as top-level ets
+    message_channel_identifier: "ctx.dataset"
+    timestamp_key: "ets"
   system-telemetry-backup:
     <<: *base_config
     topic: "system.telemetry.events"
     service_name: "system-telemetry-backup"
     consumer_group: "system-telemetry-events"
     base_path: "{{ .Values.base_path }}/system-telemetry"
+    # telemetry events have no dataset/channel field -> partition by date only
+    message_parser: "com.pinterest.secor.parser.DateMessageParser"
     timestamp_key: "ets"
   masterdata-ingest-backup:
     <<: *base_config
@@ -168,3 +172,8 @@ nodeSelector:
 
 setPvOwnership:
   enabled: true
+  # centralized via images.yaml `secor.setPvOwnership.image` (alpine anchor); default here for standalone
+  image:
+    registry: dhi.io
+    repository: alpine-base
+    tag: 3.24-alpine3.24

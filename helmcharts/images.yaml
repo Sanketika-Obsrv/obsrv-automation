@@ -100,6 +100,104 @@ images: &images
     tag: 1.0.5
     digest: ""
 
+  # bitnami charts use an "os-shell" image only for volumePermissions init chown — DHI busybox
+  # (has sh + chown) is a drop-in. Centralizes all the os-shell/volume-permissions sidecars.
+  os-shell: &os-shell
+    registry: "dhi.io"
+    repository: "busybox"
+    tag: "1.37.0"
+    digest: ""
+
+  # helm-test images (only run on `helm test`); DHI curl exists, httpbin has no DHI equivalent
+  curl: &curl
+    registry: "dhi.io"
+    repository: "curl"
+    tag: "8-debian13"
+    digest: ""
+
+  httpbin: &httpbin
+    registry: "docker.io"
+    repository: "kennethreitz/httpbin"
+    tag: "latest"
+    digest: ""
+
+  # thanos sidecar/ruler (kube-prometheus-stack, disabled by default)
+  thanos: &thanos
+    registry: "dhi.io"
+    repository: "thanos"
+    tag: "0-debian13"
+    digest: ""
+
+  # kube-rbac-proxy sidecar (kube-state-metrics + node-exporter, when kubeRBACProxy.enabled)
+  kube-rbac-proxy: &kube-rbac-proxy
+    registry: "dhi.io"
+    repository: "kube-rbac-proxy"
+    tag: "0-debian13"
+    digest: ""
+
+  # memcached (loki chunks/results cache). loki chart uses repository as a FULL path (no registry).
+  memcached: &memcached
+    repository: "dhi.io/memcached"
+    tag: "1-debian13"
+    digest: ""
+
+  # loki k8s-sidecar (loki chart uses repository as a FULL path, no registry field)
+  loki-sidecar: &loki-sidecar
+    repository: "dhi.io/k8s-sidecar"
+    tag: "2.5.0"
+    digest: ""
+
+  # statsd-exporter (secor sidecar) — NO DHI image exists; centralized on upstream prom/ image
+  statsd-exporter: &statsd-exporter
+    registry: "docker.io"
+    repository: "prom/statsd-exporter"
+    tag: "v0.28.0"
+    digest: ""
+
+  # redis-exporter sidecar (valkey metrics)
+  redis-exporter: &redis-exporter
+    registry: "dhi.io"
+    repository: "redis-exporter"
+    tag: "1-debian13"
+    digest: ""
+
+  # zookeeper (druid-raw + kafka coordination). DHI upstream apache zookeeper.
+  zookeeper: &zookeeper
+    registry: "dhi.io"
+    repository: "zookeeper"
+    tag: "3.9-jre23-debian13"
+    digest: ""
+
+  # velero-plugin-for-aws — velero initContainers[].image is a plain string, so this anchor is a string
+  velero-plugin-for-aws-image: &velero-plugin-for-aws-image "dhi.io/velero-plugin-for-aws:1-debian13"
+
+  # memcached-exporter (loki cache metrics) — NO DHI; upstream prom/ (loki uses repository as full path)
+  memcached-exporter: &memcached-exporter
+    repository: "prom/memcached-exporter"
+    tag: "v0.14.2"
+    digest: ""
+
+  # configmap-reload (promtail sidecar) — NO DHI; upstream
+  configmap-reload: &configmap-reload
+    registry: "docker.io"
+    repository: "jimmidyson/configmap-reload"
+    tag: "v0.8.0"
+    digest: ""
+
+  # minio-client (minio mc) — NO DHI; obsrv-owned
+  minio-client: &minio-client
+    registry: "docker.io"
+    repository: "sanketikahub/minio-client"
+    tag: "2024.11.7-debian-12-r0"
+    digest: ""
+
+  # alpine base (secor setPvOwnership chown init) — DHI alpine-base has shell + chown
+  alpine: &alpine
+    registry: "dhi.io"
+    repository: "alpine-base"
+    tag: "3.24-alpine3.24"
+    digest: ""
+
   s3-exporter: &s3-exporter
     registry: "docker.io"
     repository: "ribbybibby/s3-exporter"
@@ -242,10 +340,11 @@ images: &images
     tag: "6.1.0"
     digest: ""
 
+  # DHI-hardened secor (Dockerfiles/secor/Dockerfile.hardened; eclipse-temurin JDK11 DHI base)
   secor: &secor
-    # registry: *global_registry
+    registry: sanketikahub
     repository: "secor"
-    tag: "0.29.2-kafka-4.0"
+    tag: "0.29.2-kafka-4.0-dhi"
     digest: ""
 
   spark: &spark # registry: ""
@@ -362,9 +461,11 @@ images: &images
     digest: ""
 
   trino: &trino
-    registry: "docker.io"
-    repository: trinodb/trino
-    tag: "476"
+    # DHI: -compat variant REQUIRED (minimal 483-debian13 lacks the hudi connector; compat bundles
+    # hudi/hive/iceberg/delta-lake). Version bumped 476 -> 483 (DHI's available trino line).
+    registry: "dhi.io"
+    repository: trino
+    tag: "483-debian13-compat"
     digest: ""
 
   promitor-agent-scraper: &promitor-agent-scraper
@@ -391,10 +492,12 @@ images: &images
     repository: "docker.io/sanketikahub/kubectl"
     tag: "1.26.14-debian-11-r6"
 
+  # Custom DHI-hardened kubectl+curl+jq+openssl+psql image (Dockerfiles/kubectl/Dockerfile.hardened);
+  # stock DHI kubectl is shell-less and cannot run the sh-wrapped kubectl/openssl/curl jobs.
   sanketikahub-kubectl: &sanketikahub-kubectl
-    registry: dhi.io
+    registry: sanketikahub
     repository: kubectl
-    tag: "1.32-debian13"
+    tag: "1.32-dhi"
     digest: ""
 
 # Public charts like bitnami etc
@@ -426,23 +529,38 @@ internal: &internal
 
   config-api:
     <<: *config-api
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
     kubectl:
       image:
         <<: *sanketikahub-kubectl
+
+  # bootstrapper (obsrv-bootstrap / enterprise bootstrap) reads root .Values.kubectl.image
+  # for the openssl+kubectl secrets job (was hardcoded sanketikahub/kubectl in the template)
+  kubectl:
+    image:
+      <<: *sanketikahub-kubectl
 
   postgresql:
     image:
       <<: *postgresql
       pullSecrets:
       - name: *dockerSecretName
+    volumePermissions:
+      image:
+        <<: *os-shell
+    metrics:
+      image:
+        <<: *postgresql-exporter
 
   hms:
     image:
       <<: *hms
-      imagePullSecrets: 
+      imagePullSecrets:
       - name: *dockerSecretName
+    test:
+      image:
+        <<: *os-shell
 
   trino:
     image:
@@ -473,26 +591,61 @@ internal: &internal
   velero:
     image:
       <<: *velero
-    imagePullSecrets: 
+    imagePullSecrets:
     - *dockerSecretName
     kubectl:
       image:
-        <<: *kubectl
+        <<: *sanketikahub-kubectl
+    initContainers:
+      - name: velero-plugin-for-aws
+        image: *velero-plugin-for-aws-image
+        volumeMounts:
+          - name: plugins
+            mountPath: /target
+
+  masterdata-indexer-cron:
+    <<: *sanketikahub-kubectl
+    imagePullSecrets:
+    - name: *dockerSecretName
 
   valkey-dedup:
     image:
       <<: *valkey
       pullSecrets:
       - name: *dockerSecretName
+    sentinel:
+      image:
+        <<: *valkey
+    volumePermissions:
+      image:
+        <<: *os-shell
+    kubectl:
+      image:
+        <<: *sanketikahub-kubectl
+    metrics:
+      image:
+        <<: *redis-exporter
 
   valkey-denorm:
     image:
       <<: *valkey
       pullSecrets:
       - name: *dockerSecretName
+    sentinel:
+      image:
+        <<: *valkey
+    volumePermissions:
+      image:
+        <<: *os-shell
+    kubectl:
+      image:
+        <<: *sanketikahub-kubectl
+    metrics:
+      image:
+        <<: *redis-exporter
 
   loki:
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
     singleBinary:
       image:
@@ -500,6 +653,17 @@ internal: &internal
     gateway:
       image:
         <<: *loki-gateway
+    sidecar:
+      image:
+        <<: *loki-sidecar
+    memcached:
+      image:
+        <<: *memcached
+    memcachedExporter:
+      image:
+        <<: *memcached-exporter
+    kubectlImage:
+      <<: *sanketikahub-kubectl
 
   kubernetes-reflector:
     imagePullSecrets: 
@@ -515,6 +679,21 @@ internal: &internal
       prometheusSpec:
         image:
           <<: *prometheus
+        thanos:
+          image:
+            <<: *thanos
+    thanosRuler:
+      thanosRulerSpec:
+        image:
+          <<: *thanos
+    kube-state-metrics:
+      kubeRBACProxy:
+        image:
+          <<: *kube-rbac-proxy
+    prometheus-node-exporter:
+      kubeRBACProxy:
+        image:
+          <<: *kube-rbac-proxy
     alertmanager:
       imagePullSecrets:
         - name: *dockerSecretName
@@ -589,11 +768,17 @@ internal: &internal
       <<: *druid_exporter
       pullSecrets:
       - name: *dockerSecretName
+    test:
+      image:
+        <<: *os-shell
 
   druid-raw-cluster:
     <<: *druid-raw-cluster
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
+    zookeeper:
+      image:
+        <<: *zookeeper
 
   druid-operator:
     imagePullSecrets: 
@@ -619,10 +804,20 @@ internal: &internal
   kafka:
     image:
       <<: *kafka
-    # metrics: # The kafka exporter is being deployed from the kafka chart
-    #   kafka:
-    #     image:
-    #       <<: *kafka-exporter
+    metrics:
+      kafka:
+        image:
+          <<: *kafka-exporter
+      jmx:
+        image:
+          <<: *jmx
+    volumePermissions:
+      image:
+        <<: *os-shell
+    externalAccess:
+      autoDiscovery:
+        image:
+          <<: *sanketikahub-kubectl
 
   kafka40:
     image:
@@ -633,6 +828,16 @@ internal: &internal
       kafka:
         image:
           <<: *kafka-exporter
+      jmx:
+        image:
+          <<: *jmx
+    defaultInitContainers:
+      volumePermissions:
+        image:
+          <<: *os-shell
+      autoDiscovery:
+        image:
+          <<: *sanketikahub-kubectl
 
   kong:
     image:
@@ -644,6 +849,13 @@ internal: &internal
         <<: *kubernetes-ingress-controller
         pullSecrets:
         - *dockerSecretName
+    test:
+      curl:
+        image:
+          <<: *curl
+      httpbin:
+        image:
+          <<: *httpbin
 
   cert-manager:
     imagePullSecrets: 
@@ -671,8 +883,14 @@ internal: &internal
 
   secor:
     <<: *secor
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
+    exporter:
+      image:
+        <<: *statsd-exporter
+    setPvOwnership:
+      image:
+        <<: *alpine
 
   superset:
     <<: *superset
@@ -724,7 +942,12 @@ internal: &internal
       <<: *minio
       pullSecrets:
       - name: *dockerSecretName
-      
+    clientImage:
+      <<: *minio-client
+    volumePermissions:
+      image:
+        <<: *os-shell
+
   opentelemetry-collector:
     image:
     <<: *opentelemetry-collector
@@ -736,8 +959,12 @@ internal: &internal
 
   promtail:
     <<: *promtail
-    imagePullSecrets: 
+    imagePullSecrets:
     - name: *dockerSecretName
+    sidecar:
+      configReloader:
+        image:
+          <<: *configmap-reload
 
   submit-ingestion:
     <<: *sanketikahub-kubectl
