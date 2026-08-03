@@ -1,0 +1,22 @@
+# From helmcharts/services/flink/values.yaml (flink_conf, shared by all jobs).
+#
+# CHANGED FOR LOCAL: taskmanager.numberOfTaskSlots raised 1 -> 2.
+# unified-pipeline.conf asks for consumer.parallelism = 2 and
+# downstream.operators.parallelism = 2, but the chart ships 1 slot with
+# scheduler-mode: reactive, which caps parallelism at the available slots.
+# With 1 slot the job cannot reach its requested parallelism.
+jobmanager.memory.flink.size: 1024m
+taskmanager.memory.flink.size: 1024m
+taskmanager.numberOfTaskSlots: 2
+jobmanager.numberOfTaskSlots: 1
+parallelism.default: 1
+jobmanager.execution.failover-strategy: region
+taskmanager.memory.network.fraction: 0.1
+scheduler-mode: reactive
+heartbeat.timeout: 8000
+heartbeat.interval: 5000
+state.savepoints.dir: file:///tmp
+
+# cache-indexer adds these two in the chart; harmless for both jobs.
+state.checkpoint.interval: 60000
+state.checkpoint.pause.between.seconds: 5000

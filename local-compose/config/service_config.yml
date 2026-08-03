@@ -1,0 +1,76 @@
+## Localized copy of helmcharts/services/command-api/configs/service_config.yml
+## Kubernetes service DNS names replaced with docker-compose service names.
+##
+## LIMITATION: command-api drives Flink/Spark via the Kubernetes API and Helm.
+## Outside Kubernetes the PUBLISH_DATASET steps START_PIPELINE_JOBS and
+## DEPLOY_CONNECTORS will fail. CREATE_KAFKA_TOPIC, MAKE_DATASET_LIVE,
+## SUBMIT_INGESTION_TASKS and CREATE_AUDIT_EVENT only need Kafka/Postgres/Druid
+## and do work locally.
+
+flink:
+  namespace: flink
+  reinstall_sleep_time: 3
+  jobs:
+    - name: UnifiedPipelineJob
+      release_name: unified-pipeline
+      job_manager_url: unified-pipeline-jobmanager:8081
+    - name: CacheIndexerJob
+      release_name: cache-indexer
+      job_manager_url: cache-indexer-jobmanager:8081
+
+commands:
+  PUBLISH_DATASET:
+    workflow:
+      - CREATE_KAFKA_TOPIC
+      - MAKE_DATASET_LIVE
+      - SUBMIT_INGESTION_TASKS
+      - CREATE_AUDIT_EVENT
+  RESTART_PIPELINE:
+    workflow:
+      - START_PIPELINE_JOBS
+  RESTART_CONNECTORS:
+    workflow:
+      - DEPLOY_CONNECTORS
+
+postgres:
+  db_host: postgres
+  db_port: "5432"
+  db_user: obsrv
+  db_password: obsrv123
+  database: obsrv
+
+druid:
+  router_host: druid
+  router_port: "8888"
+  username: admin
+  password: admin123
+  supervisor_endpoint: indexer/v1/supervisor
+  ingestion_endpoint: ""
+
+kafka:
+  brokers: kafka:9092
+  telemetry:
+    topic: system.telemetry.events
+  replication_factor: 1
+  no_of_partitions: 1
+
+helm_charts_base_dir: /app/helm-charts
+
+connector_registry:
+  download_path: /tmp/connector-registry
+  metadata_file_name: metadata.json
+  ui_spec_file: ui-config.json
+
+connector_jobs:
+  spark:
+    namespace: spark
+    base_helm_chart: spark-connector-cron
+  flink:
+    namespace: flink-connectors
+    base_helm_chart: flink-connector
+
+node_selector:
+spark_connector_container_security_context:
+spark_connector_pod_security_context:
+flink_connector_container_security_context:
+flink_connector_pod_security_context:
