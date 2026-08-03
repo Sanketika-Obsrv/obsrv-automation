@@ -19,9 +19,10 @@ imagePullSecrets: &imagePullSecrets
 
 images: &images
   ## Obsrv Images
-  command-api: &command-api # registry: ""
+  command-api: &command-api # TEST: DHI image on jerald (revert after install.sh test)
+    registry: sanketikahub
     repository: obsrv-command-service
-    tag: "2.0.0"
+    tag: "2.2.0"
     digest: ""
 
   # dataset-api: #open source
@@ -31,8 +32,9 @@ images: &images
   #   digest: ""
 
   dataset-api: &dataset-api # registry: ""
+    registry: sanketikahub
     repository: obsrv-api-service
-    tag: "2.1.1"
+    tag: "2.2.0"
     digest: ""
 
   config-api: &config-api # registry: ""
@@ -40,22 +42,23 @@ images: &images
     tag: "1.2.0-RC"
     digest: ""
 
-  web-console: &web-console # registry: ""
+  web-console: &web-console # TEST: DHI craco image on jerald (revert after install.sh test)
+    registry: sanketikahub
     repository: "obsrv-web-console"
-    tag: "1.4.2"
+    tag: "2.2.0"
     digest: ""
 
   ## PIPELINE ENTERPRISE
   unified-pipeline: &unified-pipeline
-    registry: *global_registry
+    registry: sanketikahub
     repository: unified-pipeline
-    tag: "2.0.1"
+    tag: "2.2.0"
     digest: ""
 
   cache-indexer: &cache-indexer
-    registry: *global_registry
+    registry: sanketikahub
     repository: cache-indexer
-    tag: "2.0.1"
+    tag: "2.2.0"
     digest: ""
 
   ## PIPELINE ENTERPRISE - INDIVIDUAL COMPONENTS
@@ -71,8 +74,9 @@ images: &images
     digest: ""
 
   postgresql-backup: &postgresql-backup # registry: ""
+    registry: sanketikahub
     repository: postgresql-backup
-    tag: "17.2-r0"
+    tag: "2.2.0"
     digest: ""
 
   postgresql: &postgresql
@@ -226,8 +230,9 @@ images: &images
   #   digest: ""
 
   system-rules-ingestor: &system-rules-ingestor # registry: ""
+    registry: sanketikahub
     repository: "system-rules-ingestor"
-    tag: "1.7.0"
+    tag: "2.2.0"
     digest: ""
 
   loki: &loki
@@ -335,21 +340,22 @@ images: &images
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
   superset: &superset
-    registry: *global_registry
+    registry: sanketikahub
     repository: "superset"
-    tag: "6.1.0"
+    tag: "2.2.0"
     digest: ""
 
   # DHI-hardened secor (Dockerfiles/secor/Dockerfile.hardened; eclipse-temurin JDK11 DHI base)
   secor: &secor
     registry: sanketikahub
     repository: "secor"
-    tag: "0.29.2-kafka-4.0-dhi"
+    tag: "2.2.0"
     digest: ""
 
   spark: &spark # registry: ""
-    repository: "sanketikahub/spark"
-    tag: "3.5.1-debian-12-r6"
+    registry: sanketikahub
+    repository: "spark"
+    tag: "2.2.0"
     digest: ""
 
   cert_manager_cainjector: &cert_manager_cainjector
@@ -421,8 +427,9 @@ images: &images
     digest: ""
 
   kafka-message-exporter: &kafka-message-exporter # registry: ""
+    registry: sanketikahub
     repository: kafka-message-exporter
-    tag: 1.2.0-RC
+    tag: "2.2.0"
     digest: ""
 
   druid_operator: &druid_operator
@@ -474,8 +481,9 @@ images: &images
     pullSecrets: []
 
   lakehouse-connector: &lakehouse-connector
+    registry: sanketikahub
     repository: lakehouse-connector
-    tag: 2.2.0
+    tag: "2.2.0"
 
 
   opentelemetry-collector: &opentelemetry-collector
@@ -497,7 +505,7 @@ images: &images
   sanketikahub-kubectl: &sanketikahub-kubectl
     registry: sanketikahub
     repository: kubectl
-    tag: "1.32-dhi"
+    tag: "2.2.0"
     digest: ""
 
 # Public charts like bitnami etc
