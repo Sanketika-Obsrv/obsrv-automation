@@ -451,8 +451,8 @@ images: &images
 
   keycloakConfigCli: &keycloakConfigCli
     registry: docker.io
-    repository: adorsys/keycloak-config-cli
-    tag: 6.5.1-26.1.0
+    repository: sanketikahub/keycloak-config-cli
+    tag: 2.2.0
 
   hms: &hms
     # registry: ""
@@ -475,7 +475,7 @@ images: &images
 
   lakehouse-connector: &lakehouse-connector
     repository: lakehouse-connector
-    tag: 1.8.0
+    tag: 2.2.0
 
 
   opentelemetry-collector: &opentelemetry-collector
