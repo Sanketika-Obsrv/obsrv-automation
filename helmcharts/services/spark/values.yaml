@@ -165,7 +165,11 @@ master:
   ##  - name: SPARK_DAEMON_JAVA_OPTS
   ##    value: -Dx=y
   ##
-  extraEnvVars: []
+  extraEnvVars:
+    - name: SPARK_MASTER_HOST
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
   ## @param master.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for master nodes
   ##
   extraEnvVarsCM: "spark-env"
@@ -181,9 +185,9 @@ master:
   ## @param master.podSecurityContext.seLinuxOptions Set master pod's Security Context SELinux options
   ##
   podSecurityContext:
-    enabled: false
-    fsGroup: 1001
-    runAsUser: 1001
+    enabled: true
+    fsGroup: 65532
+    runAsUser: 65532
     runAsGroup: 0
     seLinuxOptions: {}
   ## Configure Container Security Context
@@ -195,7 +199,7 @@ master:
   ##
   containerSecurityContext:
     enabled: false
-    runAsUser: 1001
+    runAsUser: 65532
     runAsNonRoot: false
     readOnlyRootFilesystem: false
   ## @param master.command Override default container command (useful when using custom images)
@@ -285,9 +289,9 @@ master:
         - "/bin/bash"
         - "-c"
         - |+
-          /opt/bitnami/livy/bin/livy-server start
-          /opt/bitnami/spark/sbin/start-history-server.sh
-          /opt/bitnami/spark/conf/custom-init.sh
+          /opt/livy/bin/livy-server start
+          /opt/spark/sbin/start-history-server.sh
+          /opt/spark/conf/custom-init.sh
           python3 /data/connectors-init/connector.py
   ## @param master.extraVolumes Optionally specify extra list of additional volumes for the master pod(s)
   ##
@@ -301,7 +305,7 @@ master:
     - name: "{{ .Values.persistence.masterTmp.name }}"
       mountPath: /tmp
     - name: "{{ .Values.persistence.masterMetadata.name }}"
-      mountPath: /opt/bitnami/spark/spark-metadata
+      mountPath: /opt/spark/spark-metadata
     - name: "{{ .Values.persistence.connectorData.name }}"
       mountPath: /data/connectors
     - name: flink-config
@@ -496,9 +500,9 @@ worker:
   ## @param worker.podSecurityContext.seLinuxOptions SELinux options for the container
   ##
   podSecurityContext:
-    enabled: false
-    fsGroup: 1001
-    runAsUser: 1001
+    enabled: true
+    fsGroup: 65532
+    runAsUser: 65532
     runAsGroup: 0
     seLinuxOptions: {}
   ## Configure Container Security Context
@@ -510,7 +514,7 @@ worker:
   ##
   containerSecurityContext:
     enabled: false
-    runAsUser: 1001
+    runAsUser: 65532
     runAsNonRoot: true
     readOnlyRootFilesystem: false
   ## @param worker.command Override default container command (useful when using custom images)
@@ -605,8 +609,8 @@ worker:
         - "/bin/bash"
         - "-c"
         - |+
-          /opt/bitnami/spark/conf/custom-init.sh
-          chmod 777 /tmp
+          /opt/spark/conf/custom-init.sh || true
+          chmod 777 /tmp || true
   ## @param worker.extraVolumes Optionally specify extra list of additional volumes for the worker pod(s)
   ##
   extraVolumes: []
@@ -616,7 +620,7 @@ worker:
     - name: "{{ .Values.persistence.workerTmp.name }}"
       mountPath: /tmp
     - name: "{{ .Values.persistence.workerMetadata.name }}"
-      mountPath: /opt/bitnami/spark/spark-metadata
+      mountPath: /opt/spark/spark-metadata
   ## Container resource requests and limits
   ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
   ## We usually recommend not to specify default resources and to leave this as a conscious

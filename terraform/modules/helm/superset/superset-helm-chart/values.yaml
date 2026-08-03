@@ -31,7 +31,7 @@ oauth:
   whitelist_domain: ""
   user_registration_role: "Gamma"
 
-runAsUser: 1000
+runAsUser: 65532  # DHI superset bakes /app as 0770 owned uid 65532; must match or gunicorn exec fails
 
 # Install additional packages and do any other bootstrap configuration in this script
 # For production clusters it's recommended to build own image with this step done in CI
