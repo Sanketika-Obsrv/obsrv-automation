@@ -17,7 +17,7 @@ kubectl:
   image:
     registry: sanketikahub
     repository: "kubectl"
-    tag: "1.32-dhi"
+    tag: "2.2.0"
     digest: ""
 
 imagePullPolicy: IfNotPresent
