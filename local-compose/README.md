@@ -14,37 +14,62 @@ Kubernetes, the reason is in a comment next to it.
 | APIs | `dataset-api`, `command-api` | always |
 | UI | `web-console`, `nginx` (Kong stand-in) | always |
 | Realtime store | `zookeeper`, `druid` (all five roles in one container) | `druid` |
-| Pipeline | `unified-pipeline-{jobmanager,taskmanager}`, `cache-indexer-{jobmanager,taskmanager}` | `flink` |
+| Pipeline | `unified-pipeline-{jobmanager,taskmanager}` | `flink` |
+| Master data | `cache-indexer-{jobmanager,taskmanager}` | `masterdata` |
 
 ## Memory
 
 This is the binding constraint, not CPU.
 
-Measured idle, before any ingestion:
+Measured after running the ingest → query path, so these include real
+ingestion rather than idle:
 
-| Selection | Measured RSS |
-|---|---|
-| Control plane only (no profiles) | ~2.3 GB |
-| `+ druid` | ~5.3 GB |
-| `+ druid,flink` | ~8.0 GB |
+| Selection | Measured RSS | What it gives you |
+|---|---|---|
+| Control plane only (no profiles) | ~2.2 GB | console, auth, APIs, Kafka, Postgres |
+| `+ druid` | ~5.3 GB | the above plus a queryable realtime store |
+| `+ druid,flink` (default) | ~6.7 GB | the full event-dataset path, end to end |
+| `+ masterdata` | ~7.9 GB | adds master datasets / denormalization |
 
-`.env` enables both profiles by default. **Give Docker Desktop 12 GB** for the
-full stack, or trim `COMPOSE_PROFILES` in `.env`. Check what you have with
+`.env` enables `druid,flink` by default — the smallest selection that runs a
+dataset end to end. **Give Docker Desktop 10 GB**, or trim `COMPOSE_PROFILES`
+in `.env` to go smaller. Check what you have with
 `docker info --format '{{.MemTotal}}'`.
 
-12 GB against a measured 8 GB is deliberate headroom, not slack: those numbers
-are idle, and the Flink task managers and the Druid indexer are what grow once
-data flows. Running this stack on a VM sized close to 8 GB has crashed the
-Docker daemon outright, taking every container down at once.
+10 GB against a measured 6.7 GB is deliberate headroom, not slack: the Flink
+taskmanager and the Druid indexer grow once data flows. Running this stack on a
+VM sized close to its measured floor has crashed the Docker daemon outright,
+taking every container down at once.
+
+`cache-indexer` is behind its own profile because it only handles master
+datasets — its config is `dataset.type = "master-dataset"` reading the
+`masterdata.*` topics. Plain event datasets go entirely through
+`unified-pipeline`, so most first-time users never need it. Add it with
+`COMPOSE_PROFILES=druid,flink,masterdata`.
+
+The Flink memory numbers are deliberately below the chart's: managed memory is
+set to 0 (it is only used by the RocksDB state backend, which is not
+configured — Obsrv keeps dedup/denorm state in Valkey), and jobmanagers get
+384m of Flink memory instead of the chart's 1024m since in application mode
+they only coordinate. See `docs/obsrv-local-docker-compose.md` for the full
+reasoning.
 
 ## Start
 
 ```bash
 cd local-compose
+cp .env.example .env                # once: ports + which profiles come up
 ./scripts/gen-token-env.sh          # once: PEM keypair -> secrets/tokens.env
 docker compose up -d
 docker compose logs -f flyway keycloak-init kafka-topics-init
 ```
+
+Don't skip the `.env` copy. `.env` is gitignored so local port changes stay
+local, and every variable in it except `COMPOSE_PROFILES` has a default baked
+into `docker-compose.yaml`. `COMPOSE_PROFILES` is read by the Compose CLI
+itself rather than by the compose file, so without `.env` it is simply unset —
+`docker compose up -d` then brings up the control plane alone, with no Druid
+and no Flink, and publishing a dataset fails in confusing ways.
 
 Then open **http://localhost:8080/console** and log in as
 `obsrv_admin` / `enDoPvTAxFSd`.

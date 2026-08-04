@@ -34,7 +34,8 @@ topology had to change to run outside Kubernetes.
 | APIs | `dataset-api`, `command-api` |
 | UI/ingress | `web-console`, `nginx` (Kong stand-in) |
 | Realtime store | `zookeeper`, `druid` — one container running all five Druid roles (profile `druid`) |
-| Pipeline | `unified-pipeline-{jobmanager,taskmanager}`, `cache-indexer-{jobmanager,taskmanager}` (profile `flink`) |
+| Pipeline | `unified-pipeline-{jobmanager,taskmanager}` (profile `flink`) |
+| Master data | `cache-indexer-{jobmanager,taskmanager}` (profile `masterdata`, off by default) |
 
 Full detail, credentials, ports, and start/reset instructions:
 `local-compose/README.md`.
@@ -188,21 +189,45 @@ supervisor, and the status-transition state machine has no path back from
 dataset_id = ...`. This is vendor image code (`obsrv-command-service`), not
 something fixable here.
 
-Measured steady-state memory, idle, on a 11.67 GiB Docker Desktop VM — ~8.0 GB
-total across all 15 containers. This is lower than the ~11 GB the README
-previously estimated, mostly because collapsing Druid into one container
-removed four containers' base overhead:
+Measured memory on a 11.67 GiB Docker Desktop VM, after running the ingest →
+query path (so these include real ingestion, not just idle):
 
-| Selection | Measured RSS |
-|---|---|
-| Control plane only (no profiles) | ~2.3 GB |
-| `+ druid` | ~5.3 GB |
-| `+ druid,flink` | ~8.0 GB |
+| Selection | Measured RSS | What it gives you |
+|---|---|---|
+| Control plane only (no profiles) | ~2.2 GB | console, auth, APIs, Kafka, Postgres |
+| `+ druid` | ~5.3 GB | the above plus a queryable realtime store |
+| `+ druid,flink` (default) | ~6.7 GB | the full event-dataset path, end to end |
+| `+ masterdata` | ~7.9 GB | adds master datasets / denormalization |
 
-Treat these as a floor rather than a budget: they are idle figures taken before
-any ingestion, and the Flink task managers and Druid indexer are what grow
-under load. One caveat worth recording — the Docker daemon itself crashed
-outright during an earlier boot attempt of this stack, taking every container
-down at once; leaving real headroom above the numbers above is prudent.
+The default selection fits inside an 8 GB Docker VM. Getting there took four
+changes beyond collapsing Druid into one container, all traceable to values the
+charts size for production clusters:
+
+- **Flink managed memory set to 0** (`taskmanager.memory.managed.size`, was the
+  0.4 default = 410 MB reserved per taskmanager). Managed memory is only
+  consumed by the RocksDB state backend, batch operators and Python UDFs. No
+  `state.backend` is configured, so these jobs use the heap state backend, and
+  Obsrv keeps dedup/denorm state in Valkey — the reservation was never used.
+  `taskmanager.memory.flink.size` drops 1024m → 614m to give it back, leaving
+  heap and network sizing untouched.
+- **JobManagers sized separately from TaskManagers.** The chart gives both
+  1024m, which works out to an 896 MB JobManager heap. In application mode a
+  JobManager only coordinates — no records pass through it — so 384m of Flink
+  memory (256m heap) is ample. `jobmanager.*` and `taskmanager.*` are distinct
+  keys, so one shared `flink-conf.yaml` still covers both. Total process memory
+  per JobManager: 1.438 GB → 832 MB.
+- **`cache-indexer` moved to its own `masterdata` profile.** Its config is
+  `dataset.type = "master-dataset"` on the `masterdata.*` topics; plain event
+  datasets go entirely through `unified-pipeline`. Verified the full
+  create → publish → ingest → query path with it stopped.
+- **Kafka heap pinned to `-Xms256m -Xmx512m`.** It was the only JVM left on its
+  image default (`-Xms1G -Xmx1G`), and since `Xms == Xmx` the JVM committed the
+  full gigabyte at startup.
+
+Together these took the 15-container footprint from ~10.5 GB to ~8.0 GB, and
+the default 13-container selection to ~6.7 GB. Treat them as a floor: the Flink
+taskmanager and Druid indexer grow under sustained load, and the Docker daemon
+itself crashed outright during an earlier boot attempt of this stack, so leaving
+real headroom is prudent.
 
 See `local-compose/README.md` for start/reset commands and full credentials.

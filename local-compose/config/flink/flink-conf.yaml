@@ -5,8 +5,21 @@
 # downstream.operators.parallelism = 2, but the chart ships 1 slot with
 # scheduler-mode: reactive, which caps parallelism at the available slots.
 # With 1 slot the job cannot reach its requested parallelism.
-jobmanager.memory.flink.size: 1024m
-taskmanager.memory.flink.size: 1024m
+# CHANGED FOR LOCAL: jobmanager sized independently of taskmanager (the chart
+# gives both 1024m). In application mode the JobManager only coordinates --
+# no records pass through it -- so 384m of Flink memory (256m heap + 128m
+# off-heap) is ample, vs the 896m heap the chart's 1024m works out to.
+jobmanager.memory.flink.size: 384m
+# CHANGED FOR LOCAL: 1024m -> 614m, entirely by giving back managed memory
+# below. Heap and network sizing are unchanged from the chart.
+taskmanager.memory.flink.size: 614m
+# CHANGED FOR LOCAL: the chart leaves this at the 0.4 default, which reserves
+# 410m per taskmanager. Managed memory is only used by the RocksDB state
+# backend, batch operators and Python UDFs -- none of which apply here (no
+# state.backend is set, so these jobs run on the heap state backend), so that
+# reservation was pure overhead. Obsrv keeps its dedup/denorm state in Valkey,
+# not in Flink managed memory.
+taskmanager.memory.managed.size: 0
 taskmanager.numberOfTaskSlots: 2
 jobmanager.numberOfTaskSlots: 1
 parallelism.default: 1

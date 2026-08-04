@@ -7,7 +7,10 @@
 #   (always)         postgres, kafka, valkey x2, flyway, keycloak, nginx,
 #                    dataset-api, command-api, web-console
 #   profile "druid"  zookeeper + coordinator/broker/historical/indexer/router
-#   profile "flink"  unified-pipeline and cache-indexer (jobmanager + taskmanager)
+#   profile "flink"  unified-pipeline (jobmanager + taskmanager)
+#   profile "masterdata"
+#                    cache-indexer (jobmanager + taskmanager) -- master
+#                    datasets / denormalization only, off by default
 #
 # .env enables both profiles by default. Comment COMPOSE_PROFILES out there to
 # run just the control plane on a small Docker memory budget.
@@ -131,6 +134,10 @@ services:
       # 5MB, to match the Flink producers' max-request-size = 5242880.
       KAFKA_MESSAGE_MAX_BYTES: 5242880
       CLUSTER_ID: obsrv-local-cluster-0001
+      # The image defaults to -Xms1G -Xmx1G, and since Xms == Xmx the JVM
+      # commits the full gigabyte at startup. Local topic volumes are tiny;
+      # 512m is ample and gives that back.
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
     volumes:
       - kafka-data:/var/lib/kafka/data
     ports:
@@ -308,11 +315,18 @@ services:
       - ./config/flink/baseconfig.conf:/data/flink/conf/baseconfig.conf:ro
       - ./config/flink/unified-pipeline.conf:/data/flink/conf/unified-pipeline.conf:ro
 
+  # cache-indexer handles master datasets only -- cache-indexer.conf is
+  # dataset.type = "master-dataset" reading the masterdata.* topics, and it
+  # populates the Valkey denorm cache. Plain event datasets (create ->
+  # publish -> ingest -> query) go entirely through unified-pipeline and never
+  # touch it, so it sits behind its own profile to keep the default footprint
+  # down. Enable it (COMPOSE_PROFILES=...,masterdata) to work with master
+  # datasets or denormalization.
   cache-indexer-jobmanager:
     <<: *obsrv-platform
     image: sanketikahub/cache-indexer:2.0.1
     container_name: obsrv-cache-indexer-jobmanager
-    profiles: [flink]
+    profiles: [masterdata]
     restart: unless-stopped
     networks: [obsrv]
     depends_on:
@@ -345,7 +359,7 @@ services:
     <<: *obsrv-platform
     image: sanketikahub/cache-indexer:2.0.1
     container_name: obsrv-cache-indexer-taskmanager
-    profiles: [flink]
+    profiles: [masterdata]
     restart: unless-stopped
     networks: [obsrv]
     depends_on:
