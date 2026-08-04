@@ -462,9 +462,8 @@ images: &images
     tag: 2.2.0
 
   hms: &hms
-    # registry: ""
-    repository: hms
-    tag: "1.0.5"
+    repository: sanketikahub/hms
+    tag: "2.2.0"
     digest: ""
 
   trino: &trino
