@@ -8,7 +8,7 @@ metadata:
 {{- if .Values.prometheus.podmonitor.namespace }}
   namespace: {{ .Values.prometheus.podmonitor.namespace }}
 {{- else }}
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
 {{- end }}
   labels:
     app: {{ include "cert-manager.name" . }}
@@ -49,7 +49,7 @@ spec:
 {{- if .Values.prometheus.podmonitor.namespace }}
   namespaceSelector:
     matchNames:
-      - {{ include "cert-manager.namespace" . }}
+      - {{ include "base.namespace" . }}
 {{- end }}
   podMetricsEndpoints:
     - port: http-metrics

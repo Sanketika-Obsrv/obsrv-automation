@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/component: "webhook"
     {{- include "labels" . | nindent 4 }}
   annotations:
-    cert-manager.io/inject-ca-from-secret: {{ printf "%s/%s-ca" (include "cert-manager.namespace" .) (include "webhook.fullname" .) | quote }}
+    cert-manager.io/inject-ca-from-secret: {{ printf "%s/%s-ca" (include "base.namespace" .) (include "webhook.fullname" .) | quote }}
     {{- with .Values.webhook.mutatingWebhookConfigurationAnnotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -43,6 +43,6 @@ webhooks:
       {{- else }}
       service:
         name: {{ template "webhook.fullname" . }}
-        namespace: {{ include "cert-manager.namespace" . }}
+        namespace: {{ include "base.namespace" . }}
         path: /mutate
       {{- end }}

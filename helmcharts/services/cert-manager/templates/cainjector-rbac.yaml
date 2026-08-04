@@ -46,7 +46,7 @@ roleRef:
   name: {{ template "cainjector.fullname" . }}
 subjects:
   - name: {{ template "cainjector.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 ---
@@ -98,10 +98,10 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "cainjector.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
 {{- end }}
 {{- end }}
-{{- $certmanagerNamespace := include "cert-manager.namespace" . }}
+{{- $certmanagerNamespace := include "base.namespace" . }}
 {{- if (.Values.cainjector.config.metricsTLSConfig).dynamic }}
 {{- if $certmanagerNamespace | eq .Values.cainjector.config.metricsTLSConfig.dynamic.secretNamespace }}
 
@@ -112,7 +112,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: {{ template "cainjector.fullname" . }}:dynamic-serving
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: {{ include "cainjector.name" . }}
     app.kubernetes.io/name: {{ include "cainjector.name" . }}
@@ -137,7 +137,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ include "cainjector.fullname" . }}:dynamic-serving
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: {{ include "cainjector.name" . }}
     app.kubernetes.io/name: {{ include "cainjector.name" . }}
@@ -151,6 +151,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "cainjector.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
 {{- end }}
 {{- end }}

@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: {{ template "webhook.fullname" . }}:dynamic-serving
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: {{ include "webhook.name" . }}
     app.kubernetes.io/name: {{ include "webhook.name" . }}
@@ -15,7 +15,7 @@ rules:
   resources: ["secrets"]
   resourceNames:
   - '{{ template "webhook.fullname" . }}-ca'
-  {{- $certmanagerNamespace := include "cert-manager.namespace" . }}
+  {{- $certmanagerNamespace := include "base.namespace" . }}
   {{- with (.Values.webhook.config.metricsTLSConfig).dynamic }}
   {{- if $certmanagerNamespace | eq .secretNamespace }}
   # Allow webhook to read and update the metrics CA Secret when dynamic TLS is
@@ -35,7 +35,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ template "webhook.fullname" . }}:dynamic-serving
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: {{ include "webhook.name" . }}
     app.kubernetes.io/name: {{ include "webhook.name" . }}
@@ -49,7 +49,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ template "webhook.serviceAccountName" . }}
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
 
 ---
 
@@ -86,5 +86,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ template "webhook.serviceAccountName" . }}
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
 {{- end }}

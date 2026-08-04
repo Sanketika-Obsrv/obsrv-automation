@@ -17,6 +17,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "cainjector.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
 {{- end }}
 {{- end }}

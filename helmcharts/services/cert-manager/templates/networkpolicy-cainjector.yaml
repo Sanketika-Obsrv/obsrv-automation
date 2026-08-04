@@ -4,7 +4,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ template "cainjector.fullname" . }}-allow-ingress
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
 spec:
   ingress:
     {{- with .Values.cainjector.networkPolicy.ingress }}
@@ -22,7 +22,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: {{ template "cainjector.fullname" . }}-allow-egress
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
 spec:
   egress:
     {{- with .Values.cainjector.networkPolicy.egress }}

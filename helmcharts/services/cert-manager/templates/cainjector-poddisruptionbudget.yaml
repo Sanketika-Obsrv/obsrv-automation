@@ -3,7 +3,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ include "cainjector.fullname" . }}
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: {{ include "cainjector.name" . }}
     app.kubernetes.io/name: {{ include "cainjector.name" . }}

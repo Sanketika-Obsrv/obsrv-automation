@@ -783,9 +783,6 @@ internal: &internal
     <<: *druid-raw-cluster
     imagePullSecrets:
     - name: *dockerSecretName
-    zookeeper:
-      image:
-        <<: *zookeeper
 
   druid-operator:
     imagePullSecrets: 

@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "cainjector.fullname" . }}
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
 {{- with .Values.cainjector.serviceAnnotations }}
   annotations:
 {{ toYaml . | indent 4 }}

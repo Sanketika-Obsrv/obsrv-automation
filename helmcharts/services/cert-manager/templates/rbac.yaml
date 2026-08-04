@@ -41,7 +41,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
 
 ---
 
@@ -50,7 +50,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: {{ template "cert-manager.fullname" . }}-tokenrequest
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: {{ include "cert-manager.name" . }}
     app.kubernetes.io/name: {{ include "cert-manager.name" . }}
@@ -70,7 +70,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ include "cert-manager.fullname" . }}-tokenrequest
-  namespace: {{ include "cert-manager.namespace" . }}
+  namespace: {{ include "base.namespace" . }}
   labels:
     app: {{ include "cert-manager.name" . }}
     app.kubernetes.io/name: {{ include "cert-manager.name" . }}
@@ -84,7 +84,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
 {{- end }}
 
 ---
@@ -336,7 +336,7 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-issuers
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 ---
@@ -357,7 +357,7 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-clusterissuers
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 ---
@@ -378,7 +378,7 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-certificates
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 ---
@@ -399,7 +399,7 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-orders
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 ---
@@ -420,7 +420,7 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-challenges
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 ---
@@ -441,7 +441,7 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-ingress-shim
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 {{- if .Values.global.rbac.aggregateClusterRoles }}
@@ -576,7 +576,7 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-approve:cert-manager-io
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 
 ---
@@ -629,6 +629,6 @@ roleRef:
   name: {{ template "cert-manager.fullname" . }}-controller-certificatesigningrequests
 subjects:
   - name: {{ template "cert-manager.serviceAccountName" . }}
-    namespace: {{ include "cert-manager.namespace" . }}
+    namespace: {{ include "base.namespace" . }}
     kind: ServiceAccount
 {{- end }}
