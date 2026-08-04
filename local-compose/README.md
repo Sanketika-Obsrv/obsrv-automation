@@ -13,22 +13,29 @@ Kubernetes, the reason is in a comment next to it.
 | Auth | `keycloak`, `keycloak-init` (one-shot) | always |
 | APIs | `dataset-api`, `command-api` | always |
 | UI | `web-console`, `nginx` (Kong stand-in) | always |
-| Realtime store | `zookeeper`, `druid-coordinator`, `druid-broker`, `druid-historical`, `druid-indexer`, `druid-router` | `druid` |
+| Realtime store | `zookeeper`, `druid` (all five roles in one container) | `druid` |
 | Pipeline | `unified-pipeline-{jobmanager,taskmanager}`, `cache-indexer-{jobmanager,taskmanager}` | `flink` |
 
 ## Memory
 
 This is the binding constraint, not CPU.
 
-| Selection | Rough RSS |
-|---|---|
-| Control plane only (no profiles) | ~3.5 GB |
-| `+ druid` | ~7 GB |
-| `+ druid,flink` | ~11 GB |
+Measured idle, before any ingestion:
 
-`.env` enables both profiles by default. **Raise Docker Desktop to 12 GB** for
-the full stack, or trim `COMPOSE_PROFILES` in `.env`. Check what you have with
+| Selection | Measured RSS |
+|---|---|
+| Control plane only (no profiles) | ~2.3 GB |
+| `+ druid` | ~5.3 GB |
+| `+ druid,flink` | ~8.0 GB |
+
+`.env` enables both profiles by default. **Give Docker Desktop 12 GB** for the
+full stack, or trim `COMPOSE_PROFILES` in `.env`. Check what you have with
 `docker info --format '{{.MemTotal}}'`.
+
+12 GB against a measured 8 GB is deliberate headroom, not slack: those numbers
+are idle, and the Flink task managers and the Druid indexer are what grow once
+data flows. Running this stack on a VM sized close to 8 GB has crashed the
+Docker daemon outright, taking every container down at once.
 
 ## Start
 
@@ -106,16 +113,42 @@ are out of scope.
 **No object store.** `obsrv-core/framework/.../baseconfig.conf` ships
 `job.enable.distributed.checkpointing = false`, so Flink checkpoints to the local
 filesystem, and Druid uses `druid.storage.type=local`. That removes MinIO
-entirely. The `druid-deepstorage` volume is mounted into **both** historical and
-indexer — with local deep storage, segment handoff silently never completes if
-they don't share it.
+entirely. The `druid-deepstorage` volume must be visible to **both** the
+historical and the indexer — with local deep storage, segment handoff silently
+never completes if they don't share it. Running both roles in one container
+makes that automatic; it was an explicit two-container mount before, and is a
+constraint to remember if the roles are ever split apart again.
 
-**Druid is 5 processes, not 6.** The coordinator runs with
-`druid.coordinator.asOverlord=true`, which drops a JVM while keeping the overlord
-API reachable. And it uses the **Indexer** rather than the MiddleManager: the
-Indexer runs tasks as threads in one JVM instead of forking a 512 MB peon per
-task. Heaps are 512m/1g against the chart's `-Xms7g -Xmx9g`, and worker capacity
-is 2 against the chart's 30.
+**Druid is 5 roles in 1 container, not 6 processes in 6.** The coordinator runs
+with `druid.coordinator.asOverlord=true`, which drops a JVM while keeping the
+overlord API reachable. And it uses the **Indexer** rather than the
+MiddleManager: the Indexer runs tasks as threads in one JVM instead of forking a
+512 MB peon per task. Heaps are 512m/1g against the chart's `-Xms7g -Xmx9g`, and
+worker capacity is 2 against the chart's 30.
+
+All five then share one container, which is where most of the memory saving over
+the chart comes from. Three consequences worth knowing before you debug it:
+
+- **`config/druid/start-all.sh` launches the roles, not the image entrypoint.**
+  The image is distroless with no Python, so Druid's own `bin/start-druid`
+  launcher cannot run; the script backgrounds the plain-bash `bin/run-druid`
+  once per role. If any role dies the script kills the rest and exits, so a
+  partial failure shows up in `docker compose ps` instead of running silently
+  degraded.
+- **Config is static files, not environment variables.**
+  `config/druid/local-single-conf/` holds one directory per role plus
+  `_common`, each with its own `jvm.config` and `runtime.properties` — the
+  layout `run-druid` already expects. This bypasses the image's `/druid.sh`,
+  which exists to translate `druid_*` env vars into properties files at boot:
+  that works with one container per role, but a single container can only hold
+  one value per variable name. So to change a heap or a port, edit the file
+  under `local-single-conf/`; setting `druid_*` in Compose will do nothing.
+- **It runs as `user: "0:0"`.** Docker creates named volumes root-owned, and
+  the image's default `druid` user (uid 1000) cannot create the segment-cache
+  and task subdirectories inside them. Root avoids a separate chown-init step.
+
+Druid enforces basic auth, so `curl http://localhost:8888/status` returns 401 —
+that is the listener working, not a fault. Use `-u admin:admin123`.
 
 **nginx replaces Kong.** The Kong install is DB-less and driven entirely by the
 Ingress objects in `kong-ingress-routes`, so there is no Kong config to port. Two
@@ -124,12 +157,26 @@ stripping (there is no `konghq.com/strip-path` anywhere in the repo) and
 `preserve-host: true`. Routes for `/grafana` and Superset's `/` catch-all are
 dropped.
 
+`preserve-host` is `proxy_set_header Host $http_host`, and the choice of
+variable matters: nginx's more common `$host` strips the port. Because
+`HTTP_PORT` is rarely 80, `$host` makes web-console's keycloak-connect
+middleware build a `redirect_uri` with no port, which Keycloak then rejects with
+`Invalid redirect_uri` at login. `$http_host` passes the client's Host header
+through verbatim, port included.
+
 **Keycloak is built by script, not imported.** The chart imports a ~2600-line
 realm JSON from `helmcharts/obsrv/values.yaml`. `config/keycloak-init.sh` uses
 `kcadm` to create just what web-console needs: realm `obsrv`, public client
-`obsrv-console` with callback `/console?auth_callback=1`, and the two users. It
+`obsrv-console` with callback `/console?auth_callback=1`, and one user. It
 is idempotent. Upstream `quay.io/keycloak/keycloak` in `start-dev` replaces the
 bitnami sub-chart.
+
+One user, not two. The realm sets `loginWithEmailAllowed=true`, so `obsrv_admin`
+and `admin@obsrv.in` are two ways into the same account. Adding a second user
+carrying that same email is actively rejected by Keycloak
+(`User exists with same email`), which fails the script — and because it runs
+under `restart: on-failure`, that turns into an endless restart loop rather than
+a visible error.
 
 **Secrets.** `secrets/{private,public}.pem` replace the `openssl-secrets` Secret
 the bootstrapper creates. `scripts/gen-token-env.sh` writes them into
@@ -188,6 +235,31 @@ Be aware of these before debugging:
 - **Lakehouse (Trino/Hudi)** — `storage_types` is
   `{"lake_house":false,"realtime_store":true}` in both dataset-api and
   web-console, unlike the chart's default.
+- **The `AUTH_OIDC_*` variables on web-console are placeholders and are never
+  read.** The console registers a `passport-openidconnect` strategy at startup
+  no matter what `AUTHENTICATION_TYPE` is, and that constructor throws on an
+  empty issuer (`OpenIDConnectStrategy requires an issuer option`), crash-looping
+  the container. `AUTH_OIDC_ISSUER`, `AUTH_OIDC_AUTHRIZATION_URL`,
+  `AUTH_OIDC_TOKEN_URL` and `AUTH_OIDC_CLIENT_ID` are set only to get past it;
+  auth actually goes through `keycloak`. `AUTHRIZATION` is misspelled because
+  that is the name the image looks up — do not "fix" it.
+- **Publishing a dataset must go through dataset-api's
+  `/v2/datasets/status-transition` (`status: "Live"`), never command-api's
+  `/system/v1/dataset/command` directly.** The status-transition endpoint is
+  what generates the Druid ingestion spec and writes the
+  `datasources`/`datasources_draft` row before invoking command-api's
+  `PUBLISH_DATASET`. Skipping it leaves no ingestion spec for command-api to
+  submit; its `SUBMIT_INGESTION_TASKS` step (`druid_command.py`) treats an
+  empty query result as success instead of `None`, so it silently no-ops and
+  deletes the draft rows anyway, leaving the dataset stuck `Live` with no
+  supervisor and no transition back to `Draft`. Vendor image bug, not fixable
+  here — the only recovery is `DELETE FROM datasets WHERE dataset_id = ...`.
+- **`command-api`'s `druid.router_host` needs an explicit `http://` scheme.**
+  `druid_command.py` concatenates `router_host:router_port` with no scheme
+  added in code, so a bare hostname makes the ingestion-submit request fail
+  with `No host specified.`. `config/service_config.yml` sets
+  `router_host: http://druid`, same convention dataset-api uses for its own
+  `druid_host`.
 
 ## Credentials
 
