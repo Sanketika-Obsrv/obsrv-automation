@@ -40,7 +40,11 @@ postgres:
   database: obsrv
 
 druid:
-  router_host: druid
+  # command-api's druid_command.py builds the ingestion URL as
+  # "{router_host}:{router_port}/druid" with no scheme added, so the
+  # scheme must be baked into router_host itself (unlike dataset-api's
+  # DRUID_HOST which is used the same way — see docker-compose.yaml).
+  router_host: http://druid
   router_port: "8888"
   username: admin
   password: admin123

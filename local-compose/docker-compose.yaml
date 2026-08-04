@@ -29,10 +29,18 @@ volumes:
   druid-deepstorage:
   druid-historical-data:
   druid-indexer-data:
+  # Hands the Keycloak-assigned obsrv_admin user id from keycloak-init (which
+  # has kcadm but no psql) to oauth-admin-sync (which has psql but no kcadm).
+  keycloak-admin-id:
 
 networks:
   obsrv:
     name: obsrv
+    ipam:
+      config:
+        # Static subnet so nginx can be pinned to a fixed address (below) --
+        # needed for the web-console "localhost" alias, see its extra_hosts.
+        - subnet: 172.28.0.0/16
 
 services:
 
@@ -173,13 +181,26 @@ services:
   # ===========================================================================
   # Druid  (profile: druid)
   # ===========================================================================
-  # druid-raw-cluster/values.yaml, with two deliberate departures:
-  #   * coordinator runs with druid.coordinator.asOverlord=true, dropping a
+  # All 5 roles collapsed into one container to minimize footprint for a
+  # minimal-data tryout instance (see docs/obsrv-local-docker-compose.md).
+  # config/druid/start-all.sh backgrounds the image's own `bin/run-druid`
+  # once per role, each pointed at its own static config subdirectory under
+  # config/druid/local-single-conf (same heaps/ports as the original per-role
+  # containers). The image is distroless (no python), which rules out
+  # Druid's python-based `bin/start-druid` multi-service launcher, and its
+  # `/druid.sh` entrypoint only handles one service per container -- so a
+  # small wrapper around the plain-bash `bin/run-druid` is the simplest thing
+  # that runs all 5 roles in one container without reimplementing Druid's
+  # env-var-to-properties translation.
+  #   * coordinator runs with druid.coordinator.asOverlord.enabled=true, dropping a
   #     whole JVM. The overlord API stays available on the coordinator port.
   #   * Indexer instead of MiddleManager. The Indexer runs tasks as threads in
   #     one JVM; MiddleManager forks a 512m peon per task. Same ingestion, far
   #     less memory. Heap is 512m/1g here vs the chart's 7g/9g, and worker
   #     capacity 2 vs the chart's 30.
+  # Zookeeper stays external: Druid (unlike Kafka 4.0's KRaft mode) still
+  # depends on it for segment/task coordination and leader election, even in
+  # its own single-server "micro-quickstart" profile.
 
   zookeeper:
     image: zookeeper:3.9
@@ -195,9 +216,9 @@ services:
     volumes:
       - zookeeper-data:/data
 
-  druid-coordinator:
+  druid:
     image: sanketikahub/druid:32.0.1
-    container_name: obsrv-druid-coordinator
+    container_name: obsrv-druid
     profiles: [druid]
     restart: unless-stopped
     networks: [obsrv]
@@ -206,130 +227,21 @@ services:
         condition: service_healthy
       zookeeper:
         condition: service_started
-    env_file: [./config/druid/common.env]
-    environment:
-      DRUID_XMS: 256m
-      DRUID_XMX: 512m
-      druid_service: druid/coordinator
-      druid_plaintextPort: 8081
-      # Coordinator also serves the overlord; see the note above.
-      druid_coordinator_asOverlord: "true"
-      druid_coordinator_startDelay: PT10S
-      druid_coordinator_period: PT30S
-      druid_coordinator_balancer_strategy: diskNormalized
-    command: ["coordinator"]
-    ports:
-      - "${DRUID_COORDINATOR_PORT:-8081}:8081"
-
-  druid-broker:
-    image: sanketikahub/druid:32.0.1
-    container_name: obsrv-druid-broker
-    profiles: [druid]
-    restart: unless-stopped
-    networks: [obsrv]
-    depends_on:
-      druid-coordinator:
-        condition: service_started
-    env_file: [./config/druid/common.env]
-    environment:
-      DRUID_XMS: 256m
-      DRUID_XMX: 512m
-      DRUID_MAXDIRECTMEMORYSIZE: 192m
-      druid_service: druid/broker
-      druid_plaintextPort: 8082
-      druid_processing_buffer_sizeBytes: 64MiB
-      druid_processing_numThreads: 1
-      druid_processing_numMergeBuffers: 1
-      druid_server_http_numThreads: 25
-      druid_broker_http_numConnections: 25
-
-  druid-historical:
-    image: sanketikahub/druid:32.0.1
-    container_name: obsrv-druid-historical
-    profiles: [druid]
-    restart: unless-stopped
-    networks: [obsrv]
-    depends_on:
-      druid-coordinator:
-        condition: service_started
-    env_file: [./config/druid/common.env]
-    environment:
-      DRUID_XMS: 512m
-      DRUID_XMX: 768m
-      DRUID_MAXDIRECTMEMORYSIZE: 512m
-      druid_service: druid/historical
-      druid_plaintextPort: 8083
-      druid_processing_buffer_sizeBytes: 64MiB
-      druid_processing_numThreads: 1
-      druid_processing_numMergeBuffers: 1
-      druid_server_http_numThreads: 25
-      # Chart says maxSize 500GB; 20GB is plenty for a laptop.
-      druid_segmentCache_locations: '[{"path":"/druid/data/store","maxSize":21474836480}]'
-      druid_segmentCache_numLoadingThreads: 2
-      druid_historical_cache_useCache: "false"
-      druid_historical_cache_populateCache: "false"
-    volumes:
-      - druid-deepstorage:/druid/deepstorage
-      - druid-historical-data:/druid/data
-
-  druid-indexer:
-    image: sanketikahub/druid:32.0.1
-    container_name: obsrv-druid-indexer
-    profiles: [druid]
-    restart: unless-stopped
-    networks: [obsrv]
-    depends_on:
-      druid-coordinator:
-        condition: service_started
       kafka:
         condition: service_healthy
-    env_file: [./config/druid/common.env]
-    environment:
-      DRUID_XMS: 512m
-      DRUID_XMX: 1g
-      DRUID_MAXDIRECTMEMORYSIZE: 512m
-      druid_service: druid/indexer
-      druid_plaintextPort: 8091
-      # Chart: 30. Two concurrent supervisor tasks is enough locally and keeps
-      # the single Indexer JVM inside its 1g heap.
-      druid_worker_capacity: 2
-      druid_indexer_task_baseTaskDir: /druid/data/task
-      druid_indexer_task_restoreTasksOnRestart: "true"
-      druid_processing_buffer_sizeBytes: 64MiB
-      druid_processing_numThreads: 1
-      druid_processing_numMergeBuffers: 1
-      druid_server_http_numThreads: 25
-      druid_indexer_worker_globalIngestionHeapLimitBytes: "536870912"
+    # Named volumes are created root-owned; the image's default `druid` user
+    # (uid 1000) can't create subdirectories in them (segment cache, task
+    # dir). Running as root avoids needing a separate chown-init step.
+    user: "0:0"
+    entrypoint: ["/bin/bash", "/scripts/start-all.sh"]
     volumes:
+      - ./config/druid/start-all.sh:/scripts/start-all.sh:ro
+      - ./config/druid/local-single-conf:/opt/druid/local-single-conf:ro
       - druid-deepstorage:/druid/deepstorage
-      - druid-indexer-data:/druid/data
-
-  druid-router:
-    image: sanketikahub/druid:32.0.1
-    container_name: obsrv-druid-router
-    profiles: [druid]
-    restart: unless-stopped
-    networks: [obsrv]
-    depends_on:
-      druid-broker:
-        condition: service_started
-    env_file: [./config/druid/common.env]
-    environment:
-      DRUID_XMS: 256m
-      DRUID_XMX: 512m
-      druid_service: druid/router
-      druid_plaintextPort: 8888
-      druid_router_defaultBrokerServiceName: druid/broker
-      druid_router_coordinatorServiceName: druid/coordinator
-      # Required for the unified Druid console and for dataset-api's supervisor
-      # calls to reach the overlord through the router.
-      druid_router_managementProxy_enabled: "true"
-      druid_router_http_numConnections: 25
-      druid_router_http_readTimeout: PT5M
-      druid_router_http_numMaxThreads: 25
-      druid_server_http_numThreads: 25
-    command: ["router"]
+      - druid-historical-data:/druid/data/historical
+      - druid-indexer-data:/druid/data/indexer
     ports:
+      - "${DRUID_COORDINATOR_PORT:-8081}:8081"
       - "${DRUID_ROUTER_PORT:-8888}:8888"
 
   # ===========================================================================
@@ -493,9 +405,35 @@ services:
         condition: service_started
     environment:
       BASE_URL: http://localhost:${HTTP_PORT:-8080}
+    # Named volumes are created root-owned; the image's default non-root
+    # user can't write /shared/obsrv_admin_id otherwise.
+    user: "0:0"
     entrypoint: ["/bin/bash", "/scripts/keycloak-init.sh"]
     volumes:
       - ./config/keycloak-init.sh:/scripts/keycloak-init.sh:ro
+      - keycloak-admin-id:/shared
+    restart: on-failure
+
+  # Fixes up oauth_users.id for obsrv_admin to match its real Keycloak id --
+  # see config/oauth-admin-sync.sh.
+  oauth-admin-sync:
+    image: postgres:17.5
+    container_name: obsrv-oauth-admin-sync
+    networks: [obsrv]
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+      keycloak-init:
+        condition: service_completed_successfully
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: obsrv
+    entrypoint: ["/bin/bash", "/scripts/oauth-admin-sync.sh"]
+    volumes:
+      - ./config/oauth-admin-sync.sh:/scripts/oauth-admin-sync.sh:ro
+      - keycloak-admin-id:/shared:ro
     restart: on-failure
 
   # ===========================================================================
@@ -522,7 +460,7 @@ services:
       api_port: "3000"
       telemetry_kafka_compression: snappy
 
-      druid_host: http://druid-router
+      druid_host: http://druid
       druid_port: "8888"
       druid_username: admin
       druid_password: admin123
@@ -620,10 +558,18 @@ services:
         condition: service_started
       keycloak-init:
         condition: service_completed_successfully
+      oauth-admin-sync:
+        condition: service_completed_successfully
     env_file:
       # USER_TOKEN_PRIVATE_KEY -- the private half of the pair dataset-api
       # verifies with. Generated by scripts/gen-token-env.sh.
       - ./secrets/tokens.env
+    volumes:
+      # keycloak-connect (server-side calls) and the browser redirect it
+      # builds share one KEYCLOAK_SERVER_URL ("http://localhost:8080/auth").
+      # Overrides the container's own "localhost" to mean nginx instead of
+      # itself -- see config/web-console-hosts for why extra_hosts won't do.
+      - ./config/web-console-hosts:/etc/hosts:ro
     environment:
       ENV: local
       PORT: "3000"
@@ -643,6 +589,16 @@ services:
       OAUTH_WEB_CONSOLE_URL: localhost:${HTTP_PORT:-8080}/console
       HTTPS: "false"
       GENERATE_SOURCEMAP: "false"
+
+      # web-console registers an OIDC passport strategy unconditionally at
+      # startup regardless of AUTHENTICATION_TYPE, and its constructor throws
+      # if these are empty. We don't use OIDC login (keycloak type below is
+      # what's actually active) so these are unused dummy values, only
+      # present to stop the app crashing on boot.
+      AUTH_OIDC_ISSUER: unused
+      AUTH_OIDC_AUTHRIZATION_URL: http://localhost/unused
+      AUTH_OIDC_TOKEN_URL: http://localhost/unused
+      AUTH_OIDC_CLIENT_ID: unused
 
       # global-values.yaml keycloak_users + oauth.web_console_client_id.
       AUTHENTICATION_TYPE: keycloak
@@ -674,7 +630,11 @@ services:
     image: nginx:1.27-alpine
     container_name: obsrv-nginx
     restart: unless-stopped
-    networks: [obsrv]
+    networks:
+      obsrv:
+        # Fixed address so web-console can reach nginx under the same
+        # "localhost:8080" URL its browser-facing redirects use (see below).
+        ipv4_address: 172.28.0.254
     depends_on:
       web-console:
         condition: service_started

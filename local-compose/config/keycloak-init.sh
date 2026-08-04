@@ -75,12 +75,22 @@ create_user() {
   echo "Created user ${username}."
 }
 
-create_user "obsrv_admin"    "enDoPvTAxFSd" "admin@obsrv.in"
-create_user "admin@obsrv.in" "enDoPvTAxFSd" "admin@obsrv.in"
+create_user "obsrv_admin" "enDoPvTAxFSd" "admin@obsrv.in"
+# loginWithEmailAllowed=true above means this one user can log in as either
+# "obsrv_admin" or "admin@obsrv.in" -- no need for a second user account.
 
 # Give obsrv_admin realm-admin rights, as the imported realm does.
 "$KC" add-roles -r "$REALM" --uusername obsrv_admin --rolename realm-admin \
   --cclientid realm-management 2>/dev/null || true
+
+# web-console looks up its local oauth_users row by the "sub" claim in the
+# Keycloak access token, which is this user's Keycloak-assigned id (a UUID) --
+# NOT the "1" the postgresql-migration seed hardcodes for obsrv_admin. Hand
+# the real id to oauth-admin-sync (config/oauth-admin-sync.sh), which fixes
+# the row up once Postgres is seeded, since kcadm has no psql to do it here.
+admin_id="$("$KC" get users -r "$REALM" -q "username=obsrv_admin" --fields id --format csv --noquotes 2>/dev/null | tail -n +1 | head -1)"
+echo -n "$admin_id" > /shared/obsrv_admin_id
+echo "obsrv_admin Keycloak id: ${admin_id}"
 
 echo
 echo "Keycloak ready."
