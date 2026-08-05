@@ -687,12 +687,10 @@ internal: &internal
         image:
           <<: *prometheus
         thanos:
-          image:
-            <<: *thanos
+          image: "dhi.io/thanos:0-debian13"
     thanosRuler:
       thanosRulerSpec:
-        image:
-          <<: *thanos
+        image: "dhi.io/thanos:0-debian13"
     kube-state-metrics:
       kubeRBACProxy:
         image:
@@ -712,6 +710,8 @@ internal: &internal
         - name: *dockerSecretName
       admissionWebhooks:
         patch:
+          imagePullSecrets:
+            - name: *dockerSecretName
           image:
             <<: *prometheus-operator-webhook
  
