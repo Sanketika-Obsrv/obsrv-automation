@@ -5,9 +5,13 @@
 replicaCount: 1
 
 namespace: kafka40
+# DHI: dhi.io/kafka-exporter is private → the pod needs the dhi.io pull secret, which this
+# chart previously never wired (worked before only because the old image was public).
+imagePullSecrets:
+  - name: registry-secret-name
 image:
-  repository: sanketikahub/kafka-exporter
-  tag: 1.0.1
+  repository: dhi.io/kafka-exporter
+  tag: 1-debian13
   pullPolicy: IfNotPresent
 
 nameOverride: ""
