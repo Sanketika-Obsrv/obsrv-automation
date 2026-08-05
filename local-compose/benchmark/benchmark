@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Single entrypoint for the benchmark framework.
+#
+#   ./benchmark run [benchmark-config.yaml] [--profile smoke] [--events N]
+#                   [--no-queries]   ingest pipeline only
+#   ./benchmark validate | queries | cleanup | report <dir>
+#   ./benchmark watch kafka | pipeline | druid | infra
+#   ./benchmark pause | resume | restart
+#
+# Everything is stdlib Python -- no virtualenv, no pip install.
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY="${PYTHON:-python3}"
+S="$HERE/scripts"
+
+usage() {
+  sed -n '2,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  exit "${1:-0}"
+}
+
+[[ $# -eq 0 ]] && usage 1
+cmd="$1"; shift
+
+# A bare config path as the first argument to `run` is the documented form:
+#   ./benchmark run benchmark-config.yaml
+if [[ "$cmd" == "run" && $# -gt 0 && "$1" != -* ]]; then
+  set -- --config "$@"
+fi
+
+case "$cmd" in
+  run)        exec "$PY" "$S/benchmark-orchestrator.py" "$@" ;;
+  validate)   exec "$PY" "$S/validate-dataset.py" "$@" ;;
+  queries)    exec "$PY" "$S/query-benchmark.py" "$@" ;;
+  cleanup)    exec "$PY" "$S/cleanup.py" "$@" ;;
+  report)     exec "$PY" "$S/report-generator.py" "$@" ;;
+  create)     exec "$PY" "$S/create-dataset.py" "$@" ;;
+  publish)    exec "$PY" "$S/publish-dataset.py" "$@" ;;
+  users)      exec "$PY" "$S/user-generator.py" "$@" ;;
+  telemetry)  exec "$PY" "$S/telemetry-generator.py" "$@" ;;
+  produce)    exec "$PY" "$S/kafka-producer.py" "$@" ;;
+  pause)      exec "$PY" "$S/unified-pipeline-monitor.py" --pause "$@" ;;
+  resume)     exec "$PY" "$S/unified-pipeline-monitor.py" --resume "$@" ;;
+  restart)    exec "$PY" "$S/unified-pipeline-monitor.py" --restart "$@" ;;
+  watch)
+    what="${1:-kafka}"; shift || true
+    case "$what" in
+      kafka)    exec "$PY" "$S/kafka-monitor.py" "$@" ;;
+      pipeline) exec "$PY" "$S/unified-pipeline-monitor.py" "$@" ;;
+      druid)    exec "$PY" "$S/druid-monitor.py" "$@" ;;
+      infra)    exec "$PY" "$S/infrastructure-monitor.py" "$@" ;;
+      *) echo "watch: kafka | pipeline | druid | infra" >&2; exit 1 ;;
+    esac ;;
+  -h|--help|help) usage 0 ;;
+  *) echo "unknown command: $cmd" >&2; usage 1 ;;
+esac

@@ -24,22 +24,59 @@ This is the binding constraint, not CPU.
 Measured after running the ingest → query path, so these include real
 ingestion rather than idle:
 
-| Selection | Measured RSS | What it gives you |
+Numbers below are cgroup `anon` (`/sys/fs/cgroup/memory.stat`), not
+`docker stats`. **`docker stats` counts page cache**, which for Postgres and
+Keycloak is over 100 MB of pure noise that the kernel reclaims on demand — use
+`anon` when deciding how much RAM the stack actually needs.
+
+| Selection | Measured anon | What it gives you |
 |---|---|---|
 | Control plane only (no profiles) | ~2.2 GB | console, auth, APIs, Kafka, Postgres |
-| `+ druid` | ~5.3 GB | the above plus a queryable realtime store |
-| `+ druid,flink` (default) | ~6.7 GB | the full event-dataset path, end to end |
-| `+ masterdata` | ~7.9 GB | adds master datasets / denormalization |
+| `+ druid` | ~4.8 GB | the above plus a queryable realtime store |
+| `+ druid,flink,metrics` | ~5.8 GB | the full event-dataset path, end to end |
+| `+ masterdata` (default) | ~7.0 GB | adds master datasets / denormalization |
 
-`.env` enables `druid,flink` by default — the smallest selection that runs a
-dataset end to end. **Give Docker Desktop 10 GB**, or trim `COMPOSE_PROFILES`
-in `.env` to go smaller. Check what you have with
-`docker info --format '{{.MemTotal}}'`.
+Per container, after running both the event and the master path:
 
-10 GB against a measured 6.7 GB is deliberate headroom, not slack: the Flink
-taskmanager and the Druid indexer grow once data flows. Running this stack on a
+| Container | anon (MiB) |
+|---|---|
+| druid (5 JVMs in one container) | 2562 |
+| unified-pipeline taskmanager | 924 |
+| cache-indexer taskmanager | 655 |
+| cache-indexer jobmanager | 553 |
+| unified-pipeline jobmanager | 549 |
+| keycloak | 489 |
+| kafka | 404 |
+| dataset-api | 309 |
+| web-console | 228 |
+| prometheus | 173 |
+| zookeeper | 78 |
+| command-api | 74 |
+| postgres | 22 |
+| valkey ×2, node-exporter, nginx | ~30 total |
+
+**Give Docker Desktop 10 GB**, or trim `COMPOSE_PROFILES` in `.env` to go
+smaller. Check what you have with `docker info --format '{{.MemTotal}}'`.
+
+10 GB against a measured 7.0 GB is deliberate headroom, not slack: the Flink
+taskmanagers and the Druid indexer grow once data flows. Running this stack on a
 VM sized close to its measured floor has crashed the Docker daemon outright,
 taking every container down at once.
+
+The single biggest consumer of that headroom is **native, not heap**. The
+unified-pipeline taskmanager's anon starts near 900 MB but has been measured at
+2.5 GB after a long session with repeated job restarts, against only ~430 MB of
+JVM-tracked memory (275m committed heap, ~96 MB Metaspace, ~53 MB direct). Most
+of the excess is resident `rwxp` anon — glibc malloc arenas and JIT-adjacent
+allocations outside every JVM accounting bucket, so no Flink or `-XX` setting
+bounds it. `MALLOC_ARENA_MAX=2` is set on all four Flink containers to cap the
+worst of it. A `mem_limit` would bound the rest but would OOM-kill the
+taskmanager mid-job, so there is none; restart the taskmanager if it grows.
+
+Druid, by contrast, is exactly at its configured budget: 2176m of heap across
+five JVMs plus 3×128m direct ≈ the 2562 MiB measured. Nothing is wasted there,
+and the only way to shrink it is to shrink the heaps in
+`config/druid/local-single-conf/*/jvm.config`.
 
 `cache-indexer` is behind its own profile because it only handles master
 datasets — its config is `dataset.type = "master-dataset"` reading the
@@ -77,6 +114,27 @@ Then open **http://localhost:8080/console** and log in as
 Change `HTTP_PORT` in `.env` if 8080 is taken — it is one variable because it
 feeds the Keycloak redirect URI and the console's own base URL as well as the
 nginx binding.
+
+### Prove it works
+
+`scripts/sample-dataset.sh` creates a dataset, publishes it, pushes events and
+**asserts on the read-back** — not on the publish succeeding, which is the part
+that can pass while nothing actually flows. Three modes, in dependency order:
+
+```bash
+./scripts/sample-dataset.sh event  demo_events  1000   # -> 1000 rows in Druid
+./scripts/sample-dataset.sh master demo_master    50   # -> 50 keys in Valkey
+./scripts/sample-dataset.sh denorm demo_joined   200   # -> 200 rows, joined
+```
+
+`denorm` needs a live, populated master to join against — `demo_master` by
+default, or set `MASTER_DS`. It is the only mode that exercises both Flink jobs
+at once, and the only one that proves the master path is useful rather than
+merely populated. Read the script before writing your own producer: the event
+envelope is **not** the same for the two dataset types, and getting it wrong
+fails every record with an error that points somewhere else. See
+[Master datasets](#master-datasets-the-event-shape-is-not-the-same-as-an-event-datasets)
+below.
 
 ### Other endpoints
 
@@ -132,6 +190,51 @@ are out of scope.
 - Superset and Grafana `oauth_clients` rows get **placeholder** client IDs, not the
   chart's real dev credentials. They cannot be empty: `client_id` is `UNIQUE` and
   two rows are inserted, so blanks collide. Neither component runs here.
+
+### Master datasets: the event shape is not the same as an event dataset's
+
+Worth reading before you push anything at a master dataset, because getting it
+wrong fails every single record with an error that points at the wrong thing.
+
+An **event** dataset is published to the shared `ingest` topic, so each message
+must carry the wrapper that tells the extractor which dataset it belongs to:
+
+```json
+{"dataset": "demo_events", "event": {"id": "evt-1", "ets": 1754325600000, "value": 1}}
+```
+
+Without it you get `ERR_EXT_1004 "Dataset Id is missing from the data"`.
+
+A **master** dataset has its own topic, named after the dataset, so there is
+nothing for a wrapper to disambiguate — and `CacheIndexerFunction` looks for the
+dataset's `keys_config.data_key` at the **top level** of the message. Push the
+record bare:
+
+```json
+{"code": "C00000", "name": "region-0", "population": 1000}
+```
+
+Wrap it and the key ends up one level down, and every record is rejected to
+`masterdata.failed` with `ERR_MASTER_DATA_1017 "Master dataset configuration key
+is missing"` — which reads like a dataset-config problem when it is an
+event-shape problem.
+
+Two consequences of `data_key`:
+
+- **Every event must carry it.** It is the Redis key the record is stored under,
+  so a record without it cannot be written at all.
+- **It is the only field another dataset can denormalize against.** A denorm
+  lookup resolves through the master dataset's key, not through arbitrary
+  columns — so pick the key to be whatever the event datasets will join on.
+
+`scripts/sample-dataset.sh` does both shapes correctly; read it as the reference.
+
+One more thing that will silently lose records: `cache-indexer`'s Kafka source
+starts at `COMMITTED_OFFSET`, and a brand-new dataset topic has no committed
+offset, so it falls back to **LATEST**. Anything published before the reader
+takes its split is skipped outright — job `RUNNING`, topic full, Valkey empty.
+The job reaching `RUNNING` is not enough; wait for
+`Discovered new partitions: [<topic>-` in the jobmanager log, as the script does.
 
 ### Deliberate departures
 
@@ -257,6 +360,21 @@ Be aware of these before debugging:
   `START_PIPELINE_JOBS` and `DEPLOY_CONNECTORS` from the `PUBLISH_DATASET`
   workflow. The Flink jobs here are started by Compose and stay up; publishing a
   dataset still writes the schema and creates the Druid supervisor.
+- **The console's event counters read 0 for master datasets**, however many
+  records you push. Not a local-stack defect — the same is true on the charts.
+  `dataset-api`'s `DatasetListMetrics.ts` computes Total/Failed Events as a
+  `longSum(count)` over the Druid `system-events` datasource filtered on
+  `ctx_dataset`, and `cache-indexer` emits no system events at all: every record
+  in `system.events` comes from `unified-pipeline`'s terminal `DruidRouterJob`
+  stage, which master data never reaches. It also writes nothing to
+  `masterdata.stats`/`.raw`/`.unique`/`.denorm`/`.transform` — those topics stay
+  at offset 0 — because the job consumes the dataset's own topic and writes
+  straight to Valkey. Volume and Size are 0 for the same reason: they are Druid
+  datasource sizes, and a master dataset has no datasource. Verify master
+  ingestion in Valkey instead:
+  `docker exec obsrv-valkey-denorm valkey-cli -n <cache_config.redis_db> dbsize`,
+  and check `masterdata.failed` is empty. `Status: Live` and
+  `Health: Healthy` are both reported correctly.
 - **Lakehouse (Trino/Hudi)** — `storage_types` is
   `{"lake_house":false,"realtime_store":true}` in both dataset-api and
   web-console, unlike the chart's default.

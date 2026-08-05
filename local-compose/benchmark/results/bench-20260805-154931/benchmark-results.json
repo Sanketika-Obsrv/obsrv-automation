@@ -1,0 +1,1371 @@
+{
+  "run": {
+    "id": "bench-20260805-154931",
+    "profile": "standard",
+    "started_at": 1785925171.176841,
+    "finished_at": 1785925940.673772,
+    "duration_sec": 769.5,
+    "config_path": "/Users/manju/Documents/Projects/obsrv/obsrv-automation/local-compose/benchmark/benchmark-config.yaml"
+  },
+  "config": {
+    "run": {
+      "id": "bench-20260805-154931",
+      "output_dir": "results",
+      "profile": "standard",
+      "keep_going": true,
+      "cleanup": false,
+      "cleanup_on_failure": false,
+      "skip_queries": true,
+      "config_path": "/Users/manju/Documents/Projects/obsrv/obsrv-automation/local-compose/benchmark/benchmark-config.yaml"
+    },
+    "endpoints": {
+      "dataset_api": "http://localhost:3000",
+      "keycloak": "http://localhost:8080/auth",
+      "druid_router": "http://localhost:8888",
+      "druid_coordinator": "http://localhost:8081",
+      "flink_unified": "http://localhost:8181",
+      "flink_cache_indexer": "http://localhost:8182",
+      "prometheus": "http://localhost:9090",
+      "node_exporter": "http://localhost:9100"
+    },
+    "auth": {
+      "realm": "obsrv",
+      "client_id": "obsrv-console",
+      "username": "obsrv_admin",
+      "password": "enDoPvTAxFSd",
+      "druid_user": "admin",
+      "druid_password": "admin123"
+    },
+    "docker": {
+      "compose_dir": "/Users/manju/Documents/Projects/obsrv/obsrv-automation/local-compose",
+      "compose_file": "docker-compose.yaml",
+      "container_prefix": "obsrv",
+      "containers": {},
+      "kafka_bin": "/opt/kafka/bin"
+    },
+    "kafka": {
+      "bootstrap_internal": "localhost:9092",
+      "ingest_topic": "ingest",
+      "consumer_group": "unified-pipeline-group",
+      "masterdata_consumer_group": "masterdata-pipeline-group",
+      "failed_topics": [
+        "failed",
+        "extractor.failed",
+        "transform.failed",
+        "denorm.failed",
+        "masterdata.failed"
+      ]
+    },
+    "datasets": {
+      "master_id": "bench_users",
+      "telemetry_id": "bench_telemetry",
+      "denorm_out_field": "user",
+      "recreate": true,
+      "denorm_strategy": "jsonata"
+    },
+    "users": {
+      "count": 100,
+      "seed": 20260804
+    },
+    "load": {
+      "events": 20000,
+      "producer_rate": 0,
+      "batch_size": 5000,
+      "concurrent_producers": 2,
+      "event_size_bytes": [
+        400,
+        4000
+      ],
+      "large_event_fraction": 0.25,
+      "duplicate_fraction": 0.02,
+      "timestamp_spread_minutes": 30,
+      "seed": 20260804
+    },
+    "pipeline": {
+      "pause_before_load": true,
+      "pause_target": "up_taskmanager",
+      "resume_timeout_sec": 300,
+      "drain_timeout_sec": 3600,
+      "drain_idle_sec": 60
+    },
+    "monitor": {
+      "poll_interval_sec": 5,
+      "report_interval_sec": 60,
+      "druid_settle_timeout_sec": 1800
+    },
+    "queries": {
+      "warmup": 3,
+      "iterations": 12,
+      "concurrency": 4,
+      "timeout_sec": 60,
+      "qps_probe_seconds": 20
+    },
+    "validation": {
+      "functional_events": 200,
+      "dedup_probe_events": 25,
+      "settle_timeout_sec": 420
+    },
+    "capacity": {
+      "targets_per_min": [
+        10000,
+        100000
+      ],
+      "safe_headroom": 0.7,
+      "cpu_saturation_pct": 85.0,
+      "mem_saturation_pct": 90.0
+    },
+    "report": {
+      "html": true,
+      "csv": true,
+      "top_n_recommendations": 12
+    }
+  },
+  "results": {
+    "preflight": {
+      "containers": {
+        "postgres": {
+          "state": "running",
+          "health": "healthy"
+        },
+        "kafka": {
+          "state": "running",
+          "health": "healthy"
+        },
+        "druid": {
+          "state": "running",
+          "health": "-"
+        },
+        "dataset_api": {
+          "state": "running",
+          "health": "healthy"
+        },
+        "command_api": {
+          "state": "running",
+          "health": "-"
+        },
+        "up_jobmanager": {
+          "state": "running",
+          "health": "-"
+        },
+        "up_taskmanager": {
+          "state": "running",
+          "health": "-"
+        },
+        "valkey_dedup": {
+          "state": "running",
+          "health": "healthy"
+        },
+        "valkey_denorm": {
+          "state": "running",
+          "health": "healthy"
+        }
+      },
+      "cores": 4,
+      "cache_indexer": true,
+      "prometheus": true
+    },
+    "datasets": {
+      "master": {
+        "dataset_id": "bench_users",
+        "redis_db": "9",
+        "status": "Live",
+        "records": 100
+      },
+      "telemetry": {
+        "dataset_id": "bench_telemetry",
+        "datasource": "bench_telemetry_events",
+        "entry_topic": "ingest",
+        "partitions": 4,
+        "status": "Live",
+        "denorm_strategy": "jsonata",
+        "denorm_out_field": "user",
+        "dedup_key": "mid",
+        "transformations": [
+          "pipeline",
+          "isLargeEvent"
+        ]
+      }
+    },
+    "generation": {
+      "path": "/Users/manju/Documents/Projects/obsrv/obsrv-automation/local-compose/benchmark/results/bench-20260805-154931/data/telemetry.ndjson",
+      "dataset_id": "bench_telemetry",
+      "lines": 20000,
+      "unique_events": 19600,
+      "duplicate_events": 400,
+      "expected_rows_after_dedup": 19600,
+      "large_events": 4829,
+      "large_fraction_actual": 0.2464,
+      "bytes": 44763331,
+      "avg_event_bytes": 2238,
+      "users": 100,
+      "generated_at": 1785925286887,
+      "timestamp_spread_minutes": 30
+    },
+    "validation": {
+      "checks": [
+        {
+          "name": "dataset_published_master",
+          "title": "Master dataset is published and Live",
+          "passed": true,
+          "detail": "bench_users status=Live (metadata store), api reports Live",
+          "evidence": {
+            "dataset_id": "bench_users",
+            "db_status": "Live",
+            "api": {
+              "dataset_id": "bench_users",
+              "status": "Live",
+              "type": "master",
+              "api_version": "v2",
+              "connectors_config": [],
+              "transformations_config": []
+            }
+          }
+        },
+        {
+          "name": "dataset_published_telemetry",
+          "title": "Telemetry dataset is published and Live",
+          "passed": true,
+          "detail": "bench_telemetry status=Live (metadata store), api reports Live",
+          "evidence": {
+            "dataset_id": "bench_telemetry",
+            "db_status": "Live",
+            "api": {
+              "dataset_id": "bench_telemetry",
+              "status": "Live",
+              "type": "event",
+              "api_version": "v2",
+              "alias": "bench_telemetry_druid",
+              "connectors_config": [],
+              "transformations_config": [
+                {
+                  "field_key": "pipeline",
+                  "transformation_function": {
+                    "type": "jsonata",
+                    "expr": "context.pdata.pid & \"-\" & context.env",
+                    "category": "derived",
+                    "datatype": "string"
+                  },
+                  "mode": "Lenient",
+                  "metadata": null
+                },
+                {
+                  "field_key": "isLargeEvent",
+                  "transformation_function": {
+                    "type": "jsonata",
+                    "expr": "edata.size > 100000",
+                    "category": "derived"
+                  },
+                  "mode": "Lenient",
+                  "metadata": null
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "master_data_cached",
+          "title": "Master dataset records are cached and joinable",
+          "passed": true,
+          "detail": "100/100 records in Valkey db 9; GET user-0001 returns 210 bytes",
+          "evidence": {
+            "redis_db": "9",
+            "dbsize": 100,
+            "expected": 100,
+            "sample_key": "user-0001",
+            "sample_value": "{\"organization\":\"Sunbird Foundation\",\"city\":\"Pune\",\"state\":\"Maharashtra\",\"subscription\":\"free\",\"age\":27,\"department\":\"Engineering\",\"id\":\"user-0001\",\"device\":\"ios-phone\",\"userName\":\"Arjun Das\",\"gender\":\"female\"}"
+          }
+        },
+        {
+          "name": "kafka_ingestion",
+          "title": "Events reach the Kafka entry topic",
+          "passed": true,
+          "detail": "topic ingest end offset 48300 -> 48525 (+225) for 225 published events",
+          "evidence": {
+            "topic": "ingest",
+            "offset_before": 48300,
+            "offset_after": 48525,
+            "published": 225
+          }
+        },
+        {
+          "name": "unified_pipeline_processing",
+          "title": "Unified Pipeline processes events end to end",
+          "passed": true,
+          "detail": "201 of 200 probe events reached the datasource in 32s",
+          "evidence": {
+            "rows_found": 201,
+            "expected": 200,
+            "seconds": 32.3,
+            "datasource": "bench_telemetry_events"
+          }
+        },
+        {
+          "name": "druid_ingestion",
+          "title": "Druid indexes the processed events",
+          "passed": true,
+          "detail": "201 / 200 rows queryable",
+          "evidence": {
+            "rows": 201,
+            "expected": 200
+          }
+        },
+        {
+          "name": "deduplication",
+          "title": "Republishing an event with the same mid stores one row",
+          "passed": false,
+          "detail": "25 mids published twice, 24 stored once, 1 stored more than once",
+          "evidence": {
+            "duplicate_mids_published": [
+              "probe-0-0000",
+              "probe-0-0001",
+              "probe-0-0002",
+              "probe-0-0003",
+              "probe-0-0004",
+              "probe-0-0005",
+              "probe-0-0006",
+              "probe-0-0007",
+              "probe-0-0008",
+              "probe-0-0009"
+            ],
+            "rows_per_mid": {
+              "probe-0-0000": 2,
+              "probe-0-0001": 1,
+              "probe-0-0002": 1,
+              "probe-0-0003": 1,
+              "probe-0-0004": 1,
+              "probe-0-0005": 1,
+              "probe-0-0006": 1,
+              "probe-0-0007": 1,
+              "probe-0-0008": 1,
+              "probe-0-0009": 1
+            },
+            "violations": {
+              "probe-0-0000": 2
+            },
+            "query": "SELECT \"mid\", COUNT(*) FROM \"bench_telemetry_events\" WHERE \"mid\" IN (...) GROUP BY \"mid\""
+          }
+        },
+        {
+          "name": "transformation_pipeline",
+          "title": "JSONata: context.pdata.pid & \"-\" & context.env",
+          "passed": true,
+          "detail": "expected 'search-service-search'; datasource holds {'search-service-search': 106, 'search-service-player': 7, 'search-service-portal': 7, 'search-service-assessment': 3, 'search-service-content': 3}",
+          "evidence": {
+            "expected": "search-service-search",
+            "observed": {
+              "search-service-search": 106,
+              "search-service-player": 7,
+              "search-service-portal": 7,
+              "search-service-assessment": 3,
+              "search-service-content": 3
+            },
+            "column_present": true
+          }
+        },
+        {
+          "name": "transformation_is_large_event",
+          "title": "JSONata: edata.size > 100000",
+          "passed": true,
+          "detail": "flag=0 size 1788..99868 (150 rows); flag=1 size 114859..895451 (51 rows)",
+          "evidence": {
+            "by_flag": {
+              "0": {
+                "flag": 0,
+                "min_size": 1788,
+                "max_size": 99868,
+                "c": 150
+              },
+              "1": {
+                "flag": 1,
+                "min_size": 114859,
+                "max_size": 895451,
+                "c": 51
+              }
+            },
+            "note": "Druid stores the boolean as BIGINT 1/0"
+          }
+        },
+        {
+          "name": "denormalization",
+          "title": "Telemetry rows carry the joined user attributes",
+          "passed": true,
+          "detail": "201/201 rows joined (100.0%) on 10 columns, values match the master",
+          "evidence": {
+            "columns": [
+              "user.age",
+              "user.city",
+              "user.department",
+              "user.device",
+              "user.gender",
+              "user.id",
+              "user.organization",
+              "user.state",
+              "user.subscription",
+              "user.userName"
+            ],
+            "rows_joined": 201,
+            "rows_total": 201,
+            "pct": 100.0,
+            "sample": [
+              {
+                "actor_id": "user-0053",
+                "user.age": 42,
+                "user.city": "Indore",
+                "user.department": "Engineering",
+                "user.device": "android-phone",
+                "user.gender": "male",
+                "user.id": "user-0053",
+                "user.organization": "NDEAR Labs",
+                "user.state": "Madhya Pradesh",
+                "user.userName": "Myra Menon"
+              },
+              {
+                "actor_id": "user-0037",
+                "user.age": 43,
+                "user.city": "Pune",
+                "user.department": "Analytics",
+                "user.device": "kiosk",
+                "user.gender": "female",
+                "user.id": "user-0037",
+                "user.organization": "Samagra",
+                "user.state": "Maharashtra",
+                "user.userName": "Kavya Verma"
+              },
+              {
+                "actor_id": "user-0018",
+                "user.age": 27,
+                "user.city": "Kolkata",
+                "user.department": "Research",
+                "user.device": "android-phone",
+                "user.gender": "undisclosed",
+                "user.id": "user-0018",
+                "user.organization": "EkStep",
+                "user.state": "West Bengal",
+                "user.userName": "Reyansh Das"
+              }
+            ],
+            "values_match_master": true
+          }
+        },
+        {
+          "name": "druid_query",
+          "title": "The datasource answers analytical queries",
+          "passed": true,
+          "detail": "group-by returned 5 rows in 537 ms; dataset-api query failed",
+          "evidence": {
+            "sample": [
+              {
+                "actor_id": "user-0081",
+                "events": 7
+              },
+              {
+                "actor_id": "user-0034",
+                "events": 5
+              },
+              {
+                "actor_id": "user-0063",
+                "events": 5
+              },
+              {
+                "actor_id": "user-0096",
+                "events": 5
+              },
+              {
+                "actor_id": "user-0099",
+                "events": 5
+              }
+            ],
+            "sql_ms": 536.9,
+            "api_query_ok": false,
+            "api_error": "HTTP 400 from http://localhost:3000/v2/data/query/bench_telemetry: {\"id\":\"api.data.out\",\"ver\":\"v2\",\"ts\":\"2026-08-05T10:22:29+00:00\",\"params\":{\"status\":\"FAILED\",\"msgid\":\"obsrv-benchmark\",\"resmsgid\":\"20"
+          }
+        },
+        {
+          "name": "no_dead_letter_events",
+          "title": "No events were lost during functional validation",
+          "passed": true,
+          "detail": "24 duplicate rejection(s), no lost events -- the row for each is already in the datasource",
+          "evidence": {
+            "before": {
+              "failed": {
+                "0": 289,
+                "1": 228,
+                "2": 369,
+                "3": 282
+              },
+              "transform.failed": {
+                "0": 0,
+                "1": 0,
+                "2": 0,
+                "3": 0
+              },
+              "masterdata.failed": {
+                "0": 0,
+                "1": 0,
+                "2": 0,
+                "3": 0
+              }
+            },
+            "after": {
+              "failed": {
+                "0": 313,
+                "1": 228,
+                "2": 369,
+                "3": 282
+              },
+              "transform.failed": {
+                "0": 0,
+                "1": 0,
+                "2": 0,
+                "3": 0
+              },
+              "masterdata.failed": {
+                "0": 0,
+                "1": 0,
+                "2": 0,
+                "3": 0
+              }
+            },
+            "delta": {
+              "failed": 24
+            },
+            "by_error_code": {
+              "failed": {
+                "ERR_PP_1010": 24
+              }
+            },
+            "duplicate_rejections": 24,
+            "lost": {}
+          }
+        }
+      ],
+      "probe": {
+        "events_published": 225,
+        "unique_mids": 200,
+        "duplicate_mids": 25,
+        "expected_rows": 200
+      },
+      "passed": 11,
+      "failed": 1,
+      "total": 12,
+      "all_passed": false
+    },
+    "baseline_failed": {
+      "failed": 1192,
+      "transform.failed": 0,
+      "masterdata.failed": 0
+    },
+    "kafka": {
+      "failed_before": {
+        "failed": 1192,
+        "transform.failed": 0,
+        "masterdata.failed": 0
+      },
+      "topic": "ingest",
+      "partitions": 4,
+      "end_offset_before": 48525,
+      "paused_for_load": true,
+      "end_offset_after": 68525,
+      "backlog_events": 20000,
+      "producer": {
+        "events": 20000,
+        "seconds": 5.02,
+        "rate_per_sec": 3984.3
+      },
+      "producer_throughput_per_sec": 3984.3,
+      "producer_throughput_per_min": 239058.0,
+      "producer_bytes_per_sec": 8916998.2,
+      "drain_started_at": 1785925444.516635,
+      "drain_timed_out": false,
+      "drain_seconds": 470.64,
+      "events_drained": 20000,
+      "drain_throughput_per_sec": 42.5,
+      "drain_throughput_per_min": 2549.7,
+      "samples": 9,
+      "throughput": {
+        "samples": 8,
+        "sustained_per_sec": 59.23,
+        "sustained_per_min": 3553.7,
+        "peak_per_sec": 71.59,
+        "peak_per_min": 4295.6,
+        "max_per_sec": 76.28,
+        "mean_per_sec": 36.8,
+        "total": 20000,
+        "window_sec": 487.18
+      },
+      "sustained_per_sec": 59.23,
+      "sustained_per_min": 3553.7,
+      "peak_per_sec": 71.59,
+      "peak_per_min": 4295.6,
+      "max_per_sec": 76.28,
+      "max_remaining": 20000,
+      "failed_after": {
+        "failed": 1592,
+        "transform.failed": 0,
+        "masterdata.failed": 0
+      },
+      "failed_delta": {
+        "transform.failed": 0,
+        "masterdata.failed": 0,
+        "failed": 400
+      },
+      "events_failed_total": 400,
+      "events_failed_expected_duplicates": 400,
+      "events_failed": 0
+    },
+    "druid": {
+      "settle_seconds": 0.05,
+      "rows_queryable": 19801,
+      "rows_expected": 19600,
+      "completeness_pct": 101.026,
+      "datasource": "bench_telemetry_events",
+      "samples": 51,
+      "queryable_rate": {
+        "samples": 50,
+        "sustained_per_sec": 54.79,
+        "sustained_per_min": 3287.6,
+        "peak_per_sec": 104.7,
+        "peak_per_min": 6282.1,
+        "max_per_sec": 134.99,
+        "mean_per_sec": 39.97,
+        "total": 19600,
+        "window_sec": 475.82
+      },
+      "rows_per_sec_sustained": 54.79,
+      "rows_per_sec_peak": 104.7,
+      "supervisor": {
+        "state": "RUNNING",
+        "detailed_state": "RUNNING",
+        "healthy": true,
+        "active_tasks": 1,
+        "publishing_tasks": 0,
+        "aggregate_lag": 0,
+        "rows_processed_1m": 11.59,
+        "rows_processed_5m": 28.36,
+        "rows_processed_15m": 16.36,
+        "rows_processed_total": 19801,
+        "rows_with_error": 0,
+        "rows_thrown_away": 0
+      },
+      "tasks": {
+        "running": 2,
+        "pending": 0,
+        "waiting": 0,
+        "completed_sampled": 49,
+        "duration_sec": {
+          "count": 49,
+          "unit": "s",
+          "min": 0.009,
+          "avg": 0.026,
+          "p50": 0.017,
+          "p90": 0.042,
+          "p95": 0.057,
+          "p99": 0.176,
+          "max": 0.282,
+          "stdev": 0.039
+        }
+      },
+      "segments": {
+        "segments": 1,
+        "bytes": 0,
+        "rows": 19801,
+        "avg_rows_per_segment": 19801,
+        "avg_bytes_per_segment": 0
+      },
+      "latency": {
+        "syncts_column": "obsrv_meta.syncts",
+        "end_to_end_sec": 475.71,
+        "drain_to_queryable_sec": 0.05
+      },
+      "container": {
+        "cpu_pct": {
+          "count": 50,
+          "unit": "%",
+          "min": 9.61,
+          "avg": 22.379,
+          "p50": 23.515,
+          "p90": 29.182,
+          "p95": 32.86,
+          "p99": 39.799,
+          "max": 43.42,
+          "stdev": 7.164
+        },
+        "mem_anon_bytes": {
+          "count": 51,
+          "unit": "bytes",
+          "min": 3320766464,
+          "avg": 3332172217.725,
+          "p50": 3334922240,
+          "p90": 3336835072,
+          "p95": 3336900608.0,
+          "p99": 3337191424.0,
+          "max": 3337400320,
+          "stdev": 5547190.59
+        },
+        "mem_limit_bytes": null
+      }
+    },
+    "pipeline": {
+      "samples": 50,
+      "job_id": "988a910d244f72c9d613418968a8a811",
+      "state": "RUNNING",
+      "parallelism": 2,
+      "slots_total": 2,
+      "throughput_in": {
+        "samples": 49,
+        "sustained_per_sec": 70.59,
+        "sustained_per_min": 4235.4,
+        "peak_per_sec": 159.03,
+        "peak_per_min": 9542.0,
+        "max_per_sec": 250.64,
+        "mean_per_sec": 40.48,
+        "total": 20000,
+        "window_sec": 466.99
+      },
+      "throughput_out": {
+        "samples": 49,
+        "sustained_per_sec": 72.01,
+        "sustained_per_min": 4320.7,
+        "peak_per_sec": 160.13,
+        "peak_per_min": 9607.9,
+        "max_per_sec": 256.52,
+        "mean_per_sec": 40.39,
+        "total": 20000,
+        "window_sec": 466.99
+      },
+      "sustained_per_sec": 72.01,
+      "peak_per_sec": 160.13,
+      "records_in_total": 20000,
+      "records_out_total": 20000,
+      "vertices": [
+        {
+          "name": "Source: pipeline-consumer",
+          "parallelism": 2,
+          "busy_avg": 0.1487,
+          "busy_p95": 0.35649999999999943,
+          "backpressured_avg": null,
+          "out_per_sec": 72.01,
+          "out_total": 20000
+        },
+        {
+          "name": "ExtractionFunction -> (extractor-batch-failed-events-sink: Writer -> extractor-b",
+          "parallelism": 2,
+          "busy_avg": 0.8747,
+          "busy_p95": 1.0,
+          "backpressured_avg": null,
+          "out_per_sec": 0.0,
+          "out_total": 0
+        }
+      ],
+      "bottleneck_operator": {
+        "name": "ExtractionFunction -> (extractor-batch-failed-events-sink: Writer -> extractor-b",
+        "parallelism": 2,
+        "busy_avg": 0.8747,
+        "busy_p95": 1.0,
+        "backpressured_avg": null,
+        "out_per_sec": 0.0,
+        "out_total": 0
+      },
+      "jvm": {
+        "heap_used": {
+          "count": 50,
+          "unit": "bytes",
+          "min": 0.0,
+          "avg": 202729188.64,
+          "p50": 213969388.0,
+          "p90": 234176192.8,
+          "p95": 245452880.0,
+          "p99": 249206616.0,
+          "max": 249206616.0,
+          "stdev": 44262404.535
+        },
+        "heap_max": 289406976.0,
+        "heap_pct_peak": 84.8,
+        "nonheap_used": {
+          "count": 50,
+          "unit": "bytes",
+          "min": 0.0,
+          "avg": 152472743.84,
+          "p50": 158701464.0,
+          "p90": 161794212.0,
+          "p95": 162106815.2,
+          "p99": 162284375.12,
+          "max": 162410360.0,
+          "stdev": 25272221.28
+        },
+        "cpu_load": {
+          "count": 50,
+          "unit": "ratio",
+          "min": 0.0,
+          "avg": 0.251,
+          "p50": 0.295,
+          "p90": 0.387,
+          "p95": 0.393,
+          "p99": 0.4,
+          "max": 0.4,
+          "stdev": 0.127
+        },
+        "threads": 120.0,
+        "gc_young_ms": 10691.0,
+        "gc_old_ms": 0,
+        "gc_pct_of_wall": 2.29
+      },
+      "checkpoints": {
+        "completed": 15,
+        "failed": 2,
+        "duration_ms": {
+          "count": 50,
+          "unit": "ms",
+          "min": 341,
+          "avg": 5392.48,
+          "p50": 4892.0,
+          "p90": 13030.0,
+          "p95": 16325.05,
+          "p99": 19098.01,
+          "max": 19172,
+          "stdev": 5275.86
+        },
+        "avg_ms_reported": 7409
+      },
+      "taskmanager": {
+        "cpu_pct": {
+          "count": 50,
+          "unit": "%",
+          "min": 7.01,
+          "avg": 95.609,
+          "p50": 111.31,
+          "p90": 141.417,
+          "p95": 149.23,
+          "p99": 173.159,
+          "max": 178.77,
+          "stdev": 47.322
+        },
+        "mem_anon_bytes": {
+          "count": 51,
+          "unit": "bytes",
+          "min": 613990400,
+          "avg": 1371109817.725,
+          "p50": 1437876224,
+          "p90": 1748860928,
+          "p95": 1749207040.0,
+          "p99": 1751400448.0,
+          "max": 1752338432,
+          "stdev": 369136190.368
+        },
+        "mem_limit_bytes": null,
+        "mem_pct_of_limit_peak": null
+      },
+      "jobmanager": {
+        "cpu_pct": {
+          "count": 50,
+          "unit": "%",
+          "min": 9.3,
+          "avg": 19.115,
+          "p50": 20.075,
+          "p90": 26.962,
+          "p95": 28.433,
+          "p99": 33.366,
+          "max": 34.91,
+          "stdev": 6.156
+        },
+        "mem_anon_bytes": {
+          "count": 51,
+          "unit": "bytes",
+          "min": 582467584,
+          "avg": 594448624.941,
+          "p50": 596086784,
+          "p90": 598654976,
+          "p95": 600320000.0,
+          "p99": 602040320.0,
+          "max": 602693632,
+          "stdev": 4589768.622
+        },
+        "mem_limit_bytes": null,
+        "mem_pct_of_limit_peak": null
+      },
+      "states_seen": [
+        "RUNNING"
+      ],
+      "restarted_mid_run": false
+    },
+    "infrastructure": {
+      "host": {
+        "samples": 50,
+        "source": "prometheus/node-exporter",
+        "cpu_pct_avg": 72.8804,
+        "cpu_pct_p95": 84.59,
+        "cpu_pct_max": 86.76,
+        "cpu_iowait_pct_avg": 0.0478,
+        "mem_pct_avg": 81.104,
+        "mem_pct_peak": 84.41,
+        "mem_total_bytes": 12530401280,
+        "mem_used_peak_bytes": 10576785408,
+        "load1_avg": null,
+        "load1_peak": null,
+        "disk_read_bps_peak": null,
+        "disk_write_bps_peak": null,
+        "disk_io_util_peak": null,
+        "disk_pct": null,
+        "net_rx_bps_peak": null,
+        "net_tx_bps_peak": null
+      },
+      "cores": 4,
+      "containers": {
+        "ci_jobmanager": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 9.27,
+          "cpu_pct_p95": 15.152000000000001,
+          "cpu_pct_max": 23.74,
+          "cpu_seconds": 46.6,
+          "mem_anon_avg": 568528650,
+          "mem_anon_peak": 572477440,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "ci_taskmanager": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 12.96,
+          "cpu_pct_p95": 24.189999999999984,
+          "cpu_pct_max": 35.04,
+          "cpu_seconds": 65.96,
+          "mem_anon_avg": 701229056,
+          "mem_anon_peak": 704249856,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "command_api": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 3.29,
+          "cpu_pct_p95": 4.329999999999999,
+          "cpu_pct_max": 6.46,
+          "cpu_seconds": 15.48,
+          "mem_anon_avg": 77086146,
+          "mem_anon_peak": 78958592,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "dataset_api": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 7.94,
+          "cpu_pct_p95": 11.925999999999998,
+          "cpu_pct_max": 28.36,
+          "cpu_seconds": 41.05,
+          "mem_anon_avg": 396840714,
+          "mem_anon_peak": 398331904,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "druid": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 22.4,
+          "cpu_pct_p95": 32.98599999999999,
+          "cpu_pct_max": 43.42,
+          "cpu_seconds": 109.93,
+          "mem_anon_avg": 3332113121,
+          "mem_anon_peak": 3337400320,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "kafka": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 32.54,
+          "cpu_pct_p95": 56.603999999999985,
+          "cpu_pct_max": 62.98,
+          "cpu_seconds": 164.8,
+          "mem_anon_avg": 450605629,
+          "mem_anon_peak": 530284544,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "keycloak": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 1.07,
+          "cpu_pct_p95": 1.9159999999999995,
+          "cpu_pct_max": 4.95,
+          "cpu_seconds": 5.23,
+          "mem_anon_avg": 575184896,
+          "mem_anon_peak": 575188992,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "nginx": {
+          "samples": 49,
+          "state": "running",
+          "cpu_pct_avg": 0.51,
+          "cpu_pct_p95": 0.7154999999999999,
+          "cpu_pct_max": 0.99,
+          "cpu_seconds": 2.3,
+          "mem_anon_avg": 1731855,
+          "mem_anon_peak": 1732608,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "postgres": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 2.7,
+          "cpu_pct_p95": 4.291999999999997,
+          "cpu_pct_max": 5.98,
+          "cpu_seconds": 13.64,
+          "mem_anon_avg": 32047431,
+          "mem_anon_peak": 34471936,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "prometheus": {
+          "samples": 49,
+          "state": "running",
+          "cpu_pct_avg": 2.14,
+          "cpu_pct_p95": 4.629499999999999,
+          "cpu_pct_max": 6.25,
+          "cpu_seconds": 10.65,
+          "mem_anon_avg": 302079414,
+          "mem_anon_peak": 324194304,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "up_jobmanager": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 19.08,
+          "cpu_pct_p95": 28.50599999999999,
+          "cpu_pct_max": 34.91,
+          "cpu_seconds": 92.34,
+          "mem_anon_avg": 594324848,
+          "mem_anon_peak": 602693632,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "up_taskmanager": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 96.47,
+          "cpu_pct_p95": 149.49399999999997,
+          "cpu_pct_max": 178.77,
+          "cpu_seconds": 480.89,
+          "mem_anon_avg": 1363546931,
+          "mem_anon_peak": 1752338432,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "valkey_dedup": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 1.66,
+          "cpu_pct_p95": 2.416,
+          "cpu_pct_max": 3.52,
+          "cpu_seconds": 8.12,
+          "mem_anon_avg": 11810078,
+          "mem_anon_peak": 12271616,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "valkey_denorm": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 1.21,
+          "cpu_pct_p95": 1.7079999999999997,
+          "cpu_pct_max": 1.95,
+          "cpu_seconds": 5.95,
+          "mem_anon_avg": 9926656,
+          "mem_anon_peak": 9932800,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "web_console": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 3.56,
+          "cpu_pct_p95": 5.105999999999996,
+          "cpu_pct_max": 9.6,
+          "cpu_seconds": 17.85,
+          "mem_anon_avg": 284191784,
+          "mem_anon_peak": 285437952,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        },
+        "zookeeper": {
+          "samples": 50,
+          "state": "running",
+          "cpu_pct_avg": 1.16,
+          "cpu_pct_p95": 1.7319999999999998,
+          "cpu_pct_max": 2.18,
+          "cpu_seconds": 5.67,
+          "mem_anon_avg": 128250757,
+          "mem_anon_peak": 128253952,
+          "mem_limit_bytes": null,
+          "mem_pct_of_limit_peak": null
+        }
+      },
+      "cost_per_1000_events": {
+        "cpu_seconds_total": 1086.46,
+        "cpu_seconds_per_1000": 54.323,
+        "by_container": {
+          "up_taskmanager": 24.0445,
+          "kafka": 8.24,
+          "druid": 5.4965,
+          "up_jobmanager": 4.617,
+          "ci_taskmanager": 3.298,
+          "ci_jobmanager": 2.33,
+          "dataset_api": 2.0525,
+          "web_console": 0.8925,
+          "command_api": 0.774,
+          "postgres": 0.682,
+          "prometheus": 0.5325,
+          "valkey_dedup": 0.406,
+          "valkey_denorm": 0.2975,
+          "zookeeper": 0.2835,
+          "keycloak": 0.2615,
+          "nginx": 0.115
+        },
+        "window_sec": 470.69
+      },
+      "events_measured": 20000,
+      "saturation": {
+        "limits": [],
+        "notes": [
+          "no resource crossed its saturation threshold -- the limit is in the pipeline's own concurrency, not the hardware"
+        ],
+        "cpu_headroom_pct": 15.4
+      },
+      "correlation": {
+        "pairs": 6,
+        "cpu_vs_throughput_r": -0.549,
+        "interpretation": "CPU rises as throughput falls -- time is going somewhere other than useful work (GC, retries, contention)"
+      }
+    },
+    "analysis": {
+      "bottleneck": {
+        "component": "unified-pipeline operator: ExtractionFunction -> (extractor-batch-failed-events-sink: Writer -> extractor-b",
+        "layer": "flink",
+        "reason": "this operator was busy 87% of the time while only 0% backpressured -- it is doing the work that sets the pace, not waiting on a downstream stage",
+        "evidence": {
+          "host_cpu_p95": 84.59,
+          "host_mem_peak_pct": 84.41,
+          "pipeline_sustained_per_sec": 72.01,
+          "kafka_sustained_per_sec": 59.23,
+          "druid_rows_per_sec": 54.79,
+          "taskmanager_cpu_p95": 149.49399999999997,
+          "taskmanager_mem_pct_of_limit": null,
+          "operator": {
+            "name": "ExtractionFunction -> (extractor-batch-failed-events-sink: Writer -> extractor-b",
+            "parallelism": 2,
+            "busy_avg": 0.8747,
+            "busy_p95": 1.0,
+            "backpressured_avg": null,
+            "out_per_sec": 0.0,
+            "out_total": 0
+          }
+        }
+      },
+      "capacity": {
+        "sustained_per_sec": 59.23,
+        "sustained_per_min": 3553.8,
+        "peak_per_sec": 71.59,
+        "peak_per_min": 4295.4,
+        "safe_headroom": 0.7,
+        "safe_per_sec": 41.46,
+        "safe_per_min": 2487.7,
+        "safe_per_hour": 149260,
+        "safe_per_day": 3582230,
+        "targets": [
+          {
+            "events_per_min": 10000,
+            "events_per_sec": 166.67,
+            "achievable_now": false,
+            "achievable_safely": false,
+            "multiple_of_measured": 2.81
+          },
+          {
+            "events_per_min": 100000,
+            "events_per_sec": 1666.67,
+            "achievable_now": false,
+            "achievable_safely": false,
+            "multiple_of_measured": 28.14
+          }
+        ]
+      },
+      "scaling": [
+        {
+          "multiple": 2,
+          "target_per_sec": 118.46,
+          "projected_host_cpu_pct": 169.2,
+          "steps": [
+            "add ~3 CPU cores (projected 169% of the current 4)",
+            "raise unified-pipeline parallelism to ~3 slot(s) (add TaskManager replicas; the reactive scheduler absorbs them without a job restart)"
+          ]
+        },
+        {
+          "multiple": 5,
+          "target_per_sec": 296.15,
+          "projected_host_cpu_pct": 423.0,
+          "steps": [
+            "add ~13 CPU cores (projected 423% of the current 4)",
+            "raise unified-pipeline parallelism to ~5 slot(s) (add TaskManager replicas; the reactive scheduler absorbs them without a job restart)",
+            "increase ingest to >= 5 partitions -- consumer parallelism is capped by partition count",
+            "give Druid its own middle-manager capacity (more task slots and a larger heap) so segment handoff does not become the new ceiling",
+            "move Valkey dedup/denorm off the same host, or accept that each event costs two extra round trips on a shared box"
+          ]
+        },
+        {
+          "multiple": 10,
+          "target_per_sec": 592.3,
+          "projected_host_cpu_pct": 845.9,
+          "steps": [
+            "add ~30 CPU cores (projected 846% of the current 4)",
+            "raise unified-pipeline parallelism to ~10 slot(s) (add TaskManager replicas; the reactive scheduler absorbs them without a job restart)",
+            "increase ingest to >= 10 partitions -- consumer parallelism is capped by partition count",
+            "give Druid its own middle-manager capacity (more task slots and a larger heap) so segment handoff does not become the new ceiling",
+            "move Valkey dedup/denorm off the same host, or accept that each event costs two extra round trips on a shared box",
+            "split the single-container Druid into separate coordinator/overlord, broker, historical and middle-manager processes -- the bundled micro-quickstart is not a 10x target"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "impact": "high",
+          "title": "Add TaskManager slots before anything else",
+          "detail": "The constraint is inside the stream job (unified-pipeline operator: ExtractionFunction -> (extractor-batch-failed-events-sink: Writer -> extractor-b). This deployment runs 2 slot(s); the reactive scheduler rescales automatically when another TaskManager registers, so this is a compose scale operation rather than a job redeploy."
+        },
+        {
+          "impact": "medium",
+          "title": "Checkpoints are slow enough to interrupt processing",
+          "detail": "p95 checkpoint duration was 16.3 s. Increase the interval or move the checkpoint store off the container filesystem."
+        },
+        {
+          "impact": "low",
+          "title": "Segments are smaller than Druid's target",
+          "detail": "1 segment(s) averaging 19,801 rows. Druid targets ~5M rows per segment; small segments multiply query fan-out and metadata overhead. Increase segmentGranularity or run compaction."
+        },
+        {
+          "impact": "low",
+          "title": "Throughput is not CPU-limited",
+          "detail": "Correlation between host CPU and throughput was r=-0.55. Adding cores is unlikely to help; the constraint is concurrency or an external wait."
+        },
+        {
+          "impact": "low",
+          "title": "Re-run at a higher volume to confirm the ceiling",
+          "detail": "This run drained 20,000 events. The measured rate is a lower bound; OBSRV_BENCH_LOAD_EVENTS=100000 re-runs the identical benchmark at 5x."
+        }
+      ],
+      "summary_answers": [
+        {
+          "question": "Peak ingestion throughput",
+          "answer": "72 events/sec (4.30K events/min)"
+        },
+        {
+          "question": "Sustained ingestion throughput",
+          "answer": "59 events/sec (3.55K events/min)"
+        },
+        {
+          "question": "Producer-side ceiling (Kafka write path)",
+          "answer": "3.98K events/sec"
+        },
+        {
+          "question": "Unified Pipeline processing rate",
+          "answer": "72 records/sec sustained, 160 peak"
+        },
+        {
+          "question": "Druid indexing speed",
+          "answer": "55 rows/sec queryable, 12 rows/sec reported by the supervisor"
+        },
+        {
+          "question": "End-to-end latency (event generated -> queryable)",
+          "answer": "p50 - ms, p95 - ms, p99 - ms"
+        },
+        {
+          "question": "Wall-clock end to end for the whole batch",
+          "answer": "7m56s"
+        },
+        {
+          "question": "Backlog drain time",
+          "answer": "7m51s for 20,000 events"
+        },
+        {
+          "question": "Query latency (all classes)",
+          "answer": "avg - ms, p50 -, p95 -, p99 -"
+        },
+        {
+          "question": "Estimated queries/sec",
+          "answer": "- queries/sec (-/min) at concurrency None, measured under load"
+        },
+        {
+          "question": "Slowest / fastest query class",
+          "answer": "- / -"
+        },
+        {
+          "question": "CPU utilisation at peak",
+          "answer": "host 85% p95 (87% max) across 4 cores"
+        },
+        {
+          "question": "Memory utilisation at peak",
+          "answer": "host 84% of 11.7 GiB; TaskManager heap peak 85% of max"
+        },
+        {
+          "question": "Disk and network at peak",
+          "answer": "read -/s, write -/s, net rx -/s tx -/s"
+        },
+        {
+          "question": "Cost per 1,000 events",
+          "answer": "54 CPU-seconds across all containers"
+        },
+        {
+          "question": "Is Kafka the bottleneck?",
+          "answer": "No -- consumer lag fell monotonically and the producer sustained 3.98K events/sec, well above the pipeline's rate"
+        },
+        {
+          "question": "Is Flink / the Unified Pipeline the bottleneck?",
+          "answer": "Yes -- this operator was busy 87% of the time while only 0% backpressured -- it is doing the work that sets the pace, not waiting on a downstream stage"
+        },
+        {
+          "question": "Is Druid the bottleneck?",
+          "answer": "No -- this operator was busy 87% of the time while only 0% backpressured -- it is doing the work that sets the pace, not waiting on a downstream stage"
+        },
+        {
+          "question": "Is the infrastructure the bottleneck?",
+          "answer": "No -- this operator was busy 87% of the time while only 0% backpressured -- it is doing the work that sets the pace, not waiting on a downstream stage"
+        },
+        {
+          "question": "Recommended safe production throughput",
+          "answer": "2.49K events/min (41 events/sec) -- 70% of measured sustained, leaving headroom for query load and retries"
+        },
+        {
+          "question": "Daily volume at the safe rate",
+          "answer": "3.58M events/day"
+        },
+        {
+          "question": "Functional correctness",
+          "answer": "11/12 checks passed -- see the failures below"
+        },
+        {
+          "question": "Can this deployment sustain 10,000 events/min?",
+          "answer": "No -- that is 2.81x the measured sustained rate"
+        },
+        {
+          "question": "Can this deployment sustain 100,000 events/min?",
+          "answer": "No -- that is 28.14x the measured sustained rate"
+        },
+        {
+          "question": "What is needed for 2x capacity?",
+          "answer": "add ~3 CPU cores (projected 169% of the current 4); raise unified-pipeline parallelism to ~3 slot(s) (add TaskManager replicas; the reactive scheduler absorbs them without a job restart)"
+        },
+        {
+          "question": "What is needed for 5x capacity?",
+          "answer": "add ~13 CPU cores (projected 423% of the current 4); raise unified-pipeline parallelism to ~5 slot(s) (add TaskManager replicas; the reactive scheduler absorbs them without a job restart); increase ingest to >= 5 partitions -- consumer parallelism is capped by partition count; give Druid its own middle-manager capacity (more task slots and a larger heap) so segment handoff does not become the new ceiling; move Valkey dedup/denorm off the same host, or accept that each event costs two extra round trips on a shared box"
+        },
+        {
+          "question": "What is needed for 10x capacity?",
+          "answer": "add ~30 CPU cores (projected 846% of the current 4); raise unified-pipeline parallelism to ~10 slot(s) (add TaskManager replicas; the reactive scheduler absorbs them without a job restart); increase ingest to >= 10 partitions -- consumer parallelism is capped by partition count; give Druid its own middle-manager capacity (more task slots and a larger heap) so segment handoff does not become the new ceiling; move Valkey dedup/denorm off the same host, or accept that each event costs two extra round trips on a shared box; split the single-container Druid into separate coordinator/overlord, broker, historical and middle-manager processes -- the bundled micro-quickstart is not a 10x target"
+        }
+      ]
+    },
+    "run_failure": null
+  }
+}

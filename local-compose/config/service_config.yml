@@ -56,7 +56,14 @@ kafka:
   telemetry:
     topic: system.telemetry.events
   replication_factor: 1
-  no_of_partitions: 1
+  # CHANGED FOR LOCAL: 1 -> 4, to match the 4 partitions create-topics.sh gives
+  # every platform topic and the broker's num.partitions=4 default. command-api
+  # creates each dataset's topic explicitly on publish, so this value -- not the
+  # broker default -- decides the partition count for every per-dataset topic.
+  # At 1 partition a dataset's ingest topic can only ever be consumed by one
+  # Flink subtask, which caps that dataset's throughput regardless of
+  # consumer.parallelism.
+  no_of_partitions: 4
 
 helm_charts_base_dir: /app/helm-charts
 

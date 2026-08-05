@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+
+# Run outputs are regenerable from the seeded config, and the generated corpus
+# alone is ~43 MB per run. The reference run's report is committed explicitly
+# with `git add -f`; see docs/benchmark-results.md for which one and why.
+results/

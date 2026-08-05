@@ -61,21 +61,35 @@ fi
 
 # --- users -------------------------------------------------------------------
 create_user() {
-  local username="$1" password="$2" email="$3"
+  local username="$1" password="$2" email="$3" first="$4" last="$5"
   if "$KC" get users -r "$REALM" -q "username=${username}" --fields username --format csv --noquotes 2>/dev/null | grep -qx "${username}"; then
     echo "User ${username} already exists; skipping."
     return
   fi
+  # firstName and lastName are NOT optional here, even though nothing in the
+  # stack displays them. Keycloak 24+ enables the declarative user profile by
+  # default, which makes both fields required, and a user missing either gets a
+  # VERIFY_PROFILE required action attached. Any required action makes the token
+  # endpoint reject the password grant with:
+  #   invalid_grant / "Account is not fully set up"
+  # so scripts/sample-dataset.sh (and anything else using the password grant)
+  # cannot authenticate at all until someone completes the profile form in the
+  # browser by hand. That is not a startup race -- it never resolves on its own.
+  # requiredActions is set empty explicitly so a realm-level default cannot
+  # reintroduce the same problem.
   "$KC" create users -r "$REALM" \
     -s "username=${username}" \
     -s "email=${email}" \
+    -s "firstName=${first}" \
+    -s "lastName=${last}" \
     -s emailVerified=true \
+    -s 'requiredActions=[]' \
     -s enabled=true
   "$KC" set-password -r "$REALM" --username "${username}" --new-password "${password}"
   echo "Created user ${username}."
 }
 
-create_user "obsrv_admin" "enDoPvTAxFSd" "admin@obsrv.in"
+create_user "obsrv_admin" "enDoPvTAxFSd" "admin@obsrv.in" "Obsrv" "Admin"
 # loginWithEmailAllowed=true above means this one user can log in as either
 # "obsrv_admin" or "admin@obsrv.in" -- no need for a second user account.
 

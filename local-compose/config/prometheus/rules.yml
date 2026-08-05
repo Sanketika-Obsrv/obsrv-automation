@@ -1,0 +1,26 @@
+# The web console's CPU and memory panels don't query raw node-exporter series.
+# They query two *recording rules* that kube-prometheus-stack publishes:
+#
+#   cluster:node_cpu:ratio_rate5m       -- fraction of CPU busy, 0..1
+#   :node_memory_MemAvailable_bytes:sum -- available bytes, summed per cluster
+#
+# Without kube-prometheus those names simply don't exist, so the panels render
+# empty even with node-exporter running. Recreating them here from plain
+# node-exporter output is what makes the dashboards work with no Kubernetes.
+#
+# Both rules aggregate with a bare sum()/avg() and no `by`, which drops every
+# label -- including `cluster`. That is deliberate: the console selects with
+# {cluster=''}, and in PromQL an empty-string matcher also matches series where
+# the label is absent.
+groups:
+  - name: kube-prometheus-shims
+    interval: 30s
+    rules:
+      # kube-prometheus derives this as busy/total across all cores. Averaging
+      # the idle rate over every cpu gives the idle fraction directly, so 1 minus
+      # it is the busy fraction. The console multiplies by 100 for percent.
+      - record: cluster:node_cpu:ratio_rate5m
+        expr: 1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m]))
+
+      - record: :node_memory_MemAvailable_bytes:sum
+        expr: sum(node_memory_MemAvailable_bytes)

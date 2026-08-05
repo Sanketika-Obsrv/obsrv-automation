@@ -11,6 +11,9 @@
 #   profile "masterdata"
 #                    cache-indexer (jobmanager + taskmanager) -- master
 #                    datasets / denormalization only, off by default
+#   profile "metrics"
+#                    prometheus + node-exporter -- populates the console's
+#                    CPU/memory and API-health dashboards
 #
 # .env enables both profiles by default. Comment COMPOSE_PROFILES out there to
 # run just the control plane on a small Docker memory budget.
@@ -20,6 +23,17 @@
 
 x-obsrv-platform: &obsrv-platform
   platform: linux/amd64
+
+# ADDED FOR LOCAL: glibc hands a multi-threaded process up to 8 arenas per core
+# (so 32 on a 4-core VM), and each arena keeps its own free lists that are never
+# returned to the OS. Flink's TaskManager runs dozens of threads, which is why it
+# measured 1465MB RSS against a configured Total Process Memory of 768m -- the
+# gap is arena fragmentation, not Flink memory. Capping arenas at 2 trades a
+# little allocator contention (irrelevant at a few thousand events/s) for a much
+# tighter RSS. It cannot cause an OOM: it changes how free memory is pooled, not
+# how much the JVM may use.
+x-flink-env: &flink-env
+  MALLOC_ARENA_MAX: "2"
 
 volumes:
   postgres-data:
@@ -32,6 +46,7 @@ volumes:
   druid-deepstorage:
   druid-historical-data:
   druid-indexer-data:
+  prometheus-data:
   # Hands the Keycloak-assigned obsrv_admin user id from keycloak-init (which
   # has kcadm but no psql) to oauth-admin-sync (which has psql but no kcadm).
   keycloak-admin-id:
@@ -137,7 +152,18 @@ services:
       # The image defaults to -Xms1G -Xmx1G, and since Xms == Xmx the JVM
       # commits the full gigabyte at startup. Local topic volumes are tiny;
       # 512m is ample and gives that back.
-      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx256m"
+      # ADDED FOR LOCAL: without this the image falls back to its packaged
+      # config's log.dirs=/tmp/kraft-broker-logs (it actually lands in
+      # /tmp/kafka-logs), so the kafka-data volume below was mounted but never
+      # written to, and every `docker compose down` silently wiped every topic.
+      # Postgres and the Druid metadata DB do persist, so the stack came back
+      # with datasets still marked Live whose topics no longer existed. For a
+      # master dataset that is fatal rather than cosmetic: cache-indexer
+      # subscribes to a topic named after the dataset, and a missing topic makes
+      # its enumerator throw UnknownTopicOrPartitionException, which fails the
+      # job -- so the job crash-looped forever instead of starting.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
     volumes:
       - kafka-data:/var/lib/kafka/data
     ports:
@@ -163,12 +189,31 @@ services:
 
   # Two Valkey instances, as in the charts: dedup (extractor/preprocessor
   # duplicate stores) and denorm (master-data cache + dataset registry cache).
+  #
+  # CHANGED FOR LOCAL: both get a maxmemory cap. Valkey has no limit by default,
+  # so it will happily grow until the host says no. Each idles at ~12MB here and
+  # a few thousand events barely move that, but dedup keys only expire after
+  # redis.database.key.expiry.seconds (1h), so an unattended stack left ingesting
+  # has no natural ceiling. allkeys-lru is the right policy for both: dedup keys
+  # are a bloom-filter-ish optimisation (evicting one risks a duplicate slipping
+  # through, not data loss) and denorm entries are a cache of master rows that
+  # can be re-read. 256mb is ~20x the idle footprint, so nothing evicts in
+  # practice -- it is a backstop, not a working limit.
   valkey-dedup:
     image: valkey/valkey:8.1.3
     container_name: obsrv-valkey-dedup
     restart: unless-stopped
     networks: [obsrv]
-    command: ["valkey-server", "--save", "60", "1", "--appendonly", "no"]
+    command: ["valkey-server", "--save", "60", "1", "--appendonly", "no",
+              "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    # Gates the Flink taskmanagers, which open their Redis connections eagerly
+    # when an operator opens -- a refused connect there fails the whole job.
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
     volumes:
       - valkey-dedup-data:/data
     ports:
@@ -179,7 +224,14 @@ services:
     container_name: obsrv-valkey-denorm
     restart: unless-stopped
     networks: [obsrv]
-    command: ["valkey-server", "--save", "60", "1", "--appendonly", "no"]
+    command: ["valkey-server", "--save", "60", "1", "--appendonly", "no",
+              "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
     volumes:
       - valkey-denorm-data:/data
     ports:
@@ -218,10 +270,24 @@ services:
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=zookeeper:2888:3888;2181
+      # The image default is -Xmx1000m with no -Xms, so it grows lazily and only
+      # ever reached ~113MB here. Capping it costs nothing and stops a runaway
+      # from eating into Druid's budget -- this znode tree is tiny (one Druid
+      # cluster, a handful of supervisors).
+      JVMFLAGS: "-Xms64m -Xmx256m"
       ZOO_4LW_COMMANDS_WHITELIST: "srvr,mntr,ruok"
       ZOO_AUTOPURGE_PURGEINTERVAL: 1
     volumes:
       - zookeeper-data:/data
+    # "ruok" is in the 4lw whitelist above purely so this healthcheck can use
+    # it. Druid gated on service_started before, which only means the container
+    # exists -- its coordinator would then fail its first znode write and retry.
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc -w 2 localhost 2181 | grep -q imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
 
   druid:
     image: sanketikahub/druid:32.0.1
@@ -233,7 +299,7 @@ services:
       postgres:
         condition: service_healthy
       zookeeper:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_healthy
     # Named volumes are created root-owned; the image's default `druid` user
@@ -264,6 +330,7 @@ services:
     <<: *obsrv-platform
     image: sanketikahub/unified-pipeline:2.0.1
     container_name: obsrv-unified-pipeline-jobmanager
+    environment: *flink-env
     profiles: [flink]
     restart: unless-stopped
     networks: [obsrv]
@@ -297,12 +364,20 @@ services:
     <<: *obsrv-platform
     image: sanketikahub/unified-pipeline:2.0.1
     container_name: obsrv-unified-pipeline-taskmanager
+    environment: *flink-env
     profiles: [flink]
     restart: unless-stopped
     networks: [obsrv]
     depends_on:
       unified-pipeline-jobmanager:
         condition: service_started
+      # The taskmanager, not the jobmanager, is where the operators run and so
+      # where the Redis connections are opened (dedup store in baseconfig.conf,
+      # denorm store for the enrichment operators).
+      valkey-dedup:
+        condition: service_healthy
+      valkey-denorm:
+        condition: service_healthy
     entrypoint: ["/opt/flink/bin/taskmanager.sh"]
     command:
       - start-foreground
@@ -326,6 +401,7 @@ services:
     <<: *obsrv-platform
     image: sanketikahub/cache-indexer:2.0.1
     container_name: obsrv-cache-indexer-jobmanager
+    environment: *flink-env
     profiles: [masterdata]
     restart: unless-stopped
     networks: [obsrv]
@@ -359,12 +435,19 @@ services:
     <<: *obsrv-platform
     image: sanketikahub/cache-indexer:2.0.1
     container_name: obsrv-cache-indexer-taskmanager
+    environment: *flink-env
     profiles: [masterdata]
     restart: unless-stopped
     networks: [obsrv]
     depends_on:
       cache-indexer-jobmanager:
         condition: service_started
+      # This is the job whose entire output is Valkey writes -- master records
+      # land in valkey-denorm at the dataset's cache_config.redis_db.
+      valkey-dedup:
+        condition: service_healthy
+      valkey-denorm:
+        condition: service_healthy
     entrypoint: ["/opt/flink/bin/taskmanager.sh"]
     command:
       - start-foreground
@@ -407,7 +490,9 @@ services:
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: xforwarded
-      JAVA_OPTS_KC_HEAP: "-Xms256m -Xmx512m"
+      # Keycloak's own default is 512m/70% of RAM. One realm and one admin user
+      # do not need it; 384m leaves room for the initial realm import spike.
+      JAVA_OPTS_KC_HEAP: "-Xms128m -Xmx384m"
     command: ["start-dev"]
 
   keycloak-init:
@@ -465,11 +550,37 @@ services:
         condition: service_completed_successfully
       kafka:
         condition: service_healthy
+      # Every write endpoint validates a Keycloak token, so the realm, the
+      # obsrv-console client and obsrv_admin all have to exist before the API is
+      # reachable -- otherwise the first request after `up` fails on auth rather
+      # than on anything to do with the API.
+      keycloak-init:
+        condition: service_completed_successfully
+    # Gates web-console and nginx below: the API answers /health only once it has
+    # finished its (ts-node) startup compile, which is several seconds after the
+    # container reports "started".
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health | grep -q SUCCESS"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
     env_file:
       # user_token_public_key -- generated by scripts/gen-token-env.sh, the
       # stand-in for the chart's openssl-secrets Secret.
       - ./secrets/tokens.env
     environment:
+      # ADDED FOR LOCAL: the image's start script is "ts-node ./src/app.ts", so it
+      # compiles TypeScript at every boot and keeps the whole type checker --
+      # program, AST and symbol tables -- resident for the life of the process.
+      # Measured 622MB RSS against 4MB of actually-live JS heap. transpile-only
+      # strips types without type-checking, which is all a shipped image needs
+      # (the code was type-checked at build time; checking it again at runtime
+      # cannot change the outcome, it can only fail the boot).
+      TS_NODE_TRANSPILE_ONLY: "true"
+      # With the checker gone, 256MB of old-space is generous for a service whose
+      # live heap is single-digit MB. This is a ceiling, not a reservation.
+      NODE_OPTIONS: "--max-old-space-size=256"
       system_env: local
       api_port: "3000"
       telemetry_kafka_compression: snappy
@@ -523,11 +634,12 @@ services:
       pipeline_merged_job_manager_url: http://unified-pipeline-jobmanager:8081
       masterdata_processor_job_manager_url: http://cache-indexer-jobmanager:8081
 
-      # Grafana and Prometheus are out of scope; the observability endpoints
-      # that read them will return errors.
+      # Grafana is out of scope; the endpoints that read it return errors.
       grafana_url: http://localhost:3001
       GRAFANA_ADMIN_URL: http://localhost:3001
-      prometheus_url: http://localhost:9090
+      # Real when COMPOSE_PROFILES includes "metrics"; otherwise this resolves to
+      # nothing and the metrics endpoints log ECONNREFUSED, which is harmless.
+      prometheus_url: http://prometheus:9090
 
       storage_types: '{"lake_house":false,"realtime_store":true}'
       telemetry_dataset: system.telemetry.events
@@ -552,6 +664,11 @@ services:
     depends_on:
       flyway:
         condition: service_completed_successfully
+      # command-api runs the CREATE_KAFKA_TOPIC command on publish, creating each
+      # dataset's topic through the admin client, so it needs a live broker --
+      # not just a started container.
+      kafka:
+        condition: service_healthy
     environment:
       CONFIG_PATH: /data/config
       system_env: local
@@ -568,12 +685,26 @@ services:
     restart: unless-stopped
     networks: [obsrv]
     depends_on:
+      # service_healthy, not service_started: the console's first page load calls
+      # dataset-api, and "started" only means the container exists -- ts-node
+      # takes several more seconds to answer anything.
       dataset-api:
-        condition: service_started
+        condition: service_healthy
       keycloak-init:
         condition: service_completed_successfully
       oauth-admin-sync:
         condition: service_completed_successfully
+    # Gates nginx below. There is no dedicated health route -- the console is a
+    # SPA and every unmatched path returns index.html -- so serving the app shell
+    # is the readiness signal. Note 127.0.0.1 rather than localhost: the
+    # /etc/hosts override below points "localhost" at nginx, so a healthcheck on
+    # localhost would test nginx (and deadlock, since nginx waits on this check).
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ | grep -q '<title>Obsrv'"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
     env_file:
       # USER_TOKEN_PRIVATE_KEY -- the private half of the pair dataset-api
       # verifies with. Generated by scripts/gen-token-env.sh.
@@ -585,6 +716,12 @@ services:
       # itself -- see config/web-console-hosts for why extra_hosts won't do.
       - ./config/web-console-hosts:/etc/hosts:ro
     environment:
+      # ADDED FOR LOCAL: same ts-node story as dataset-api -- "npm run start" is
+      # "ts-node ./src", which measured 415MB for the server plus 122MB for the
+      # npm wrapper process. See the note on dataset-api for why dropping the
+      # runtime type check is safe.
+      TS_NODE_TRANSPILE_ONLY: "true"
+      NODE_OPTIONS: "--max-old-space-size=384"
       ENV: local
       PORT: "3000"
       APP_NAME: obsrv-web-console
@@ -631,8 +768,114 @@ services:
       GRAFANA_URL: http://localhost:3001
       GRAFANA_ADMIN_URL: http://localhost:3001
       ALERT_MANAGER_URL: http://localhost:9093
-      PROMETHEUS_URL: http://localhost:9090
+      # Read server-side by the console's own axios instance (not the browser),
+      # so a compose service name is correct here. Needs COMPOSE_PROFILES to
+      # include "metrics".
+      PROMETHEUS_URL: http://prometheus:9090
       SUPERSET_URL: http://localhost:8088
+
+  # Mirrors helmcharts/services/submit-ingestion (a one-shot k8s Job, same
+  # alpine/curl image). It registers the "system-events" Druid supervisor, which
+  # is what makes the console's pipeline/error dashboards resolve -- obsrv's Flink
+  # jobs publish per-stage stats to the system.events topic, and without this
+  # supervisor nothing reads that topic into Druid.
+  #
+  # The chart also submits system-telemetry-events; omitted here as not needed.
+  #
+  # Distinct from per-dataset ingestion: publishing a dataset makes dataset-api
+  # generate a spec and command-api submit it (SUBMIT_INGESTION_TASKS). This job
+  # only covers the one built-in system datasource, which no dataset publish
+  # creates. Re-POSTing a supervisor spec is an idempotent update, so this is safe
+  # to re-run on every `up`.
+  submit-ingestion:
+    image: alpine/curl:8.12.1
+    container_name: obsrv-submit-ingestion
+    profiles: [druid]
+    networks: [obsrv]
+    restart: on-failure
+    depends_on:
+      # The supervisor this submits reads system.telemetry.events, so wait for
+      # create-topics.sh rather than just for the broker -- otherwise the
+      # supervisor spends its first minutes retrying a topic that isn't there.
+      kafka-topics-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./config/druid/system-events.json:/config/system-events.json:ro
+    entrypoint:
+      - sh
+      - -c
+      - |
+        # Druid has no compose healthcheck (five JVMs behind one container), so
+        # poll the router until it answers before POSTing.
+        until curl -sf -u admin:admin123 http://druid:8888/status >/dev/null; do
+          echo "waiting for druid router..."; sleep 5
+        done
+        echo "submitting system-events supervisor"
+        curl -sS -X POST \
+          -H "Content-Type: application/json" \
+          -u admin:admin123 \
+          -d @/config/system-events.json \
+          http://druid:8888/druid/indexer/v1/supervisor
+        echo
+
+  # ===========================================================================
+  # Observability
+  # ===========================================================================
+  # Upstream runs kube-prometheus-stack. Here it is one Prometheus plus a
+  # cut-down node-exporter, which is enough for the console's CPU/memory panels
+  # and its API-health charts. See config/prometheus/rules.yml for the trick that
+  # makes the kube-prometheus-only metric names resolve without Kubernetes.
+  #
+  # Panels that stay blank: anything sourced from kubelet
+  # (kubelet_volume_stats_*, the PV/disk charts), kube-state-metrics (node
+  # counts) or velero (backups). Those describe Kubernetes objects that have no
+  # Compose equivalent, so there is nothing to point them at.
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: obsrv-prometheus
+    restart: unless-stopped
+    profiles: [metrics]
+    networks: [obsrv]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      # 6h/256MB instead of the 15d default. Local use is "look at what just
+      # happened", and the default retention is the main driver of RSS here.
+      - --storage.tsdb.retention.time=6h
+      - --storage.tsdb.retention.size=256MB
+      - --web.listen-address=:9090
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/prometheus/rules.yml:/etc/prometheus/rules.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: obsrv-node-exporter
+    restart: unless-stopped
+    profiles: [metrics]
+    networks: [obsrv]
+    # disable-defaults then re-enable only cpu and meminfo: those two collectors
+    # cover every panel we can actually populate, and dropping the rest keeps
+    # this container around 10MB instead of ~25MB.
+    command:
+      - --path.procfs=/host/proc
+      - --collector.disable-defaults
+      - --collector.cpu
+      - --collector.meminfo
+    volumes:
+      # On Docker Desktop this is the Linux VM's /proc, not the host Mac's, so
+      # the numbers describe the VM the stack actually runs in. That is the right
+      # denominator for "how much headroom is left".
+      - /proc:/host/proc:ro
 
   # ===========================================================================
   # Ingress
@@ -649,8 +892,18 @@ services:
         # Fixed address so web-console can reach nginx under the same
         # "localhost:8080" URL its browser-facing redirects use (see below).
         ipv4_address: 172.28.0.254
+    # Every proxy_pass in config/nginx.conf names a host literally rather than
+    # through a variable, so nginx resolves all of them at config-load time and
+    # refuses to start ("host not found in upstream") if any one is missing --
+    # it does not retry. All three upstreams are therefore gated here, and on
+    # healthy rather than started where a healthcheck exists, so the first
+    # request through the proxy is served instead of 502'd.
     depends_on:
       web-console:
+        condition: service_healthy
+      dataset-api:
+        condition: service_healthy
+      keycloak:
         condition: service_started
     volumes:
       - ./config/nginx.conf:/etc/nginx/nginx.conf:ro

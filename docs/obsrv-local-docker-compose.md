@@ -93,6 +93,61 @@ Full detail, credentials, ports, and start/reset instructions:
   `$host`, which strips the port. Since `HTTP_PORT` is rarely 80, dropping it
   makes web-console's keycloak-connect middleware build a `redirect_uri`
   without the port, which Keycloak then rejects as an invalid redirect URI.
+- **Kafka's log directory is set explicitly (`KAFKA_LOG_DIRS`).** This looks
+  redundant next to the `kafka-data` volume and is not: `apache/kafka:4.0.0`
+  falls back to its packaged config's `log.dirs=/tmp/kraft-broker-logs` when the
+  variable is unset, so the volume was mounted at `/var/lib/kafka/data` but never
+  written to. The failure mode is worth understanding because it is
+  asymmetric — Postgres and the Druid metadata DB *do* persist, so every
+  `docker compose down` silently wiped every topic while leaving datasets marked
+  `Live`. For an event dataset that self-heals (the shared `ingest` topic is
+  recreated by `kafka-topics-init`). For a **master** dataset it is fatal:
+  `cache-indexer` subscribes to a topic named after the dataset, and a missing
+  topic makes its enumerator throw `UnknownTopicOrPartitionException`, failing
+  the job — which then crash-loops permanently under
+  `FixedDelayRestartBackoffTimeStrategy(maxNumberRestartAttempts=3)`. The
+  presenting symptom is a Flink job that will not start, several layers away
+  from the cause.
+- **`kafka.no_of_partitions` is 4 in `config/service_config.yml`, not 1.** The
+  broker's `num.partitions=4` default does not decide this. `command-api`
+  creates each dataset's topic explicitly during `PUBLISH_DATASET`
+  (`CREATE_KAFKA_TOPIC` → `kafka_command.py`, reading
+  `kafka.no_of_partitions`), so the broker default never applies to per-dataset
+  topics. At 1 partition a dataset's topic can only be consumed by one Flink
+  subtask, capping that dataset's throughput regardless of
+  `consumer.parallelism`. Platform topics get 4 from `create-topics.sh`; this
+  makes per-dataset topics match.
+- **`keycloak-init.sh` sets `firstName`, `lastName` and an empty
+  `requiredActions` on `obsrv_admin`,** none of which the stack displays. Without
+  them the password grant is permanently broken, not slow: Keycloak 24+ enables
+  the declarative user profile, which makes both name fields required, and a user
+  missing either gets a `VERIFY_PROFILE` required action. Any pending required
+  action makes the token endpoint reject the password grant with
+  `invalid_grant` / `"Account is not fully set up"`. Nothing resolves it on its
+  own — the only other fix is completing the profile form in a browser by hand,
+  which is not something a scripted `up` can do. `requiredActions=[]` is set
+  explicitly so a realm-level default cannot reintroduce it.
+- **Startup order is expressed as health gates, not `service_started`.**
+  Compose's `service_started` only means the container exists, which for most of
+  these services is several seconds before they answer anything. The gates that
+  matter: `zookeeper` has a `ruok`/`imok` check that Druid waits on (otherwise
+  the coordinator fails its first znode write and retries); `dataset-api` waits
+  on `kafka` healthy, the Flyway migration *and* `keycloak-init` completing,
+  since every write endpoint validates a token; `command-api` waits on `kafka`
+  healthy because it creates topics through the admin client; both Flink
+  taskmanagers wait on both Valkeys healthy, since the operators open their Redis
+  connections eagerly and a refused connect fails the job; `web-console` and
+  `nginx` wait on `dataset-api` healthy rather than started. `nginx` gates on all
+  three of its upstreams because every `proxy_pass` in `config/nginx.conf` names
+  a host literally, so nginx resolves them all at config-load time and refuses to
+  start with `host not found in upstream` — it does not retry.
+
+  Two services deliberately have no healthcheck. `keycloak:26.0` ships with
+  neither `curl` nor `bash`, so there is no practical in-container HTTP probe;
+  `keycloak-init`'s own kcadm retry loop covers it, and everything that needs
+  Keycloak gates on `keycloak-init` completing instead. Druid has five JVMs
+  behind one container with no single meaningful endpoint, so `submit-ingestion`
+  polls the router itself.
 - **Flyway migrations are rendered, not copied.** The real migration SQL under
   `helmcharts/services/postgresql-migration/configs/migrations/` is `tpl`-
   templated by Helm before it reaches Postgres. `scripts/migrate.sh`
@@ -189,15 +244,82 @@ supervisor, and the status-transition state machine has no path back from
 dataset_id = ...`. This is vendor image code (`obsrv-command-service`), not
 something fixable here.
 
-Measured memory on a 11.67 GiB Docker Desktop VM, after running the ingest →
-query path (so these include real ingestion, not just idle):
+**Master datasets and denormalization are verified too**, and the event shape
+differs from an event dataset's in a way that is not documented anywhere and
+fails 100% of records when got wrong. A master dataset ingests on a topic named
+after the dataset, so there is no `{"dataset", "event"}` wrapper — and
+`CacheIndexerFunction` reads the dataset's `keys_config.data_key` from the **top
+level** of the message. Push a wrapped event and the key sits one level down, so
+every record is rejected to `masterdata.failed` with `ERR_MASTER_DATA_1017`
+*"Master dataset configuration key is missing"* — which reads as a dataset-config
+fault rather than an event-shape one. Event datasets on the shared `ingest` topic
+need the opposite: without the wrapper the extractor fails with `ERR_EXT_1004`
+*"Dataset Id is missing from the data"*.
 
-| Selection | Measured RSS | What it gives you |
+`data_key` is also the join key, and the only one: a denorm lookup is
+`GET <event[denorm_key]>` against the master's Redis DB, so denormalization
+resolves through the master dataset's `data_key` and through nothing else. There
+is no join on any other column. An unmatched lookup is *not* an error either —
+`DenormalizerJob` counts it as `denorm_partial_success` and passes the event
+through with the `denorm_out_field` absent, so a completely broken join looks
+like a working pipeline unless the joined column is checked explicitly. Druid
+names those columns `<denorm_out_field>.<master column>`.
+
+One more silent-loss trap on the master path: `cache-indexer`'s Kafka source
+starts at `COMMITTED_OFFSET`, and a brand-new dataset topic has no committed
+offset, so it falls back to **LATEST**. Anything published before the reader
+takes its split is dropped — job `RUNNING`, topic full, Valkey empty. The job
+reaching `RUNNING` is necessary but not sufficient; wait for
+`Discovered new partitions: [<topic>-` in the jobmanager log. `cache-indexer`
+also builds its subscription list once at startup ("without periodic partition
+discovery"), so a master dataset created after the job started is invisible to
+it and the job must be restarted.
+
+`scripts/sample-dataset.sh` has three modes — `event`, `master` and `denorm` —
+and each one asserts on the read-back rather than on the publish succeeding.
+Latest full run on a fresh `down -v` / `up -d`: 1000/1000 rows in Druid for the
+event dataset, 50/50 keys in Valkey for the master dataset, and 200/200 rows with
+the master record joined for the denorm dataset, with `masterdata.failed` empty.
+
+**The console's event counters read 0 for master datasets** no matter how many
+records are ingested, and this is upstream behaviour rather than a local
+artifact. `dataset-api`'s `DatasetListMetrics.ts` computes Total/Failed Events as
+a `longSum(count)` over the Druid `system-events` datasource filtered on
+`ctx_dataset`; `cache-indexer` emits no system events at all — every record in
+`system.events` comes from `unified-pipeline`'s terminal `DruidRouterJob` stage,
+which master data never reaches. It also writes nothing to
+`masterdata.stats`/`.raw`/`.unique`/`.denorm`/`.transform`, which stay at offset
+0, because the job consumes the dataset's own topic and writes straight to
+Valkey. Volume and Size are 0 for the same reason: both are Druid datasource
+sizes, and a master dataset has no datasource. `Status: Live` and
+`Health: Healthy` are reported correctly. Check Valkey `DBSIZE` instead.
+
+Measured memory on a 11.67 GiB Docker Desktop VM, after running the event, master
+and denorm paths. These are cgroup `anon` from `/sys/fs/cgroup/memory.stat`, not
+`docker stats` — `docker stats` includes page cache, which is over 100 MB of
+reclaimable noise for Postgres and Keycloak alone:
+
+| Selection | Measured anon | What it gives you |
 |---|---|---|
 | Control plane only (no profiles) | ~2.2 GB | console, auth, APIs, Kafka, Postgres |
-| `+ druid` | ~5.3 GB | the above plus a queryable realtime store |
-| `+ druid,flink` (default) | ~6.7 GB | the full event-dataset path, end to end |
-| `+ masterdata` | ~7.9 GB | adds master datasets / denormalization |
+| `+ druid` | ~4.8 GB | the above plus a queryable realtime store |
+| `+ druid,flink,metrics` | ~5.8 GB | the full event-dataset path, end to end |
+| `+ masterdata` (default) | ~7.0 GB | adds master datasets / denormalization |
+
+Two things worth knowing about where that goes. **Druid is exactly at its
+configured budget** — 2176m of heap across five JVMs plus 3×128m direct ≈ the
+2562 MiB measured — so the only way to shrink it is to shrink the heaps in
+`config/druid/local-single-conf/*/jvm.config`. **The unified-pipeline taskmanager
+is the opposite**: it starts near 900 MB but has been measured at 2.5 GB after a
+long session with repeated job restarts, against only ~430 MB of JVM-tracked
+memory (275m committed heap, ~96 MB Metaspace, ~53 MB direct). ~1.8 GB of that
+was resident `rwxp` anon across ~1675 mappings, outside every JVM accounting
+bucket (`ReservedCodeCacheSize` is only 240 MB), so no Flink or `-XX` setting
+bounds it — `MALLOC_ARENA_MAX=2` is set on all four Flink containers to cap the
+worst of it. A `mem_limit` would bound the rest but would OOM-kill the
+taskmanager mid-job, so there deliberately is none; restart the taskmanager if it
+grows. This is the main reason to leave headroom rather than size to the measured
+floor.
 
 The default selection fits inside an 8 GB Docker VM. Getting there took four
 changes beyond collapsing Druid into one container, all traceable to values the

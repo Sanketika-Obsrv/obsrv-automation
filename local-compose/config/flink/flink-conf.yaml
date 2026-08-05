@@ -9,10 +9,28 @@
 # gives both 1024m). In application mode the JobManager only coordinates --
 # no records pass through it -- so 384m of Flink memory (256m heap + 128m
 # off-heap) is ample, vs the 896m heap the chart's 1024m works out to.
-jobmanager.memory.flink.size: 384m
-# CHANGED FOR LOCAL: 1024m -> 614m, entirely by giving back managed memory
-# below. Heap and network sizing are unchanged from the chart.
-taskmanager.memory.flink.size: 614m
+jobmanager.memory.flink.size: 256m
+# CHANGED FOR LOCAL: 1024m -> 448m, by giving back managed memory (below) and
+# sizing network buffers for a try-it-out workload rather than a cluster.
+taskmanager.memory.flink.size: 448m
+
+# CHANGED FOR LOCAL: "*.memory.flink.size" is Total Flink Memory and EXCLUDES
+# both of these, so Total Process Memory = flink.size + metaspace + overhead.
+# The defaults (256m metaspace, 192m overhead) are sized for long-lived cluster
+# TaskManagers running many jobs; these two run one job each with a fixed set of
+# classes. Trimming them is what turns the flink.size cuts above into real RSS.
+jobmanager.memory.jvm-metaspace.size: 192m
+jobmanager.memory.jvm-overhead.min: 128m
+jobmanager.memory.jvm-overhead.max: 128m
+taskmanager.memory.jvm-metaspace.size: 192m
+taskmanager.memory.jvm-overhead.min: 128m
+taskmanager.memory.jvm-overhead.max: 128m
+
+# CHANGED FOR LOCAL: network.fraction alone can't go below the 64m floor, so the
+# floor has to move too. At a few thousand events these buffers are never the
+# bottleneck.
+taskmanager.memory.network.min: 32m
+taskmanager.memory.network.max: 64m
 # CHANGED FOR LOCAL: the chart leaves this at the 0.4 default, which reserves
 # 410m per taskmanager. Managed memory is only used by the RocksDB state
 # backend, batch operators and Python UDFs -- none of which apply here (no
@@ -21,13 +39,30 @@ taskmanager.memory.flink.size: 614m
 # not in Flink managed memory.
 taskmanager.memory.managed.size: 0
 taskmanager.numberOfTaskSlots: 2
+
+# ADDED FOR LOCAL: the chart scrapes Flink through a ServiceMonitor; there is no
+# operator here, so expose the metrics directly for Prometheus to pull. The
+# flink-metrics-prometheus jar already ships in the image under
+# plugins/metrics-prometheus, so this needs no extra download.
+# Costs a few MB per JVM and is what populates the console's per-dataset
+# pipeline charts (flink_taskmanager_job_task_operator_*).
+metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+metrics.reporter.prom.port: 9249
 jobmanager.numberOfTaskSlots: 1
 parallelism.default: 1
 jobmanager.execution.failover-strategy: region
 taskmanager.memory.network.fraction: 0.1
 scheduler-mode: reactive
-heartbeat.timeout: 8000
-heartbeat.interval: 5000
+# CHANGED FOR LOCAL: the chart's 8s timeout / 5s interval assumes a TaskManager
+# with a dedicated node under it. Here four Flink JVMs share the host with Druid,
+# Kafka and Postgres on a 4-core VM, and a stop-the-world pause or a scheduling
+# delay longer than 8s is routine -- especially during startup, when Flink parses
+# the bundled Hadoop core-default.xml. The TaskManager was being declared dead
+# mid-deploy and the job sat in a RESTARTING loop it never escaped. These are
+# Flink's own defaults; raising the timeout only delays failure detection, it
+# does not mask a real failure.
+heartbeat.timeout: 60000
+heartbeat.interval: 10000
 state.savepoints.dir: file:///tmp
 
 # cache-indexer adds these two in the chart; harmless for both jobs.
