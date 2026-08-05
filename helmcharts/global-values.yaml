@@ -346,9 +346,9 @@ keycloak:
     - name: KC_DB
       value: postgres
     - name: KC_DB_URL
-      value: jdbc:postgresql://{{ .Values.defaults.postgres.pghost }}:5432/{{ .Values.defaults.postgres.keycloak_db_name }}
+      value: jdbc:postgresql://{{ .Values.global.postgresql.host }}:5432/{{ .Values.global.postgresql.keycloak.name }}
     - name: KC_DB_USERNAME
-      value: "{{ .Values.defaults.postgres.keycloak_db_name }}"
+      value: "{{ .Values.global.postgresql.keycloak.user }}"
     - name: KC_DB_PASSWORD
       valueFrom:
         secretKeyRef:
