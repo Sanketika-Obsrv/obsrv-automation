@@ -1721,7 +1721,8 @@ metrics:
   customReadinessProbe: {}
   ## @param metrics.command Override default metrics container init command (useful when using custom images)
   ##
-  command: []
+  command:
+    - /usr/local/bin/redis-exporter
   ## @param metrics.valkeyTargetHost A way to specify an alternative Valkey hostname
   ## Useful for certificate CN/SAN matching
   ##

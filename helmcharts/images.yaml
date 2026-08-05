@@ -862,8 +862,9 @@ internal: &internal
           <<: *httpbin
 
   cert-manager:
-    imagePullSecrets: 
-    - name: *dockerSecretName
+    global:
+      imagePullSecrets:
+      - name: *dockerSecretName
     image:
       <<: *cert_manager_controller
     startupapicheck:
