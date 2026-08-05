@@ -46,14 +46,17 @@ ENV LIVY_HOME=/opt/livy \
 # (on LD_LIBRARY_PATH) since the spark base ships none of them (no libssl/libffi/libz/etc).
 COPY --from=dhi.io/python:3.12-debian13 /usr/bin/python3.12 /usr/bin/python3.12
 COPY --from=dhi.io/python:3.12-debian13 /usr/lib/python3.12 /usr/lib/python3.12
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 /opt/pylib/libpython3.12.so.1.0
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/libssl.so.3           /opt/pylib/libssl.so.3
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/libcrypto.so.3        /opt/pylib/libcrypto.so.3
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/libffi.so.8           /opt/pylib/libffi.so.8
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/libbz2.so.1.0         /opt/pylib/libbz2.so.1.0
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/liblzma.so.5          /opt/pylib/liblzma.so.5
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/libzstd.so.1          /opt/pylib/libzstd.so.1
-COPY --from=dhi.io/python:3.12-debian13 /usr/lib/x86_64-linux-gnu/libz.so.1             /opt/pylib/libz.so.1
+# Debian multiarch: libs live under /usr/lib/<arch>-linux-gnu (x86_64 on amd64, aarch64 on arm64).
+# Glob the arch dir with *-linux-gnu (matches the single arch dir present) + a directory dest so
+# the filename is preserved — makes these COPYs arch-agnostic for multi-arch builds.
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/libpython3.12.so.1.0 /opt/pylib/
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/libssl.so.3          /opt/pylib/
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/libcrypto.so.3       /opt/pylib/
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/libffi.so.8          /opt/pylib/
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/libbz2.so.1.0        /opt/pylib/
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/liblzma.so.5         /opt/pylib/
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/libzstd.so.1         /opt/pylib/
+COPY --from=dhi.io/python:3.12-debian13 /usr/lib/*-linux-gnu/libz.so.1            /opt/pylib/
 RUN mkdir -p /usr/local/bin \
     && ln -sf /usr/bin/python3.12 /usr/local/bin/python3 \
     && ln -sf /usr/bin/python3.12 /usr/local/bin/python
