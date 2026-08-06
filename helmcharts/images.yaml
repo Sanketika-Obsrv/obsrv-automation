@@ -462,7 +462,7 @@ images: &images
     tag: 2.2.0
 
   hms: &hms
-    repository: sanketikahub/hms
+    repository: hms
     tag: "2.2.0"
     digest: ""
 
@@ -561,19 +561,19 @@ internal: &internal
         <<: *postgresql-exporter
 
   hms:
+    imagePullSecrets:
+      - name: *dockerSecretName
     image:
       <<: *hms
-      imagePullSecrets:
-      - name: *dockerSecretName
     test:
       image:
         <<: *os-shell
 
   trino:
+    imagePullSecrets:
+      - name: *dockerSecretName
     image:
       <<: *trino
-      imagePullSecrets: 
-      - name: *dockerSecretName
 
   postgresql-backup:
     <<: *postgresql-backup
@@ -687,12 +687,10 @@ internal: &internal
         image:
           <<: *prometheus
         thanos:
-          image:
-            <<: *thanos
+          image: "dhi.io/thanos:0-debian13"
     thanosRuler:
       thanosRulerSpec:
-        image:
-          <<: *thanos
+        image: "dhi.io/thanos:0-debian13"
     kube-state-metrics:
       kubeRBACProxy:
         image:
@@ -712,6 +710,8 @@ internal: &internal
         - name: *dockerSecretName
       admissionWebhooks:
         patch:
+          imagePullSecrets:
+            - name: *dockerSecretName
           image:
             <<: *prometheus-operator-webhook
  
@@ -862,8 +862,9 @@ internal: &internal
           <<: *httpbin
 
   cert-manager:
-    imagePullSecrets: 
-    - name: *dockerSecretName
+    global:
+      imagePullSecrets:
+      - name: *dockerSecretName
     image:
       <<: *cert_manager_controller
     startupapicheck:
