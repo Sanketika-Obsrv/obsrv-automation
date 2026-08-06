@@ -137,12 +137,53 @@ class ObsrvApi:
                          {"dataset_id": dataset_id, "status": "Delete"},
                          raise_on_error=False)
 
-    def query(self, dataset_id, body, timeout=120):
-        """Native/SQL query through the API's own /data/v2/query path."""
-        url = "%s/v2/data/query/%s" % (self.base, dataset_id)
-        _, res, elapsed = httpc.request(
-            url, "POST", body=self.envelope("api.data.out", body),
-            bearer=self.token(), timeout=timeout)
+    def datasources(self):
+        """The live datasources table, as the API reports it.
+
+        Not routed through `call`, which is hardwired to /v2/datasets/.
+        """
+        try:
+            _, res, _ = httpc.request(
+                "%s/v2/datasources/list" % self.base, "POST",
+                body=self.envelope("api.datasources.list", {}),
+                bearer=self.token(), timeout=60)
+        except httpc.HttpError:
+            return []
+        return ((res or {}).get("result") or {}).get("data") or []
+
+    def datasource_key(self, dataset_id):
+        """The path segment /v2/data/query/<key> will actually resolve.
+
+        The route names its parameter `dataset_id`, but the lookup behind it
+        matches `datasources.datasource` or `datasources.id` and never
+        `datasources.dataset_id` -- so passing the dataset id can only ever
+        404. Resolving through the list API rather than reconstructing the
+        name keeps this correct if the derivation changes.
+        """
+        for row in self.datasources():
+            if row.get("dataset_id") == dataset_id:
+                return row.get("datasource") or row.get("id")
+        return dataset_id
+
+    def query(self, dataset_id, query, timeout=120):
+        """Query through the API's own data-out path.
+
+        `query` is either a SQL string or a native Druid query object; the
+        controller dispatches on the type. Note the envelope: unlike every
+        /v2/datasets route, data-out validates `query` at the *top level* and
+        has no `request` property at all, so the usual wrapper fails schema
+        validation with "must have required property 'query'".
+        """
+        url = "%s/v2/data/query/%s" % (self.base, self.datasource_key(dataset_id))
+        body = {
+            "id": "api.data.out",
+            "ver": "v2",
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%S+00:00", time.gmtime()),
+            "params": {"msgid": "obsrv-benchmark"},
+            "query": query,
+        }
+        _, res, elapsed = httpc.request(url, "POST", body=body,
+                                        bearer=self.token(), timeout=timeout)
         return res, elapsed
 
     def ingest(self, dataset_id, events, timeout=120):

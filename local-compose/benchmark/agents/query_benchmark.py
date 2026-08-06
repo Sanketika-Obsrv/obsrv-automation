@@ -38,8 +38,11 @@ def query_set(ds, sample_user=None, sample_city=None):
         ("group_by", "Group by a high-cardinality dimension",
          'SELECT "actor.id" AS actor, COUNT(*) AS events FROM "%s" '
          'GROUP BY 1 ORDER BY events DESC LIMIT 50' % ds),
+        # The alias is quoted because MINUTE is a reserved time-unit keyword in
+        # Druid's SQL parser: bare `AS minute` is a 400 on every iteration, not
+        # a slow query.
         ("time_series", "Per-minute time series",
-         'SELECT TIME_FLOOR(__time, \'PT1M\') AS minute, COUNT(*) AS events '
+         'SELECT TIME_FLOOR(__time, \'PT1M\') AS "minute", COUNT(*) AS events '
          'FROM "%s" GROUP BY 1 ORDER BY 1' % ds),
         ("top_n", "TopN over a dimension",
          'SELECT "eid", COUNT(*) AS events FROM "%s" GROUP BY 1 '
@@ -82,16 +85,27 @@ def run(ctx):
     for name, title, sql in queries:
         r = _time_query(ctx, name, title, sql, q)
         results.append(r)
-        log.info("%-14s avg %7.1f ms  p50 %7.1f  p95 %7.1f  p99 %7.1f  max %7.1f  (%d rows)"
+        if not r["samples_ms"]:
+            # Every iteration failed. Reporting this as 0.0 ms would put it at
+            # the top of the latency table as the fastest query in the run.
+            log.warn("%-14s FAILED all %d iteration(s) -- %s"
+                     % (name, r["iterations"], r["error"] or "no detail"))
+            continue
+        log.info("%-14s avg %7.1f ms  p50 %7.1f  p95 %7.1f  p99 %7.1f  max %7.1f  (%d rows)%s"
                  % (name, r["latency_ms"]["avg"], r["latency_ms"]["p50"],
                     r["latency_ms"]["p95"], r["latency_ms"]["p99"],
-                    r["latency_ms"]["max"], r["rows"]))
+                    r["latency_ms"]["max"], r["rows"],
+                    "  [%d error(s)]" % r["errors"] if r["errors"] else ""))
     res["by_query"] = results
+    res["failed"] = [r["name"] for r in results if not r["samples_ms"]]
 
     allm = [ms for r in results for ms in r["samples_ms"]]
     res["overall_latency_ms"] = stats.summarize(allm, "ms")
-    res["slowest"] = max(results, key=lambda r: r["latency_ms"]["p95"])["name"] if results else None
-    res["fastest"] = min(results, key=lambda r: r["latency_ms"]["p95"])["name"] if results else None
+    # Ranked over queries that actually ran. A query that failed every
+    # iteration has p95 0.0, which would otherwise make it the fastest.
+    timed = [r for r in results if r["samples_ms"]]
+    res["slowest"] = max(timed, key=lambda r: r["latency_ms"]["p95"])["name"] if timed else None
+    res["fastest"] = min(timed, key=lambda r: r["latency_ms"]["p95"])["name"] if timed else None
 
     res["qps"] = _qps_probe(ctx, queries, q)
     log.info("sustained %s queries/sec (%s queries/min) at concurrency %d"
@@ -99,10 +113,13 @@ def run(ctx):
                 stats.human_count(res["qps"]["queries_per_min"]),
                 q["concurrency"]))
     log.table(
-        ["query", "avg ms", "p50", "p95", "p99", "max", "rows"],
-        [[r["name"], "%.1f" % r["latency_ms"]["avg"], "%.1f" % r["latency_ms"]["p50"],
-          "%.1f" % r["latency_ms"]["p95"], "%.1f" % r["latency_ms"]["p99"],
-          "%.1f" % r["latency_ms"]["max"], r["rows"]] for r in results])
+        ["query", "avg ms", "p50", "p95", "p99", "max", "rows", "errors"],
+        [[r["name"]] + (["-", "-", "-", "-", "-", "-"] if not r["samples_ms"] else
+                        ["%.1f" % r["latency_ms"]["avg"], "%.1f" % r["latency_ms"]["p50"],
+                         "%.1f" % r["latency_ms"]["p95"], "%.1f" % r["latency_ms"]["p99"],
+                         "%.1f" % r["latency_ms"]["max"], r["rows"]])
+         + ["%d/%d" % (r["errors"], r["iterations"]) if r["errors"] else ""]
+         for r in results])
     return res
 
 
@@ -134,17 +151,22 @@ def _time_query(ctx, name, title, sql, q):
             ctx.druid.sql(sql, timeout=q["timeout_sec"])
         except Exception:
             break
-    samples, rows, errors = [], 0, 0
+    samples, rows, errors, err = [], 0, 0, None
     for _ in range(q["iterations"]):
         try:
             got, elapsed = ctx.druid.sql(sql, timeout=q["timeout_sec"])
             samples.append(elapsed * 1000.0)
             rows = len(got)
-        except Exception:
+        except Exception as exc:
             errors += 1
+            # Keep the first one: a query that fails every iteration otherwise
+            # reports a count with no way to find out why.
+            if err is None:
+                err = str(exc)[:300]
     return {
         "name": name, "title": title, "sql": sql,
         "iterations": q["iterations"], "errors": errors, "rows": rows,
+        "error": err,
         "samples_ms": [round(s, 3) for s in samples],
         "latency_ms": stats.summarize(samples, "ms") if samples
         else {"count": 0, "avg": 0, "p50": 0, "p95": 0, "p99": 0, "max": 0},
