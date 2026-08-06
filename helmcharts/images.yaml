@@ -462,7 +462,7 @@ images: &images
     tag: 2.2.0
 
   hms: &hms
-    repository: sanketikahub/hms
+    repository: hms
     tag: "2.2.0"
     digest: ""
 
@@ -561,19 +561,19 @@ internal: &internal
         <<: *postgresql-exporter
 
   hms:
+    imagePullSecrets:
+      - name: *dockerSecretName
     image:
       <<: *hms
-      imagePullSecrets:
-      - name: *dockerSecretName
     test:
       image:
         <<: *os-shell
 
   trino:
+    imagePullSecrets:
+      - name: *dockerSecretName
     image:
       <<: *trino
-      imagePullSecrets: 
-      - name: *dockerSecretName
 
   postgresql-backup:
     <<: *postgresql-backup

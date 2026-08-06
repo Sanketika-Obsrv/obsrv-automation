@@ -86,7 +86,8 @@ spec:
                 fi
 
                 # Convert x5c to PEM format in a variable
-                CERT_PEM=$(printf -- "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n" "$(echo "$x5c" | fold -w 64)")
+                CERT_BODY=$(echo "$x5c" | fold -w 64)
+                CERT_PEM=$(printf '%s\n%s\n%s' "-----BEGIN CERTIFICATE-----" "$CERT_BODY" "-----END CERTIFICATE-----")
 
                 echo "Certificate content created in memory."
 
