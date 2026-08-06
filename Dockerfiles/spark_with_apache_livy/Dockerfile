@@ -15,7 +15,9 @@ RUN mkdir -p /jars \
     && mv /tmp/apache-livy-0.8.0-incubating_2.12-bin /opt/livy \
     && mkdir -p /opt/livy/logs \
     && curl -fsSL -o /jars/postgresql-42.3.1.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.3.1/postgresql-42.3.1.jar \
-    && curl -fsSL -o /jars/guava-19.0.jar https://repo1.maven.org/maven2/com/google/guava/guava/19.0/guava-19.0.jar
+    && curl -fsSL -o /jars/guava-19.0.jar https://repo1.maven.org/maven2/com/google/guava/guava/19.0/guava-19.0.jar \
+    && curl -fsSL -o /jars/hadoop-aws-3.4.2.jar https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.4.2/hadoop-aws-3.4.2.jar \
+    && curl -fsSL -o /jars/bundle-2.29.52.jar https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.29.52/bundle-2.29.52.jar
 
 # ---------- python deps (obsrv batch connectors) ----------
 FROM dhi.io/python:3.12-debian13-dev AS pybuild
@@ -66,6 +68,8 @@ COPY --from=fetch /opt/livy /opt/livy
 COPY --from=pybuild /pydeps /opt/python-deps
 COPY --from=fetch /jars/postgresql-42.3.1.jar /opt/spark/jars/postgresql-42.3.1.jar
 COPY --from=fetch /jars/guava-19.0.jar /opt/spark/jars/guava-19.0.jar
+COPY --from=fetch /jars/hadoop-aws-3.4.2.jar /opt/spark/jars/hadoop-aws-3.4.2.jar
+COPY --from=fetch /jars/bundle-2.29.52.jar /opt/spark/jars/bundle-2.29.52.jar
 # drop the stock guava (WFS needs 19) — name/version may differ on 3.5.8; remove any guava-1x
 RUN sh -c 'rm -f /opt/spark/jars/guava-1[0-8].*.jar' || true
 
