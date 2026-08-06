@@ -4,118 +4,76 @@ A local, single-machine Obsrv stack derived from `helmcharts/`. Every value here
 traces back to a chart; where something had to change to work outside
 Kubernetes, the reason is in a comment next to it.
 
-## What runs
+**Start here:**
 
-| Group | Services | Profile |
-|---|---|---|
-| Stores | `postgres`, `kafka` (KRaft), `valkey-dedup`, `valkey-denorm` | always |
-| Schema | `flyway` (one-shot), `kafka-topics-init` (one-shot) | always |
-| Auth | `keycloak`, `keycloak-init` (one-shot) | always |
-| APIs | `dataset-api`, `command-api` | always |
-| UI | `web-console`, `nginx` (Kong stand-in) | always |
-| Realtime store | `zookeeper`, `druid` (all five roles in one container) | `druid` |
-| Pipeline | `unified-pipeline-{jobmanager,taskmanager}` | `flink` |
-| Master data | `cache-indexer-{jobmanager,taskmanager}` | `masterdata` |
-
-## Memory
-
-This is the binding constraint, not CPU.
-
-Measured after running the ingest → query path, so these include real
-ingestion rather than idle:
-
-Numbers below are cgroup `anon` (`/sys/fs/cgroup/memory.stat`), not
-`docker stats`. **`docker stats` counts page cache**, which for Postgres and
-Keycloak is over 100 MB of pure noise that the kernel reclaims on demand — use
-`anon` when deciding how much RAM the stack actually needs.
-
-| Selection | Measured anon | What it gives you |
-|---|---|---|
-| Control plane only (no profiles) | ~2.2 GB | console, auth, APIs, Kafka, Postgres |
-| `+ druid` | ~4.8 GB | the above plus a queryable realtime store |
-| `+ druid,flink,metrics` | ~5.8 GB | the full event-dataset path, end to end |
-| `+ masterdata` (default) | ~7.0 GB | adds master datasets / denormalization |
-
-Per container, after running both the event and the master path:
-
-| Container | anon (MiB) |
+| I want to… | Go to |
 |---|---|
-| druid (5 JVMs in one container) | 2562 |
-| unified-pipeline taskmanager | 924 |
-| cache-indexer taskmanager | 655 |
-| cache-indexer jobmanager | 553 |
-| unified-pipeline jobmanager | 549 |
-| keycloak | 489 |
-| kafka | 404 |
-| dataset-api | 309 |
-| web-console | 228 |
-| prometheus | 173 |
-| zookeeper | 78 |
-| command-api | 74 |
-| postgres | 22 |
-| valkey ×2, node-exporter, nginx | ~30 total |
+| Get it running | [1. Prerequisites](#1-prerequisites) → [2. Setup](#2-setup) |
+| Understand what the pieces are | [3. Components](#3-components) |
+| Know how fast it is | [4. Performance](#4-performance) |
+| Measure it myself | [5. Running the benchmarks](#5-running-the-benchmarks) |
+| Understand a design choice | [6. How this maps to the charts](#6-how-this-maps-to-the-charts) |
+| Debug something that won't work | [7. What does not work here](#7-what-does-not-work-here) |
 
-**Give Docker Desktop 10 GB**, or trim `COMPOSE_PROFILES` in `.env` to go
-smaller. Check what you have with `docker info --format '{{.MemTotal}}'`.
+Deeper detail lives in linked companion docs rather than here:
+[design rationale](../docs/obsrv-local-docker-compose.md) ·
+[ingest benchmark results](docs/benchmark-results.md) ·
+[query benchmark results](docs/query-benchmark-results.md) ·
+[benchmark operating guide](benchmark/AGENTS.md) ·
+[load-test guide](benchmark/loadtest/README.md)
 
-10 GB against a measured 7.0 GB is deliberate headroom, not slack: the Flink
-taskmanagers and the Druid indexer grow once data flows. Running this stack on a
-VM sized close to its measured floor has crashed the Docker daemon outright,
-taking every container down at once.
+---
 
-The single biggest consumer of that headroom is **native, not heap**. The
-unified-pipeline taskmanager's anon starts near 900 MB but has been measured at
-2.5 GB after a long session with repeated job restarts, against only ~430 MB of
-JVM-tracked memory (275m committed heap, ~96 MB Metaspace, ~53 MB direct). Most
-of the excess is resident `rwxp` anon — glibc malloc arenas and JIT-adjacent
-allocations outside every JVM accounting bucket, so no Flink or `-XX` setting
-bounds it. `MALLOC_ARENA_MAX=2` is set on all four Flink containers to cap the
-worst of it. A `mem_limit` would bound the rest but would OOM-kill the
-taskmanager mid-job, so there is none; restart the taskmanager if it grows.
+# 1. Prerequisites
 
-Druid, by contrast, is exactly at its configured budget: 2176m of heap across
-five JVMs plus 3×128m direct ≈ the 2562 MiB measured. Nothing is wasted there,
-and the only way to shrink it is to shrink the heaps in
-`config/druid/local-single-conf/*/jvm.config`.
+| Requirement | Value | Why |
+|---|---|---|
+| **Docker Desktop** (or Docker Engine + Compose v2) | any recent version | `docker compose` v2 syntax throughout |
+| **Memory allocated to Docker** | **10 GB minimum** | stack measures ~7.0 GB; the rest is headroom, not slack |
+| **CPU allocated to Docker** | 4 cores | fewer works but the Flink pipeline gets starved |
+| **Disk** | ~15 GB free | images are large; five are amd64-only |
+| **Platform** | arm64 (Apple Silicon) or amd64 | five images run under emulation on arm64 — see [Platform](#platform) |
+| `python3` | 3.8+, stdlib only | only needed for the benchmark harness |
 
-`cache-indexer` is behind its own profile because it only handles master
-datasets — its config is `dataset.type = "master-dataset"` reading the
-`masterdata.*` topics. Plain event datasets go entirely through
-`unified-pipeline`, so most first-time users never need it. Add it with
-`COMPOSE_PROFILES=druid,flink,masterdata`.
+Check what Docker has:
 
-The Flink memory numbers are deliberately below the chart's: managed memory is
-set to 0 (it is only used by the RocksDB state backend, which is not
-configured — Obsrv keeps dedup/denorm state in Valkey), and jobmanagers get
-384m of Flink memory instead of the chart's 1024m since in application mode
-they only coordinate. See `docs/obsrv-local-docker-compose.md` for the full
-reasoning.
+```bash
+docker info --format 'mem={{.MemTotal}} cpus={{.NCPU}}'
+```
 
-## Start
+**10 GB against a measured 7.0 GB is deliberate.** The Flink taskmanagers and
+the Druid indexer grow once data flows. Running this stack on a VM sized close
+to its measured floor has crashed the Docker daemon outright, taking every
+container down at once. If you cannot spare 10 GB, trim `COMPOSE_PROFILES` —
+see [Memory](#memory-the-binding-constraint).
+
+---
+
+# 2. Setup
 
 ```bash
 cd local-compose
 cp .env.example .env                # once: ports + which profiles come up
 ./scripts/gen-token-env.sh          # once: PEM keypair -> secrets/tokens.env
 docker compose up -d
-docker compose logs -f flyway keycloak-init kafka-topics-init
+docker compose logs -f flyway keycloak-init oauth-admin-sync kafka-topics-init submit-ingestion
 ```
 
-Don't skip the `.env` copy. `.env` is gitignored so local port changes stay
-local, and every variable in it except `COMPOSE_PROFILES` has a default baked
-into `docker-compose.yaml`. `COMPOSE_PROFILES` is read by the Compose CLI
-itself rather than by the compose file, so without `.env` it is simply unset —
-`docker compose up -d` then brings up the control plane alone, with no Druid
-and no Flink, and publishing a dataset fails in confusing ways.
+Wait for those five one-shot containers to exit cleanly, then open
+**http://localhost:8080/console** and log in as `obsrv_admin` / `enDoPvTAxFSd`.
 
-Then open **http://localhost:8080/console** and log in as
-`obsrv_admin` / `enDoPvTAxFSd`.
+**Don't skip the `.env` copy.** `.env` is gitignored so local port changes stay
+local, and every variable in it except `COMPOSE_PROFILES` has a default baked
+into `docker-compose.yaml`. `COMPOSE_PROFILES` is read by the Compose CLI itself
+rather than by the compose file, so without `.env` it is simply unset —
+`docker compose up -d` then brings up the control plane alone, with no Druid and
+no Flink, and publishing a dataset fails in confusing ways.
 
 Change `HTTP_PORT` in `.env` if 8080 is taken — it is one variable because it
 feeds the Keycloak redirect URI and the console's own base URL as well as the
 nginx binding.
 
-### Prove it works
+## Prove it works
 
 `scripts/sample-dataset.sh` creates a dataset, publishes it, pushes events and
 **asserts on the read-back** — not on the publish succeeding, which is the part
@@ -133,10 +91,9 @@ at once, and the only one that proves the master path is useful rather than
 merely populated. Read the script before writing your own producer: the event
 envelope is **not** the same for the two dataset types, and getting it wrong
 fails every record with an error that points somewhere else. See
-[Master datasets](#master-datasets-the-event-shape-is-not-the-same-as-an-event-datasets)
-below.
+[Master datasets](#master-datasets-the-event-shape-is-not-the-same-as-an-event-datasets).
 
-### Other endpoints
+## Endpoints
 
 | | |
 |---|---|
@@ -156,9 +113,307 @@ below.
 docker compose down -v      # -v also drops the schema, so flyway reruns
 ```
 
-## How this maps to the charts
+---
 
-### Schema comes from the repo, not from this directory
+# 3. Components
+
+## The data path
+
+```mermaid
+flowchart LR
+  subgraph Ingestion
+    P[Producer] -->|"{dataset, event}"| K["Kafka<br/>topic: ingest"]
+    PM[Producer] -->|bare record| KM["Kafka<br/>topic: &lt;master-dataset&gt;"]
+  end
+
+  subgraph Processing
+    K --> UP["unified-pipeline<br/>(Flink)"]
+    KM --> CI["cache-indexer<br/>(Flink)"]
+    UP -.->|dedup state| VD[(valkey-dedup)]
+    UP -.->|lookup| VN[(valkey-denorm)]
+    CI -->|writes| VN
+  end
+
+  subgraph Storage
+    UP -->|DruidRouterJob| DR[("Druid<br/>realtime + segments")]
+  end
+
+  subgraph Serving
+    DR --> DA[dataset-api]
+    DA --> NG[nginx] --> WC[web-console]
+  end
+
+  PG[(Postgres<br/>metadata)] --- DA
+  KC[Keycloak] --- WC
+```
+
+**Event datasets** go through `unified-pipeline` and land in Druid, where they
+are queryable. **Master datasets** go through `cache-indexer` and land in Valkey,
+where they exist only to be joined against — they have no Druid datasource, which
+is why the console reports 0 events and 0 bytes for them ([details](#what-does-not-work-here)).
+
+The five pipeline stages every event passes through are: **extract → validate →
+deduplicate → denormalize → transform**, then the terminal `DruidRouterJob` stage
+writes to Druid and emits the system event that feeds the console's counters.
+
+## Services by role
+
+| Role | Services | Profile | What it does |
+|---|---|---|---|
+| **Ingestion buffer** | `kafka` (KRaft) | always | 23 explicit topics, 4 partitions each |
+| **Processing — events** | `unified-pipeline-{jobmanager,taskmanager}` | `flink` | validate, dedup, denorm, transform, route to Druid |
+| **Processing — master data** | `cache-indexer-{jobmanager,taskmanager}` | `masterdata` | writes master records into Valkey for denorm lookups |
+| **Pipeline state** | `valkey-dedup`, `valkey-denorm` | always | dedup keys; master-data cache |
+| **Realtime store** | `druid` (5 roles, 1 container), `zookeeper` | `druid` | ingestion, segments, SQL query |
+| **Metadata** | `postgres` | always | datasets, datasources, system settings |
+| **APIs** | `dataset-api`, `command-api` | always | dataset CRUD + query-out; publish workflow |
+| **Auth** | `keycloak` | always | realm `obsrv`, client `obsrv-console` |
+| **UI / edge** | `web-console`, `nginx` | always | console; Kong stand-in |
+| **Observability** | `prometheus`, `node-exporter` | `metrics` | container and host metrics |
+
+**17 long-running containers** with the default profiles, plus five one-shot
+bootstrap containers that run once and exit — watch these if `up` misbehaves:
+
+| One-shot | Does |
+|---|---|
+| `flyway` | renders and applies the repo's real migrations |
+| `keycloak-init` | creates realm `obsrv`, client `obsrv-console`, one user |
+| `oauth-admin-sync` | points the `oauth_users` admin row at the Keycloak user id |
+| `kafka-topics-init` | creates all 23 topics explicitly |
+| `submit-ingestion` | submits the `system-events` Druid supervisor (feeds console counters) |
+
+## Profiles
+
+`COMPOSE_PROFILES` in `.env` controls what comes up. Default is
+`druid,flink,masterdata,metrics`.
+
+| Selection | Measured anon | What it gives you |
+|---|---|---|
+| Control plane only (no profiles) | ~2.2 GB | console, auth, APIs, Kafka, Postgres |
+| `+ druid` | ~4.8 GB | the above plus a queryable realtime store |
+| `+ druid,flink,metrics` | ~5.8 GB | the full event-dataset path, end to end |
+| `+ masterdata` (default) | ~7.0 GB | adds master datasets / denormalization |
+
+`cache-indexer` is behind its own profile because it only handles master
+datasets — its config is `dataset.type = "master-dataset"` reading the
+`masterdata.*` topics. Plain event datasets go entirely through
+`unified-pipeline`, so most first-time users never need it.
+
+## Memory: the binding constraint
+
+Not CPU. Measured after running the ingest → query path, so these include real
+ingestion rather than idle.
+
+Numbers are cgroup `anon` (`/sys/fs/cgroup/memory.stat`), not `docker stats`.
+**`docker stats` counts page cache**, which for Postgres and Keycloak is over
+100 MB of pure noise that the kernel reclaims on demand — use `anon` when
+deciding how much RAM the stack actually needs.
+
+| Container | anon (MiB) |
+|---|---|
+| druid (5 JVMs in one container) | 2562 |
+| unified-pipeline taskmanager | 924 |
+| cache-indexer taskmanager | 655 |
+| cache-indexer jobmanager | 553 |
+| unified-pipeline jobmanager | 549 |
+| keycloak | 489 |
+| kafka | 404 |
+| dataset-api | 309 |
+| web-console | 228 |
+| prometheus | 173 |
+| zookeeper | 78 |
+| command-api | 74 |
+| postgres | 22 |
+| valkey ×2, node-exporter, nginx | ~30 total |
+
+The single biggest consumer of headroom is **native, not heap**. The
+unified-pipeline taskmanager's anon starts near 900 MB but has been measured at
+2.5 GB after a long session with repeated job restarts, against only ~430 MB of
+JVM-tracked memory (275m committed heap, ~96 MB Metaspace, ~53 MB direct). Most
+of the excess is resident `rwxp` anon — glibc malloc arenas and JIT-adjacent
+allocations outside every JVM accounting bucket, so no Flink or `-XX` setting
+bounds it. `MALLOC_ARENA_MAX=2` is set on all four Flink containers to cap the
+worst of it. A `mem_limit` would bound the rest but would OOM-kill the
+taskmanager mid-job, so there is none; restart the taskmanager if it grows.
+
+Druid, by contrast, is exactly at its configured budget: 2176m of heap across
+five JVMs plus 3×128m direct ≈ the 2562 MiB measured. Nothing is wasted there,
+and the only way to shrink it is to shrink the heaps in
+`config/druid/local-single-conf/*/jvm.config`.
+
+The Flink memory numbers are deliberately below the chart's: managed memory is
+set to 0 (it is only used by the RocksDB state backend, which is not
+configured — Obsrv keeps dedup/denorm state in Valkey), and jobmanagers get
+384m of Flink memory instead of the chart's 1024m since in application mode
+they only coordinate. See [the design doc](../docs/obsrv-local-docker-compose.md)
+for the full reasoning.
+
+---
+
+# 4. Performance
+
+Measured 5–6 August 2026 on a **4-core / 11.7 GB Docker VM**. Every number comes
+from a recorded run; nothing is extrapolated. Full detail:
+[ingest](docs/benchmark-results.md) · [query](docs/query-benchmark-results.md).
+
+## Ingestion
+
+> Sustains **59–71 events/sec (3,500–4,300 events/min)** through the full
+> pipeline — validate → dedup → transform → denormalize → Druid — with events
+> averaging 2.2 KB.
+>
+> **Plan for 2,500–3,000 events/min (~40–50 ev/s)** for continuous load.
+
+| Stage | Rate |
+|---|---|
+| Producing into Kafka | **14,220 events/sec** |
+| Draining through Flink into Druid | **~50–100 events/sec** |
+
+**The Flink pipeline is the bottleneck by two orders of magnitude.** Kafka
+accepted 100,000 events in 7 seconds; the pipeline needed ~25 minutes to make
+them queryable. Plan around the drain rate, not the produce rate.
+
+The ceiling is **not** the hardware — CPU averaged 65–73%. It is the Flink job's
+own concurrency: 2 task slots at parallelism 2.
+
+**Known limits at scale.** A sustained 100,000-event ingest pushed memory to
+10.92 GB of 11.67 (94%) and the Flink TaskManager missed its 50-second heartbeat
+deadline; the JobManager declared it dead and the job restarted from checkpoint.
+It recovered without data loss, but two things follow: the harness's drain
+accounting silently reports `PASS drained 0 events` after such a restart (trust
+the Druid row count instead), and the **deduplication check failed** at that
+scale — 2 of 25 duplicates were stored twice. Treat exactly-once as unverified
+above ~20k events.
+
+## Querying
+
+> With **70,339 rows** and 4 concurrent clients: **150 queries/sec direct from
+> Druid** (p50 17 ms) and **36 queries/sec through the Obsrv query API**
+> (p50 58 ms). Zero failures across 33,433 requests.
+
+| Target | Requests | Failures | rps | p50 | p95 | p99 |
+|---|---|---|---|---|---|---|
+| Druid SQL direct | 27,009 | 0 | **150.0** | 17 ms | 71 ms | 130 ms |
+| Obsrv query API | 6,424 | 0 | **35.7** | 58 ms | 300 ms | 930 ms |
+
+The API costs roughly **4× the throughput and 3× the median latency**. That is
+auth, RBAC, query-rule validation and the table rewrite — and it is bounded by a
+single CPU core, because `dataset-api` is a single-threaded Node service sitting
+at ~91% of one core under load. Adding CPUs will not move it; more API replicas
+behind nginx would.
+
+Scaling, measured with the same probe at both sizes:
+
+| Rows | Sustained qps (direct Druid) |
+|---|---|
+| 19,801 | 200 |
+| 70,339 | 105 |
+
+3.5× the data cost roughly half the throughput — better than linear, which is
+the expected shape for a columnar store.
+
+## Two things that will surprise you
+
+**Data is not queryable through the API until segments hand off.** The API gates
+on the coordinator's `/loadstatus`, which lists only datasources with segments
+published to the metadata store. The supervisor's default `taskDuration` is
+`PT14400S` — **4 hours** — so fresh rows sit in the realtime task and the API
+answers `DATASOURCE_NOT_AVAILABLE` for up to four hours, while direct Druid SQL
+returns them immediately. Force a handoff:
+
+```bash
+curl -u admin:admin123 -X POST \
+  http://localhost:8888/druid/indexer/v1/supervisor/<datasource>/suspend
+# ...and resume it afterwards, or the next ingest piles up in Kafka
+curl -u admin:admin123 -X POST \
+  http://localhost:8888/druid/indexer/v1/supervisor/<datasource>/resume
+```
+
+**SQL sent to the API must name the dataset, not the datasource.** The data-out
+controller rewrites the dataset id to `datasource_ref` before forwarding, so
+passing the datasource name makes the rewrite fire on the substring and Druid
+receives `bench_telemetry_events_events` — an opaque HTTP 400.
+
+---
+
+# 5. Running the benchmarks
+
+**No model required.** The harness in `local-compose/benchmark/` is plain stdlib
+Python 3 — no `pip install`, no virtualenv, no API key, no LLM. Its internal
+modules are called "agents" in the sense of independent workers, not AI agents.
+If `python3` and `docker` work, this works.
+
+## Without a model — the normal way
+
+The stack must be up first and all 17 containers healthy; the run refuses to
+start otherwise, naming the container that is not ready.
+
+```bash
+cd local-compose/benchmark
+
+./benchmark run --profile smoke --no-queries     # ~12 min, 2,000 events
+./benchmark run --profile standard --no-queries  # ~15 min, 20,000 events
+./benchmark run --profile heavy                  # ~2 h,   500,000 events
+```
+
+| Profile | Events | Users | Producers | Drain timeout |
+|---|---|---|---|---|
+| `smoke` | 2,000 | 25 | 1 | 30 min |
+| `standard` | 20,000 | 100 | 2 | 30 min |
+| `heavy` | 500,000 | 100 | 4 | 90 min |
+
+`--no-queries` measures ingest only and removes roughly a third of the wall
+clock. Individual steps also run standalone:
+
+```bash
+./benchmark validate                 # the 12 functional checks, nothing else
+./benchmark queries                  # query benchmark against existing data
+./benchmark cleanup                  # drop the benchmark datasets
+./benchmark report results/<run-id>  # regenerate artefacts from raw JSON
+./benchmark watch kafka | pipeline | druid | infra    # live monitors
+```
+
+Query **load** testing is separate, and uses Locust so the harness is a standard
+tool anyone can pick up:
+
+```bash
+cd local-compose/benchmark/loadtest
+./run.sh 3m 4                        # 4 users, 3 min, both targets
+open results/druid.html results/api.html
+```
+
+⚠️ **Size the load generator deliberately.** It shares the machine with the
+stack it measures. At `--processes 4` on this 4-core box the generator starved
+the Flink TaskManager past its heartbeat deadline and Druid collapsed from 175
+req/s to 0.1 — a self-inflicted result that looks like an Obsrv problem.
+`run.sh` defaults to half the cores. Full explanation in the
+[load-test guide](benchmark/loadtest/README.md).
+
+Full options, config layering and failure modes: [benchmark/AGENTS.md](benchmark/AGENTS.md).
+
+## With a model — optional
+
+Nothing above needs one. A coding agent (Claude Code, or similar) is useful for
+the parts that are judgement rather than execution:
+
+- **Interpreting a run.** Point it at `results/<run-id>/` and ask what the
+  bottleneck was; the raw JSON carries per-stage timings the summary elides.
+- **Watching a long run.** Ingest at `heavy` takes ~2 hours. An agent can poll
+  `./benchmark watch infra` and flag container restarts, OOM kills and the Flink
+  heartbeat signature as they happen rather than post-hoc.
+- **Diagnosing a failed check.** The 12 functional checks report *what* failed,
+  not *why*; tracing one back through the Flink and Druid logs is exactly the
+  kind of multi-source correlation an agent is good at.
+
+Treat its output as a hypothesis to verify against the recorded artefacts — the
+numbers in this repo's results docs were all produced by the harness, not by a
+model, and several early conclusions were wrong until checked against the CSVs.
+
+---
+
+# 6. How this maps to the charts
+
+## Schema comes from the repo, not from this directory
 
 `config/postgres-init/00-databases.sql` creates the three databases, mirroring
 `global-values.yaml` → `postgresql.primary.initdb.scripts`. Everything else —
@@ -183,7 +438,7 @@ docker compose run --rm -e RENDER_ONLY=1 flyway
 Folders `01-superset` and `04-hms` are skipped — Superset and the Hive metastore
 are out of scope.
 
-### Substitutions worth knowing about
+## Substitutions worth knowing about
 
 - `kong_ingress_domain` → `localhost:$HTTP_PORT`
 - `global.ssl_enabled` → false, so the `http{{ if … }}s{{ end }}` pairs collapse to `http`
@@ -191,7 +446,7 @@ are out of scope.
   chart's real dev credentials. They cannot be empty: `client_id` is `UNIQUE` and
   two rows are inserted, so blanks collide. Neither component runs here.
 
-### Master datasets: the event shape is not the same as an event dataset's
+## Master datasets: the event shape is not the same as an event dataset's
 
 Worth reading before you push anything at a master dataset, because getting it
 wrong fails every single record with an error that points at the wrong thing.
@@ -236,7 +491,7 @@ takes its split is skipped outright — job `RUNNING`, topic full, Valkey empty.
 The job reaching `RUNNING` is not enough; wait for
 `Discovered new partitions: [<topic>-` in the jobmanager log, as the script does.
 
-### Deliberate departures
+## Deliberate departures
 
 **No object store.** `obsrv-core/framework/.../baseconfig.conf` ships
 `job.enable.distributed.checkpointing = false`, so Flink checkpoints to the local
@@ -325,13 +580,14 @@ chart's 1 — `unified-pipeline.conf` asks for `consumer.parallelism = 2`, and
 `scheduler-mode: reactive` caps parallelism at available slots, so with 1 slot
 the job can never reach the parallelism its own config requests.
 
-**Platform.** Five images are published amd64-only and are pinned to
-`linux/amd64` to run under emulation: `obsrv-api-service`,
-`obsrv-command-service`, `obsrv-web-console`, `unified-pipeline`,
-`cache-indexer`. Everything else is arm64-native. `sanketikahub/druid:32.0.1` is
-genuinely multi-arch, so Druid runs natively. The repo's `Dockerfiles/druid` and
-`Dockerfiles/flink` were checked and add only cloud filesystem plugins and a
-`chmod` — nothing needed locally.
+### Platform
+
+Five images are published amd64-only and are pinned to `linux/amd64` to run
+under emulation: `obsrv-api-service`, `obsrv-command-service`,
+`obsrv-web-console`, `unified-pipeline`, `cache-indexer`. Everything else is
+arm64-native. `sanketikahub/druid:32.0.1` is genuinely multi-arch, so Druid runs
+natively. The repo's `Dockerfiles/druid` and `Dockerfiles/flink` were checked and
+add only cloud filesystem plugins and a `chmod` — nothing needed locally.
 
 **Postgres auth.** The chart forces `password_encryption = md5`; this stack keeps
 Postgres 17's `scram-sha-256` default, since every client here speaks it.
@@ -342,14 +598,16 @@ wrong but it is what the chart does — `dataset-api/values.yaml` has
 and nothing overrides `postgresqlUser`. Kept identical to avoid a
 permissions difference between local and deployed.
 
-## What does not work here
+---
+
+# 7. What does not work here
 
 Be aware of these before debugging:
 
 - **`config-api`** is missing. It is `config-service-ext`, an enterprise image
   absent from `kitchen/install.sh`. `CONFIG_API_EXT_URL` points at `dataset-api`
   so calls fail fast instead of hanging on an unresolvable host.
-- **Grafana, Superset, Prometheus, Alertmanager** are out of scope. Console
+- **Grafana, Superset, Alertmanager** are out of scope. Console
   panels and dataset-api endpoints that read them will error or stay blank.
   `GF_BEARER_TOKEN` is empty.
 - **Anything that touches cloud storage** — connector-registry upload,
@@ -404,7 +662,9 @@ Be aware of these before debugging:
   `router_host: http://druid`, same convention dataset-api uses for its own
   `druid_host`.
 
-## Credentials
+---
+
+# 8. Credentials
 
 All from `helmcharts/global-values.yaml`. Local-only defaults — do not reuse.
 
@@ -419,7 +679,9 @@ All from `helmcharts/global-values.yaml`. Local-only defaults — do not reuse.
 | Console / realm user | `obsrv_admin` / `enDoPvTAxFSd` (email `admin@obsrv.in`) |
 | Encryption key | `strong_encryption_key_to_encrypt` |
 
-## Notes
+---
+
+# 9. Notes
 
 `AUTHENTICATION_TYPE` is `keycloak`, matching the chart — it is the only path
 exercised in this repo. `web-console/values.yaml` also lists
