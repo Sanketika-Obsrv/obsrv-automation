@@ -23,7 +23,7 @@ metadata:
 spec:
   podMetricsEndpoints:
     - port: http
-      path: /metrics/
+      path: /metrics/prometheus/
       {{- if .Values.metrics.podMonitor.interval }}
       interval: {{ .Values.metrics.podMonitor.interval }}
       {{- end }}

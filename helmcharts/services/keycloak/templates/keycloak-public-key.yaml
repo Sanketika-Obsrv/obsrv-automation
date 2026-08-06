@@ -40,6 +40,8 @@ metadata:
   namespace: {{ include "base.namespace" . }}
   annotations:
     deployment_version: "v2"
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   completions: 1
   parallelism: 1
@@ -84,7 +86,7 @@ spec:
                 fi
 
                 # Convert x5c to PEM format in a variable
-                CERT_PEM=$(printf "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n" "$(echo "$x5c" | fold -w 64)")
+                CERT_PEM=$(printf -- "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n" "$(echo "$x5c" | fold -w 64)")
 
                 echo "Certificate content created in memory."
 
