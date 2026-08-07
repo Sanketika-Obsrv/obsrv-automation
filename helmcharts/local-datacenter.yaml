@@ -1,4 +1,8 @@
 global:
+  # kube-dns ClusterIP for kind/kubeadm-style local clusters — used by DHI nginx's `resolver`
+  # directive (see helmcharts/services/loki/values.yaml). Verify with
+  # `kubectl get svc kube-dns -n kube-system` if your local cluster differs.
+  kubeDnsIP: "10.96.0.10"
   ssl_enabled: &ssl_enabled false
   cloud_storage_provider: &cloud_storage_provider "aws"
   cloud_store_provider: &cloud_store_provider "s3"

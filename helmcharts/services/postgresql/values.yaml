@@ -383,8 +383,9 @@ primary:
   ##
   extraEnvVarsSecret: ""
   ## @param primary.command Override default container command (useful when using custom images)
-  ## DHI: bypass the bitnami entrypoint; run upstream postgres directly with our config.
-  command: ["postgres"]
+  ## DHI: no override — keep the image's own docker-entrypoint.sh so initdb runs on a fresh,
+  ## empty PVC. The entrypoint execs `postgres $@` once init is done (or immediately on an
+  ## existing data dir), so passing -c config_file via args below still applies our config.
   ## @param primary.args Override default container args (useful when using custom images)
   ##
   args: ["-c", "config_file=/config/postgresql.conf"]
@@ -597,7 +598,7 @@ primary:
       securityContext:
         runAsUser: 0
         runAsNonRoot: false
-      command: ["sh", "-c", "chown -R 1001:1001 /bitnami/postgresql && chmod 700 /bitnami/postgresql/data && echo perms-fixed"]
+      command: ["sh", "-c", "mkdir -p /bitnami/postgresql/data && chown -R 1001:1001 /bitnami/postgresql && chmod 700 /bitnami/postgresql/data && echo perms-fixed"]
       volumeMounts:
         - name: data
           mountPath: /bitnami/postgresql

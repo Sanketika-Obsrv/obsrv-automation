@@ -1,17 +1,17 @@
-name: Build and Push Superset Image
-run-name: Build superset image ${{ inputs.superset_version }}
+name: Build and Push Kafka Message Exporter Image
+run-name: Build kafka-message-exporter image ${{ inputs.image_version }}
 permissions:
   contents: read
 on:
   workflow_dispatch:
     inputs:
-      superset_version:
-        description: "Superset image tag to publish (e.g. 6.1.0)"
+      image_version:
+        description: "kafka-message-exporter image tag to publish (e.g. 2.2.0)"
         required: true
         type: string
 
 jobs:
-  build-superset-image:
+  build-kafka-message-exporter-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,7 +23,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Dockerfile's build stage is FROM dhi.io/superset:6-debian13-dev — needs its own
+      # FROM dhi.io/node:22-alpine3.22-dev / dhi.io/node:22-alpine3.22 — needs its own
       # credentials, separate from the Docker Hub login above.
       - name: Login to dhi.io
         uses: docker/login-action@v3
@@ -41,8 +41,8 @@ jobs:
       - name: Build docker image and push
         uses: docker/build-push-action@v5
         with:
-          context: ./Dockerfiles/superset
-          file: ./Dockerfiles/superset/Dockerfile
+          context: ./exporters/kafka-message-exporter
+          file: ./exporters/kafka-message-exporter/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/superset:${{ inputs.superset_version }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/kafka-message-exporter:${{ inputs.image_version }}

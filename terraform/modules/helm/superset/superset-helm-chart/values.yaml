@@ -31,7 +31,11 @@ oauth:
   whitelist_domain: ""
   user_registration_role: "Gamma"
 
-runAsUser: 65532  # DHI superset bakes /app as 0770 owned uid 65532; must match or gunicorn exec fails
+# terraform/ is not part of the 2.2.0 DHI migration (helmcharts/ is) — this chart's default
+# image is still apache/superset:3.1.0 (see superset-helm-chart/values.yaml image block below),
+# and superset_image_tag has no default anywhere in this repo, so runAsUser must stay matched
+# to the non-DHI image's own uid (1000) until terraform gets its own DHI migration pass.
+runAsUser: 1000
 
 # Install additional packages and do any other bootstrap configuration in this script
 # For production clusters it's recommended to build own image with this step done in CI

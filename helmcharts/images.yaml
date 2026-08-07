@@ -19,7 +19,7 @@ imagePullSecrets: &imagePullSecrets
 
 images: &images
   ## Obsrv Images
-  command-api: &command-api # TEST: DHI image on jerald (revert after install.sh test)
+  command-api: &command-api
     registry: sanketikahub
     repository: obsrv-command-service
     tag: "2.2.0"
@@ -42,7 +42,7 @@ images: &images
     tag: "1.2.0-RC"
     digest: ""
 
-  web-console: &web-console # TEST: DHI craco image on jerald (revert after install.sh test)
+  web-console: &web-console
     registry: sanketikahub
     repository: "obsrv-web-console"
     tag: "2.2.0"

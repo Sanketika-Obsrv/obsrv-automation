@@ -306,7 +306,7 @@ kubectl:
 
 # This job upgrades the CRDs.
 # Disabled: hook copies sh+kubectl from the debian kubectl image into the distroless
-# DHI velero container (jerald23sanketika/velero) → /tmp/sh libc mismatch, job fails.
+# DHI velero container → /tmp/sh libc mismatch, job fails.
 # Velero CRDs are already installed; re-run manually if a velero version bump needs them.
 upgradeCRDs: false
 

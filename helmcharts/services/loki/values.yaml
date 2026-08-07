@@ -1102,8 +1102,11 @@ gateway:
     customBackendUrl: null
     # -- Allows overriding the DNS resolver address nginx will use.
     # DHI nginx (1.31) resolves the `resolver` host at startup; a hostname (kube-dns...svc) fails
-    # chicken-and-egg. Use the kube-dns ClusterIP so no startup resolution is needed.
-    resolver: "10.96.0.10"
+    # chicken-and-egg, so this needs an IP, not a hostname. Left empty here so the cloud-specific
+    # values file's `global.kubeDnsIP` (see _helpers.tpl) picks the right IP for the actual
+    # cluster instead of one hardcoded value shared across every cloud. Run
+    # `kubectl get svc kube-dns -n kube-system` to find the real IP if setting this directly.
+    resolver: ""
     # -- Config file contents for Nginx. Passed through the `tpl` function to allow templating
     # @default -- See values.yaml
     file: |

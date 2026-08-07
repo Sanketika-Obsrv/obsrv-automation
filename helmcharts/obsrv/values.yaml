@@ -2995,9 +2995,9 @@ spark:
         spark.master spark://spark-master-svc:7077
         spark.ui.prometheus.enabled true
         spark.executor.processTreeMetrics.enabled true
-        spark.history.fs.logDirectory /opt/bitnami/spark/spark-metadata/spark-events
+        spark.history.fs.logDirectory /opt/spark/spark-metadata/spark-events
         spark.eventLog.enabled true
-        spark.eventLog.dir /opt/bitnami/spark/spark-metadata/spark-events
+        spark.eventLog.dir /opt/spark/spark-metadata/spark-events
 
   fullnameOverride: spark
   persistence:

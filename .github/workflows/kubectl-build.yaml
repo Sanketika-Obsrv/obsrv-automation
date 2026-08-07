@@ -1,17 +1,17 @@
-name: Build and Push Superset Image
-run-name: Build superset image ${{ inputs.superset_version }}
+name: Build and Push Kubectl Image
+run-name: Build kubectl image ${{ inputs.image_version }}
 permissions:
   contents: read
 on:
   workflow_dispatch:
     inputs:
-      superset_version:
-        description: "Superset image tag to publish (e.g. 6.1.0)"
+      image_version:
+        description: "kubectl image tag to publish (e.g. 2.2.0)"
         required: true
         type: string
 
 jobs:
-  build-superset-image:
+  build-kubectl-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,8 +23,8 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Dockerfile's build stage is FROM dhi.io/superset:6-debian13-dev — needs its own
-      # credentials, separate from the Docker Hub login above.
+      # FROM dhi.io/kubectl:1.32-debian13-dev — needs its own credentials, separate from the
+      # Docker Hub login above.
       - name: Login to dhi.io
         uses: docker/login-action@v3
         with:
@@ -41,8 +41,8 @@ jobs:
       - name: Build docker image and push
         uses: docker/build-push-action@v5
         with:
-          context: ./Dockerfiles/superset
-          file: ./Dockerfiles/superset/Dockerfile
+          context: ./Dockerfiles/kubectl
+          file: ./Dockerfiles/kubectl/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/superset:${{ inputs.superset_version }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/kubectl:${{ inputs.image_version }}

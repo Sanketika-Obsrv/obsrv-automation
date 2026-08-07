@@ -1,4 +1,9 @@
 global:
+  # kube-dns ClusterIP for this cluster — used by DHI nginx's `resolver` directive (see
+  # helmcharts/services/loki/values.yaml). EKS commonly assigns 172.20.0.10, but the service
+  # CIDR isn't pinned by this terraform module, so verify with
+  # `kubectl get svc kube-dns -n kube-system` after the cluster is up and correct if different.
+  kubeDnsIP: "172.20.0.10"
   ssl_enabled: &ssl_enabled true
   cloud_storage_provider: &cloud_storage_provider "aws"
   cloud_store_provider: &cloud_store_provider "s3"
