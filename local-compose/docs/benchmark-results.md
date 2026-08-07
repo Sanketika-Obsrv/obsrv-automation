@@ -297,6 +297,12 @@ The 400 deliberate duplicates all land there, correctly.
 
 ## Reproducing
 
+Every number above comes from one run: `bench-20260805-154931`, profile
+`standard`, 2026-08-05 15:49:31, 20,000 events drained in 769.5s, corpus seed
+`20260804` from the committed `benchmark/benchmark-config.yaml`. The corpus is
+deterministic, so that seed and that config reproduce the same input on any
+machine; what varies is the host, and Caveats above says how much.
+
 ```bash
 cd local-compose && docker compose up -d      # wait for all 17 healthy
 cd benchmark
@@ -308,7 +314,9 @@ cd benchmark
 Artefacts land in `benchmark/results/<run-id>/`: a one-page summary, a full
 report with every measurement and its evidence, a standalone HTML page, the
 raw JSON, and seven CSVs (Kafka lag, throughput series, Flink operators,
-Druid indexing, per-container resources, host resources).
+Druid indexing, per-container resources, host resources). That directory is
+gitignored — the reports are build output that goes stale the moment anyone
+re-runs the harness, so the findings live in this document instead.
 
 Operating details, configuration layering and known traps:
 [`benchmark/AGENTS.md`](../benchmark/AGENTS.md).
