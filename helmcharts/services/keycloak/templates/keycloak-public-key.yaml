@@ -8,8 +8,10 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade
+  # No hook annotation: a normal resource, guaranteed created before the post-install Job
+  # below runs (Helm creates all normal resources before any post-install hook fires). SA and
+  # RoleBinding are already normal resources too, so all three RBAC pieces the Job needs exist
+  # by the time it starts.
   name: keycloak-job-role  # The role name
   namespace: {{ include "base.namespace" . }}  # Namespace where the role should be applied
 rules:
@@ -40,7 +42,9 @@ metadata:
   namespace: {{ include "base.namespace" . }}
   annotations:
     deployment_version: "v2"
-    "helm.sh/hook": pre-install,pre-upgrade
+    # post-install, not pre-install: this job curls the keycloak Service, which doesn't exist
+    # yet during pre-install hooks -- pre-install deadlocks every fresh install.
+    "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   completions: 1
