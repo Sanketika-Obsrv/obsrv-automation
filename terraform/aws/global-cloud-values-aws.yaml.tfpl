@@ -90,7 +90,7 @@ velero-backup: &velero-backup
           region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-aws
-      image: velero/velero-plugin-for-aws
+      image: dhi.io/velero-plugin-for-aws:1-debian13
       volumeMounts:
         - name: plugins
           mountPath: /target

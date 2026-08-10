@@ -23,13 +23,15 @@ RUN mkdir -p /jars \
 FROM dhi.io/python:3.12-debian13-dev AS pybuild
 USER 0
 COPY ./connectors /data/connectors-init
-# DHI python-dev has NO git, so install obsrv-python-sdk from the GitHub tarball (default branch main)
+# DHI python-dev has NO git, so install obsrv-python-sdk from the GitHub tarball (pinned commit)
 # instead of git+https. Install into a relocatable target dir copied to the runtime image.
 # NOTE: the sdk's package metadata name is `obsrv` (with a `batch` extra = pyspark), so install it
 # directly from the tarball with the extra. This is the same `obsrv` the bitnami image got from git.
+# Pinned to a commit (repo has no tags) instead of main, so the 2.2.0 image is reproducible -
+# a rebuild no longer silently picks up whatever has since landed on the SDK's default branch.
 RUN pip install --no-cache-dir --target=/pydeps -r /data/connectors-init/requirements.txt \
     && pip install --no-cache-dir --target=/pydeps \
-       "obsrv[batch] @ https://github.com/Sanketika-Obsrv/obsrv-python-sdk/archive/refs/heads/main.tar.gz"
+       "obsrv[batch] @ https://github.com/Sanketika-Obsrv/obsrv-python-sdk/archive/44a0898d94877046a9bb065be391143d661c34bb.tar.gz"
 
 # ---------- runtime ----------
 FROM dhi.io/spark:3.5

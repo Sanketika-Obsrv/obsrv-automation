@@ -307,7 +307,13 @@ kubectl:
 # This job upgrades the CRDs.
 # Disabled: hook copies sh+kubectl from the debian kubectl image into the distroless
 # DHI velero container → /tmp/sh libc mismatch, job fails.
-# Velero CRDs are already installed; re-run manually if a velero version bump needs them.
+# 2.2.0 bumps velero v1.15.0 -> 1.16-debian13, a minor version bump - v1.15's CRDs (Backup/
+# Restore/BackupRepository) don't have 1.16's new/changed fields, and the apiserver silently
+# strips anything not in the old schema. REQUIRED before upgrading an existing cluster to
+# 2.2.0: from a machine with velero CLI + cluster access, run
+#   velero install --crds-only --dry-run=client -o yaml | kubectl apply -f -
+# (or `helm show crds` from the upstream velero chart at the target version) to apply the
+# 1.16 CRDs manually, since this job can't do it for you on the DHI image.
 upgradeCRDs: false
 
 # This job is meant primarily for cleaning up CRDs on CI systems.
