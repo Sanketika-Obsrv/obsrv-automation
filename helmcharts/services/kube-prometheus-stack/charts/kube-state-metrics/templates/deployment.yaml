@@ -200,7 +200,8 @@ spec:
               value: {{ $header.value }}
             {{- end }}
             path: /readyz
-            port: {{ $servicePort }}
+            {{- /* ksm serves /readyz on the telemetry port (8081), not the main service port */}}
+            port: {{ $telemetryPort }}
             scheme: {{ upper .Values.readinessProbe.httpGet.scheme }}
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.readinessProbe.periodSeconds }}

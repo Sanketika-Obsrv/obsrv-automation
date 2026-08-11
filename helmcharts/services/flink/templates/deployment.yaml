@@ -67,6 +67,9 @@ spec:
             "-Ds3.endpoint={{ .Values.s3_endpoint }}",
             "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
   {{- end }}
+  {{- if and (eq .Values.checkpoint_store_type "s3") (eq .Values.s3_auth_type "serviceAccount") }}
+            "-Dfs.s3a.aws.credentials.provider=com.amazonaws.auth.WebIdentityTokenCredentialsProvider",
+  {{- end }}
   {{- if eq .Values.checkpoint_store_type "gcs" }}
             "-Dgoogle.cloud.auth.service.account.enable=true",
   {{- end }}
@@ -173,6 +176,9 @@ spec:
                 "-Ds3.secret-key={{ .Values.s3_secret_key }}",
                 "-Ds3.endpoint={{ .Values.s3_endpoint }}",
                 "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
+  {{- end }}
+  {{- if and (eq .Values.checkpoint_store_type "s3") (eq .Values.s3_auth_type "serviceAccount") }}
+                "-Dfs.s3a.aws.credentials.provider=com.amazonaws.auth.WebIdentityTokenCredentialsProvider",
   {{- end }}
   {{- if eq .Values.checkpoint_store_type "gcs" }}
             "-Dgoogle.cloud.auth.service.account.enable=true",

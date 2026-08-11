@@ -188,11 +188,11 @@ primary:
     - FLUSHDB
     - FLUSHALL
   ## @param primary.command Override default container command (useful when using custom images)
-  ##
-  command: []
+  ## DHI: bypass bitnami start-primary.sh; run upstream valkey-server directly.
+  command: ["valkey-server"]
   ## @param primary.args Override default container args (useful when using custom images)
   ##
-  args: []
+  args: ["--port", "6379", "--dir", "/data", "--protected-mode", "no"]
   ## @param primary.enableServiceLinks Whether information about services should be injected into pod's environment variable
   ##
   enableServiceLinks: true
@@ -308,7 +308,7 @@ primary:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 65532
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param primary.containerSecurityContext.enabled Enabled Valkey primary containers' Security Context
@@ -324,8 +324,8 @@ primary:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 65532
+    runAsGroup: 65532
     runAsNonRoot: true
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
@@ -781,7 +781,7 @@ replica:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 65532
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param replica.containerSecurityContext.enabled Enabled Valkey replicas containers' Security Context
@@ -797,8 +797,8 @@ replica:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 65532
+    runAsGroup: 65532
     runAsNonRoot: true
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
@@ -1389,8 +1389,8 @@ sentinel:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 65532
+    runAsGroup: 65532
     runAsNonRoot: true
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
@@ -1649,9 +1649,9 @@ metrics:
   ## @param metrics.image.pullSecrets Valkey Exporter image pull secrets
   ##
   image:
-    registry: docker.io
-    repository: sanketikahub/redis-exporter
-    tag: 1.66.0-debian-12-r2
+    registry: dhi.io
+    repository: redis-exporter
+    tag: 1-debian13
     digest: ""
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -1721,7 +1721,8 @@ metrics:
   customReadinessProbe: {}
   ## @param metrics.command Override default metrics container init command (useful when using custom images)
   ##
-  command: []
+  command:
+    - /usr/local/bin/redis-exporter
   ## @param metrics.valkeyTargetHost A way to specify an alternative Valkey hostname
   ## Useful for certificate CN/SAN matching
   ##
@@ -1754,8 +1755,8 @@ metrics:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 65532
+    runAsGroup: 65532
     runAsNonRoot: true
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
@@ -2105,8 +2106,8 @@ kubectl:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 65532
+    runAsGroup: 65532
     runAsNonRoot: true
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true

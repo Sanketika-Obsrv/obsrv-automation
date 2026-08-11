@@ -11,4 +11,3 @@
   {{- end }}
   {{- $namespace | trunc 63 | trimSuffix "-" }}
 {{- end }}
-

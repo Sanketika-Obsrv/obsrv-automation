@@ -39,7 +39,9 @@ image:
   # digest:
   pullPolicy: IfNotPresent
   # One or more secrets to be used when pulling images
-  imagePullSecrets: []
+  # dhi.io/velero needs the dhi.io pull cred (registry-secret-name); velero chart doesn't wire the global one.
+  imagePullSecrets:
+    - registry-secret-name
   # - registrySecretName
 
 nameOverride: ""
@@ -115,7 +117,7 @@ dnsPolicy: ClusterFirst
 #   #       name: plugins
 initContainers:
   - name: velero-plugin-for-aws
-    image: velero/velero-plugin-for-aws
+    image: dhi.io/velero-plugin-for-aws:1-debian13
     volumeMounts:
       - name: plugins
         mountPath: /target
@@ -303,7 +305,16 @@ kubectl:
   labels: {}
 
 # This job upgrades the CRDs.
-upgradeCRDs: true
+# Disabled: hook copies sh+kubectl from the debian kubectl image into the distroless
+# DHI velero container → /tmp/sh libc mismatch, job fails.
+# 2.2.0 bumps velero v1.15.0 -> 1.16-debian13, a minor version bump - v1.15's CRDs (Backup/
+# Restore/BackupRepository) don't have 1.16's new/changed fields, and the apiserver silently
+# strips anything not in the old schema. REQUIRED before upgrading an existing cluster to
+# 2.2.0: from a machine with velero CLI + cluster access, run
+#   velero install --crds-only --dry-run=client -o yaml | kubectl apply -f -
+# (or `helm show crds` from the upstream velero chart at the target version) to apply the
+# 1.16 CRDs manually, since this job can't do it for you on the DHI image.
+upgradeCRDs: false
 
 # This job is meant primarily for cleaning up CRDs on CI systems.
 # Using this on production systems, especially those that have multiple releases of Velero, will be destructive.

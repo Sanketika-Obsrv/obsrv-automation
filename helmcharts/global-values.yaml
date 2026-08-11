@@ -341,6 +341,36 @@ keycloak:
   extraEnvVars:
     - name: KC_HOSTNAME
       value: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth"
+    # DHI: upstream keycloak reads KC_* env (bitnami KEYCLOAK_* is ignored). DB + admin bootstrap +
+    # proxy/http config so `kc.sh start` connects to the existing keycloak DB and serves behind kong.
+    - name: KC_DB
+      value: postgres
+    - name: KC_DB_URL
+      value: jdbc:postgresql://{{ .Values.global.postgresql.host }}:5432/{{ .Values.global.postgresql.keycloak.name }}
+    - name: KC_DB_USERNAME
+      value: "{{ .Values.global.postgresql.keycloak.user }}"
+    - name: KC_DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-externaldb
+          key: db-password
+    - name: KC_BOOTSTRAP_ADMIN_USERNAME
+      value: admin
+    - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak
+          key: admin-password
+    - name: KC_HTTP_RELATIVE_PATH
+      value: /auth
+    - name: KC_HTTP_ENABLED
+      value: "true"
+    - name: KC_PROXY_HEADERS
+      value: xforwarded
+    - name: KC_HOSTNAME_STRICT
+      value: "false"
+    - name: KC_HEALTH_ENABLED
+      value: "true"
   externalDatabase:
     host: *pghost
     port: 5432

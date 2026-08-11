@@ -11,7 +11,16 @@ cert-manager:
   global:
     commonLabels:
       system.api: "true"
-  installCRDs: true
+  # false: helmcharts/bootstrapper/crds/ already installs the 6 cert-manager CRDs via Helm's
+  # skip-if-exists crds/ mechanism, and install.sh runs that bootstrap release first. Leaving
+  # this true makes this chart's templates/ *also* try to own the same CRD objects, which
+  # already-created-with-no-Helm-annotations objects reject: "invalid ownership metadata;
+  # annotation validation error: missing key meta.helm.sh/release-name" on every
+  # ssl_enabled: true install and every upgrade. Known follow-up: bootstrapper/crds/ ships
+  # cert-manager v1.12.2-vintage CRDs against this chart's v1.20.3 controller - fine for the
+  # CRD fields this release actually uses, but the CRDs themselves should get bumped there
+  # separately rather than fixed by re-enabling the double-install here.
+  installCRDs: false
   prometheus:
     enabled: true
     servicemonitor:
@@ -2995,9 +3004,9 @@ spark:
         spark.master spark://spark-master-svc:7077
         spark.ui.prometheus.enabled true
         spark.executor.processTreeMetrics.enabled true
-        spark.history.fs.logDirectory /opt/bitnami/spark/spark-metadata/spark-events
+        spark.history.fs.logDirectory /opt/spark/spark-metadata/spark-events
         spark.eventLog.enabled true
-        spark.eventLog.dir /opt/bitnami/spark/spark-metadata/spark-events
+        spark.eventLog.dir /opt/spark/spark-metadata/spark-events
 
   fullnameOverride: spark
   persistence:

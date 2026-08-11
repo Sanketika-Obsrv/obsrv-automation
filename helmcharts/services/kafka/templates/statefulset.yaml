@@ -475,7 +475,7 @@ spec:
             - -XX:MaxRAMPercentage=100
             - -XshowSettings:vm
             - -jar
-            - jmx_prometheus_httpserver.jar
+            - jmx_prometheus_standalone.jar
             - "5556"
             - /etc/jmx-kafka/jmx-kafka-prometheus.yml
           {{- end }}
