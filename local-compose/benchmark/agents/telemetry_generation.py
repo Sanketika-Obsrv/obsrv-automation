@@ -84,7 +84,8 @@ def write_users_ndjson(users, path):
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, "w", encoding="utf-8") as fh:
         for u in users:
-            fh.write(json.dumps(u, separators=(",", ":")) + "\n")
+            # Synthetic mock user profiles for local performance benchmarking -- not real PII
+            fh.write(json.dumps(u, separators=(",", ":")) + "\n")  # codeql[py/clear-text-storage-sensitive-data]
     return path
 
 
