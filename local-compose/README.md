@@ -33,12 +33,14 @@ Deeper detail lives in linked companion docs rather than here:
 | **CPU allocated to Docker** | 4 cores | fewer works but the Flink pipeline gets starved |
 | **Disk** | ~15 GB free | images are large; five are amd64-only |
 | **Platform** | arm64 (Apple Silicon) or amd64 | five images run under emulation on arm64 — see [Platform](#platform) |
+| **Port Availability** | `3000`, `5432`, `6379`, `6380`, `8000`, `8080`, `8081`, `8181`, `8182`, `8888`, `9090`, `29092` | verify no local service (e.g. host Postgres/Redis) occupies these ports |
 | `python3` | 3.8+, stdlib only | only needed for the benchmark harness |
 
-Check what Docker has:
+Check Docker resources & port availability:
 
 ```bash
 docker info --format 'mem={{.MemTotal}} cpus={{.NCPU}}'
+lsof -i :3000 -i :5432 -i :6379 -i :6380 -i :8000 -i :8080 -i :8081 -i :8181 -i :8182 -i :8888 -i :9090 -i :29092 -sTCP:LISTEN
 ```
 
 **10 GB against a measured 7.0 GB is deliberate.** The Flink taskmanagers and
@@ -54,6 +56,13 @@ see [Memory](#memory-the-binding-constraint).
 ```bash
 cd local-compose
 cp .env.example .env                # once: ports + which profiles come up
+
+# once: create the RSA keypair the token script converts -- it does not
+# generate these itself, and fails with "missing secrets/private.pem" without them
+mkdir -p secrets
+openssl genrsa -out secrets/private.pem 2048
+openssl rsa -in secrets/private.pem -pubout -out secrets/public.pem
+
 ./scripts/gen-token-env.sh          # once: PEM keypair -> secrets/tokens.env
 docker compose up -d
 docker compose logs -f flyway keycloak-init oauth-admin-sync kafka-topics-init submit-ingestion
