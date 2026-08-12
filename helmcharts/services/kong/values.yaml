@@ -1197,3 +1197,17 @@ extraObjects: []
 #   config:
 #     per_consumer: false
 #   plugin: prometheus
+
+# helm-test images (curl hits proxy, httpbin echo target); gated by deployment.test.enabled (false).
+# Centralized via images.yaml `kong.test.curl.image` (DHI curl) + `kong.test.httpbin.image` (no DHI).
+test:
+  curl:
+    image:
+      registry: dhi.io
+      repository: curl
+      tag: "8-debian13"
+  httpbin:
+    image:
+      registry: docker.io
+      repository: kennethreitz/httpbin
+      tag: "latest"

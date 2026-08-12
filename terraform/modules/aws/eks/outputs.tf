@@ -16,6 +16,14 @@ output "flink_sa_iam_role" {
   value = aws_iam_role.flink_sa_iam_role.arn
 }
 
+output "trino_sa_iam_role" {
+  value = aws_iam_role.trino_sa_iam_role.arn
+}
+
+output "hms_sa_iam_role" {
+  value = aws_iam_role.hms_sa_iam_role.arn
+}
+
 output "druid_raw_sa_iam_role" {
   value = aws_iam_role.druid_raw_sa_iam_role.arn
 }

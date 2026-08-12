@@ -1101,6 +1101,11 @@ gateway:
     # -- Override Backend URL
     customBackendUrl: null
     # -- Allows overriding the DNS resolver address nginx will use.
+    # DHI nginx (1.31) resolves the `resolver` host at startup; a hostname (kube-dns...svc) fails
+    # chicken-and-egg, so this needs an IP, not a hostname. Left empty here so the cloud-specific
+    # values file's `global.kubeDnsIP` (see _helpers.tpl) picks the right IP for the actual
+    # cluster instead of one hardcoded value shared across every cloud. Run
+    # `kubectl get svc kube-dns -n kube-system` to find the real IP if setting this directly.
     resolver: ""
     # -- Config file contents for Nginx. Passed through the `tpl` function to allow templating
     # @default -- See values.yaml
@@ -3361,9 +3366,10 @@ extraObjects: []
 sidecar:
   image:
     # -- The Docker registry and image for the k8s sidecar
-    repository: kiwigrid/k8s-sidecar
+    # DHI: loki chart uses repository as a FULL path (no separate registry field) → dhi.io/k8s-sidecar
+    repository: dhi.io/k8s-sidecar
     # -- Docker image tag
-    tag: 1.28.0
+    tag: 2.5.0
     # -- Docker image sha. If empty, no sha will be used
     sha: ""
     # -- Docker image pull policy

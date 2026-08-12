@@ -141,4 +141,10 @@ cronjob:
  enabled: false
 # The schedule in cron format
  cronSchedule: 0 0 1 * * # Every month
+
+# 2.0.0 master data indexer
+dataproductsJarV2: ""
+cronjobV2:
+ enabled: false
+ cronSchedule: 0 0 1 * * # Every month
 restartPolicy: OnFailure

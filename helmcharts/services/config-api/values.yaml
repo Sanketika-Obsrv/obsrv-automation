@@ -15,9 +15,9 @@ digest: ""
 
 kubectl:
   image:
-    registry: "sanketikahub"
+    registry: sanketikahub
     repository: "kubectl"
-    tag: "1.32.0-r1"
+    tag: "2.2.0"
     digest: ""
 
 imagePullPolicy: IfNotPresent

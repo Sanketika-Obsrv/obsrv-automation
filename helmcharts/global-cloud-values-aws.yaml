@@ -49,6 +49,10 @@ service_accounts:
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   velero: &velero_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
+  trino: &trino_sa_annotation
+    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the trino_sa_iam_role (terraform module.eks output trino_sa_iam_role)
+  hms: &hms_sa_annotation
+    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the hms_sa_iam_role (terraform module.eks output hms_sa_iam_role)
 
 s3-exporter-service-account: &s3-exporter-service-account
   s3_region: *cloud_storage_region
@@ -82,7 +86,7 @@ velero-backup: &velero-backup
           region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-aws
-      image: velero/velero-plugin-for-aws
+      image: dhi.io/velero-plugin-for-aws:1-debian13
       volumeMounts:
         - name: plugins
           mountPath: /target
@@ -114,6 +118,11 @@ masterdata-indexer-cron:
   cronjob:
     enabled: true
     cronSchedule: "30 5 * * *" # Daily 5:30 AM
+  # 2.0.0 master data indexer
+  dataproductsJarV2: "<fill-value>" # Update with the path to the 2.0.0 data products jar e.g. s3a://<bucket>/data-products/data-products-2.0.0.jar
+  cronjobV2:
+    enabled: false
+    cronSchedule: "0 7 * * *" # daily 7 AM
 
 dataset-api-service-account: &dataset-api-service-account
   serviceAccount:
@@ -195,9 +204,8 @@ druid-raw-cluster:
 
 lakehouse-connector:
   hadoop_core_site:
-      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem
-      fs.s3a.access.key: *s3-access-key
-      fs.s3a.secret.key: *s3-secret-access-key
+    fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+    fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
   serviceAccount:
     create: false
     name: flink-sa
@@ -208,22 +216,31 @@ lakehouse-connector:
       <<: *flink_sa_annotation
 
 trino:
+  serviceAccount:
+    create: *create_sa
+    name: trino-sa
+    annotations:
+      <<: *trino_sa_annotation
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
       hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
       fs.native-s3.enabled=true
-      s3.aws-access-key=<fill-value>
-      s3.aws-secret-key=<fill-value>
+      s3.region=<fill-value>
 
 hms:
+  serviceAccount:
+    create: *create_sa
+    automount: true
+    name: hms-sa
+    annotations:
+      <<: *hms_sa_annotation
   envVars:
     WAREHOUSE_DIR: *hudi_metadata_bucket
 
-
   hadoop_core_site:
-    fs.s3a.access.key:  *s3-access-key
-    fs.s3a.secret.key:  *s3-secret-access-key
+    fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+    fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
     # fs.s3a.endpoint: *s3-endpoint-url
     # fs.s3a.path.style.access: false
     # fs.s3a.connection.ssl.enabled: true

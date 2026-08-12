@@ -8,8 +8,10 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade
+  # No hook annotation: a normal resource, guaranteed created before the post-install Job
+  # below runs (Helm creates all normal resources before any post-install hook fires). SA and
+  # RoleBinding are already normal resources too, so all three RBAC pieces the Job needs exist
+  # by the time it starts.
   name: keycloak-job-role  # The role name
   namespace: {{ include "base.namespace" . }}  # Namespace where the role should be applied
 rules:
@@ -40,6 +42,10 @@ metadata:
   namespace: {{ include "base.namespace" . }}
   annotations:
     deployment_version: "v2"
+    # post-install, not pre-install: this job curls the keycloak Service, which doesn't exist
+    # yet during pre-install hooks -- pre-install deadlocks every fresh install.
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   completions: 1
   parallelism: 1
@@ -84,7 +90,8 @@ spec:
                 fi
 
                 # Convert x5c to PEM format in a variable
-                CERT_PEM=$(printf "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n" "$(echo "$x5c" | fold -w 64)")
+                CERT_BODY=$(echo "$x5c" | fold -w 64)
+                CERT_PEM=$(printf '%s\n%s\n%s' "-----BEGIN CERTIFICATE-----" "$CERT_BODY" "-----END CERTIFICATE-----")
 
                 echo "Certificate content created in memory."
 

@@ -77,7 +77,7 @@ variable "eks_node_group_scaling_config" {
 variable "eks_version" {
   type        = string
   description = "EKS version."
-  default     = "1.33"
+  default     = "1.36"
 }
 
 variable "eks_addons" {
@@ -89,19 +89,19 @@ variable "eks_addons" {
   default = [
     {
     name  = "kube-proxy"
-    version = "v1.33.0-eksbuild.2"
+    version = "v1.36.0-eksbuild.9"
     },
     {
     name  = "vpc-cni"
-    version = "v1.20.0-eksbuild.1"
+    version = "v1.22.2-eksbuild.1"
     },
     {
     name  = "coredns"
-    version = "v1.12.2-eksbuild.4"
+    version = "v1.14.3-eksbuild.3"
     },
     {
     name  = "aws-ebs-csi-driver"
-    version = "v1.46.0-eksbuild.1"
+    version = "v1.62.0-eksbuild.1"
     }
   ]
 }
@@ -176,6 +176,30 @@ variable "flink_namespace" {
   type        = string
   description = "Flink namespace."
   default     = "flink"
+}
+
+variable "trino_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for trino service account."
+  default     = "trino-sa-iam-role"
+}
+
+variable "trino_namespace" {
+  type        = string
+  description = "Trino namespace."
+  default     = "trino"
+}
+
+variable "hms_sa_iam_role_name" {
+  type        = string
+  description = "IAM role name for hive metastore service account."
+  default     = "hms-sa-iam-role"
+}
+
+variable "hms_namespace" {
+  type        = string
+  description = "Hive metastore namespace."
+  default     = "hms"
 }
 
 variable "druid_raw_sa_iam_role_name" {
