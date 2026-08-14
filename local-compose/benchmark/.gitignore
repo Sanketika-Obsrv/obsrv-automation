@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+
+# Run outputs are regenerable from the seeded config, and the generated corpus
+# alone is ~43 MB per run. Nothing here is committed: the reports are build
+# output that goes stale on the next run. The findings and the provenance of
+# the run they came from live in docs/benchmark-results.md.
+results/

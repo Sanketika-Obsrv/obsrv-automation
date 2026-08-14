@@ -1,0 +1,7 @@
+# Overrides web-console's /etc/hosts entirely (mounted straight over it --
+# extra_hosts only appends, and the image's built-in "127.0.0.1 localhost"
+# wins over an appended alias). keycloak-connect and the browser redirect it
+# builds share one KEYCLOAK_SERVER_URL ("http://localhost:8080/auth"); inside
+# this container "localhost" must mean nginx, not the container itself.
+172.28.0.254 localhost
+::1          ip6-localhost ip6-loopback

@@ -1,0 +1,911 @@
+# Obsrv, locally, on Docker Compose.
+#
+# Derived from helmcharts/ -- every value here traces back to a chart. Where a
+# value had to change to work outside Kubernetes, the reason is in a comment.
+#
+# Layout:
+#   (always)         postgres, kafka, valkey x2, flyway, keycloak, nginx,
+#                    dataset-api, command-api, web-console
+#   profile "druid"  zookeeper + coordinator/broker/historical/indexer/router
+#   profile "flink"  unified-pipeline (jobmanager + taskmanager)
+#   profile "masterdata"
+#                    cache-indexer (jobmanager + taskmanager) -- master
+#                    datasets / denormalization only, off by default
+#   profile "metrics"
+#                    prometheus + node-exporter -- populates the console's
+#                    CPU/memory and API-health dashboards
+#
+# .env enables both profiles by default. Comment COMPOSE_PROFILES out there to
+# run just the control plane on a small Docker memory budget.
+#
+# Platform note: five images are published amd64-only and are pinned to
+# linux/amd64 so they run under emulation. Everything else is arm64-native.
+
+x-obsrv-platform: &obsrv-platform
+  platform: linux/amd64
+
+# ADDED FOR LOCAL: glibc hands a multi-threaded process up to 8 arenas per core
+# (so 32 on a 4-core VM), and each arena keeps its own free lists that are never
+# returned to the OS. Flink's TaskManager runs dozens of threads, which is why it
+# measured 1465MB RSS against a configured Total Process Memory of 768m -- the
+# gap is arena fragmentation, not Flink memory. Capping arenas at 2 trades a
+# little allocator contention (irrelevant at a few thousand events/s) for a much
+# tighter RSS. It cannot cause an OOM: it changes how free memory is pooled, not
+# how much the JVM may use.
+x-flink-env: &flink-env
+  MALLOC_ARENA_MAX: "2"
+
+volumes:
+  postgres-data:
+  kafka-data:
+  valkey-dedup-data:
+  valkey-denorm-data:
+  zookeeper-data:
+  # Shared by historical AND indexer: with local deep storage both processes
+  # must see the same directory or segment handoff silently never completes.
+  druid-deepstorage:
+  druid-historical-data:
+  druid-indexer-data:
+  prometheus-data:
+  # Hands the Keycloak-assigned obsrv_admin user id from keycloak-init (which
+  # has kcadm but no psql) to oauth-admin-sync (which has psql but no kcadm).
+  keycloak-admin-id:
+
+networks:
+  obsrv:
+    name: obsrv
+    ipam:
+      config:
+        # Static subnet so nginx can be pinned to a fixed address (below) --
+        # needed for the web-console "localhost" alias, see its extra_hosts.
+        - subnet: 172.28.0.0/16
+
+services:
+
+  # ===========================================================================
+  # Data stores
+  # ===========================================================================
+
+  postgres:
+    image: postgres:17.5
+    container_name: obsrv-postgres
+    restart: unless-stopped
+    networks: [obsrv]
+    environment:
+      # global-values.yaml:42-43 -- pguser / pgpassword.
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    command:
+      # From global-values.yaml postgresql.primary.extendedConfiguration.
+      # Dropped: password_encryption=md5 (the chart sets it for legacy clients;
+      # every client in this stack speaks scram-sha-256) and the file-logging
+      # options (compose captures stdout instead).
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_stat_statements
+      - -c
+      - pg_stat_statements.max=10000
+      - -c
+      - pg_stat_statements.track=all
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./config/postgres-init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Runs the repo's own Flyway migrations (roles + full obsrv schema).
+  # See scripts/migrate.sh for why the SQL needs rendering first.
+  flyway:
+    image: flyway/flyway:11
+    container_name: obsrv-flyway
+    networks: [obsrv]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: postgres
+      PGPASSWORD: postgres
+      PGHOST: postgres
+      INGRESS_DOMAIN: "localhost:${HTTP_PORT:-8080}"
+    entrypoint: ["/bin/bash", "/scripts/migrate.sh"]
+    volumes:
+      - ../helmcharts/services/postgresql-migration/configs/migrations:/migrations-src:ro
+      - ./scripts:/scripts:ro
+    restart: on-failure
+
+  kafka:
+    # apache/kafka is the KRaft-mode image and is multi-arch; the chart's
+    # bitnami kafka40 4.0.0 is the same broker version.
+    image: apache/kafka:4.0.0
+    container_name: obsrv-kafka
+    restart: unless-stopped
+    networks: [obsrv]
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,HOST://:29092
+      # Two advertised listeners: in-network clients use kafka:9092, tools run
+      # from the host (kcat, console producers) use localhost:29092. A single
+      # listener cannot serve both.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,HOST://localhost:${KAFKA_HOST_PORT:-29092}
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # Single broker, so every internal topic is replication factor 1.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NUM_PARTITIONS: 4
+      # 5MB, to match the Flink producers' max-request-size = 5242880.
+      KAFKA_MESSAGE_MAX_BYTES: 5242880
+      CLUSTER_ID: obsrv-local-cluster-0001
+      # The image defaults to -Xms1G -Xmx1G, and since Xms == Xmx the JVM
+      # commits the full gigabyte at startup. Local topic volumes are tiny;
+      # 512m is ample and gives that back.
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx256m"
+      # ADDED FOR LOCAL: without this the image falls back to its packaged
+      # config's log.dirs=/tmp/kraft-broker-logs (it actually lands in
+      # /tmp/kafka-logs), so the kafka-data volume below was mounted but never
+      # written to, and every `docker compose down` silently wiped every topic.
+      # Postgres and the Druid metadata DB do persist, so the stack came back
+      # with datasets still marked Live whose topics no longer existed. For a
+      # master dataset that is fatal rather than cosmetic: cache-indexer
+      # subscribes to a topic named after the dataset, and a missing topic makes
+      # its enumerator throw UnknownTopicOrPartitionException, which fails the
+      # job -- so the job crash-looped forever instead of starting.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    ports:
+      - "${KAFKA_HOST_PORT:-29092}:29092"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
+
+  kafka-topics-init:
+    image: apache/kafka:4.0.0
+    container_name: obsrv-kafka-topics-init
+    networks: [obsrv]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "/scripts/create-topics.sh"]
+    volumes:
+      - ./config/create-topics.sh:/scripts/create-topics.sh:ro
+    restart: on-failure
+
+  # Two Valkey instances, as in the charts: dedup (extractor/preprocessor
+  # duplicate stores) and denorm (master-data cache + dataset registry cache).
+  #
+  # CHANGED FOR LOCAL: both get a maxmemory cap. Valkey has no limit by default,
+  # so it will happily grow until the host says no. Each idles at ~12MB here and
+  # a few thousand events barely move that, but dedup keys only expire after
+  # redis.database.key.expiry.seconds (1h), so an unattended stack left ingesting
+  # has no natural ceiling. allkeys-lru is the right policy for both: dedup keys
+  # are a bloom-filter-ish optimisation (evicting one risks a duplicate slipping
+  # through, not data loss) and denorm entries are a cache of master rows that
+  # can be re-read. 256mb is ~20x the idle footprint, so nothing evicts in
+  # practice -- it is a backstop, not a working limit.
+  valkey-dedup:
+    image: valkey/valkey:8.1.3
+    container_name: obsrv-valkey-dedup
+    restart: unless-stopped
+    networks: [obsrv]
+    command: ["valkey-server", "--save", "60", "1", "--appendonly", "no",
+              "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    # Gates the Flink taskmanagers, which open their Redis connections eagerly
+    # when an operator opens -- a refused connect there fails the whole job.
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    volumes:
+      - valkey-dedup-data:/data
+    ports:
+      - "${VALKEY_DEDUP_PORT:-6379}:6379"
+
+  valkey-denorm:
+    image: valkey/valkey:8.1.3
+    container_name: obsrv-valkey-denorm
+    restart: unless-stopped
+    networks: [obsrv]
+    command: ["valkey-server", "--save", "60", "1", "--appendonly", "no",
+              "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    volumes:
+      - valkey-denorm-data:/data
+    ports:
+      - "${VALKEY_DENORM_PORT:-6380}:6379"
+
+  # ===========================================================================
+  # Druid  (profile: druid)
+  # ===========================================================================
+  # All 5 roles collapsed into one container to minimize footprint for a
+  # minimal-data tryout instance (see docs/obsrv-local-docker-compose.md).
+  # config/druid/start-all.sh backgrounds the image's own `bin/run-druid`
+  # once per role, each pointed at its own static config subdirectory under
+  # config/druid/local-single-conf (same heaps/ports as the original per-role
+  # containers). The image is distroless (no python), which rules out
+  # Druid's python-based `bin/start-druid` multi-service launcher, and its
+  # `/druid.sh` entrypoint only handles one service per container -- so a
+  # small wrapper around the plain-bash `bin/run-druid` is the simplest thing
+  # that runs all 5 roles in one container without reimplementing Druid's
+  # env-var-to-properties translation.
+  #   * coordinator runs with druid.coordinator.asOverlord.enabled=true, dropping a
+  #     whole JVM. The overlord API stays available on the coordinator port.
+  #   * Indexer instead of MiddleManager. The Indexer runs tasks as threads in
+  #     one JVM; MiddleManager forks a 512m peon per task. Same ingestion, far
+  #     less memory. Heap is 512m/1g here vs the chart's 7g/9g, and worker
+  #     capacity 2 vs the chart's 30.
+  # Zookeeper stays external: Druid (unlike Kafka 4.0's KRaft mode) still
+  # depends on it for segment/task coordination and leader election, even in
+  # its own single-server "micro-quickstart" profile.
+
+  zookeeper:
+    image: zookeeper:3.9
+    container_name: obsrv-zookeeper
+    profiles: [druid]
+    restart: unless-stopped
+    networks: [obsrv]
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zookeeper:2888:3888;2181
+      # The image default is -Xmx1000m with no -Xms, so it grows lazily and only
+      # ever reached ~113MB here. Capping it costs nothing and stops a runaway
+      # from eating into Druid's budget -- this znode tree is tiny (one Druid
+      # cluster, a handful of supervisors).
+      JVMFLAGS: "-Xms64m -Xmx256m"
+      ZOO_4LW_COMMANDS_WHITELIST: "srvr,mntr,ruok"
+      ZOO_AUTOPURGE_PURGEINTERVAL: 1
+    volumes:
+      - zookeeper-data:/data
+    # "ruok" is in the 4lw whitelist above purely so this healthcheck can use
+    # it. Druid gated on service_started before, which only means the container
+    # exists -- its coordinator would then fail its first znode write and retry.
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc -w 2 localhost 2181 | grep -q imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  druid:
+    image: sanketikahub/druid:32.0.1
+    container_name: obsrv-druid
+    profiles: [druid]
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    # Named volumes are created root-owned; the image's default `druid` user
+    # (uid 1000) can't create subdirectories in them (segment cache, task
+    # dir). Running as root avoids needing a separate chown-init step.
+    user: "0:0"
+    entrypoint: ["/bin/bash", "/scripts/start-all.sh"]
+    volumes:
+      - ./config/druid/start-all.sh:/scripts/start-all.sh:ro
+      - ./config/druid/local-single-conf:/opt/druid/local-single-conf:ro
+      - druid-deepstorage:/druid/deepstorage
+      - druid-historical-data:/druid/data/historical
+      - druid-indexer-data:/druid/data/indexer
+    ports:
+      - "${DRUID_COORDINATOR_PORT:-8081}:8081"
+      - "${DRUID_ROUTER_PORT:-8888}:8888"
+
+  # ===========================================================================
+  # Flink pipeline jobs  (profile: flink)
+  # ===========================================================================
+  # Application mode via standalone-job.sh, exactly as
+  # services/flink/templates/deployment.yaml does -- not a session cluster.
+  # Checkpointing stays on the local filesystem because
+  # obsrv-core baseconfig.conf has job.enable.distributed.checkpointing = false,
+  # so no S3/MinIO is needed.
+
+  unified-pipeline-jobmanager:
+    <<: *obsrv-platform
+    image: sanketikahub/unified-pipeline:2.0.1
+    container_name: obsrv-unified-pipeline-jobmanager
+    environment: *flink-env
+    profiles: [flink]
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      kafka-topics-init:
+        condition: service_completed_successfully
+      flyway:
+        condition: service_completed_successfully
+    working_dir: /opt/flink
+    entrypoint: ["/opt/flink/bin/standalone-job.sh"]
+    command:
+      - start-foreground
+      - --job-classname=org.sunbird.obsrv.pipeline.task.UnifiedPipelineStreamTask
+      - -Dweb.submit.enable=false
+      - -Djobmanager.rpc.address=unified-pipeline-jobmanager
+      - -Djobmanager.rpc.port=6123
+      - -Dparallelism.default=1
+      - -Dblob.server.port=6124
+      - -Dqueryable-state.server.ports=6125
+      - --config.file.path
+      - /data/flink/conf/unified-pipeline.conf
+    volumes:
+      - ./config/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./config/flink/log4j-console.properties:/opt/flink/conf/log4j-console.properties:ro
+      - ./config/flink/baseconfig.conf:/data/flink/conf/baseconfig.conf:ro
+      - ./config/flink/unified-pipeline.conf:/data/flink/conf/unified-pipeline.conf:ro
+    ports:
+      - "${UNIFIED_PIPELINE_UI_PORT:-8181}:8081"
+
+  unified-pipeline-taskmanager:
+    <<: *obsrv-platform
+    image: sanketikahub/unified-pipeline:2.0.1
+    container_name: obsrv-unified-pipeline-taskmanager
+    environment: *flink-env
+    profiles: [flink]
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      unified-pipeline-jobmanager:
+        condition: service_started
+      # The taskmanager, not the jobmanager, is where the operators run and so
+      # where the Redis connections are opened (dedup store in baseconfig.conf,
+      # denorm store for the enrichment operators).
+      valkey-dedup:
+        condition: service_healthy
+      valkey-denorm:
+        condition: service_healthy
+    entrypoint: ["/opt/flink/bin/taskmanager.sh"]
+    command:
+      - start-foreground
+      - -Dweb.submit.enable=false
+      - -Djobmanager.rpc.address=unified-pipeline-jobmanager
+      - -Dtaskmanager.rpc.port=6122
+    volumes:
+      - ./config/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./config/flink/log4j-console.properties:/opt/flink/conf/log4j-console.properties:ro
+      - ./config/flink/baseconfig.conf:/data/flink/conf/baseconfig.conf:ro
+      - ./config/flink/unified-pipeline.conf:/data/flink/conf/unified-pipeline.conf:ro
+
+  # cache-indexer handles master datasets only -- cache-indexer.conf is
+  # dataset.type = "master-dataset" reading the masterdata.* topics, and it
+  # populates the Valkey denorm cache. Plain event datasets (create ->
+  # publish -> ingest -> query) go entirely through unified-pipeline and never
+  # touch it, so it sits behind its own profile to keep the default footprint
+  # down. Enable it (COMPOSE_PROFILES=...,masterdata) to work with master
+  # datasets or denormalization.
+  cache-indexer-jobmanager:
+    <<: *obsrv-platform
+    image: sanketikahub/cache-indexer:2.0.1
+    container_name: obsrv-cache-indexer-jobmanager
+    environment: *flink-env
+    profiles: [masterdata]
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      kafka-topics-init:
+        condition: service_completed_successfully
+      flyway:
+        condition: service_completed_successfully
+    working_dir: /opt/flink
+    entrypoint: ["/opt/flink/bin/standalone-job.sh"]
+    command:
+      - start-foreground
+      - --job-classname=org.sunbird.obsrv.streaming.CacheIndexerStreamTask
+      - -Dweb.submit.enable=false
+      - -Djobmanager.rpc.address=cache-indexer-jobmanager
+      - -Djobmanager.rpc.port=6123
+      - -Dparallelism.default=1
+      - -Dblob.server.port=6124
+      - -Dqueryable-state.server.ports=6125
+      - --config.file.path
+      - /data/flink/conf/cache-indexer.conf
+    volumes:
+      - ./config/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./config/flink/log4j-console.properties:/opt/flink/conf/log4j-console.properties:ro
+      - ./config/flink/baseconfig.conf:/data/flink/conf/baseconfig.conf:ro
+      - ./config/flink/cache-indexer.conf:/data/flink/conf/cache-indexer.conf:ro
+    ports:
+      - "${CACHE_INDEXER_UI_PORT:-8182}:8081"
+
+  cache-indexer-taskmanager:
+    <<: *obsrv-platform
+    image: sanketikahub/cache-indexer:2.0.1
+    container_name: obsrv-cache-indexer-taskmanager
+    environment: *flink-env
+    profiles: [masterdata]
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      cache-indexer-jobmanager:
+        condition: service_started
+      # This is the job whose entire output is Valkey writes -- master records
+      # land in valkey-denorm at the dataset's cache_config.redis_db.
+      valkey-dedup:
+        condition: service_healthy
+      valkey-denorm:
+        condition: service_healthy
+    entrypoint: ["/opt/flink/bin/taskmanager.sh"]
+    command:
+      - start-foreground
+      - -Dweb.submit.enable=false
+      - -Djobmanager.rpc.address=cache-indexer-jobmanager
+      - -Dtaskmanager.rpc.port=6122
+    volumes:
+      - ./config/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+      - ./config/flink/log4j-console.properties:/opt/flink/conf/log4j-console.properties:ro
+      - ./config/flink/baseconfig.conf:/data/flink/conf/baseconfig.conf:ro
+      - ./config/flink/cache-indexer.conf:/data/flink/conf/cache-indexer.conf:ro
+
+  # ===========================================================================
+  # Auth
+  # ===========================================================================
+  # The chart uses the bitnami keycloak sub-chart and imports a ~2600-line realm
+  # JSON. This uses the upstream image in dev mode and creates the same realm,
+  # client and users with kcadm (config/keycloak-init.sh).
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: obsrv-keycloak
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak123
+      # global-values.yaml:79-81 -- keycloak master admin.
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin123
+      # web-console's KEYCLOAK_SERVER_URL ends in /auth, so Keycloak must be
+      # served under that prefix (the chart gets it from KC_HOSTNAME).
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HOSTNAME: http://localhost:${HTTP_PORT:-8080}/auth
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      # Keycloak's own default is 512m/70% of RAM. One realm and one admin user
+      # do not need it; 384m leaves room for the initial realm import spike.
+      JAVA_OPTS_KC_HEAP: "-Xms128m -Xmx384m"
+    command: ["start-dev"]
+
+  keycloak-init:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: obsrv-keycloak-init
+    networks: [obsrv]
+    depends_on:
+      keycloak:
+        condition: service_started
+    environment:
+      BASE_URL: http://localhost:${HTTP_PORT:-8080}
+    # Named volumes are created root-owned; the image's default non-root
+    # user can't write /shared/obsrv_admin_id otherwise.
+    user: "0:0"
+    entrypoint: ["/bin/bash", "/scripts/keycloak-init.sh"]
+    volumes:
+      - ./config/keycloak-init.sh:/scripts/keycloak-init.sh:ro
+      - keycloak-admin-id:/shared
+    restart: on-failure
+
+  # Fixes up oauth_users.id for obsrv_admin to match its real Keycloak id --
+  # see config/oauth-admin-sync.sh.
+  oauth-admin-sync:
+    image: postgres:17.5
+    container_name: obsrv-oauth-admin-sync
+    networks: [obsrv]
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+      keycloak-init:
+        condition: service_completed_successfully
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: obsrv
+    entrypoint: ["/bin/bash", "/scripts/oauth-admin-sync.sh"]
+    volumes:
+      - ./config/oauth-admin-sync.sh:/scripts/oauth-admin-sync.sh:ro
+      - keycloak-admin-id:/shared:ro
+    restart: on-failure
+
+  # ===========================================================================
+  # Obsrv services
+  # ===========================================================================
+
+  dataset-api:
+    <<: *obsrv-platform
+    image: sanketikahub/obsrv-api-service:2.1.0
+    container_name: obsrv-dataset-api
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
+      # Every write endpoint validates a Keycloak token, so the realm, the
+      # obsrv-console client and obsrv_admin all have to exist before the API is
+      # reachable -- otherwise the first request after `up` fails on auth rather
+      # than on anything to do with the API.
+      keycloak-init:
+        condition: service_completed_successfully
+    # Gates web-console and nginx below: the API answers /health only once it has
+    # finished its (ts-node) startup compile, which is several seconds after the
+    # container reports "started".
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health | grep -q SUCCESS"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+    env_file:
+      # user_token_public_key -- generated by scripts/gen-token-env.sh, the
+      # stand-in for the chart's openssl-secrets Secret.
+      - ./secrets/tokens.env
+    environment:
+      # ADDED FOR LOCAL: the image's start script is "ts-node ./src/app.ts", so it
+      # compiles TypeScript at every boot and keeps the whole type checker --
+      # program, AST and symbol tables -- resident for the life of the process.
+      # Measured 622MB RSS against 4MB of actually-live JS heap. transpile-only
+      # strips types without type-checking, which is all a shipped image needs
+      # (the code was type-checked at build time; checking it again at runtime
+      # cannot change the outcome, it can only fail the boot).
+      TS_NODE_TRANSPILE_ONLY: "true"
+      # With the checker gone, 256MB of old-space is generous for a service whose
+      # live heap is single-digit MB. This is a ceiling, not a reservation.
+      NODE_OPTIONS: "--max-old-space-size=256"
+      system_env: local
+      api_port: "3000"
+      telemetry_kafka_compression: snappy
+
+      druid_host: http://druid
+      druid_port: "8888"
+      druid_username: admin
+      druid_password: admin123
+
+      kafka_host: kafka
+      kafka_port: "9092"
+      client_id: obsrv-apis
+      kafka_initial_retry_time: "3000"
+      kafka_retries: "5"
+      kafka_connection_timeout: "5000"
+
+      # The chart connects dataset-api as the postgres superuser
+      # (global.postgresql.username), not as the obsrv role. Kept identical.
+      postgres_host: postgres
+      postgres_port: "5432"
+      postgres_username: postgres
+      postgres_password: postgres
+      postgres_database: obsrv
+
+      denorm_redis_host: valkey-denorm
+      denorm_redis_port: "6379"
+      dedup_redis_host: valkey-dedup
+      dedup_redis_port: "6379"
+
+      # No object store in this stack. These keep the config shape the service
+      # expects; connector-registry upload and data-exhaust download will fail
+      # if exercised. See README.
+      cloud_storage_provider: aws
+      cloud_storage_region: us-east-1
+      container: storage-obsrv-local
+      container_prefix: connector-registry
+      telemetry_data_path: telemetry-data
+      storage_url_expiry: "3600"
+
+      exhaust_query_range: "31"
+      max_query_threshold: "5000"
+      max_query_limit: "5000"
+      max_date_range: "30"
+      exclude_datasource_validation: system-stats,failed-events-summary,masterdata-system-stats,system-events
+      object_key: authenticationMechanism
+      encryption_key: strong_encryption_key_to_encrypt
+
+      command_service_host: http://command-api
+      command_service_port: "8000"
+
+      pipeline_merged_job_manager_url: http://unified-pipeline-jobmanager:8081
+      masterdata_processor_job_manager_url: http://cache-indexer-jobmanager:8081
+
+      # Grafana is out of scope; the endpoints that read it return errors.
+      grafana_url: http://localhost:3001
+      GRAFANA_ADMIN_URL: http://localhost:3001
+      # Real when COMPOSE_PROFILES includes "metrics"; otherwise this resolves to
+      # nothing and the metrics endpoints log ECONNREFUSED, which is harmless.
+      prometheus_url: http://prometheus:9090
+
+      storage_types: '{"lake_house":false,"realtime_store":true}'
+      telemetry_dataset: system.telemetry.events
+      default_task_duration: PT4H
+      alerts_config_path: /config
+      obsrv_version: 2.1.0
+
+      default_freshness_threshold: "5"
+      data_out_query_time_period: 1d
+      default_query_time_period: "7"
+    volumes:
+      - ./config/alertsConfig.json:/config/alertsConfig.json:ro
+    ports:
+      - "${DATASET_API_PORT:-3000}:3000"
+
+  command-api:
+    <<: *obsrv-platform
+    image: sanketikahub/obsrv-command-service:2.0.0
+    container_name: obsrv-command-api
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+      # command-api runs the CREATE_KAFKA_TOPIC command on publish, creating each
+      # dataset's topic through the admin client, so it needs a live broker --
+      # not just a started container.
+      kafka:
+        condition: service_healthy
+    environment:
+      CONFIG_PATH: /data/config
+      system_env: local
+    volumes:
+      - ./config/service_config.yml:/data/config/service_config.yml:ro
+      - ./config/dummy.conf:/data/config/dummy.conf:ro
+    ports:
+      - "${COMMAND_API_PORT:-8000}:8000"
+
+  web-console:
+    <<: *obsrv-platform
+    image: sanketikahub/obsrv-web-console:1.4.2
+    container_name: obsrv-web-console
+    restart: unless-stopped
+    networks: [obsrv]
+    depends_on:
+      # service_healthy, not service_started: the console's first page load calls
+      # dataset-api, and "started" only means the container exists -- ts-node
+      # takes several more seconds to answer anything.
+      dataset-api:
+        condition: service_healthy
+      keycloak-init:
+        condition: service_completed_successfully
+      oauth-admin-sync:
+        condition: service_completed_successfully
+    # Gates nginx below. There is no dedicated health route -- the console is a
+    # SPA and every unmatched path returns index.html -- so serving the app shell
+    # is the readiness signal. Note 127.0.0.1 rather than localhost: the
+    # /etc/hosts override below points "localhost" at nginx, so a healthcheck on
+    # localhost would test nginx (and deadlock, since nginx waits on this check).
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ | grep -q '<title>Obsrv'"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+    env_file:
+      # USER_TOKEN_PRIVATE_KEY -- the private half of the pair dataset-api
+      # verifies with. Generated by scripts/gen-token-env.sh.
+      - ./secrets/tokens.env
+    volumes:
+      # keycloak-connect (server-side calls) and the browser redirect it
+      # builds share one KEYCLOAK_SERVER_URL ("http://localhost:8080/auth").
+      # Overrides the container's own "localhost" to mean nginx instead of
+      # itself -- see config/web-console-hosts for why extra_hosts won't do.
+      - ./config/web-console-hosts:/etc/hosts:ro
+    environment:
+      # ADDED FOR LOCAL: same ts-node story as dataset-api -- "npm run start" is
+      # "ts-node ./src", which measured 415MB for the server plus 122MB for the
+      # npm wrapper process. See the note on dataset-api for why dropping the
+      # runtime type check is safe.
+      TS_NODE_TRANSPILE_ONLY: "true"
+      NODE_OPTIONS: "--max-old-space-size=384"
+      ENV: local
+      PORT: "3000"
+      APP_NAME: obsrv-web-console
+
+      CONFIG_API_URL: http://dataset-api:3000
+      OBS_API_URL: http://dataset-api:3000
+      SYSTEM_API_URL: http://command-api:8000
+      # config-api (config-service-ext) is an enterprise image and is not part
+      # of this stack; pointed at dataset-api so requests fail fast rather than
+      # hanging on an unresolvable host.
+      CONFIG_API_EXT_URL: http://dataset-api:3000
+
+      SESSION_SECRET: backend-session
+      POSTGRES_CONNECTION_STRING: postgres://obsrv:obsrv123@postgres:5432/obsrv
+
+      OAUTH_WEB_CONSOLE_URL: localhost:${HTTP_PORT:-8080}/console
+      HTTPS: "false"
+      GENERATE_SOURCEMAP: "false"
+
+      # web-console registers an OIDC passport strategy unconditionally at
+      # startup regardless of AUTHENTICATION_TYPE, and its constructor throws
+      # if these are empty. We don't use OIDC login (keycloak type below is
+      # what's actually active) so these are unused dummy values, only
+      # present to stop the app crashing on boot.
+      AUTH_OIDC_ISSUER: unused
+      AUTH_OIDC_AUTHRIZATION_URL: http://localhost/unused
+      AUTH_OIDC_TOKEN_URL: http://localhost/unused
+      AUTH_OIDC_CLIENT_ID: unused
+
+      # global-values.yaml keycloak_users + oauth.web_console_client_id.
+      AUTHENTICATION_TYPE: keycloak
+      KEYCLOAK_REALM: obsrv
+      KEYCLOAK_CLIENT_ID: obsrv-console
+      KEYCLOAK_PUBLIC_CLIENT: "true"
+      KEYCLOAK_SSL_REQUIRED: none
+      KEYCLOAK_SERVER_URL: http://localhost:${HTTP_PORT:-8080}/auth
+
+      # No lakehouse (Trino/Hudi) here, unlike the chart's default.
+      STORAGE_TYPES: '{"lake_house":false,"realtime_store":true}'
+
+      # Out of scope. The chart injects a real Grafana service-account token via
+      # an init job; empty means the Grafana-backed panels stay blank.
+      GF_BEARER_TOKEN: ""
+      GRAFANA_URL: http://localhost:3001
+      GRAFANA_ADMIN_URL: http://localhost:3001
+      ALERT_MANAGER_URL: http://localhost:9093
+      # Read server-side by the console's own axios instance (not the browser),
+      # so a compose service name is correct here. Needs COMPOSE_PROFILES to
+      # include "metrics".
+      PROMETHEUS_URL: http://prometheus:9090
+      SUPERSET_URL: http://localhost:8088
+
+  # Mirrors helmcharts/services/submit-ingestion (a one-shot k8s Job, same
+  # alpine/curl image). It registers the "system-events" Druid supervisor, which
+  # is what makes the console's pipeline/error dashboards resolve -- obsrv's Flink
+  # jobs publish per-stage stats to the system.events topic, and without this
+  # supervisor nothing reads that topic into Druid.
+  #
+  # The chart also submits system-telemetry-events; omitted here as not needed.
+  #
+  # Distinct from per-dataset ingestion: publishing a dataset makes dataset-api
+  # generate a spec and command-api submit it (SUBMIT_INGESTION_TASKS). This job
+  # only covers the one built-in system datasource, which no dataset publish
+  # creates. Re-POSTing a supervisor spec is an idempotent update, so this is safe
+  # to re-run on every `up`.
+  submit-ingestion:
+    image: alpine/curl:8.12.1
+    container_name: obsrv-submit-ingestion
+    profiles: [druid]
+    networks: [obsrv]
+    restart: on-failure
+    depends_on:
+      # The supervisor this submits reads system.telemetry.events, so wait for
+      # create-topics.sh rather than just for the broker -- otherwise the
+      # supervisor spends its first minutes retrying a topic that isn't there.
+      kafka-topics-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./config/druid/system-events.json:/config/system-events.json:ro
+    entrypoint:
+      - sh
+      - -c
+      - |
+        # Druid has no compose healthcheck (five JVMs behind one container), so
+        # poll the router until it answers before POSTing.
+        until curl -sf -u admin:admin123 http://druid:8888/status >/dev/null; do
+          echo "waiting for druid router..."; sleep 5
+        done
+        echo "submitting system-events supervisor"
+        curl -sS -X POST \
+          -H "Content-Type: application/json" \
+          -u admin:admin123 \
+          -d @/config/system-events.json \
+          http://druid:8888/druid/indexer/v1/supervisor
+        echo
+
+  # ===========================================================================
+  # Observability
+  # ===========================================================================
+  # Upstream runs kube-prometheus-stack. Here it is one Prometheus plus a
+  # cut-down node-exporter, which is enough for the console's CPU/memory panels
+  # and its API-health charts. See config/prometheus/rules.yml for the trick that
+  # makes the kube-prometheus-only metric names resolve without Kubernetes.
+  #
+  # Panels that stay blank: anything sourced from kubelet
+  # (kubelet_volume_stats_*, the PV/disk charts), kube-state-metrics (node
+  # counts) or velero (backups). Those describe Kubernetes objects that have no
+  # Compose equivalent, so there is nothing to point them at.
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: obsrv-prometheus
+    restart: unless-stopped
+    profiles: [metrics]
+    networks: [obsrv]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      # 6h/256MB instead of the 15d default. Local use is "look at what just
+      # happened", and the default retention is the main driver of RSS here.
+      - --storage.tsdb.retention.time=6h
+      - --storage.tsdb.retention.size=256MB
+      - --web.listen-address=:9090
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/prometheus/rules.yml:/etc/prometheus/rules.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: obsrv-node-exporter
+    restart: unless-stopped
+    profiles: [metrics]
+    networks: [obsrv]
+    # disable-defaults then re-enable only cpu and meminfo: those two collectors
+    # cover every panel we can actually populate, and dropping the rest keeps
+    # this container around 10MB instead of ~25MB.
+    command:
+      - --path.procfs=/host/proc
+      - --collector.disable-defaults
+      - --collector.cpu
+      - --collector.meminfo
+    volumes:
+      # On Docker Desktop this is the Linux VM's /proc, not the host Mac's, so
+      # the numbers describe the VM the stack actually runs in. That is the right
+      # denominator for "how much headroom is left".
+      - /proc:/host/proc:ro
+
+  # ===========================================================================
+  # Ingress
+  # ===========================================================================
+  # Stands in for Kong. See config/nginx.conf for the two Kong behaviours it
+  # has to reproduce (no path stripping, Host preserved).
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: obsrv-nginx
+    restart: unless-stopped
+    networks:
+      obsrv:
+        # Fixed address so web-console can reach nginx under the same
+        # "localhost:8080" URL its browser-facing redirects use (see below).
+        ipv4_address: 172.28.0.254
+    # Every proxy_pass in config/nginx.conf names a host literally rather than
+    # through a variable, so nginx resolves all of them at config-load time and
+    # refuses to start ("host not found in upstream") if any one is missing --
+    # it does not retry. All three upstreams are therefore gated here, and on
+    # healthy rather than started where a healthcheck exists, so the first
+    # request through the proxy is served instead of 502'd.
+    depends_on:
+      web-console:
+        condition: service_healthy
+      dataset-api:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "${HTTP_PORT:-8080}:80"

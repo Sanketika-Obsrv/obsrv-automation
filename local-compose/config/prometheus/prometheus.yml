@@ -1,0 +1,54 @@
+# Prometheus for the local stack. Upstream runs kube-prometheus-stack; this is a
+# single scraper with just enough targets to make the web console's dashboards
+# render outside Kubernetes.
+#
+# 30s instead of the usual 15s: halves series churn and memory, and nothing here
+# is worth sub-30s resolution locally.
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+rule_files:
+  - /etc/prometheus/rules.yml
+
+scrape_configs:
+  # The job name is load-bearing: the console filters on
+  # node_memory_MemTotal_bytes{job='node-exporter'}, so renaming this blanks the
+  # memory panels.
+  - job_name: node-exporter
+    static_configs:
+      - targets: [node-exporter:9100]
+
+  # obsrv's own API metrics -- node_total_api_calls, node_failed_api_calls,
+  # node_query_response_time. These drive the API health and data-in/data-out
+  # panels.
+  - job_name: dataset-api
+    static_configs:
+      - targets: [dataset-api:3000]
+
+  - job_name: command-api
+    static_configs:
+      - targets: [command-api:8000]
+
+  - job_name: web-console
+    static_configs:
+      - targets: [web-console:3000]
+
+  # Flink exposes these only because config/flink/flink-conf.yaml enables the
+  # PrometheusReporter. Targets go down when COMPOSE_PROFILES omits flink or
+  # masterdata -- that shows up as up=0, which is expected, not a failure.
+  - job_name: flink
+    static_configs:
+      - targets:
+          - unified-pipeline-jobmanager:9249
+          - unified-pipeline-taskmanager:9249
+          - cache-indexer-jobmanager:9249
+          - cache-indexer-taskmanager:9249
+    # Flink re-exports the whole Kafka client JMX tree once per operator, which
+    # measured 3634 of 5920 flink series -- 61% of them -- for metrics no console
+    # panel reads. Dropping them at ingestion keeps the TSDB (and so Prometheus's
+    # RSS) roughly a third of the size.
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'flink_.*Kafka(Producer|Consumer)_.*'
+        action: drop

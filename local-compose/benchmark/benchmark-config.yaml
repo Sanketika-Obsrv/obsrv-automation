@@ -1,0 +1,111 @@
+# Obsrv benchmark configuration.
+#
+# Everything here has a default in lib/config.py -- delete any key you do not
+# care about and the run still works. Changing the benchmark should never
+# require editing Python.
+#
+# Keys the profiles govern (load.events, users.count, the queries block, ...)
+# are left commented out on purpose. Setting one here pins it for every
+# profile, because the file is merged on top of the profile -- which is what
+# used to make `--profile smoke` still run 20,000 events. Uncomment to pin.
+#
+#   ./benchmark run                       # this file
+#   ./benchmark run --profile smoke       # 2k events, fast sanity pass
+#   ./benchmark run --events 500000       # override just the volume
+#   OBSRV_BENCH_LOAD_EVENTS=1000000 ./benchmark run
+
+run:
+  profile: standard          # smoke (2k) | standard (20k) | heavy (500k)
+  output_dir: results        # results/<run.id>/
+  keep_going: true           # a failed functional check does not abort the run
+  cleanup: false             # drop the datasets when the run finishes
+  cleanup_on_failure: false
+  skip_queries: false        # true = ingest pipeline only, no query benchmark
+
+endpoints:
+  dataset_api: http://localhost:3000
+  keycloak: http://localhost:8080/auth
+  druid_router: http://localhost:8888
+  druid_coordinator: http://localhost:8081
+  flink_unified: http://localhost:8181
+  flink_cache_indexer: http://localhost:8182
+  prometheus: http://localhost:9090
+  node_exporter: http://localhost:9100
+
+auth:
+  realm: obsrv
+  client_id: obsrv-console
+  username: obsrv_admin
+  password: enDoPvTAxFSd
+  druid_user: admin
+  druid_password: admin123
+
+kafka:
+  bootstrap_internal: localhost:9092    # as the broker sees itself
+  ingest_topic: ingest
+  consumer_group: unified-pipeline-group
+  masterdata_consumer_group: masterdata-pipeline-group
+
+datasets:
+  master_id: bench_users
+  telemetry_id: bench_telemetry
+  denorm_out_field: user     # denormalized columns land as user.city, user.userName, ...
+  denorm_strategy: jsonata   # jsonata (joins on the nested actor.id) | flat (actor_id)
+  recreate: true             # drop and rebuild if they already exist
+
+users:
+  # count: 100               # profile-governed: smoke 25, standard/heavy 100
+  seed: 20260804             # same seed -> same corpus -> comparable runs
+
+load:
+  # events: 20000            # profile-governed: smoke 2k, standard 20k, heavy 500k
+  # concurrent_producers: 2  # profile-governed: smoke 1, standard 2, heavy 4
+  # batch_size: 5000         # profile-governed: heavy raises it to 20000
+  producer_rate: 0           # events/sec into Kafka, 0 = as fast as the broker takes
+  event_size_bytes: [400, 4000]   # payload padding range, for size variety
+  large_event_fraction: 0.25      # share with edata.size > 100000 (isLargeEvent = true)
+  duplicate_fraction: 0.02        # share re-emitted with the same mid, to exercise dedup
+  timestamp_spread_minutes: 30
+  seed: 20260804
+
+pipeline:
+  pause_before_load: true    # build the backlog with the consumer stopped
+  pause_target: up_taskmanager
+  resume_timeout_sec: 300
+  # drain_timeout_sec: 1800  # profile-governed: heavy raises it to 5400
+  drain_idle_sec: 60         # lag zero held this long counts as drained
+
+monitor:
+  poll_interval_sec: 5       # Flink, Druid, cgroup and host sampling
+  report_interval_sec: 60    # Kafka lag rollup -- each one starts a JVM in the broker
+  # druid_settle_timeout_sec: 900   # profile-governed: heavy raises it to 2700
+
+queries:
+  warmup: 3                  # discarded: the first run measures cache state, not cost
+  timeout_sec: 60
+  # iterations: 12           # profile-governed: smoke 5, standard 12, heavy 25
+  # concurrency: 4           # profile-governed: smoke 2, standard 4, heavy 8
+  # qps_probe_seconds: 20    # profile-governed: smoke 10, standard 20, heavy 45
+
+validation:
+  # functional_events: 200   # profile-governed: smoke 100, standard/heavy 200
+  dedup_probe_events: 25
+  settle_timeout_sec: 420
+
+capacity:
+  targets_per_min: [10000, 100000]   # the executive summary answers yes/no to these
+  safe_headroom: 0.7                 # recommend 70% of sustained for production
+  cpu_saturation_pct: 85.0
+  mem_saturation_pct: 90.0
+
+report:
+  html: true
+  csv: true
+  top_n_recommendations: 12
+
+docker:
+  compose_file: docker-compose.yaml
+  container_prefix: obsrv
+  kafka_bin: /opt/kafka/bin
+  # compose_dir defaults to the local-compose directory above this one.
+  # containers: {kafka: obsrv-kafka, ...}   # only if you renamed something
