@@ -3,6 +3,14 @@
 # debian13 variant (confirmed via `docker inspect` labels on the already-published hms:2.2.0 image)
 FROM dhi.io/eclipse-temurin:17-jdk-debian13-dev
 
+# Fail every RUN layer on the first error, including inside for-loops and pipes. Without this,
+# a curl failure partway through one of the jar-replacement loops below would delete the old jar,
+# fail to fetch the replacement, and the RUN step would still exit 0 (the loop just moves on to
+# the next artifact and the layer's exit status ends up being whatever the LAST command returned)
+# - shipping an image silently missing a jar, which fails at runtime with NoClassDefFoundError
+# instead of failing the build. bash is already present on the dhi.io base image.
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+
 # see https://hadoop.apache.org/releases.html
 # 3.3.4 only exists on archive.apache.org, which throttles this file to ~50-100KB/s (confirmed
 # from multiple networks incl. GitHub Actions runners) - a ~700MB download that never finishes
@@ -38,13 +46,19 @@ ARG COMMONS_CONFIGURATION2_VERSION=2.15.1
 ARG SNAPPY_JAVA_VERSION=1.1.10.8
 ARG COMMONS_COMPRESS_VERSION=1.28.0
 ARG COMMONS_LANG3_VERSION=3.20.0
-ARG BOUNCYCASTLE_VERSION=1.70
-# NOT the latest (10.9.1) - that switched its own BouncyCastle dependency from bcprov-jdk15on
-# to bcprov-jdk18on, a different artifact family than what's actually bundled here (jdk15on,
-# see BOUNCYCASTLE_VERSION below). 9.37.2 is the last version still on jdk15on - matches the
-# classpath exactly - and already clears the CVE (fixed as of 9.37.2).
-ARG NIMBUS_JOSE_JWT_VERSION=9.37.2
-ARG LZ4_JAVA_VERSION=1.8.1
+# bcprov-jdk15on stopped receiving releases after 1.70, which does NOT fix CVE-2023-33201
+# (LDAP injection, no fixed jdk15on version exists at all - the fix only ships as jdk18on).
+# Switching the artifact family (not just the version) - bcprov-jdk15on -> bcprov-jdk18on -
+# closes that CVE plus 5 other residual BC CVEs that also only have jdk18on fixes.
+ARG BOUNCYCASTLE_VERSION=1.85.2
+# Paired with the jdk18on BC switch above: nimbus-jose-jwt 10.9.1 (latest) itself declares
+# bcprov-jdk18on 1.81 as its own dependency - matches the artifact family we're now using.
+# (9.37.2 was used in an earlier round specifically to match the old jdk15on family; now that
+# BC itself is moving to jdk18on, 10.9.1 is the correct match instead.)
+ARG NIMBUS_JOSE_JWT_VERSION=10.9.1
+# 1.8.1 is listed in Maven Central's version index but the jar itself 404s (a broken/partial
+# publish) - confirmed directly. 1.8.0 is the latest version that's actually downloadable.
+ARG LZ4_JAVA_VERSION=1.8.0
 # commons-configuration2 2.15.1's own pom.xml declares these as its actual dependency versions -
 # a real cluster crash (NoClassDefFoundError: org/apache/commons/io/build/AbstractSupplier)
 # proved that bumping one half of a dependency pair without the other breaks at runtime, so
@@ -77,12 +91,17 @@ RUN apt-get update -y && \
 # retry loop anyway as defense-in-depth for ordinary transient network blips.
 RUN echo "Download the Hadoop binary package" && \
     for i in 1 2 3 4 5 6 7 8; do \
-      curl -sS -C - --connect-timeout 30 --max-time 300 \
+      curl -sS --fail -C - --connect-timeout 30 --max-time 300 \
         -o /tmp/hadoop.tar.gz \
         https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz \
       && break; \
       echo "download attempt $i failed/interrupted, resuming..."; sleep 5; \
     done && \
+    echo "Verify the Hadoop tarball checksum" && \
+    curl -sS --fail --retry 3 \
+      -o /tmp/hadoop.tar.gz.sha512 \
+      https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz.sha512 && \
+    (cd /tmp && echo "$(grep -oE '[0-9a-fA-F]{128}' hadoop.tar.gz.sha512)  hadoop.tar.gz" | sha512sum -c -) && \
     echo "Extract the Hadoop binary package" && \
     tar xzf /tmp/hadoop.tar.gz -C /opt/ && \
     rm /tmp/hadoop.tar.gz && \
@@ -149,12 +168,17 @@ would also delete/miss those unrelated artifacts." && \
 
 RUN echo "Download the standalone metastore binary" && \
     for i in 1 2 3 4 5 6 7 8; do \
-      curl -sS -C - --connect-timeout 30 --max-time 900 \
+      curl -sS --fail -C - --connect-timeout 30 --max-time 900 \
         -o /tmp/hive-metastore.tar.gz \
         https://downloads.apache.org/hive/hive-standalone-metastore-$HIVE_METASTORE_VERSION/hive-standalone-metastore-$HIVE_METASTORE_VERSION-bin.tar.gz \
       && break; \
       echo "download attempt $i failed/interrupted, resuming..."; sleep 5; \
     done && \
+    echo "Verify the metastore tarball checksum" && \
+    curl -sS --fail --retry 3 \
+      -o /tmp/hive-metastore.tar.gz.sha256 \
+      https://downloads.apache.org/hive/hive-standalone-metastore-$HIVE_METASTORE_VERSION/hive-standalone-metastore-$HIVE_METASTORE_VERSION-bin.tar.gz.sha256 && \
+    (cd /tmp && echo "$(grep -oE '[0-9a-fA-F]{64}' hive-metastore.tar.gz.sha256)  hive-metastore.tar.gz" | sha256sum -c -) && \
     echo "Extract the standalone metastore binary" && \
     tar xzf /tmp/hive-metastore.tar.gz -C /opt/ && \
     rm /tmp/hive-metastore.tar.gz && \
@@ -276,13 +300,14 @@ established-compatible major.minor line - see per-ARG comments above)" && \
           --output $loc/commons-logging-$COMMONS_LOGGING_VERSION.jar; \
       fi; \
     done && \
-    for artifact in bcprov-jdk15on bcpkix-jdk15on; do \
-      old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-[0-9]*.jar 2>/dev/null || true); \
+    for pair in bcprov-jdk15on:bcprov-jdk18on bcpkix-jdk15on:bcpkix-jdk18on; do \
+      old_artifact=${pair%%:*}; new_artifact=${pair##*:}; \
+      old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$old_artifact-[0-9]*.jar 2>/dev/null || true); \
       if [ -n "$old" ]; then \
         rm -f $old && \
         curl -sL --retry 3 --retry-delay 2 --fail \
-          https://repo1.maven.org/maven2/org/bouncycastle/$artifact/$BOUNCYCASTLE_VERSION/$artifact-$BOUNCYCASTLE_VERSION.jar \
-          --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-$BOUNCYCASTLE_VERSION.jar; \
+          https://repo1.maven.org/maven2/org/bouncycastle/$new_artifact/$BOUNCYCASTLE_VERSION/$new_artifact-$BOUNCYCASTLE_VERSION.jar \
+          --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$new_artifact-$BOUNCYCASTLE_VERSION.jar; \
       fi; \
     done && \
     for artifact in jetty-annotations jetty-client jetty-jndi jetty-plus; do \
