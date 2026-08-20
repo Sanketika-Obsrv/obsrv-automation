@@ -41,7 +41,13 @@ ARG COMMONS_LANG3_VERSION=3.20.0
 ARG BOUNCYCASTLE_VERSION=1.70
 ARG NIMBUS_JOSE_JWT_VERSION=10.9.1
 ARG LZ4_JAVA_VERSION=1.8.1
+# commons-configuration2 2.15.1's own pom.xml declares these as its actual dependency versions -
+# a real cluster crash (NoClassDefFoundError: org/apache/commons/io/build/AbstractSupplier)
+# proved that bumping one half of a dependency pair without the other breaks at runtime, so
+# these three are pinned to exactly what commons-configuration2 itself was built against.
 ARG COMMONS_IO_VERSION=2.22.0
+ARG COMMONS_TEXT_VERSION=1.15.0
+ARG COMMONS_LOGGING_VERSION=1.3.6
 ARG COMMONS_BEANUTILS_VERSION=1.11.0
 ARG JDOM2_VERSION=2.0.6.1
 
@@ -249,6 +255,20 @@ established-compatible major.minor line - see per-ARG comments above)" && \
         curl -sL --retry 3 --retry-delay 2 --fail \
           https://repo1.maven.org/maven2/commons-beanutils/commons-beanutils/$COMMONS_BEANUTILS_VERSION/commons-beanutils-$COMMONS_BEANUTILS_VERSION.jar \
           --output $loc/commons-beanutils-$COMMONS_BEANUTILS_VERSION.jar; \
+      fi; \
+      old=$(ls $loc/commons-text-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/org/apache/commons/commons-text/$COMMONS_TEXT_VERSION/commons-text-$COMMONS_TEXT_VERSION.jar \
+          --output $loc/commons-text-$COMMONS_TEXT_VERSION.jar; \
+      fi; \
+      old=$(ls $loc/commons-logging-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/commons-logging/commons-logging/$COMMONS_LOGGING_VERSION/commons-logging-$COMMONS_LOGGING_VERSION.jar \
+          --output $loc/commons-logging-$COMMONS_LOGGING_VERSION.jar; \
       fi; \
     done && \
     for artifact in bcprov-jdk15on bcpkix-jdk15on; do \
