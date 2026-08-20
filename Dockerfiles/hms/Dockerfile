@@ -38,10 +38,6 @@ ARG JACKSON_VERSION=2.22.2
 # jackson-annotations uses its own version scheme (major.minor only, no patch digit) - latest
 # as of writing.
 ARG JACKSON_ANNOTATIONS_VERSION=2.22
-# jetty must stay on the 9.4.x line - Hadoop's embedded HTTP server is built against jetty9's
-# javax.servlet APIs; jetty 10/11 switched to the jakarta.servlet namespace, a breaking change.
-# Latest 9.4.x patch as of writing.
-ARG JETTY_VERSION=9.4.58.v20250814
 ARG COMMONS_CONFIGURATION2_VERSION=2.15.1
 ARG SNAPPY_JAVA_VERSION=1.1.10.8
 ARG COMMONS_COMPRESS_VERSION=1.28.0
@@ -224,20 +220,20 @@ handled separately - it uses its own major.minor-only version scheme, no patch d
 # exists upstream at any version - same as perl-base), kotlin-stdlib (only fix available is a
 # 1.x -> 2.x major language-version jump for 2 CVEs), kafka-clients/libthrift (libthrift in
 # particular is the metastore's own RPC wire protocol - breaking this breaks client compat).
+RUN echo "Remove jetty entirely (all modules, both here and the yarn/lib set below) - confirmed \
+via 'jcmd <pid> GC.class_histogram' on the real running metastore process (a live production pod, \
+not a synthetic boot-test) that zero org.eclipse.jetty.* classes are loaded out of 3817 total - \
+metastore's own startup scripts/config never reference an HTTP port, matching the same dead-weight \
+pattern already confirmed for zookeeper. Removes every jetty CVE outright rather than just bumping \
+to the latest-still-vulnerable 9.4.x patch." && \
+    rm -f /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib/jetty-*.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib/jetty-*.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/jetty-*.jar
+
 RUN echo "Bump remaining standalone MEDIUM/LOW-severity libs in place (each within its own \
 established-compatible major.minor line - see per-ARG comments above)" && \
     for loc in /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib \
                /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib; do \
-      for artifact in jetty-http jetty-server jetty-xml jetty-security jetty-io jetty-util \
-        jetty-util-ajax jetty-servlet jetty-webapp; do \
-        old=$(ls $loc/$artifact-[0-9]*.jar 2>/dev/null || true); \
-        if [ -n "$old" ]; then \
-          rm -f $old && \
-          curl -sL --retry 3 --retry-delay 2 --fail \
-            https://repo1.maven.org/maven2/org/eclipse/jetty/$artifact/$JETTY_VERSION/$artifact-$JETTY_VERSION.jar \
-            --output $loc/$artifact-$JETTY_VERSION.jar; \
-        fi; \
-      done; \
       old=$(ls $loc/commons-configuration2-[0-9]*.jar 2>/dev/null || true); \
       if [ -n "$old" ]; then \
         rm -f $old && \
@@ -312,15 +308,6 @@ established-compatible major.minor line - see per-ARG comments above)" && \
           --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$new_artifact-$BOUNCYCASTLE_VERSION.jar; \
       fi; \
     done && \
-    for artifact in jetty-annotations jetty-client jetty-jndi jetty-plus; do \
-      old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-[0-9]*.jar 2>/dev/null || true); \
-      if [ -n "$old" ]; then \
-        rm -f $old && \
-        curl -sL --retry 3 --retry-delay 2 --fail \
-          https://repo1.maven.org/maven2/org/eclipse/jetty/$artifact/$JETTY_VERSION/$artifact-$JETTY_VERSION.jar \
-          --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-$JETTY_VERSION.jar; \
-      fi; \
-    done && \
     old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/lz4-java-[0-9]*.jar 2>/dev/null || true); \
     if [ -n "$old" ]; then \
       rm -f $old && \
@@ -379,7 +366,7 @@ RUN echo "Verify no known-stale jars survived" && \
         -iname "jackson-mapper-asl-*.jar" -o \
         -iname "derby-*.jar" -o \
         -iname "hsqldb-*.jar" -o \
-        -iname "jetty-*-9.4.51.v20230217.jar" -o \
+        -iname "jetty-*.jar" -o \
         -iname "commons-io-2.8.0.jar" -o \
         -iname "commons-text-1.10.0.jar" -o \
         -iname "commons-logging-1.1.3.jar" -o \
