@@ -69,11 +69,15 @@ RUN echo "Add S3a jars to the classpath" && \
     ln -s /opt/hadoop/share/hadoop/tools/lib/hadoop-aws* /opt/hadoop/share/hadoop/common/lib/ && \
     ln -s /opt/hadoop/share/hadoop/tools/lib/aws-java-sdk* /opt/hadoop/share/hadoop/common/lib/
 
-RUN echo "Remove hadoop-client fat jars and the YARN app-catalog webapp war - confirmed via \
-'hadoop classpath'/'hadoop jar' (what run.sh actually invokes) that neither is ever on the \
-metastore classpath; they only carry their own shaded/vendored copies of old netty/avro/zookeeper/ \
-jackson-mapper-asl (CVE-2019-20444, CVE-2024-47561, CVE-2023-44981, CVE-2019-10202, etc)" && \
+RUN echo "Remove hadoop-client fat jars, the YARN app-catalog webapp war, and the YARN \
+timelineservice lib dir - confirmed via 'hadoop classpath'/'hadoop jar' (what run.sh actually \
+invokes) that none of these are ever on the metastore classpath (classpath only includes \
+yarn/lib and yarn/*, not the nested yarn/timelineservice/lib); they only carry their own \
+shaded/vendored copies of old netty/avro/zookeeper/jackson-mapper-asl/jackson-databind \
+(CVE-2019-20444, CVE-2024-47561, CVE-2023-44981, CVE-2019-10202, etc - htrace-core alone in \
+timelineservice/lib carries 52 CVE-instances via its bundled jackson 2.4.0)" && \
     rm -rf /opt/hadoop-$HADOOP_VERSION/share/hadoop/client && \
+    rm -rf /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/timelineservice && \
     rm -f /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/hadoop-yarn-applications-catalog-webapp-*.war
 
 RUN echo "Remove unused zookeeper (run.sh sets no ZK/HA config; verified via boot-test that its \
