@@ -19,6 +19,17 @@ ARG POSTGRES_CONNECTOR_VERSION=42.7.13
 # bundled hive-metastore ships log4j 2.8.2 (Log4Shell CVE-2021-44228 + others); bumped in place.
 # 2.25.4 still carries CVE-2026-49844 (fixed 2.25.5/2.26.1) - latest as of writing
 ARG LOG4J_VERSION=2.26.1
+# Hadoop 3.3.6 ships netty 4.1.89.Final (plus a leftover netty 3.10.6.Final, see below) - both
+# carry dozens of CVEs. Bumping within the 4.1.x line only (Netty's own compat policy: binary
+# compatible across 4.1.x patches) - latest as of writing.
+ARG NETTY_VERSION=4.1.137.Final
+# bundled jackson-databind/core range from 2.4.0 to 2.12.7 depending on which lib dir - bumping
+# to the latest 2.x line (Jackson maintains ObjectMapper API compat across minor versions) -
+# latest as of writing.
+ARG JACKSON_VERSION=2.22.2
+# jackson-annotations uses its own version scheme (major.minor only, no patch digit) - latest
+# as of writing.
+ARG JACKSON_ANNOTATIONS_VERSION=2.22
 
 ENV HADOOP_HOME="/opt/hadoop"
 ENV PATH="/opt/spark/bin:/opt/hadoop/bin:${PATH}"
@@ -65,6 +76,49 @@ jackson-mapper-asl (CVE-2019-20444, CVE-2024-47561, CVE-2023-44981, CVE-2019-102
     rm -rf /opt/hadoop-$HADOOP_VERSION/share/hadoop/client && \
     rm -f /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/hadoop-yarn-applications-catalog-webapp-*.war
 
+RUN echo "Remove unused zookeeper (run.sh sets no ZK/HA config; verified via boot-test that its \
+absence doesn't affect metastore startup) and ancient jackson-mapper-asl (EOL, no upstream fix \
+exists) - fixes CVE-2023-44981, CVE-2024-23944, CVE-2019-10202, CVE-2019-10172" && \
+    rm -f /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib/zookeeper-*.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib/zookeeper-*.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib/jackson-mapper-asl-*.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib/jackson-mapper-asl-*.jar
+
+RUN echo "Remove native-transport netty jars (opt-in perf jars for epoll/kqueue - NIO is \
+Hadoop's default transport, these are never loaded unless explicitly configured) and the \
+leftover netty 3.x jar (only used by zookeeper's optional NettyServerCnxnFactory, removed \
+above) - fixes CVE-2019-20444 and removes dead weight before the real netty bump below" && \
+    rm -f /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib/netty-3.10.6.Final.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib/netty-3.10.6.Final.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/*/lib/netty-transport-native-epoll-*.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/*/lib/netty-transport-native-kqueue-*.jar \
+          /opt/hadoop-$HADOOP_VERSION/share/hadoop/*/lib/netty-resolver-dns-native-macos-*.jar
+
+RUN echo "Bump remaining netty 4.1.x jars in place (same major.minor line, binary compatible \
+per Netty's own policy) - fixes dozens of CVEs incl. CVE-2026-42579/44893/33870/56817/44249. \
+NB: glob is anchored on a digit right after the artifact name (\$artifact-[0-9]*.jar) because \
+many netty artifact names are string-prefixes of others (netty-transport vs. \
+netty-transport-classes-epoll, netty-codec vs. netty-codec-dns, etc) - a plain \$artifact-*.jar \
+would also delete/miss those unrelated artifacts." && \
+    for dir in common hdfs; do \
+      for artifact in netty-buffer netty-codec netty-codec-dns netty-codec-haproxy \
+        netty-codec-http netty-codec-http2 netty-codec-memcache netty-codec-mqtt \
+        netty-codec-redis netty-codec-smtp netty-codec-socks netty-codec-stomp netty-codec-xml \
+        netty-common netty-handler netty-handler-proxy netty-handler-ssl-ocsp netty-resolver \
+        netty-resolver-dns netty-resolver-dns-classes-macos netty-transport \
+        netty-transport-classes-epoll netty-transport-classes-kqueue \
+        netty-transport-native-unix-common netty-transport-rxtx netty-transport-sctp \
+        netty-transport-udt netty-all; do \
+        old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/$dir/lib/$artifact-[0-9]*.jar 2>/dev/null || true); \
+        if [ -n "$old" ]; then \
+          rm -f $old && \
+          curl -sL --retry 3 --retry-delay 2 --fail \
+            https://repo1.maven.org/maven2/io/netty/$artifact/$NETTY_VERSION/$artifact-$NETTY_VERSION.jar \
+            --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/$dir/lib/$artifact-$NETTY_VERSION.jar; \
+        fi; \
+      done; \
+    done
+
 RUN echo "Download the standalone metastore binary" && \
     for i in 1 2 3 4 5 6 7 8; do \
       curl -sS -C - --connect-timeout 30 --max-time 900 \
@@ -85,6 +139,32 @@ RUN echo "Fix guava conflict (HIVE-22915)" && \
 RUN echo "Remove unused embedded DB driver jars - only postgres is used (see run.sh DATABASE_TYPE) - fixes CVE-2015-1832 (derby XXE), CVE-2022-41853 (hsqldb RCE)" && \
     rm -f /opt/apache-hive-metastore-$HIVE_METASTORE_VERSION-bin/lib/derby-*.jar && \
     rm -f /opt/hadoop-$HADOOP_VERSION/share/hadoop/mapreduce/lib-examples/hsqldb-*.jar
+
+RUN echo "Bump bundled jackson-databind/jackson-core/jackson-annotations in place (same 2.x \
+API line, Jackson maintains ObjectMapper compat across minor versions) - fixes CVE-2025-52999, \
+CVE-2022-42003 and dozens more. Same digit-anchored glob as the netty step - jackson-core would \
+otherwise collide with nothing here, but kept consistent for safety. jackson-annotations is \
+handled separately - it uses its own major.minor-only version scheme, no patch digit." && \
+    for loc in /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib \
+               /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib \
+               /opt/apache-hive-metastore-$HIVE_METASTORE_VERSION-bin/lib; do \
+      for artifact in jackson-databind jackson-core; do \
+        old=$(ls $loc/$artifact-[0-9]*.jar 2>/dev/null || true); \
+        if [ -n "$old" ]; then \
+          rm -f $old && \
+          curl -sL --retry 3 --retry-delay 2 --fail \
+            https://repo1.maven.org/maven2/com/fasterxml/jackson/core/$artifact/$JACKSON_VERSION/$artifact-$JACKSON_VERSION.jar \
+            --output $loc/$artifact-$JACKSON_VERSION.jar; \
+        fi; \
+      done; \
+      old=$(ls $loc/jackson-annotations-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/$JACKSON_ANNOTATIONS_VERSION/jackson-annotations-$JACKSON_ANNOTATIONS_VERSION.jar \
+          --output $loc/jackson-annotations-$JACKSON_ANNOTATIONS_VERSION.jar; \
+      fi; \
+    done
 
 RUN echo "Patch bundled log4j to fix Log4Shell (CVE-2021-44228) and related CVEs" && \
     rm -f /opt/apache-hive-metastore-$HIVE_METASTORE_VERSION-bin/lib/log4j-core-*.jar \
