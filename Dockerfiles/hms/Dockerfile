@@ -40,6 +40,10 @@ ARG COMMONS_COMPRESS_VERSION=1.28.0
 ARG COMMONS_LANG3_VERSION=3.20.0
 ARG BOUNCYCASTLE_VERSION=1.70
 ARG NIMBUS_JOSE_JWT_VERSION=10.9.1
+ARG LZ4_JAVA_VERSION=1.8.1
+ARG COMMONS_IO_VERSION=2.22.0
+ARG COMMONS_BEANUTILS_VERSION=1.11.0
+ARG JDOM2_VERSION=2.0.6.1
 
 ENV HADOOP_HOME="/opt/hadoop"
 ENV PATH="/opt/spark/bin:/opt/hadoop/bin:${PATH}"
@@ -188,7 +192,7 @@ RUN echo "Bump remaining standalone MEDIUM/LOW-severity libs in place (each with
 established-compatible major.minor line - see per-ARG comments above)" && \
     for loc in /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib \
                /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib; do \
-      for artifact in jetty-http jetty-server jetty-xml; do \
+      for artifact in jetty-http jetty-server jetty-xml jetty-security; do \
         old=$(ls $loc/$artifact-[0-9]*.jar 2>/dev/null || true); \
         if [ -n "$old" ]; then \
           rm -f $old && \
@@ -232,6 +236,20 @@ established-compatible major.minor line - see per-ARG comments above)" && \
           https://repo1.maven.org/maven2/com/nimbusds/nimbus-jose-jwt/$NIMBUS_JOSE_JWT_VERSION/nimbus-jose-jwt-$NIMBUS_JOSE_JWT_VERSION.jar \
           --output $loc/nimbus-jose-jwt-$NIMBUS_JOSE_JWT_VERSION.jar; \
       fi; \
+      old=$(ls $loc/commons-io-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/commons-io/commons-io/$COMMONS_IO_VERSION/commons-io-$COMMONS_IO_VERSION.jar \
+          --output $loc/commons-io-$COMMONS_IO_VERSION.jar; \
+      fi; \
+      old=$(ls $loc/commons-beanutils-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/commons-beanutils/commons-beanutils/$COMMONS_BEANUTILS_VERSION/commons-beanutils-$COMMONS_BEANUTILS_VERSION.jar \
+          --output $loc/commons-beanutils-$COMMONS_BEANUTILS_VERSION.jar; \
+      fi; \
     done && \
     for artifact in bcprov-jdk15on bcpkix-jdk15on; do \
       old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-[0-9]*.jar 2>/dev/null || true); \
@@ -242,6 +260,20 @@ established-compatible major.minor line - see per-ARG comments above)" && \
           --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-$BOUNCYCASTLE_VERSION.jar; \
       fi; \
     done && \
+    old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/lz4-java-[0-9]*.jar 2>/dev/null || true); \
+    if [ -n "$old" ]; then \
+      rm -f $old && \
+      curl -sL --retry 3 --retry-delay 2 --fail \
+        https://repo1.maven.org/maven2/org/lz4/lz4-java/$LZ4_JAVA_VERSION/lz4-java-$LZ4_JAVA_VERSION.jar \
+        --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/lz4-java-$LZ4_JAVA_VERSION.jar; \
+    fi && \
+    old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/jdom2-[0-9]*.jar 2>/dev/null || true); \
+    if [ -n "$old" ]; then \
+      rm -f $old && \
+      curl -sL --retry 3 --retry-delay 2 --fail \
+        https://repo1.maven.org/maven2/org/jdom/jdom2/$JDOM2_VERSION/jdom2-$JDOM2_VERSION.jar \
+        --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/jdom2-$JDOM2_VERSION.jar; \
+    fi && \
     old=$(ls /opt/apache-hive-metastore-$HIVE_METASTORE_VERSION-bin/lib/commons-lang3-[0-9]*.jar 2>/dev/null || true); \
     if [ -n "$old" ]; then \
       rm -f $old && \
