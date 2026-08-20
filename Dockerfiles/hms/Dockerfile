@@ -50,7 +50,9 @@ ARG COMMONS_LANG3_VERSION=3.20.0
 # (LDAP injection, no fixed jdk15on version exists at all - the fix only ships as jdk18on).
 # Switching the artifact family (not just the version) - bcprov-jdk15on -> bcprov-jdk18on -
 # closes that CVE plus 5 other residual BC CVEs that also only have jdk18on fixes.
-ARG BOUNCYCASTLE_VERSION=1.85.2
+# NOT 1.85.2 - bcprov published a 1.85.2 patch but bcpkix did not (404, confirmed directly);
+# 1.85 is the latest version where both actually exist.
+ARG BOUNCYCASTLE_VERSION=1.85
 # Paired with the jdk18on BC switch above: nimbus-jose-jwt 10.9.1 (latest) itself declares
 # bcprov-jdk18on 1.81 as its own dependency - matches the artifact family we're now using.
 # (9.37.2 was used in an earlier round specifically to match the old jdk15on family; now that
@@ -357,6 +359,37 @@ RUN echo "Download and install the PostgreSQL connector" && \
       https://jdbc.postgresql.org/download/postgresql-$POSTGRES_CONNECTOR_VERSION.jar --output /opt/postgresql-$POSTGRES_CONNECTOR_VERSION.jar && \
     ln -s /opt/postgresql-$POSTGRES_CONNECTOR_VERSION.jar /opt/hadoop/share/hadoop/common/lib/ && \
     ln -s /opt/postgresql-$POSTGRES_CONNECTOR_VERSION.jar /opt/hive-metastore/lib/
+
+# Explicit final safety net: fail the build loudly if any known-should-have-been-removed jar
+# survived one of the replace-in-place steps above, instead of silently shipping a stale/
+# duplicate jar. This caught a real bug where lz4-java-1.7.1.jar survived alongside its
+# replacement despite the removal logic looking correct in isolated testing - root cause
+# unconfirmed, but this assertion means it can never ship silently again, for this or any
+# other artifact in this list.
+RUN echo "Verify no known-stale jars survived" && \
+    STALE=$(find /opt -type f \( \
+        -iname "lz4-java-1.7.1.jar" -o \
+        -iname "*-jdk15on-*.jar" -o \
+        -iname "log4j-*-2.8.2.jar" -o \
+        -iname "netty-3.10.6.Final.jar" -o \
+        -iname "netty-transport-native-epoll-*.jar" -o \
+        -iname "netty-transport-native-kqueue-*.jar" -o \
+        -iname "netty-resolver-dns-native-macos-*.jar" -o \
+        -iname "zookeeper-*.jar" -o \
+        -iname "jackson-mapper-asl-*.jar" -o \
+        -iname "derby-*.jar" -o \
+        -iname "hsqldb-*.jar" -o \
+        -iname "jetty-*-9.4.51.v20230217.jar" -o \
+        -iname "commons-io-2.8.0.jar" -o \
+        -iname "commons-text-1.10.0.jar" -o \
+        -iname "commons-logging-1.1.3.jar" -o \
+        -iname "nimbus-jose-jwt-9.37.2.jar" \
+      \) 2>/dev/null || true); \
+    if [ -n "$STALE" ]; then \
+      echo "ERROR: stale jars found that a replace-in-place step should have removed:" >&2; \
+      echo "$STALE" >&2; \
+      exit 1; \
+    fi
 
 COPY run.sh run.sh
 
