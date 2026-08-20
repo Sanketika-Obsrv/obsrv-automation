@@ -30,6 +30,16 @@ ARG JACKSON_VERSION=2.22.2
 # jackson-annotations uses its own version scheme (major.minor only, no patch digit) - latest
 # as of writing.
 ARG JACKSON_ANNOTATIONS_VERSION=2.22
+# jetty must stay on the 9.4.x line - Hadoop's embedded HTTP server is built against jetty9's
+# javax.servlet APIs; jetty 10/11 switched to the jakarta.servlet namespace, a breaking change.
+# Latest 9.4.x patch as of writing.
+ARG JETTY_VERSION=9.4.58.v20250814
+ARG COMMONS_CONFIGURATION2_VERSION=2.15.1
+ARG SNAPPY_JAVA_VERSION=1.1.10.8
+ARG COMMONS_COMPRESS_VERSION=1.28.0
+ARG COMMONS_LANG3_VERSION=3.20.0
+ARG BOUNCYCASTLE_VERSION=1.70
+ARG NIMBUS_JOSE_JWT_VERSION=10.9.1
 
 ENV HADOOP_HOME="/opt/hadoop"
 ENV PATH="/opt/spark/bin:/opt/hadoop/bin:${PATH}"
@@ -169,6 +179,76 @@ handled separately - it uses its own major.minor-only version scheme, no patch d
           --output $loc/jackson-annotations-$JACKSON_ANNOTATIONS_VERSION.jar; \
       fi; \
     done
+
+# Not touched (real risk, not worth it - see report for details): commons-lang (EOL, no fix
+# exists upstream at any version - same as perl-base), kotlin-stdlib (only fix available is a
+# 1.x -> 2.x major language-version jump for 2 CVEs), kafka-clients/libthrift (libthrift in
+# particular is the metastore's own RPC wire protocol - breaking this breaks client compat).
+RUN echo "Bump remaining standalone MEDIUM/LOW-severity libs in place (each within its own \
+established-compatible major.minor line - see per-ARG comments above)" && \
+    for loc in /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib \
+               /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib; do \
+      for artifact in jetty-http jetty-server jetty-xml; do \
+        old=$(ls $loc/$artifact-[0-9]*.jar 2>/dev/null || true); \
+        if [ -n "$old" ]; then \
+          rm -f $old && \
+          curl -sL --retry 3 --retry-delay 2 --fail \
+            https://repo1.maven.org/maven2/org/eclipse/jetty/$artifact/$JETTY_VERSION/$artifact-$JETTY_VERSION.jar \
+            --output $loc/$artifact-$JETTY_VERSION.jar; \
+        fi; \
+      done; \
+      old=$(ls $loc/commons-configuration2-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/org/apache/commons/commons-configuration2/$COMMONS_CONFIGURATION2_VERSION/commons-configuration2-$COMMONS_CONFIGURATION2_VERSION.jar \
+          --output $loc/commons-configuration2-$COMMONS_CONFIGURATION2_VERSION.jar; \
+      fi; \
+      old=$(ls $loc/snappy-java-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/org/xerial/snappy/snappy-java/$SNAPPY_JAVA_VERSION/snappy-java-$SNAPPY_JAVA_VERSION.jar \
+          --output $loc/snappy-java-$SNAPPY_JAVA_VERSION.jar; \
+      fi; \
+      old=$(ls $loc/commons-compress-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/org/apache/commons/commons-compress/$COMMONS_COMPRESS_VERSION/commons-compress-$COMMONS_COMPRESS_VERSION.jar \
+          --output $loc/commons-compress-$COMMONS_COMPRESS_VERSION.jar; \
+      fi; \
+      old=$(ls $loc/commons-lang3-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/$COMMONS_LANG3_VERSION/commons-lang3-$COMMONS_LANG3_VERSION.jar \
+          --output $loc/commons-lang3-$COMMONS_LANG3_VERSION.jar; \
+      fi; \
+      old=$(ls $loc/nimbus-jose-jwt-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/com/nimbusds/nimbus-jose-jwt/$NIMBUS_JOSE_JWT_VERSION/nimbus-jose-jwt-$NIMBUS_JOSE_JWT_VERSION.jar \
+          --output $loc/nimbus-jose-jwt-$NIMBUS_JOSE_JWT_VERSION.jar; \
+      fi; \
+    done && \
+    for artifact in bcprov-jdk15on bcpkix-jdk15on; do \
+      old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/org/bouncycastle/$artifact/$BOUNCYCASTLE_VERSION/$artifact-$BOUNCYCASTLE_VERSION.jar \
+          --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-$BOUNCYCASTLE_VERSION.jar; \
+      fi; \
+    done && \
+    old=$(ls /opt/apache-hive-metastore-$HIVE_METASTORE_VERSION-bin/lib/commons-lang3-[0-9]*.jar 2>/dev/null || true); \
+    if [ -n "$old" ]; then \
+      rm -f $old && \
+      curl -sL --retry 3 --retry-delay 2 --fail \
+        https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/$COMMONS_LANG3_VERSION/commons-lang3-$COMMONS_LANG3_VERSION.jar \
+        --output /opt/apache-hive-metastore-$HIVE_METASTORE_VERSION-bin/lib/commons-lang3-$COMMONS_LANG3_VERSION.jar; \
+    fi
 
 RUN echo "Patch bundled log4j to fix Log4Shell (CVE-2021-44228) and related CVEs" && \
     rm -f /opt/apache-hive-metastore-$HIVE_METASTORE_VERSION-bin/lib/log4j-core-*.jar \
