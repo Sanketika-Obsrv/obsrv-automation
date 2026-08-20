@@ -4,7 +4,11 @@
 FROM dhi.io/eclipse-temurin:17-jdk-debian13-dev
 
 # see https://hadoop.apache.org/releases.html
-ARG HADOOP_VERSION=3.3.4
+# 3.3.4 only exists on archive.apache.org, which throttles this file to ~50-100KB/s (confirmed
+# from multiple networks incl. GitHub Actions runners) - a ~700MB download that never finishes
+# in practice. 3.3.6 is the same 3.3.x line (no API/wire-compat break) and is still on the fast
+# CDN mirror (dlcdn.apache.org, confirmed 12MB/s+) since it hasn't been superseded off it yet.
+ARG HADOOP_VERSION=3.3.6
 # see https://downloads.apache.org/hive/
 ARG HIVE_METASTORE_VERSION=3.0.0
 # see https://jdbc.postgresql.org/download.html#current
@@ -33,14 +37,14 @@ RUN apt-get update -y && \
   apt-get install -y --no-install-recommends curl net-tools gzip && \
   rm -rf /var/lib/apt/lists/*
 
-# archive.apache.org drops long-lived connections mid-transfer on this (900MB+) file; piping
-# straight into tar meant a mid-stream drop threw away all progress. Download to a file with
-# `-C -` (resume) in a retry loop instead - a dropped connection continues from its last byte.
+# dlcdn.apache.org is the fast CDN mirror for current (non-archived) releases - confirmed
+# 12MB/s+, vs. archive.apache.org's ~50-100KB/s throttle on old releases. Keep the resumable
+# retry loop anyway as defense-in-depth for ordinary transient network blips.
 RUN echo "Download the Hadoop binary package" && \
     for i in 1 2 3 4 5 6 7 8; do \
-      curl -sS -C - --connect-timeout 30 --max-time 900 \
+      curl -sS -C - --connect-timeout 30 --max-time 300 \
         -o /tmp/hadoop.tar.gz \
-        https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz \
+        https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz \
       && break; \
       echo "download attempt $i failed/interrupted, resuming..."; sleep 5; \
     done && \
