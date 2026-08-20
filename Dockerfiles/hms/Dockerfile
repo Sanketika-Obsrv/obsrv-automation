@@ -39,7 +39,11 @@ ARG SNAPPY_JAVA_VERSION=1.1.10.8
 ARG COMMONS_COMPRESS_VERSION=1.28.0
 ARG COMMONS_LANG3_VERSION=3.20.0
 ARG BOUNCYCASTLE_VERSION=1.70
-ARG NIMBUS_JOSE_JWT_VERSION=10.9.1
+# NOT the latest (10.9.1) - that switched its own BouncyCastle dependency from bcprov-jdk15on
+# to bcprov-jdk18on, a different artifact family than what's actually bundled here (jdk15on,
+# see BOUNCYCASTLE_VERSION below). 9.37.2 is the last version still on jdk15on - matches the
+# classpath exactly - and already clears the CVE (fixed as of 9.37.2).
+ARG NIMBUS_JOSE_JWT_VERSION=9.37.2
 ARG LZ4_JAVA_VERSION=1.8.1
 # commons-configuration2 2.15.1's own pom.xml declares these as its actual dependency versions -
 # a real cluster crash (NoClassDefFoundError: org/apache/commons/io/build/AbstractSupplier)
@@ -198,7 +202,8 @@ RUN echo "Bump remaining standalone MEDIUM/LOW-severity libs in place (each with
 established-compatible major.minor line - see per-ARG comments above)" && \
     for loc in /opt/hadoop-$HADOOP_VERSION/share/hadoop/common/lib \
                /opt/hadoop-$HADOOP_VERSION/share/hadoop/hdfs/lib; do \
-      for artifact in jetty-http jetty-server jetty-xml jetty-security; do \
+      for artifact in jetty-http jetty-server jetty-xml jetty-security jetty-io jetty-util \
+        jetty-util-ajax jetty-servlet jetty-webapp; do \
         old=$(ls $loc/$artifact-[0-9]*.jar 2>/dev/null || true); \
         if [ -n "$old" ]; then \
           rm -f $old && \
@@ -278,6 +283,15 @@ established-compatible major.minor line - see per-ARG comments above)" && \
         curl -sL --retry 3 --retry-delay 2 --fail \
           https://repo1.maven.org/maven2/org/bouncycastle/$artifact/$BOUNCYCASTLE_VERSION/$artifact-$BOUNCYCASTLE_VERSION.jar \
           --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-$BOUNCYCASTLE_VERSION.jar; \
+      fi; \
+    done && \
+    for artifact in jetty-annotations jetty-client jetty-jndi jetty-plus; do \
+      old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-[0-9]*.jar 2>/dev/null || true); \
+      if [ -n "$old" ]; then \
+        rm -f $old && \
+        curl -sL --retry 3 --retry-delay 2 --fail \
+          https://repo1.maven.org/maven2/org/eclipse/jetty/$artifact/$JETTY_VERSION/$artifact-$JETTY_VERSION.jar \
+          --output /opt/hadoop-$HADOOP_VERSION/share/hadoop/yarn/lib/$artifact-$JETTY_VERSION.jar; \
       fi; \
     done && \
     old=$(ls /opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/lz4-java-[0-9]*.jar 2>/dev/null || true); \
