@@ -14,10 +14,22 @@ RUN mkdir -p /jars \
     && unzip -q /tmp/livy.zip -d /tmp \
     && mv /tmp/apache-livy-0.8.0-incubating_2.12-bin /opt/livy \
     && mkdir -p /opt/livy/logs \
-    && curl -fsSL -o /jars/postgresql-42.3.1.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.3.1/postgresql-42.3.1.jar \
+    && curl -fsSL -o /jars/postgresql-42.7.13.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.13/postgresql-42.7.13.jar \
     && curl -fsSL -o /jars/guava-19.0.jar https://repo1.maven.org/maven2/com/google/guava/guava/19.0/guava-19.0.jar \
     && curl -fsSL -o /jars/hadoop-aws-3.4.2.jar https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.4.2/hadoop-aws-3.4.2.jar \
-    && curl -fsSL -o /jars/bundle-2.29.52.jar https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.29.52/bundle-2.29.52.jar
+    && curl -fsSL -o /jars/bundle-2.53.3.jar https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.53.3/bundle-2.53.3.jar
+
+# Drop livy's bundled Hadoop 2.7.3 / ZooKeeper / legacy commons stack. It exists only for livy's
+# optional YARN backend, ZK+filesystem session recovery and LDAP auth -- none of which this
+# deployment enables (conf/livy.conf uses spark:// master, no recovery mode, no auth type). The
+# runtime stage symlinks in the spark base's own Hadoop 3.4.2 client, which livy does need.
+RUN cd /opt/livy/jars && rm -f \
+      hadoop-*.jar zookeeper-*.jar htrace-core-*.jar netty-3.7.0.Final.jar \
+      protobuf-java-2.5.0.jar jackson-mapper-asl-*.jar commons-beanutils*.jar \
+      commons-httpclient-*.jar commons-configuration-1.6.jar commons-lang-2.6.jar \
+      commons-compress-1.4.1.jar commons-net-3.1.jar snappy-java-1.1.7.3.jar \
+      gson-*.jar xercesImpl-*.jar avro-*.jar jline-0.9.94.jar guava-16.0.1.jar \
+      jetty-util-6.1.26.jar
 
 # ---------- python deps (obsrv batch connectors) ----------
 FROM dhi.io/python:3.12-debian13-dev AS pybuild
@@ -32,6 +44,10 @@ COPY ./connectors /data/connectors-init
 RUN pip install --no-cache-dir --target=/pydeps -r /data/connectors-init/requirements.txt \
     && pip install --no-cache-dir --target=/pydeps \
        "obsrv[batch] @ https://github.com/Sanketika-Obsrv/obsrv-python-sdk/archive/44a0898d94877046a9bb065be391143d661c34bb.tar.gz"
+# The sdk's `batch` extra pulls the pyspark 3.5.1 wheel, which bundles a second full copy of
+# spark's jars (~317MB). It is unreachable: PYTHONPATH puts /opt/spark/python (pyspark 3.5.8,
+# from the base) ahead of /opt/python-deps, so `import pyspark` always resolves to 3.5.8.
+RUN rm -rf /pydeps/pyspark /pydeps/pyspark-*.dist-info /pydeps/bin/pyspark* /pydeps/bin/spark-*
 
 # ---------- runtime ----------
 FROM dhi.io/spark:3.5
@@ -68,12 +84,21 @@ RUN mkdir -p /usr/local/bin \
 # livy + python deps + jars
 COPY --from=fetch /opt/livy /opt/livy
 COPY --from=pybuild /pydeps /opt/python-deps
-COPY --from=fetch /jars/postgresql-42.3.1.jar /opt/spark/jars/postgresql-42.3.1.jar
+COPY --from=fetch /jars/postgresql-42.7.13.jar /opt/spark/jars/postgresql-42.7.13.jar
 COPY --from=fetch /jars/guava-19.0.jar /opt/spark/jars/guava-19.0.jar
 COPY --from=fetch /jars/hadoop-aws-3.4.2.jar /opt/spark/jars/hadoop-aws-3.4.2.jar
-COPY --from=fetch /jars/bundle-2.29.52.jar /opt/spark/jars/bundle-2.29.52.jar
+COPY --from=fetch /jars/bundle-2.53.3.jar /opt/spark/jars/bundle-2.53.3.jar
 # drop the stock guava (WFS needs 19) — name/version may differ on 3.5.8; remove any guava-1x
 RUN sh -c 'rm -f /opt/spark/jars/guava-1[0-8].*.jar' || true
+# livy's classpath is LIVY_HOME/jars/* only (bin/livy-server never adds SPARK_HOME/jars), and livy
+# needs Hadoop classes on its startup/session-create paths, so give it the base's Hadoop 3.4.2
+# client to replace the 2.7.3 stack removed in the fetch stage. Symlinked, not copied.
+RUN for j in /opt/spark/jars/hadoop-client-api-*.jar /opt/spark/jars/hadoop-client-runtime-*.jar; do \
+      ln -s "$j" "/opt/livy/jars/$(basename "$j")"; \
+    done
+# derby is Hive's embedded-metastore driver. Unused here: no hive/metastore config exists in the
+# spark chart or connectors, and obsrv's metastore (HMS) is a separate postgres-backed service.
+RUN rm -f /opt/spark/jars/derby-*.jar
 
 # obsrv config + scripts + connectors
 COPY ./conf/ /opt/livy/conf/
