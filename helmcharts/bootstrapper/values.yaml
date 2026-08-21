@@ -6,7 +6,6 @@ namespaces:
 - druid-raw
 - flink
 - hms
-- kafka
 - kafka40
 - kong-ingress
 - kubernetes-reflector

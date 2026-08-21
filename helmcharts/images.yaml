@@ -390,12 +390,6 @@ images: &images
     tag: 3-debian13
     digest: ""
 
-  kafka: &kafka
-    registry: ""
-    repository: sanketikahub/kafka
-    tag: 3.6.0
-    digest: ""
-
   kafka40: &kafka40
     registry: ""
     repository: sanketikahub/kafka
@@ -804,24 +798,6 @@ internal: &internal
   # kafka-connector:
   #   image:
   #     <<: *kafka-connector
-
-  kafka:
-    image:
-      <<: *kafka
-    metrics:
-      kafka:
-        image:
-          <<: *kafka-exporter
-      jmx:
-        image:
-          <<: *jmx
-    volumePermissions:
-      image:
-        <<: *os-shell
-    externalAccess:
-      autoDiscovery:
-        image:
-          <<: *sanketikahub-kubectl
 
   kafka40:
     image:

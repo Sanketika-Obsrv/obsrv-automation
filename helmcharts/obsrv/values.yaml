@@ -56,11 +56,6 @@ flink:
   commonLabels:
     app: flink
 
-kafka:
-  fullnameOverride: kafka
-  zookeeper:
-    fullnameOverride: kafka-zookeeper
-
 kafka-exporter:
   fullnameOverride: kafka-exporter
 
@@ -2821,10 +2816,6 @@ kube-prometheus-stack:
           scrape_interval: 15s
           static_configs:
             - targets: ['monitoring-prometheus-pushgateway.monitoring.svc.cluster.local:9091']
-        - job_name: 'kafka-exporter'
-          scrape_interval: 15s
-          static_configs:
-            - targets: ['kafka-metrics.kafka.svc.cluster.local:9308']
 
       retention: 90d
       storageSpec:
