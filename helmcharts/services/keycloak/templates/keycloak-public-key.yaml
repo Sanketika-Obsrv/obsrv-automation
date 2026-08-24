@@ -46,6 +46,9 @@ metadata:
     # yet during pre-install hooks -- pre-install deadlocks every fresh install.
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
+    # Runs last: after keycloak-config-cli (weight "5", realm import) and create-obsrv-user
+    # (weight "10", needs the realm to exist first).
+    "helm.sh/hook-weight": "20"
 spec:
   completions: 1
   parallelism: 1

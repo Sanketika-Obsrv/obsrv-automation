@@ -10,6 +10,10 @@ metadata:
     # created) -- pre-install deadlocks every fresh install.
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
+    # Must run after keycloak-config-cli (weight "5") - that job imports the "obsrv" realm this
+    # job creates a user in. Without an explicit weight here this job defaults to weight "0" and
+    # races ahead of the realm import, 404ing on /admin/realms/obsrv/users forever.
+    "helm.sh/hook-weight": "10"
 spec:
   completions: 1
   parallelism: 1
