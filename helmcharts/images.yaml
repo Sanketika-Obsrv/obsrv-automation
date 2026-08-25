@@ -209,15 +209,15 @@ images: &images
     digest: ""
 
   alloy: &alloy
-    registry: "docker.io"
-    repository: "grafana/alloy"
-    tag: "v1.12.2"
+    registry: "dhi.io"
+    repository: "alloy"
+    tag: "1.18.1-debian13"
     digest: ""
 
   alloy-config-reloader: &alloy-config-reloader
-    registry: "quay.io"
-    repository: "prometheus-operator/prometheus-config-reloader"
-    tag: "v0.81.0"
+    registry: "dhi.io"
+    repository: "prometheus-config-reloader"
+    tag: "0.93.1-debian13"
     digest: ""
 
   valkey: &valkey
