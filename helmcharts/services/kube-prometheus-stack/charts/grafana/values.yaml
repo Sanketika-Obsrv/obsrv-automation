@@ -833,6 +833,12 @@ grafana.ini:
   ## NOTE: To enable the grafana.ini must be configured with auth.ldap.enabled
   ## ref: http://docs.grafana.org/installation/configuration/#auth-ldap
   ## ref: http://docs.grafana.org/installation/ldap/#configuration
+  # oauth_allow_insecure_email_lookup: without this, Grafana won't link an OAuth login to an
+  # existing internal account by email - combined with login_attribute_path being broken below,
+  # every login after the first failed to match the already-created user and tried to recreate
+  # it, colliding on "user already exists".
+  auth:
+    oauth_allow_insecure_email_lookup: true
   auth.generic_oauth:
     enabled: true
     name: obsrv
@@ -841,8 +847,11 @@ grafana.ini:
     client_secret: "{{ .Values.global.oauth_configs.grafana_client_secret }}"
     scopes: openid email profile offline_access roles
     email_attribute_path: email
-    login_attribute_path: obsrv
-    name_attribute_path: admin
+    # Were literal hardcoded strings "obsrv"/"admin" (not claim paths) - every user who logged in
+    # got the identical login value, so only the first-ever login could create a user; every
+    # login after that (same user or different) collided with that first one on create.
+    login_attribute_path: preferred_username
+    name_attribute_path: name
     auth_url: http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/auth
     token_url: http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/token
     api_url: http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth/realms/obsrv/protocol/openid-connect/userinfo
