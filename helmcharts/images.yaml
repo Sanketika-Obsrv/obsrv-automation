@@ -945,8 +945,14 @@ internal: &internal
 
   alloy:
     <<: *alloy
-    imagePullSecrets:
-    - name: *dockerSecretName
+    # This chart is the upstream grafana/alloy chart, not one of our in-house ones - it reads
+    # pull secrets from "global.image.pullSecrets" instead of a top-level "imagePullSecrets" key,
+    # but the shape is the same K8s LocalObjectReference object, not a plain name string - the
+    # chart's own template renders this list straight through with no name-wrapping.
+    global:
+      image:
+        pullSecrets:
+          - name: *dockerSecretName
     configReloader:
       image:
         <<: *alloy-config-reloader
