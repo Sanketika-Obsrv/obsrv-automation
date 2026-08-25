@@ -14,7 +14,7 @@ metadata:
 spec:
   containers:
   - name: wget
-    image: busybox
+    image: {{ .Values.test.image.registry }}/{{ .Values.test.image.repository }}:{{ .Values.test.image.tag }}
     command: ['wget']
     args:  ['-qO-', '{{ include "prometheus-druid-exporter.fullname" . }}:{{ .Values.exporterPort }}/metrics']
   restartPolicy: Never

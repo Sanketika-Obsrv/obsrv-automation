@@ -9,7 +9,7 @@ image:
   registry: sanketikahub
   repository: hms
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.0.4"
+  tag: "2.2.0"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -117,3 +117,10 @@ affinity: {}
 envVars: {}
 
 hadoop_core_site: {}
+
+# helm-test wget image; centralized via images.yaml `hms.test.image` (os-shell/busybox anchor)
+test:
+  image:
+    registry: dhi.io
+    repository: busybox
+    tag: "1.37.0"

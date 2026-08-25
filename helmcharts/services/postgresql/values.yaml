@@ -368,7 +368,14 @@ primary:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars: []
+  # DHI: upstream postgres reads PGDATA env (bitnami POSTGRESQL_* env is ignored). Existing data at
+  # /bitnami/postgresql/data (PG_VERSION present) → entrypoint skips initdb and resumes.
+  extraEnvVars:
+    - name: PGDATA
+      value: /bitnami/postgresql/data
+  # DHI: render + mount the reproduced postgresql.conf/pg_hba.conf (templates/dhi-config.yaml)
+  dhiConfig:
+    enabled: true
   ## @param primary.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for PostgreSQL Primary nodes
   ##
   extraEnvVarsCM: ""
@@ -376,11 +383,12 @@ primary:
   ##
   extraEnvVarsSecret: ""
   ## @param primary.command Override default container command (useful when using custom images)
-  ##
-  command: []
+  ## DHI: no override — keep the image's own docker-entrypoint.sh so initdb runs on a fresh,
+  ## empty PVC. The entrypoint execs `postgres $@` once init is done (or immediately on an
+  ## existing data dir), so passing -c config_file via args below still applies our config.
   ## @param primary.args Override default container args (useful when using custom images)
   ##
-  args: []
+  args: ["-c", "config_file=/config/postgresql.conf"]
   ## Configure extra options for PostgreSQL Primary containers' liveness, readiness and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param primary.livenessProbe.enabled Enable livenessProbe on PostgreSQL Primary containers
@@ -454,9 +462,10 @@ primary:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ## @param primary.podSecurityContext.enabled Enable security context
   ## @param primary.podSecurityContext.fsGroup Group ID for the pod
-  ##
+  ## DHI: disable pod fsGroup — CSI makes the PVC group-writable, which PG rejects (needs <=0750).
+  ## A root initContainer chowns 1001 + chmod 700 the data dir instead.
   podSecurityContext:
-    enabled: true
+    enabled: false
     fsGroup: 1001
   ## Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
@@ -465,7 +474,11 @@ primary:
   ##
   containerSecurityContext:
     enabled: true
-    runAsUser: 1001
+    # dhi.io/postgres:17-debian13's own uid (verified: /etc/passwd has only postgres:70 and
+    # nobody:65534). The old Bitnami uid (1001) doesn't exist in this image -- initdb calls
+    # geteuid()/getpwuid() and fails outright ("could not look up effective user ID 1001") if
+    # the euid has no passwd entry.
+    runAsUser: 70
   ## @param primary.hostAliases PostgreSQL primary pods host aliases
   ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
   ##
@@ -551,11 +564,17 @@ primary:
     type: RollingUpdate
     rollingUpdate: {}
   ## @param primary.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the PostgreSQL Primary container(s)
-  ##
-  extraVolumeMounts: []
+  ## DHI: mount the reproduced postgres config at /config
+  extraVolumeMounts:
+    - name: dhi-config
+      mountPath: /config
+      readOnly: true
   ## @param primary.extraVolumes Optionally specify extra list of additional volumes for the PostgreSQL Primary pod(s)
   ##
-  extraVolumes: []
+  extraVolumes:
+    - name: dhi-config
+      configMap:
+        name: '{{ include "common.names.fullname" . }}-dhi-config'
   ## @param primary.sidecars Add additional sidecar containers to the PostgreSQL Primary pod(s)
   ## For example:
   ## sidecars:
@@ -575,7 +594,21 @@ primary:
   ##     image: busybox
   ##     command: ['do', 'something']
   ##
-  initContainers: []
+  ## DHI: chown/chmod the existing PVC so upstream postgres (run as uid 1001) accepts PGDATA (0700).
+  initContainers:
+    - name: fix-perms
+      # track the same image as the main container (images.yaml *postgresql anchor) instead of hardcoding
+      image: '{{ printf "%s/%s:%s" .Values.image.registry .Values.image.repository .Values.image.tag }}'
+      securityContext:
+        runAsUser: 0
+        runAsNonRoot: false
+      # chown target must match primary.containerSecurityContext.runAsUser (70, dhi.io/postgres's own
+      # uid) -- left at 1001 this leaves the data dir owned by the wrong uid and initdb fails with
+      # "Permission denied" (confirmed via real fresh-install test).
+      command: ["sh", "-c", "mkdir -p /bitnami/postgresql/data && chown -R 70:70 /bitnami/postgresql && chmod 700 /bitnami/postgresql/data && echo perms-fixed"]
+      volumeMounts:
+        - name: data
+          mountPath: /bitnami/postgresql
   ## @param primary.extraPodSpec Optionally specify extra PodSpec for the PostgreSQL Primary pod(s)
   ##
   extraPodSpec: {}
@@ -805,7 +838,8 @@ readReplicas:
   ##
   containerSecurityContext:
     enabled: true
-    runAsUser: 1001
+    # Same image as primary -- see primary.containerSecurityContext.runAsUser for why 70.
+    runAsUser: 70
   ## @param readReplicas.hostAliases PostgreSQL read only pods host aliases
   ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
   ##
@@ -1281,7 +1315,9 @@ metrics:
   ##
   containerSecurityContext:
     enabled: true
-    runAsUser: 1001
+    # dhi.io/postgres-exporter:0-debian13's own default uid (verified via docker inspect
+    # .Config.User) -- different image from primary/readReplicas, and 1001 isn't its uid either.
+    runAsUser: 65532
     runAsNonRoot: true
   ## Configure extra options for PostgreSQL Prometheus exporter containers' liveness, readiness and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes

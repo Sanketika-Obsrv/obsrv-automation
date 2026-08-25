@@ -1,0 +1,26 @@
+{{- if (.Values.primary.dhiConfig).enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-dhi-config
+  namespace: {{ (include "base.namespace" $) | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+data:
+  postgresql.conf: |
+    listen_addresses = '*'
+    port = 5432
+    password_encryption = md5
+    shared_preload_libraries = 'pg_stat_statements'
+    pg_stat_statements.max = 10000
+    pg_stat_statements.track = all
+    log_statement = 'all'
+    log_min_duration_statement = 0
+    logging_collector = off
+    hba_file = '/config/pg_hba.conf'
+  pg_hba.conf: |
+    host     all             all             0.0.0.0/0               md5
+    host     all             all             ::/0                    md5
+    local    all             all                                     md5
+    host     all             all             127.0.0.1/32            md5
+    host     all             all             ::1/128                 md5
+{{- end }}

@@ -77,7 +77,7 @@ spec:
       {{- range .Values.image.imagePullSecrets }}
         - name: {{ . }}
       {{- end }}
-      {{- if .Values.serviceAccount.create }}
+      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
       serviceAccountName: {{ include "base.serviceaccountname" . }}
       {{- end }}
       volumes:
@@ -190,7 +190,9 @@ spec:
       {{- range .Values.image.imagePullSecrets }}
         - name: {{ . }}
       {{- end }}
-      # serviceAccount: flink-sa
+      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
+      serviceAccountName: {{ include "base.serviceaccountname" . }}
+      {{- end }}
       volumes:
       - configMap:
           items:

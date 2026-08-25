@@ -766,6 +766,8 @@ http {
   tcp_nopush   on;
   {{- if .Values.gateway.nginxConfig.resolver }}
   resolver {{ .Values.gateway.nginxConfig.resolver }};
+  {{- else if .Values.global.kubeDnsIP }}
+  resolver {{ .Values.global.kubeDnsIP }};
   {{- else }}
   resolver {{ .Values.global.dnsService }}.{{ .Values.global.dnsNamespace }}.svc.{{ .Values.global.clusterDomain }}.;
   {{- end }}

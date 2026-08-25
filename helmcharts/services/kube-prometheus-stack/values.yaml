@@ -10,7 +10,7 @@ nameOverride: ""
 ##
 namespaceOverride: ""
 
-## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.33.0
+## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.34.0
 ##
 kubeTargetVersionOverride: ""
 
@@ -667,6 +667,10 @@ alertmanager:
       repository: prometheus/alertmanager
       tag: v0.27.0
       sha: ""
+
+    ## Pin the Alertmanager version — the DHI image tag (0-debian13) isn't semver, so the
+    ## operator can't derive it from the tag. Matches dhi.io/alertmanager:0-debian13 (v0.33.1).
+    version: "v0.33.1"
 
     ## If true then the user will be responsible to provide a secret with alertmanager configuration
     ## So when true the config part will be ignored (including templateFiles) and the one in the secret will be used
@@ -3485,7 +3489,8 @@ prometheus:
 
     ## Sets version of Prometheus overriding the Prometheus version as derived
     ## from the image tag. Useful in cases where the tag does not follow semver v2.
-    version: ""
+    ## DHI image tag (3.5-debian13) isn't semver → pin the real version.
+    version: "v3.5.5"
 
     ## WebTLSConfig defines the TLS parameters for HTTPS
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#webtlsconfig

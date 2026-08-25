@@ -30,3 +30,10 @@ terraform/aws/public_key.pem
 *.tfvars
 *.env
 .env
+
+# Personal Claude Code permission overrides (not shared with the team)
+.claude/settings.local.json
+
+# Generated local-compose secrets (regenerate with scripts/gen-token-env.sh)
+local-compose/secrets/*.pem
+local-compose/secrets/tokens.env

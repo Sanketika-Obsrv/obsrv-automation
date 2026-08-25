@@ -1,4 +1,9 @@
 global:
+  # kube-dns ClusterIP for this cluster — used by DHI nginx's `resolver` directive (see
+  # helmcharts/services/loki/values.yaml). EKS commonly assigns 172.20.0.10, but the service
+  # CIDR isn't pinned by this terraform module, so verify with
+  # `kubectl get svc kube-dns -n kube-system` after the cluster is up and correct if different.
+  kubeDnsIP: "172.20.0.10"
   ssl_enabled: &ssl_enabled true
   cloud_storage_provider: &cloud_storage_provider "aws"
   cloud_store_provider: &cloud_store_provider "s3"
@@ -48,6 +53,10 @@ service_accounts:
     eks.amazonaws.com/role-arn: "${spark_sa_annotation}"
   velero: &velero_sa_annotation
     eks.amazonaws.com/role-arn: "${velero_sa_annotation}"
+  trino: &trino_sa_annotation
+    eks.amazonaws.com/role-arn: "${trino_sa_annotation}"
+  hms: &hms_sa_annotation
+    eks.amazonaws.com/role-arn: "${hms_sa_annotation}"
 
 s3-exporter-service-account: &s3-exporter-service-account
   s3_region: *cloud_storage_region
@@ -81,7 +90,7 @@ velero-backup: &velero-backup
           region: *cloud_storage_region
   initContainers:
     - name: velero-plugin-for-aws
-      image: velero/velero-plugin-for-aws
+      image: dhi.io/velero-plugin-for-aws:1-debian13
       volumeMounts:
         - name: plugins
           mountPath: /target
@@ -108,8 +117,16 @@ masterdata-indexer-cron:
     name: spark-sa
     annotations:
       <<: *spark_sa_annotation
-  serviceAccountRoleArn: *spark_service_account_arn  
-  dataproductsJar: "<fill-value>"
+  serviceAccountRoleArn: *spark_service_account_arn
+  dataproductsJar: "<fill-value>" # Update with the path to the data products jar e.g. s3a://<bucket>/data-products/data-products-1.0.0.jar
+  cronjob:
+    enabled: true
+    cronSchedule: "30 5 * * *" # Daily 5:30 AM
+  # 2.0.0 master data indexer
+  dataproductsJarV2: "<fill-value>" # Update with the path to the 2.0.0 data products jar e.g. s3a://<bucket>/data-products/data-products-2.0.0.jar
+  cronjobV2:
+    enabled: false
+    cronSchedule: "0 7 * * *" # daily 7 AM
 
 dataset-api-service-account: &dataset-api-service-account
   serviceAccount:
@@ -191,9 +208,8 @@ druid-raw-cluster:
 
 lakehouse-connector:
   hadoop_core_site:
-      fs.s3a.imp: org.apache.hadoop.fs.s3a.S3AFileSystem
-      fs.s3a.access.key: *s3-access-key
-      fs.s3a.secret.key: *s3-secret-access-key
+      fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+      fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
   serviceAccount:
     create: false
     name: flink-sa
@@ -204,22 +220,31 @@ lakehouse-connector:
       <<: *flink_sa_annotation
 
 trino:
+  serviceAccount:
+    create: *create_sa
+    name: trino-sa
+    annotations:
+      <<: *trino_sa_annotation
   additionalCatalogs:
     lakehouse: |-
       connector.name=hudi
       hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
-      hive.s3.aws-access-key=<fill-value>
-      hive.s3.aws-secret-key=<fill-value>
-      hive.s3.ssl.enabled=false
+      fs.native-s3.enabled=true
+      s3.region=${cloud_storage_region}
 
 hms:
+  serviceAccount:
+    create: *create_sa
+    automount: true
+    name: hms-sa
+    annotations:
+      <<: *hms_sa_annotation
   envVars:
     WAREHOUSE_DIR: *hudi_metadata_bucket
 
-
   hadoop_core_site:
-    fs.s3a.access.key:  *s3-access-key
-    fs.s3a.secret.key:  *s3-secret-access-key
+    fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+    fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
     # fs.s3a.endpoint: *s3-endpoint-url
     # fs.s3a.path.style.access: false
     # fs.s3a.connection.ssl.enabled: true

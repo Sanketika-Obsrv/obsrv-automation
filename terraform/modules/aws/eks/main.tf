@@ -132,6 +132,7 @@ resource "aws_eks_node_group" "eks_nodes" {
   ami_type        = var.eks_node_group_ami_type
   instance_types  = var.eks_node_group_instance_type
   capacity_type   = var.eks_node_group_capacity_type
+  version         = var.eks_version
   # disk_size       = var.eks_node_disk_size
 
   tags = merge(
@@ -274,6 +275,32 @@ resource "aws_iam_role" "flink_sa_iam_role" {
   tags = merge(
     {
       Name = "${var.env}-${var.flink_sa_iam_role_name}"
+    },
+    local.common_tags,
+  var.additional_tags)
+}
+
+resource "aws_iam_role" "trino_sa_iam_role" {
+  name                = "${var.env}-${var.building_block}-${var.trino_sa_iam_role_name}"
+  assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.trino_namespace}", SA_NAME = "${var.trino_namespace}-sa" })
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+  depends_on          = [aws_iam_openid_connect_provider.eks_openid]
+  tags = merge(
+    {
+      Name = "${var.env}-${var.trino_sa_iam_role_name}"
+    },
+    local.common_tags,
+  var.additional_tags)
+}
+
+resource "aws_iam_role" "hms_sa_iam_role" {
+  name                = "${var.env}-${var.building_block}-${var.hms_sa_iam_role_name}"
+  assume_role_policy  = templatefile("${path.module}/oidc_assume_role_policy.json.tfpl", { OIDC_ARN = aws_iam_openid_connect_provider.eks_openid.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.eks_openid.url, "https://", ""), NAMESPACE = "${var.hms_namespace}", SA_NAME = "${var.hms_namespace}-sa" })
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+  depends_on          = [aws_iam_openid_connect_provider.eks_openid]
+  tags = merge(
+    {
+      Name = "${var.env}-${var.hms_sa_iam_role_name}"
     },
     local.common_tags,
   var.additional_tags)

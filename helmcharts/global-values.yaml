@@ -4,7 +4,6 @@ defaults:
   allowInsecureImages: &allow-insecure-images true
   encryption_key: &encryption-key "strong_encryption_key_to_encrypt"
   namespaces: &namespaces
-    kafka_namespace: &kafka-namespace "kafka"
     kafka40_namespace: &kafka40-namespace "kafka40"
     postgresql_namespace: &postgresql-namespace "postgresql"
     druid_namespace: &druid-namespace "druid-raw"
@@ -115,57 +114,6 @@ defaults:
     web_console_client_id: "obsrv-console"
 
 #coredb-charts/
-kafka: &kafka
-  namespace: *kafka-namespace
-  host: "kafka-headless.kafka.svc.cluster.local"
-  port: 9092
-  bootstrap-server: &kafka-bootstrap-server "kafka-headless.kafka.svc.cluster.local:9092"
-  ingestTopic: *ingestTopic
-  masterdataIngestTopic: *masterdataIngestTopic
-  telemetryEventsTopic: *telemetryEventsTopic
-  ss-kafka-topic: *system_stats_topic
-  masterdata-ss-kafka-topic: *masterdata_system_stats_topic
-  hudiConnectorTopic: *hudiConnectorTopic
-  connectorsMetricTopic: *connectorsMetricTopic
-  connectorsFailedTopic: *connectorsFailedTopic
-  numPartitions: *kafkaNumPartitions
-  provisioning:
-    numPartitions: *kafkaNumPartitions
-    replicationFactor: 1
-    topics:
-      - name: *ingestTopic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-      - name: *masterdataIngestTopic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-      - name: *telemetryEventsTopic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-      - name: *system_stats_topic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-      - name: *masterdata_system_stats_topic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-      - name: *hudiConnectorTopic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-      - name: *connectorsMetricTopic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-      - name: *connectorsFailedTopic
-        partitions: *kafkaNumPartitions
-        replicationFactor: 1
-
-  zookeeper: &zookeeper
-    namespace: *kafka-namespace
-    host: "kafka-zookeeper-headless.kafka.svc.cluster.local"
-    port: 2181
-  global:
-    security:
-      allowInsecureImages: *allow-insecure-images 
-
 kafka40: &kafka40
   namespace: *kafka40-namespace
   # For externally managed Kafka (e.g., AWS MSK, Confluent Cloud):
@@ -341,6 +289,36 @@ keycloak:
   extraEnvVars:
     - name: KC_HOSTNAME
       value: "http{{ if .Values.global.ssl_enabled }}s{{ end }}://{{ .Values.global.domain }}/auth"
+    # DHI: upstream keycloak reads KC_* env (bitnami KEYCLOAK_* is ignored). DB + admin bootstrap +
+    # proxy/http config so `kc.sh start` connects to the existing keycloak DB and serves behind kong.
+    - name: KC_DB
+      value: postgres
+    - name: KC_DB_URL
+      value: jdbc:postgresql://{{ .Values.global.postgresql.host }}:5432/{{ .Values.global.postgresql.keycloak.name }}
+    - name: KC_DB_USERNAME
+      value: "{{ .Values.global.postgresql.keycloak.user }}"
+    - name: KC_DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-externaldb
+          key: db-password
+    - name: KC_BOOTSTRAP_ADMIN_USERNAME
+      value: admin
+    - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak
+          key: admin-password
+    - name: KC_HTTP_RELATIVE_PATH
+      value: /auth
+    - name: KC_HTTP_ENABLED
+      value: "true"
+    - name: KC_PROXY_HEADERS
+      value: xforwarded
+    - name: KC_HOSTNAME_STRICT
+      value: "false"
+    - name: KC_HEALTH_ENABLED
+      value: "true"
   externalDatabase:
     host: *pghost
     port: 5432
@@ -508,6 +486,10 @@ superset:
   adminUser:
     username: *superset_admin_user
     password: *superset_admin_password
+  embed:
+    allowed_origins:
+      - "http://localhost:8080"
+      - "http://127.0.0.1:8080"
 
 command-api: &command-api
   namespace: *command-api-namespace
@@ -569,8 +551,6 @@ druid-exporter:
 
 secor:
   namespace: *secor-namespace
-  # kafka: *kafka
-  # zookeeper: *zookeeper
 
 cert-manager: &cert-manager
   namespace: *cert-manager-namespace
@@ -681,7 +661,6 @@ global:
   encryption_key: *encryption-key
   domain: *domain
   grafana: *grafana
-  kafka: *kafka
   kafka40: *kafka40
   druid: *druid
   postgresql: *postgresql

@@ -251,7 +251,7 @@ extraStartupArgs: ""
 ## @param enableDefaultInitContainers Deploy default init containers
 ## Disable this parameter could be helpful for 3rd party images e.g native Keycloak image.
 ##
-enableDefaultInitContainers: true
+enableDefaultInitContainers: false
 ## @param initdbScripts Dictionary of initdb scripts
 ## Specify dictionary of scripts to be run at first boot
 ## ref: https://github.com/bitnami/containers/tree/main/bitnami/keycloak#initializing-a-new-instance
@@ -267,10 +267,15 @@ initdbScripts: {}
 initdbScriptsConfigMap: ""
 ## @param command Override default container command (useful when using custom images)
 ##
-command: []
+# DHI: run upstream keycloak entrypoint (kc.sh) directly, bypassing the bitnami one.
+# DHI keycloak /opt/keycloak/lib/quarkus is read-only (hardened layer), so `start` (which
+# rebuilds at boot when build-time opts db/health/http-relative-path differ) fails with
+# ReadOnlyFileSystemException. Instead: the `kc-build` initContainer runs `kc.sh build`
+# into a writable emptyDir mounted at that path, then main runs `start --optimized` (no rebuild).
+command: ["/opt/keycloak/bin/kc.sh"]
 ## @param args Override default container args (useful when using custom images)
 ##
-args: []
+args: ["start", "--optimized"]
 ## @param extraEnvVars Extra environment variables to be set on Keycloak container
 ## Example:
 ## extraEnvVars:
@@ -317,7 +322,7 @@ podSecurityContext:
   fsGroupChangePolicy: Always
   sysctls: []
   supplementalGroups: []
-  fsGroup: 1001
+  fsGroup: 65532
 ## Keycloak containers' Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
 ## @param containerSecurityContext.enabled Enabled containers' Security Context
@@ -334,11 +339,11 @@ podSecurityContext:
 containerSecurityContext:
   enabled: true
   seLinuxOptions: {}
-  runAsUser: 1001
-  runAsGroup: 1001
+  runAsUser: 65532
+  runAsGroup: 65532
   runAsNonRoot: true
   privileged: false
-  readOnlyRootFilesystem: true
+  readOnlyRootFilesystem: false
   allowPrivilegeEscalation: false
   capabilities:
     drop: ["ALL"]
@@ -503,10 +508,19 @@ updateStrategy:
 minReadySeconds: 0
 ## @param extraVolumes Optionally specify extra list of additional volumes for Keycloak pods
 ##
-extraVolumes: []
+extraVolumes:
+  # DHI: shared emptyDir holding the optimized keycloak build. The kc-build initContainer
+  # (root) runs `kc.sh build` in place (the image's /opt/keycloak/lib/quarkus is root-owned
+  # and immutable for the nonroot runtime user) and copies the built artifacts here; the main
+  # container mounts it at the real /opt/keycloak/lib/quarkus and runs `start --optimized`.
+  # /opt/keycloak/data and /tmp are already writable by uid 65532 in the image, so no mounts needed.
+  - name: kc-quarkus
+    emptyDir: {}
 ## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for Keycloak container(s)
 ##
-extraVolumeMounts: []
+extraVolumeMounts:
+  - name: kc-quarkus
+    mountPath: /opt/keycloak/lib/quarkus
 ## @param initContainers Add additional init containers to the Keycloak pods
 ## Example:
 ## initContainers:
@@ -517,7 +531,43 @@ extraVolumeMounts: []
 ##       - name: portname
 ##         containerPort: 1234
 ##
-initContainers: []
+initContainers:
+  # DHI: pre-build the optimized keycloak server so the main container can `start --optimized`
+  # without a boot rebuild. The DHI image's /opt/keycloak/lib/quarkus is owned root:root (mode
+  # 755) and immutable for the nonroot runtime user, and the baked build has db=<unset> which
+  # mismatches our KC_DB=postgres. So: run `kc.sh build` in place AS ROOT (writes lib/quarkus
+  # fine — it's a root-owned dir on the init's own writable rootfs), then copy the freshly built
+  # lib/quarkus into the shared kc-quarkus emptyDir. Main mounts that at the real path and reads
+  # it as uid 65532. Build path == run path (/opt/keycloak) so nothing is relocated.
+  # Build-time opts (db/health/http-relative-path) MUST match the runtime env main uses, else
+  # start --optimized errors "build time option changed".
+  - name: kc-build
+    image: '{{ template "keycloak.image" . }}'
+    imagePullPolicy: '{{ .Values.image.pullPolicy }}'
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        set -ex
+        /opt/keycloak/bin/kc.sh build
+        rm -rf /shared/* 2>/dev/null || true
+        cp -r /opt/keycloak/lib/quarkus/. /shared/
+        ls -l /shared/quarkus-application.dat
+        echo KC_BUILD_DONE
+    env:
+      - name: KC_DB
+        value: "postgres"
+      - name: KC_HEALTH_ENABLED
+        value: "true"
+      - name: KC_HTTP_RELATIVE_PATH
+        value: "/auth"
+    securityContext:
+      runAsNonRoot: false
+      runAsUser: 0
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+    volumeMounts:
+      - name: kc-quarkus
+        mountPath: /shared
 ## @param sidecars Add additional sidecar containers to the Keycloak pods
 ## Example:
 ## sidecars:
@@ -1136,8 +1186,9 @@ keycloakConfigCli:
     helm.sh/hook-delete-policy: "hook-succeeded,before-hook-creation"
     helm.sh/hook-weight: "5"
   ## @param keycloakConfigCli.command Command for running the container (set to default if not set). Use array form
-  ##
-  command: []
+  ## DHI/adorsys: the bitnami chart default is `java -jar /opt/bitnami/keycloak-config-cli/...`,
+  ## but we use the adorsys upstream image whose jar is at /app. Override so the right jar runs.
+  command: ["java", "-jar", "/app/keycloak-config-cli.jar"]
   ## @param keycloakConfigCli.args Args for running the container (set to default if not set). Use array form
   ##
   args: []
@@ -1181,8 +1232,8 @@ keycloakConfigCli:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 65532
+    runAsGroup: 65532
     runAsNonRoot: true
     privileged: false
     readOnlyRootFilesystem: true
@@ -1204,11 +1255,11 @@ keycloakConfigCli:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 65532
   ## @param keycloakConfigCli.backoffLimit Number of retries before considering a Job as failed
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
   ##
-  backoffLimit: 1
+  backoffLimit: 5
   ## @param keycloakConfigCli.podLabels Pod extra labels
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
@@ -1232,7 +1283,12 @@ keycloakConfigCli:
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   ##
   podTolerations: []
-  extraEnvVars: []
+  ## DHI: keycloak `kc.sh start` rebuilds at boot (~90s); wait long enough for it to be ready.
+  extraEnvVars:
+    - name: KEYCLOAK_AVAILABILITYCHECK_ENABLED
+      value: "true"
+    - name: KEYCLOAK_AVAILABILITYCHECK_TIMEOUT
+      value: "300s"
   ## @param keycloakConfigCli.extraEnvVarsCM ConfigMap with extra environment variables
   ##
   extraEnvVarsCM: ""
@@ -1373,7 +1429,7 @@ logging:
 
 kubectl:
   image:
-    registry: "sanketikahub"
+    registry: sanketikahub
     repository: "kubectl"
-    tag: "1.32.0-r1"
+    tag: "2.2.0"
     digest: ""
