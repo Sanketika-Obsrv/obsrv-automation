@@ -90,10 +90,6 @@ druid-raw-cluster:
   druid_s3_protocol: *s3-protocol
   druid_s3_path_style_access: *s3-path-style-access
 
-kafka:
-  persistence:
-    size: 5Gi
-
 redis_dedup_backup_sidecar: &redis_dedup_backup_sidecar
   master:
     <<: *service-account-disable
