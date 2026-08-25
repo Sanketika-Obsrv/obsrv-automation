@@ -23,8 +23,8 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # FROM dhi.io/eclipse-temurin:jre-17-alpine3.24 — needs its own credentials, separate
-      # from the Docker Hub login above.
+      # DHI (Docker Hardened Images) entitlement rides on the same Docker Hub account/token -
+      # reuse DOCKERHUB_TOKEN instead of a separate DHI_TOKEN secret.
       - name: Login to dhi.io
         uses: docker/login-action@v3
         with:
