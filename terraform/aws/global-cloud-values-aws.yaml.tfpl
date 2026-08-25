@@ -117,8 +117,16 @@ masterdata-indexer-cron:
     name: spark-sa
     annotations:
       <<: *spark_sa_annotation
-  serviceAccountRoleArn: *spark_service_account_arn  
-  dataproductsJar: "<fill-value>"
+  serviceAccountRoleArn: *spark_service_account_arn
+  dataproductsJar: "<fill-value>" # Update with the path to the data products jar e.g. s3a://<bucket>/data-products/data-products-1.0.0.jar
+  cronjob:
+    enabled: true
+    cronSchedule: "30 5 * * *" # Daily 5:30 AM
+  # 2.0.0 master data indexer
+  dataproductsJarV2: "<fill-value>" # Update with the path to the 2.0.0 data products jar e.g. s3a://<bucket>/data-products/data-products-2.0.0.jar
+  cronjobV2:
+    enabled: false
+    cronSchedule: "0 7 * * *" # daily 7 AM
 
 dataset-api-service-account: &dataset-api-service-account
   serviceAccount:
@@ -223,8 +231,6 @@ trino:
       hive.metastore.uri=thrift://hudi-hms.hms.svc.cluster.local:9083
       fs.native-s3.enabled=true
       s3.region=${cloud_storage_region}
-      s3.aws-access-key=
-      s3.aws-secret-key=
 
 hms:
   serviceAccount:
