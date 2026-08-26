@@ -174,7 +174,7 @@ base_config: |
     parallelism = 1
     consumer.parallelism = 1
     checkpointing.interval = 120000
-    checkpointing.pause.between.seconds = 120000
+    checkpointing.pause.between.seconds = 120   # SECONDS (FlinkUtil ofSeconds); 120000 = 33h, blocked all checkpoints
     restart-strategy.attempts = 3
     restart-strategy.delay = 30000 # in milli-seconds
   }
@@ -228,7 +228,7 @@ lakehouse-connector:
     task {
       checkpointing.compressed = true
       checkpointing.interval = 120000
-      checkpointing.pause.between.seconds = 120000
+      checkpointing.pause.between.seconds = 120   # SECONDS (FlinkUtil ofSeconds); 120000 = 33h, blocked all checkpoints
       restart-strategy.attempts = 3
       restart-strategy.delay = 30000 # in milli-seconds
       parallelism = 1

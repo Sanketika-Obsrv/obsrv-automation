@@ -121,6 +121,12 @@ spec:
 {{- if eq .Values.global.checkpoint_store_type "gcs" }}
           "-Dgoogle.cloud.auth.service.account.enable=true",
 {{- end }}
+{{- /* IRSA (EKS): pass the web-identity provider as a Flink dynamic property, the same way
+       services/flink does. Only set when s3_auth_type=serviceAccount (AWS values); local
+       datacenter leaves it unset and keeps using the fs.s3a.* keys from hadoop_core_site. */}}
+{{- if eq (.Values.s3_auth_type | default "credentials") "serviceAccount" }}
+          "-Dfs.s3a.aws.credentials.provider=com.amazonaws.auth.WebIdentityTokenCredentialsProvider",
+{{- end }}
 {{- $release_name := .Chart.Name }}
                "--job-classname={{ (index .Values $release_name).job_classname }}",
                "-Dweb.submit.enable=false",
@@ -240,6 +246,12 @@ spec:
           subPath: core-site.xml
         workingDir: /opt/flink
         args: ["taskmanager",
+{{- /* IRSA (EKS): pass the web-identity provider as a Flink dynamic property, the same way
+       services/flink does. Only set when s3_auth_type=serviceAccount (AWS values); local
+       datacenter leaves it unset and keeps using the fs.s3a.* keys from hadoop_core_site. */}}
+{{- if eq (.Values.s3_auth_type | default "credentials") "serviceAccount" }}
+               "-Dfs.s3a.aws.credentials.provider=com.amazonaws.auth.WebIdentityTokenCredentialsProvider",
+{{- end }}
                "-Dweb.submit.enable=false",
                "-Dmetrics.reporter.prom.factory.class=org.apache.flink.metrics.prometheus.PrometheusReporterFactory",
                "-Dmetrics.reporter.prom.port={{ .Values.taskmanager.prom_port }}",
