@@ -203,6 +203,11 @@ druid-raw-cluster:
   <<: *druid-raw-service-account
 
 lakehouse-connector:
+  # IRSA: makes the chart pass -Dfs.s3a.aws.credentials.provider=WebIdentityTokenCredentialsProvider
+  # (as services/flink already does) instead of the static -Ds3.access-key/-Ds3.secret-key pair,
+  # whose values here are the "<fill-value>" placeholders. Without this the job fell through to
+  # hadoop-aws's default chain -> IMDS -> the EKS *node* role -> s3:ListBucket AccessDenied.
+  s3_auth_type: "serviceAccount"
   hadoop_core_site:
     fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
     fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
