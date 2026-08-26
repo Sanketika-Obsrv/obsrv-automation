@@ -80,13 +80,13 @@ images: &images
     digest: ""
 
   postgresql: &postgresql
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "postgres"
     tag: "17-debian13"
     digest: ""
 
   postgresql-exporter: &postgresql-exporter
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "postgres-exporter"
     tag: "0-debian13"
     digest: ""
@@ -107,14 +107,14 @@ images: &images
   # bitnami charts use an "os-shell" image only for volumePermissions init chown — DHI busybox
   # (has sh + chown) is a drop-in. Centralizes all the os-shell/volume-permissions sidecars.
   os-shell: &os-shell
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "busybox"
     tag: "1.37.0"
     digest: ""
 
   # helm-test images (only run on `helm test`); DHI curl exists, httpbin has no DHI equivalent
   curl: &curl
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "curl"
     tag: "8-debian13"
     digest: ""
@@ -127,27 +127,27 @@ images: &images
 
   # thanos sidecar/ruler (kube-prometheus-stack, disabled by default)
   thanos: &thanos
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "thanos"
     tag: "0-debian13"
     digest: ""
 
   # kube-rbac-proxy sidecar (kube-state-metrics + node-exporter, when kubeRBACProxy.enabled)
   kube-rbac-proxy: &kube-rbac-proxy
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "kube-rbac-proxy"
     tag: "0-debian13"
     digest: ""
 
   # memcached (loki chunks/results cache). loki chart uses repository as a FULL path (no registry).
   memcached: &memcached
-    repository: "dhi.io/memcached"
+    repository: "sanketikahub/memcached"
     tag: "1-debian13"
     digest: ""
 
   # loki k8s-sidecar (loki chart uses repository as a FULL path, no registry field)
   loki-sidecar: &loki-sidecar
-    repository: "dhi.io/k8s-sidecar"
+    repository: "sanketikahub/k8s-sidecar"
     tag: "2.5.0"
     digest: ""
 
@@ -160,20 +160,20 @@ images: &images
 
   # redis-exporter sidecar (valkey metrics)
   redis-exporter: &redis-exporter
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "redis-exporter"
     tag: "1-debian13"
     digest: ""
 
   # zookeeper (druid-raw + kafka coordination). DHI upstream apache zookeeper.
   zookeeper: &zookeeper
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "zookeeper"
     tag: "3.9-jre23-debian13"
     digest: ""
 
   # velero-plugin-for-aws — velero initContainers[].image is a plain string, so this anchor is a string
-  velero-plugin-for-aws-image: &velero-plugin-for-aws-image "dhi.io/velero-plugin-for-aws:1-debian13"
+  velero-plugin-for-aws-image: &velero-plugin-for-aws-image "sanketikahub/velero-plugin-for-aws:1-debian13"
 
   # memcached-exporter (loki cache metrics) — NO DHI; upstream prom/ (loki uses repository as full path)
   memcached-exporter: &memcached-exporter
@@ -197,7 +197,7 @@ images: &images
 
   # alpine base (secor setPvOwnership chown init) — DHI alpine-base has shell + chown
   alpine: &alpine
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "alpine-base"
     tag: "3.24-alpine3.24"
     digest: ""
@@ -209,19 +209,19 @@ images: &images
     digest: ""
 
   alloy: &alloy
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "alloy"
     tag: "1.18.1-debian13"
     digest: ""
 
   alloy-config-reloader: &alloy-config-reloader
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "prometheus-config-reloader"
     tag: "0.93.1-debian13"
     digest: ""
 
   valkey: &valkey
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "valkey"
     tag: "8.1-debian13"
     digest: ""
@@ -242,13 +242,13 @@ images: &images
     digest: ""
 
   loki: &loki
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "loki"
     tag: "3.4-debian13"
     digest: ""
 
   loki-gateway: &loki-gateway
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: "nginx"
     tag: "1-alpine3.24"
     digest: ""
@@ -260,88 +260,88 @@ images: &images
     digest: ""
 
   alertmanager: &alertmanager
-    registry: dhi.io
+    registry: sanketikahub
     repository: alertmanager
     tag: 0-debian13
     digest: ""
 
   prometheus-operator-webhook: &prometheus-operator-webhook
-    registry: dhi.io
+    registry: sanketikahub
     repository: kube-webhook-certgen
     tag: 1-debian13
     digest: ""
 
   prometheus-operator: &prometheus-operator
-    registry: dhi.io
+    registry: sanketikahub
     repository: prometheus-operator
     tag: "0-debian13"
     digest: ""
 
   prometheus-config-reloader: &prometheus-config-reloader
-    registry: dhi.io
+    registry: sanketikahub
     repository: prometheus-config-reloader
     # if not set appVersion field from Chart.yaml is used
     tag: "0-debian13"
     digest: ""
 
   prometheus: &prometheus
-    registry: dhi.io
+    registry: sanketikahub
     repository: prometheus
     tag: 3.5-debian13
     digest: ""
 
   prometheus-pushgateway: &prometheus-pushgateway
     # prometheus-community pushgateway chart uses image.repository as the FULL path (ignores registry)
-    registry: dhi.io
-    repository: dhi.io/pushgateway
+    registry: sanketikahub
+    repository: sanketikahub/pushgateway
     tag: 1-debian13
     digest: ""
 
   grafana: &grafana
-    registry: dhi.io
+    registry: sanketikahub
     repository: grafana
     tag: "12.3-debian13"
     digest: ""
 
   grafana-test-framework: &grafana-test-framework
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: bats
     tag: "1-alpine3.24"
     digest: ""
 
   grafana-download-dashboards: &grafana-download-dashboards
-    registry: dhi.io
+    registry: sanketikahub
     repository: bats
     tag: "1-alpine3.24"
     digest: ""
 
   grafana-init-chown-data: &grafana-init-chown-data
-    registry: dhi.io
+    registry: sanketikahub
     repository: busybox
     tag: "1.37.0"
     digest: ""
 
   grafana-side-car: &grafana-side-car
-    registry: dhi.io
+    registry: sanketikahub
     repository: k8s-sidecar
     tag: 2-debian13
     digest: ""
 
   kube-state-metrics: &kube-state-metrics
-    registry: dhi.io
+    registry: sanketikahub
     repository: "kube-state-metrics"
     tag: "2-debian13"
     digest: ""
 
   prometheus-node-exporter: &prometheus-node-exporter
-    registry: dhi.io
+    registry: sanketikahub
     repository: "node-exporter"
     tag: "1-debian13"
     digest: ""
 
   velero: &velero
-    registry: "dhi.io"
-    repository: "dhi.io/velero"
+    registry: "sanketikahub"
+    repository: "sanketikahub/velero"
     tag: "1.16-debian13"
   #  digest: "" If uncommented, this will take precendence as per velero chart design
 
@@ -365,34 +365,34 @@ images: &images
     digest: ""
 
   cert_manager_cainjector: &cert_manager_cainjector
-    repository: dhi.io/cert-manager-cainjector
+    repository: sanketikahub/cert-manager-cainjector
     tag: 1.20.3-debian13
     digest: ""
 
   cert_manager_webhook: &cert_manager_webhook
-    repository: dhi.io/cert-manager-webhook
+    repository: sanketikahub/cert-manager-webhook
     tag: 1.20.3-debian13
     digest: ""
 
   cert_manager_controller: &cert_manager_controller
-    repository: dhi.io/cert-manager-controller
+    repository: sanketikahub/cert-manager-controller
     tag: 1.20.3-debian13
     digest: ""
 
   cert_manager_ctl: &cert_manager_ctl
-    repository: dhi.io/cert-manager-startupapicheck
+    repository: sanketikahub/cert-manager-startupapicheck
     tag: 1.20.3-debian13
     digest: ""
 
   cert_manager_acmesolver: &cert_manager_acmesolver
-    repository: dhi.io/cert-manager-acmesolver
+    repository: sanketikahub/cert-manager-acmesolver
     tag: 1.20.3-debian13
     digest: ""
 
   kong: &kong
     # kong chart uses image.repository as FULL path (ignores registry) — like velero/pushgateway
-    registry: dhi.io
-    repository: dhi.io/kong
+    registry: sanketikahub
+    repository: sanketikahub/kong
     tag: 3-debian13
     digest: ""
 
@@ -403,7 +403,7 @@ images: &images
     digest: ""
 
   jmx: &jmx
-    registry: dhi.io
+    registry: sanketikahub
     repository: jmx-exporter
     tag: 1.3-debian13
     digest: ""
@@ -421,7 +421,7 @@ images: &images
   #   digest: ""
 
   kafka-exporter: &kafka-exporter
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: kafka-exporter
     tag: "1-debian13"
     digest: ""
@@ -451,7 +451,7 @@ images: &images
     digest: ""
 
   keycloak: &keycloak
-    registry: dhi.io
+    registry: sanketikahub
     repository: keycloak
     tag: "26.3-debian13"
     digest: ""
@@ -469,7 +469,7 @@ images: &images
   trino: &trino
     # DHI: -compat variant REQUIRED (minimal 483-debian13 lacks the hudi connector; compat bundles
     # hudi/hive/iceberg/delta-lake). Version bumped 476 -> 483 (DHI's available trino line).
-    registry: "dhi.io"
+    registry: "sanketikahub"
     repository: trino
     tag: "483-debian13-compat"
     digest: ""
@@ -686,10 +686,10 @@ internal: &internal
         image:
           <<: *prometheus
         thanos:
-          image: "dhi.io/thanos:0-debian13"
+          image: "sanketikahub/thanos:0-debian13"
     thanosRuler:
       thanosRulerSpec:
-        image: "dhi.io/thanos:0-debian13"
+        image: "sanketikahub/thanos:0-debian13"
     kube-state-metrics:
       kubeRBACProxy:
         image:
