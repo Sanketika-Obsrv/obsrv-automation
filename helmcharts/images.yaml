@@ -476,7 +476,10 @@ images: &images
   lakehouse-connector: &lakehouse-connector
     registry: sanketikahub
     repository: lakehouse-connector
-    tag: "2.2.0"
+    # 2.2.1 adds aws-java-sdk-sts, which WebIdentityTokenCredentialsProvider needs at runtime to
+    # call AssumeRoleWithWebIdentity. On 2.2.0 the IRSA path dies with
+    # ClassNotFoundException: com.amazonaws.services.securitytoken.internal.STSProfileCredentialsService
+    tag: "2.2.1"
 
 
   opentelemetry-collector: &opentelemetry-collector
