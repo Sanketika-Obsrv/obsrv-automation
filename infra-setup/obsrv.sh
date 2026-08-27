@@ -23,11 +23,101 @@ install_obsrv() {
     echo "Installation completed successfully!"
 }
 
+# Ask a yes/no question. Returns 0 for yes, 1 for no.
+confirm() {
+    local prompt="$1"
+    local response
+    read -r -p "$prompt (yes/no): " response
+    [[ "$response" == "yes" ]]
+}
+
+# Post-destroy cleanup for AWS-side resources terraform doesn't fully own
+# (S3 bucket contents, k8s-provisioned LoadBalancer/EIP, k8s-provisioned EBS volumes).
+# Runs AFTER terragrunt destroy, since by then the EKS cluster/API server is
+# already gone — cleanup here is by AWS resource tag, not kubectl.
+# Each step is opt-in — press "no" to leave that resource alone.
+cleanup_leftover_aws_resources() {
+    local building_block env cluster_name account_id
+    building_block=$(grep -E '^building_block' vars/cluster_overrides.tfvars | cut -d'"' -f2)
+    env=$(grep -E '^env ' vars/cluster_overrides.tfvars | cut -d'"' -f2)
+    cluster_name="${building_block}-${env}-eks"
+    account_id=$(aws sts get-caller-identity --query Account --output text)
+
+    # --- 1. S3 bucket data ---
+    if confirm "Some S3 buckets may still have data (non-empty buckets don't get deleted by terragrunt) — empty and delete them now?"; then
+        for bucket in "${building_block}-${env}-${account_id}" \
+                      "checkpoint-${building_block}-${env}-${account_id}" \
+                      "velero-${building_block}-${env}-${account_id}" \
+                      "backups-${building_block}-${env}-${account_id}"; do
+            if aws s3api head-bucket --bucket "$bucket" 2>/dev/null; then
+                echo "Emptying s3://$bucket ..."
+                aws s3 rm "s3://$bucket" --recursive || true
+                # clear versioned objects/delete-markers too, if versioning is on
+                aws s3api list-object-versions --bucket "$bucket" --output json \
+                  --query '{Objects: Versions[].{Key:Key,VersionId:VersionId}}' 2>/dev/null \
+                  | jq -c 'select(.Objects != null)' \
+                  | xargs -I{} aws s3api delete-objects --bucket "$bucket" --delete '{}' 2>/dev/null || true
+                echo "Deleting bucket $bucket ..."
+                aws s3api delete-bucket --bucket "$bucket" || true
+            fi
+        done
+    else
+        echo "Skipping S3 bucket cleanup — leftover buckets/data preserved."
+    fi
+
+    # --- 2. LoadBalancer + EIP ---
+    if confirm "Delete leftover LoadBalancer(s) and release EIP(s) for this cluster?"; then
+        lb_arns=$(aws resourcegroupstaggingapi get-resources \
+            --tag-filters "Key=kubernetes.io/cluster/${cluster_name},Values=owned" \
+            --resource-type-filters "elasticloadbalancing:loadbalancer" \
+            --query 'ResourceTagMappingList[].ResourceARN' --output text 2>/dev/null)
+        if [[ -n "$lb_arns" ]]; then
+            for arn in $lb_arns; do
+                echo "Deleting load balancer $arn ..."
+                aws elbv2 delete-load-balancer --load-balancer-arn "$arn" || true
+            done
+            echo "Waiting for AWS to finish deleting the NLB(s)..."
+            sleep 60
+        else
+            echo "No tagged load balancer found."
+        fi
+        eip_alloc_id=$(aws ec2 describe-addresses \
+            --filters "Name=tag:Name,Values=${building_block}-${env}-kong-ingress-ip" \
+            --query 'Addresses[0].AllocationId' --output text 2>/dev/null)
+        if [[ -n "$eip_alloc_id" && "$eip_alloc_id" != "None" ]]; then
+            echo "Releasing EIP $eip_alloc_id ..."
+            aws ec2 release-address --allocation-id "$eip_alloc_id" || echo "Warning: EIP release failed — LB may still be deleting. Retry in a bit."
+        fi
+    else
+        echo "Skipping LoadBalancer/EIP cleanup — left running."
+    fi
+
+    # --- 3. Volumes ---
+    if confirm "Delete leftover EBS volumes for this cluster (detached, no longer attached to any node)?"; then
+        vol_ids=$(aws ec2 describe-volumes \
+            --filters "Name=tag:kubernetes.io/cluster/${cluster_name},Values=owned" "Name=status,Values=available" \
+            --query 'Volumes[].VolumeId' --output text 2>/dev/null)
+        if [[ -n "$vol_ids" ]]; then
+            for vol in $vol_ids; do
+                echo "Deleting volume $vol ..."
+                aws ec2 delete-volume --volume-id "$vol" || true
+            done
+        else
+            echo "No tagged leftover volumes found."
+        fi
+    else
+        echo "Skipping volume cleanup — leftover EBS volumes preserved."
+    fi
+}
+
 # WARNING: This will destroy all resources created by Obsrv
 # Execute this only if you want to decommission Obsrv completely
 destroy_obsrv() {
     echo "Destroying Obsrv for $provider..."
     terragrunt destroy -var-file=vars/cluster_overrides.tfvars
+    if [ "$provider" == "aws" ]; then
+        cleanup_leftover_aws_resources
+    fi
     echo "Obsrv has been successfully destroyed."
 }
 
