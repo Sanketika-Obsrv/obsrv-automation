@@ -262,6 +262,17 @@ kong:
   livenessProbe: ### For Dev Only
   readinessProbe: ### For Dev Only
 
+# web-console's server sends HSTS + a CSP with upgrade-insecure-requests unconditionally, which
+# breaks it on any ssl_enabled: false deployment (browser silently upgrades the page's own asset
+# requests to https, which then fail - blank screen after login). Strip those two headers via
+# Kong here, local-only - see the KongPlugin's own comment in kong-ingress-routes for the full
+# story. Doesn't apply to ssl_enabled: true deployments, where these headers are correct.
+kong-ingress-routes:
+  ingress:
+    webconsole:
+      annotations:
+        konghq.com/plugins: webconsole-strip-https-headers
+
 lakehouse-connector:
   enable_lakehouse: *enable_lakehouse
   s3_access_key: *s3-access-key

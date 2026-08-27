@@ -1,0 +1,21 @@
+# web-console's own server sends Strict-Transport-Security and a CSP with
+# upgrade-insecure-requests unconditionally, even on deployments with ssl_enabled: false. That
+# CSP directive tells the browser to silently rewrite the page's own http:// asset requests
+# (JS/CSS/images) to https:// - which then fail outright on a plain-HTTP deployment (nothing
+# listens on 443), leaving the console blank after a successful login.
+#
+# This plugin strips those two headers at the ingress. It's only actually attached to a route
+# (via the konghq.com/plugins annotation) on ssl_enabled: false deployments - see
+# local-datacenter.yaml. On a real ssl_enabled: true deployment these headers are correct and
+# wanted, so nothing here should touch them.
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: webconsole-strip-https-headers
+  namespace: web-console
+plugin: response-transformer
+config:
+  remove:
+    headers:
+      - "Strict-Transport-Security"
+      - "Content-Security-Policy"
