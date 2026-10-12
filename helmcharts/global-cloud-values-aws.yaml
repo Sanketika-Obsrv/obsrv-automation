@@ -7,6 +7,7 @@ global:
   dataset_api_container: "<fill-value>"  # Update the dataset APIs bucket name
   config_api_container: "<fill-value>"   # Update the config API's bucket name only when deploying the config-api
   postgresql_backup_cloud_bucket: &backups_bucket "<fill-value>" # Update with the backup bucket name
+  redis_backup_cloud_bucket: &redis_backup_cloud_bucket "<fill-value>" # Update with the redis backup bucket name
   velero_backup_cloud_bucket: &velero_backup_cloud_bucket "<fill-value>" # Update with velero backup  bucket name
   cloud_storage_bucket: &cloud_storage_bucket "<fill-value>" # Update with the name of cloud storage bucket
   hudi_metadata_bucket: &hudi_metadata_bucket "s3a://<fill-value>/hudi" # Update with hudi bucket name
@@ -42,6 +43,8 @@ service_accounts:
   flink: &flink_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   postgresql_backup: &postgresql_backup_sa_annotation
+    eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
+  redis_backup: &redis_backup_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
   s3_exporter: &s3_exporter_sa_annotation
     eks.amazonaws.com/role-arn: "<fill-value>" # Update with the ARN of the IAM role for this service account
@@ -180,6 +183,65 @@ postgres-backup-service-account: &postgres-backup-service-account
 
 postgresql-backup:
   <<: *postgres-backup-service-account
+
+# Redis backup was previously configured under a `redis_denorm_backup_sidecar` /
+# `redis_denorm_backup_sidecar` key with `master.sidecars`, left over from before the
+# chart was renamed redis -> valkey and master -> primary. Helm scopes subchart
+# overrides by the subchart's own Chart.yaml `name` (valkey-denorm / valkey-dedup), so
+# that old block was never actually applied - this is the key path to the real chart.
+valkey-denorm:
+  serviceAccount:
+    create: *create_sa
+    annotations:
+      <<: *redis_backup_sa_annotation
+  primary:
+    sidecars:
+      - name: redis-backup
+        image: sanketikahub/redis-backup:1.0.6-GA
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /data
+            name: redis-data
+        env:
+          - name: REDIS_BACKUP_CRON_SCHEDULE
+            value: "00 00 * * *"
+          - name: CLOUD_SERVICE
+            value: *cloud_store_provider
+          - name: S3_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
+          - name: REDIS_RDB_FILE_PATH
+            value: /data
+          - name: REDIS_REPLICATION_MODE
+            value: master
+          - name: BACKUP_PREFIX
+            value: denorm-redis
+
+valkey-dedup:
+  serviceAccount:
+    create: *create_sa
+    annotations:
+      <<: *redis_backup_sa_annotation
+  primary:
+    sidecars:
+      - name: redis-backup
+        image: sanketikahub/redis-backup:1.0.6-GA
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /data
+            name: redis-data
+        env:
+          - name: REDIS_BACKUP_CRON_SCHEDULE
+            value: "00 * * * *"
+          - name: CLOUD_SERVICE
+            value: *cloud_store_provider
+          - name: S3_BACKUP_BUCKET
+            value: *redis_backup_cloud_bucket
+          - name: REDIS_RDB_FILE_PATH
+            value: /data
+          - name: REDIS_REPLICATION_MODE
+            value: master
+          - name: BACKUP_PREFIX
+            value: dedup-redis
 
 druid-raw-service-account: &druid-raw-service-account
   serviceAccount:
