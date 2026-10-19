@@ -8,9 +8,11 @@ global:
   image:
     registry: "sanketikahub"
 
-registry: "bitnami"
+# Hardened kubectl+curl+jq image (see obsrv-automation/Dockerfiles/kubectl/Dockerfile) --
+# curl is required to submit to Livy's /batches API below; stock bitnami/kubectl has no curl.
+registry: "sanketikahub"
 repository: "kubectl"
-tag: "latest"
+tag: "2.2.0"
 digest: ""
 
 imagePullPolicy: IfNotPresent
