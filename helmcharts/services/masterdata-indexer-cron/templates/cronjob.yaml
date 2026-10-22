@@ -66,29 +66,15 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  set -e
-                  # Submit through Livy's /batches API (like the WFS cron) instead of kubectl exec +
-                  # spark-submit, so the job is tracked and visible in the Spark/Livy dashboard.
-                  kubectl wait --for=condition=Ready pod -n spark -l app.kubernetes.io/name=spark,app.kubernetes.io/component=master --timeout=300s
-                  CURRENT_TIME=$(date +%Y-%m-%dT%H:%M)
-                  curl -sf --location "{{ .Values.spark.host }}" \
-                    --header "Content-Type: application/json" \
-                    --data '{
-                        "file": "{{ .Values.dataproductsJar }}",
-                        "className": "org.sunbird.obsrv.dataproducts.MasterDataProcessorIndexer",
-                        "name": "masterdata-indexer-'"$CURRENT_TIME"'",
-                        "conf": {
-                            "spark.master": "{{ .Values.spark.master.host }}",
-                            "spark.driver.extraJavaOptions": "{{ .Values.spark.driver.extraJavaOptions }}",
-                            "spark.executor.extraJavaOptions": "{{ .Values.spark.executor.extraJavaOptions }}",
-                            "spark.driver.extraClassPath": "/data/conf",
-                            "spark.executor.extraClassPath": "/data/conf",
-                            "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
-                            "spark.hadoop.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.auth.AssumedRoleCredentialProvider",
-                            "spark.hadoop.fs.s3a.assumed.role.credentials.provider": "com.amazonaws.auth.InstanceProfileCredentialsProvider",
-                            "spark.hadoop.fs.s3a.assumed.role.arn": "{{ .Values.serviceAccountRoleArn }}"
-                        }
-                    }'
+                  {{- include "masterdata-indexer-cron.livySubmitCommand" (dict
+                      "jarPath" .Values.dataproductsJar
+                      "namePrefix" "masterdata-indexer"
+                      "sparkHost" .Values.spark.host
+                      "sparkMaster" .Values.spark.master.host
+                      "driverJavaOpts" .Values.spark.driver.extraJavaOptions
+                      "executorJavaOpts" .Values.spark.executor.extraJavaOptions
+                      "roleArn" .Values.serviceAccountRoleArn
+                    ) | nindent 18 }}
               {{- with .Values.sidecars }}
               {{- toYaml . | nindent 12 }}
               {{- end }}
