@@ -8,9 +8,10 @@ global:
   image:
     registry: "sanketikahub"
 
-registry: "bitnami"
+# Hardened kubectl+curl+jq image -- curl is needed to submit to Livy below.
+registry: "sanketikahub"
 repository: "kubectl"
-tag: "latest"
+tag: "2.2.0"
 digest: ""
 
 imagePullPolicy: IfNotPresent

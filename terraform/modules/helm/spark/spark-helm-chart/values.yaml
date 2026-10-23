@@ -1122,7 +1122,7 @@ appdata:
         topicName = ${env}".spark.stats"
       }
       #inputSourceSpec
-      source.spec="{\"spec\":{\"ioConfig\":{\"type\":\"index_parallel\",\"inputSource\":{\"type\":\"${cloud.storage.provider}\",\"objectGlob\":\"**.json.gz\",\"prefixes\":[\"FILE_PATH\"]}}}}"
+      source.spec="{\"spec\":{\"ioConfig\":{\"type\":\"index_parallel\",\"inputSource\":{\"type\":\"${cloud.storage.provider}\",\"objectGlob\":\"**.gz\",\"prefixes\":[\"FILE_PATH\"]}}}}"
       #deltaIngestionSpec
       delta.ingestion.spec= "{\"type\":\"index_parallel\",\"spec\":{\"dataSchema\":{\"dataSource\":\"DATASOURCE_REF\"},\"ioConfig\":{\"type\":\"index_parallel\"},\"tuningConfig\":{\"type\":\"index_parallel\",\"maxRowsInMemory\":500000,\"forceExtendableShardSpecs\":false,\"logParseExceptions\":true}}}"
   jdbc-connector:
