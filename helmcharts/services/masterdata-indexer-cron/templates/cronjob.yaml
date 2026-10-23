@@ -54,6 +54,11 @@ spec:
                 {{- toYaml .Values.resources | nindent 16 }}
               securityContext:
                 {{- toYaml .Values.securityContext | nindent 16 }}
+              # uid 1001 (podSecurityContext) has no writable $HOME on this image, which breaks
+              # kubectl's discovery cache for any subcommand beyond the `wait` used today.
+              env:
+                - name: HOME
+                  value: /tmp
               {{- if .Values.configmap.enabled }}
               envFrom:
                 - configMapRef:

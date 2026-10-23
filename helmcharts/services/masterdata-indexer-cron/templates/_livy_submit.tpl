@@ -19,6 +19,8 @@ set -e
 # real result instead of exiting as soon as Livy accepts the job.
 kubectl wait --for=condition=Ready pod -n spark -l app.kubernetes.io/name=spark,app.kubernetes.io/component=master --timeout=300s
 CURRENT_TIME=$(date +%Y-%m-%dT%H:%M)
+# Unquoted delimiter is deliberate (needed for $CURRENT_TIME below) -- keep jarPath/javaOpts/roleArn
+# free of $ and backticks, since they'd get shell-expanded into the JSON body instead of passed through.
 JSON_BODY=$(cat <<JSON
 {
     "file": {{ .jarPath | toJson }},
@@ -39,10 +41,15 @@ JSON_BODY=$(cat <<JSON
 JSON
 )
 
-# --fail-with-body prints Livy's error on failure instead of a bare non-zero exit.
-RESPONSE=$(curl -sS --fail-with-body --max-time 30 --location "{{ .sparkHost }}" \
+# --fail-with-body prints Livy's error on failure instead of a bare non-zero exit. The explicit
+# if/exit (rather than letting `set -e` kill the script here) is required so this line's own
+# non-zero exit doesn't skip straight past printing $RESPONSE.
+if ! RESPONSE=$(curl -sS --fail-with-body --max-time 30 --location "{{ .sparkHost }}" \
   --header "Content-Type: application/json" \
-  --data "$JSON_BODY")
+  --data "$JSON_BODY"); then
+  echo "ERROR: Livy rejected the submission: $RESPONSE" >&2
+  exit 1
+fi
 echo "$RESPONSE"
 BATCH_ID=$(echo "$RESPONSE" | jq -r '.id')
 if [ -z "$BATCH_ID" ] || [ "$BATCH_ID" = "null" ]; then
