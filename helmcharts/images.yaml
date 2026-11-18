@@ -44,8 +44,8 @@ images: &images
 
   web-console: &web-console
     registry: sanketikahub
-    repository: "obsrv-web-console"
-    tag: "2.2.0"
+    repository: "obsrv-management-console-ext"
+    tag: "2.3.0-rc1"
     digest: ""
 
   ## PIPELINE ENTERPRISE
