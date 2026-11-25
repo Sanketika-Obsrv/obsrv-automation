@@ -31,6 +31,9 @@ RUN cd /opt/livy/jars && rm -f \
       gson-*.jar xercesImpl-*.jar avro-*.jar jline-0.9.94.jar guava-16.0.1.jar \
       jetty-util-6.1.26.jar
 
+# ---------- patched JRE (CVE-2026-114938) ----------
+FROM public.ecr.aws/docker/library/eclipse-temurin:17-jre AS jre
+
 # ---------- python deps (obsrv batch connectors) ----------
 FROM dhi.io/python:3.12-debian13-dev AS pybuild
 USER 0
@@ -52,7 +55,11 @@ RUN rm -rf /pydeps/pyspark /pydeps/pyspark-*.dist-info /pydeps/bin/pyspark* /pyd
 # ---------- runtime ----------
 FROM dhi.io/spark:3.5
 USER 0
-ENV LIVY_HOME=/opt/livy \
+# Replace the base's JRE in place; JAVA_HOME already points here.
+RUN rm -rf /opt/java/openjdk/17-jre
+COPY --from=jre /opt/java/openjdk /opt/java/openjdk/17-jre
+ENV JAVA_VERSION=jre-17.0.21.1+2 \
+    LIVY_HOME=/opt/livy \
     SPARK_HOME=/opt/spark \
     PYTHONPATH=/opt/spark/python:/opt/spark/python/lib/py4j-0.10.9.7-src.zip:/opt/python-deps \
     PYSPARK_PYTHON=/usr/bin/python3.12 \

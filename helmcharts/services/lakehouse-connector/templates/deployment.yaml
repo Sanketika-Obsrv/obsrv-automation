@@ -113,10 +113,11 @@ spec:
 {{- if eq .Values.global.checkpoint_store_type "azure" }}
 - -Dfs.azure.account.key.{{ .Values.global.azure_storage_account_name }}.blob.core.windows.net={{ .Values.global.azure_storage_account_key }}
 {{- end }}
-{{- if eq .Values.global.checkpoint_store_type "s3" }}
-          "-Ds3.access.key={{ .Values.global.s3_access_key }}",
-          "-Ds3.secret.key={{ .Values.global.s3_secret_key }}",
-          "-Ds3.endpoint={{ .Values.global.s3_endpoint_url }}",
+{{- if and (eq .Values.checkpoint_store_type "s3") (ne (.Values.s3_auth_type | default "credentials") "serviceAccount") }}
+          "-Ds3.access-key={{ .Values.s3_access_key }}",
+          "-Ds3.secret-key={{ .Values.s3_secret_key }}",
+          "-Ds3.endpoint={{ .Values.s3_endpoint }}",
+          "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
 {{- end }}
 {{- if eq .Values.global.checkpoint_store_type "gcs" }}
           "-Dgoogle.cloud.auth.service.account.enable=true",
@@ -251,6 +252,12 @@ spec:
        datacenter leaves it unset and keeps using the fs.s3a.* keys from hadoop_core_site. */}}
 {{- if eq (.Values.s3_auth_type | default "credentials") "serviceAccount" }}
                "-Dfs.s3a.aws.credentials.provider=com.amazonaws.auth.WebIdentityTokenCredentialsProvider",
+{{- end }}
+{{- if and (eq .Values.checkpoint_store_type "s3") (ne (.Values.s3_auth_type | default "credentials") "serviceAccount") }}
+               "-Ds3.access-key={{ .Values.s3_access_key }}",
+               "-Ds3.secret-key={{ .Values.s3_secret_key }}",
+               "-Ds3.endpoint={{ .Values.s3_endpoint }}",
+               "-Ds3.path.style.access={{ .Values.s3_path_style_access }}",
 {{- end }}
                "-Dweb.submit.enable=false",
                "-Dmetrics.reporter.prom.factory.class=org.apache.flink.metrics.prometheus.PrometheusReporterFactory",
